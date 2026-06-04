@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>洗碗机制造费差异模型</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script type="module" src="./src/app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>洗碗机制造费差异模型</h1>
+        <p>26实际 - 25同期</p>
+      </div>
+      <div class="header-actions">
+        <label class="file-button">
+          <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
+          导入SAP报表
+        </label>
+        <button id="exportBtn" type="button" disabled>导出分析表</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="toolbar" aria-label="筛选">
+        <div class="field">
+          <label for="monthSelect">月份</label>
+          <select id="monthSelect">
+            <option value="1">1月</option>
+            <option value="2">2月</option>
+            <option value="3">3月</option>
+            <option value="4">4月</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label for="searchInput">科目搜索</label>
+          <input id="searchInput" type="search" placeholder="账户编码 / 英文描述" />
+        </div>
+        <div class="field">
+          <label for="statusFilter">状态</label>
+          <select id="statusFilter">
+            <option value="all">全部</option>
+            <option value="high">重点差异</option>
+            <option value="both">两边都有</option>
+            <option value="only_25">25有26无</option>
+            <option value="only_26">26有25无</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="categoryFilter">大科目</label>
+          <select id="categoryFilter">
+            <option value="all">全部</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sortBy">排序</label>
+          <select id="sortBy">
+            <option value="amount">按额差异</option>
+            <option value="unit">按单台差异</option>
+            <option value="code">按账户编码</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="总览">
+        <article class="metric">
+          <span>26实际</span>
+          <strong id="total26">--</strong>
+          <small>K€</small>
+        </article>
+        <article class="metric">
+          <span>25同期</span>
+          <strong id="total25">--</strong>
+          <small>K€</small>
+        </article>
+        <article class="metric">
+          <span>额差异</span>
+          <strong id="diffAmount">--</strong>
+          <small>K€</small>
+        </article>
+        <article class="metric">
+          <span>单台差异</span>
+          <strong id="diffUnit">--</strong>
+          <small>€/台</small>
+        </article>
+        <article class="metric">
+          <span>科目状态</span>
+          <strong id="statusCount">--</strong>
+          <small>有差异 / 25有26无 / 26有25无</small>
+        </article>
+        <article class="metric">
+          <span>4+8校验</span>
+          <strong id="referenceStatus">--</strong>
+          <small id="referenceNote">待导入</small>
+        </article>
+      </section>
+
+      <section class="split-view">
+        <section class="panel chart-panel" aria-label="大科目对比">
+          <div class="panel-title">
+            <h2>大科目对比</h2>
+            <div id="validationChips" class="chips"></div>
+          </div>
+          <canvas id="categoryChart" width="900" height="320"></canvas>
+          <div id="emptyChart" class="empty-state">导入SAP报表后显示大科目对比</div>
+        </section>
+      </section>
+
+      <section class="panel table-panel" aria-label="科目明细">
+        <div class="panel-title">
+          <h2>科目明细</h2>
+          <span id="rowCount">0 项</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>账户</th>
+                <th>大科目</th>
+                <th>25同期</th>
+                <th>26实际</th>
+                <th>额差异</th>
+                <th>25单台</th>
+                <th>26单台</th>
+                <th>单台差异</th>
+                <th>状态</th>
+                <th>差异分析</th>
+              </tr>
+            </thead>
+            <tbody id="detailBody">
+              <tr>
+                <td colspan="10" class="empty-cell">导入SAP报表后显示科目明细</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
