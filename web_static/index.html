@@ -3,61 +3,83 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>洗碗机制造费差异模型</title>
+    <title>洗碗机制造费三表工作台</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js?v=20260604-budget-v2"></script>
+    <script type="module" src="./src/app.js?v=20260604-three-table-v1"></script>
   </head>
   <body>
     <header class="app-header">
       <div>
-        <h1>洗碗机制造费差异模型</h1>
-        <p>26实际 - 25同期</p>
+        <h1 data-i18n="appTitle">洗碗机制造费三表工作台</h1>
+        <p data-i18n="appSubtitle">全年驾驶舱 · 月度差异 · 项目因素</p>
       </div>
       <div class="header-actions">
+        <label class="field compact">
+          <span data-i18n="language">语言</span>
+          <select id="languageSelect">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+            <option value="tr">Türkçe</option>
+          </select>
+        </label>
+        <label class="field compact">
+          <span data-i18n="author">填写人</span>
+          <input id="userName" placeholder="姓名" />
+        </label>
         <label class="file-button">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          导入SAP报表
+          <span data-i18n="importSap">导入SAP报表</span>
         </label>
-        <button id="exportBtn" type="button" disabled>导出分析表</button>
+        <button id="exportBtn" type="button" disabled data-i18n="exportAnalysis">导出分析表</button>
       </div>
     </header>
 
     <main class="workspace">
+      <section class="top-strip" aria-label="当前状态">
+        <div class="status-pill" id="saveMode">本机保存</div>
+        <div class="status-pill muted" id="fileStatus">待导入SAP</div>
+        <div class="status-pill muted">4+8预测总数已隐藏</div>
+      </section>
+
+      <nav class="tabbar" aria-label="页面">
+        <button class="tab active" data-tab="dashboard" type="button" data-i18n="tabDashboard">全年驾驶舱</button>
+        <button class="tab" data-tab="variance" type="button" data-i18n="tabVariance">月度差异</button>
+        <button class="tab" data-tab="projects" type="button" data-i18n="tabProjects">项目因素</button>
+      </nav>
+
       <section class="toolbar" aria-label="筛选">
         <div class="field">
-          <label for="monthSelect">月份</label>
+          <label for="monthSelect" data-i18n="month">月份</label>
           <select id="monthSelect">
             <option value="1">1月</option>
             <option value="2">2月</option>
             <option value="3">3月</option>
-            <option value="4">4月</option>
+            <option value="4" selected>4月</option>
           </select>
         </div>
         <div class="field grow">
-          <label for="searchInput">科目搜索</label>
-          <input id="searchInput" type="search" placeholder="账户编码 / 英文描述" />
+          <label for="searchInput" data-i18n="accountSearch">科目搜索</label>
+          <input id="searchInput" type="search" placeholder="账户编码 / 英文描述 / 原因" />
         </div>
         <div class="field">
-          <label for="statusFilter">状态</label>
-          <select id="statusFilter">
+          <label for="analysisFilter" data-i18n="analysisFilter">差异筛选</label>
+          <select id="analysisFilter">
             <option value="all">全部</option>
-            <option value="high">重点差异</option>
-            <option value="both">两边都有</option>
-            <option value="only_25">25有26无</option>
-            <option value="only_26">26有25无</option>
+            <option value="high">单台差≥0.5</option>
+            <option value="blank">待填写原因</option>
           </select>
         </div>
         <div class="field">
-          <label for="categoryFilter">大科目</label>
+          <label for="categoryFilter" data-i18n="category">大科目</label>
           <select id="categoryFilter">
             <option value="all">全部</option>
           </select>
         </div>
         <div class="field">
-          <label for="sortBy">排序</label>
+          <label for="sortBy" data-i18n="sort">排序</label>
           <select id="sortBy">
-            <option value="amount">按额差异</option>
             <option value="unit">按单台差异</option>
+            <option value="amount">按额差异</option>
             <option value="code">按账户编码</option>
           </select>
         </div>
@@ -65,102 +87,158 @@
 
       <section class="summary-grid" aria-label="总览">
         <article class="metric">
-          <span>26实际</span>
+          <span data-i18n="actual26">26实际</span>
           <strong id="total26">--</strong>
           <small>K€</small>
         </article>
         <article class="metric">
-          <span>25同期</span>
+          <span data-i18n="same25">25同期</span>
           <strong id="total25">--</strong>
           <small>K€</small>
         </article>
         <article class="metric">
-          <span>26预算</span>
+          <span data-i18n="budget26">26预算</span>
           <strong id="budget26">--</strong>
           <small>K€</small>
         </article>
         <article class="metric">
-          <span>4+8预测</span>
-          <strong id="forecast26">--</strong>
-          <small>K€</small>
-        </article>
-        <article class="metric">
-          <span>实际-同期</span>
+          <span data-i18n="actualVsSame">实际-同期</span>
           <strong id="diffAmount">--</strong>
           <small>K€</small>
         </article>
         <article class="metric">
-          <span>单台差异</span>
+          <span data-i18n="unitDiff">单台差异</span>
           <strong id="diffUnit">--</strong>
           <small>€/台</small>
         </article>
         <article class="metric">
-          <span>制造费差额</span>
+          <span data-i18n="manufacturingDiff">制造费差额</span>
           <strong id="manufacturingDiff">--</strong>
           <small>单台差 × 26产量</small>
         </article>
         <article class="metric">
-          <span>重点差异</span>
-          <strong id="statusCount">--</strong>
-          <small>重点科目 / 预算缺失</small>
+          <span data-i18n="factorNet">因素净影响</span>
+          <strong id="factorNet">--</strong>
+          <small>K€ 累计</small>
         </article>
         <article class="metric">
-          <span>4+8参考</span>
-          <strong id="referenceStatus">--</strong>
-          <small id="referenceNote">待导入</small>
+          <span data-i18n="openItems">待解释重点</span>
+          <strong id="openItems">--</strong>
+          <small>单台差≥0.5且未填写</small>
         </article>
       </section>
 
-      <section class="panel narrative-panel" aria-label="原因分析">
-        <div class="panel-title">
-          <h2>月度总结与原因分析</h2>
-          <span>三张表总结 + 填写原因</span>
-        </div>
-        <pre id="narrativeText" class="narrative-text">导入SAP报表后显示本月总结和原因分析</pre>
-        <ul id="sharedAnalysis" class="analysis-list"></ul>
-      </section>
-
-      <section class="split-view">
-        <section class="panel chart-panel" aria-label="大科目对比">
+      <section id="dashboardView" class="view active">
+        <section class="panel dashboard-panel">
           <div class="panel-title">
-            <h2>大科目对比</h2>
-            <div id="validationChips" class="chips"></div>
+            <h2 data-i18n="dashboardTitle">全年数据驾驶舱</h2>
+            <span id="dashboardMonthLabel">4月实际</span>
           </div>
-          <canvas id="categoryChart" width="900" height="320"></canvas>
-          <div id="emptyChart" class="empty-state">导入SAP报表后显示大科目对比</div>
+          <div class="dashboard-table-wrap">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th data-i18n="indicator">指标</th>
+                  <th data-i18n="samePeriod">同期</th>
+                  <th data-i18n="target">目标/预算</th>
+                  <th data-i18n="actual">实际</th>
+                  <th data-i18n="variance">差异</th>
+                  <th data-i18n="amplitude">幅度</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardBody">
+                <tr><td colspan="6" class="empty-cell">导入SAP报表前显示三张表全年基础数据</td></tr>
+              </tbody>
+            </table>
+          </div>
         </section>
       </section>
 
-      <section class="panel table-panel" aria-label="科目明细">
-        <div class="panel-title">
-          <h2>科目明细</h2>
-          <span id="rowCount">0 项</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>账户</th>
-                <th>大科目</th>
-                <th>25同期</th>
-                <th>26预算</th>
-                <th>26实际</th>
-                <th>实际-同期</th>
-                <th>制造费差额</th>
-                <th>25单台</th>
-                <th>预算单台</th>
-                <th>26单台</th>
-                <th>单台差异</th>
-                <th>差异分析</th>
-              </tr>
-            </thead>
-            <tbody id="detailBody">
-              <tr>
-                <td colspan="12" class="empty-cell">导入SAP报表后显示科目明细</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <section id="varianceView" class="view">
+        <section class="panel narrative-panel" aria-label="原因分析">
+          <div class="panel-title">
+            <h2 data-i18n="monthSummary">月度总结与原因分析</h2>
+            <span data-i18n="autoFromSite">由网站填写内容自动汇总</span>
+          </div>
+          <pre id="summaryText" class="narrative-text">导入SAP报表后生成本月总结。</pre>
+          <ul id="analysisList" class="analysis-list"></ul>
+        </section>
+
+        <section class="split-view">
+          <section class="panel chart-panel" aria-label="大科目对比">
+            <div class="panel-title">
+              <h2 data-i18n="categoryCompare">大科目对比</h2>
+              <span data-i18n="redBadGreenGood">红色为恶化，绿色为优化</span>
+            </div>
+            <canvas id="categoryChart" width="900" height="320"></canvas>
+            <div id="emptyChart" class="empty-state">导入SAP报表后显示大科目对比</div>
+          </section>
+        </section>
+
+        <section class="panel table-panel" aria-label="科目明细">
+          <div class="panel-title">
+            <h2 data-i18n="accountDetail">科目明细</h2>
+            <span id="rowCount">0 项</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="account">账户</th>
+                  <th data-i18n="category">大科目</th>
+                  <th>25同期</th>
+                  <th>26预算</th>
+                  <th>26实际</th>
+                  <th>实际-同期</th>
+                  <th>制造费差额</th>
+                  <th>25单台</th>
+                  <th>26单台</th>
+                  <th>单台差异</th>
+                  <th data-i18n="analysis">差异分析</th>
+                </tr>
+              </thead>
+              <tbody id="detailBody">
+                <tr><td colspan="11" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="projectsView" class="view">
+        <section class="panel factor-panel">
+          <div class="panel-title">
+            <h2 data-i18n="factorProjects">上涨因素 / 下降因素</h2>
+            <div class="factor-actions">
+              <button id="addIncreaseBtn" type="button">添加上涨因素</button>
+              <button id="addDecreaseBtn" type="button">添加下降因素</button>
+              <button id="saveFactorsBtn" type="button">保存项目</button>
+            </div>
+          </div>
+          <div class="factor-summary">
+            <div><span>上涨累计</span><strong id="increaseTotal">--</strong></div>
+            <div><span>下降累计</span><strong id="decreaseTotal">--</strong></div>
+            <div><span>净影响</span><strong id="factorNetDetail">--</strong></div>
+          </div>
+          <div class="table-wrap project-wrap">
+            <table class="project-table">
+              <thead>
+                <tr>
+                  <th>类型</th>
+                  <th>分类</th>
+                  <th>核心策略/路径</th>
+                  <th>关键项目</th>
+                  <th>责任人</th>
+                  <th>到位时间</th>
+                  <th>预计影响 K€</th>
+                  <th>实际月累 K€</th>
+                  <th>进展</th>
+                </tr>
+              </thead>
+              <tbody id="factorBody"></tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
 
