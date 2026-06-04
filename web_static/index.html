@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费差异模型</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js"></script>
+    <script type="module" src="./src/app.js?v=20260604-budget-v2"></script>
   </head>
   <body>
     <header class="app-header">
@@ -75,7 +75,17 @@
           <small>K€</small>
         </article>
         <article class="metric">
-          <span>额差异</span>
+          <span>26预算</span>
+          <strong id="budget26">--</strong>
+          <small>K€</small>
+        </article>
+        <article class="metric">
+          <span>4+8预测</span>
+          <strong id="forecast26">--</strong>
+          <small>K€</small>
+        </article>
+        <article class="metric">
+          <span>实际-同期</span>
           <strong id="diffAmount">--</strong>
           <small>K€</small>
         </article>
@@ -85,15 +95,29 @@
           <small>€/台</small>
         </article>
         <article class="metric">
-          <span>科目状态</span>
-          <strong id="statusCount">--</strong>
-          <small>有差异 / 25有26无 / 26有25无</small>
+          <span>制造费差额</span>
+          <strong id="manufacturingDiff">--</strong>
+          <small>单台差 × 26产量</small>
         </article>
         <article class="metric">
-          <span>4+8校验</span>
+          <span>重点差异</span>
+          <strong id="statusCount">--</strong>
+          <small>重点科目 / 预算缺失</small>
+        </article>
+        <article class="metric">
+          <span>4+8参考</span>
           <strong id="referenceStatus">--</strong>
           <small id="referenceNote">待导入</small>
         </article>
+      </section>
+
+      <section class="panel narrative-panel" aria-label="原因分析">
+        <div class="panel-title">
+          <h2>月度总结与原因分析</h2>
+          <span>三张表总结 + 填写原因</span>
+        </div>
+        <pre id="narrativeText" class="narrative-text">导入SAP报表后显示本月总结和原因分析</pre>
+        <ul id="sharedAnalysis" class="analysis-list"></ul>
       </section>
 
       <section class="split-view">
@@ -119,18 +143,20 @@
                 <th>账户</th>
                 <th>大科目</th>
                 <th>25同期</th>
+                <th>26预算</th>
                 <th>26实际</th>
-                <th>额差异</th>
+                <th>实际-同期</th>
+                <th>制造费差额</th>
                 <th>25单台</th>
+                <th>预算单台</th>
                 <th>26单台</th>
                 <th>单台差异</th>
-                <th>状态</th>
                 <th>差异分析</th>
               </tr>
             </thead>
             <tbody id="detailBody">
               <tr>
-                <td colspan="10" class="empty-cell">导入SAP报表后显示科目明细</td>
+                <td colspan="12" class="empty-cell">导入SAP报表后显示科目明细</td>
               </tr>
             </tbody>
           </table>

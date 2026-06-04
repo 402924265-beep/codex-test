@@ -333,6 +333,39 @@ tr.high {
   background: #fffbf2;
 }
 
+.narrative-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.narrative-text {
+  margin: 0;
+  min-height: 96px;
+  white-space: pre-wrap;
+  line-height: 1.55;
+  color: #243342;
+  font: 13px/1.55 "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+  background: #f7fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.analysis-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.analysis-list li {
+  border-left: 3px solid #2364aa;
+  padding: 6px 10px;
+  background: #f8fbff;
+  color: #304152;
+}
+
 .empty-cell {
   height: 280px;
   text-align: center;

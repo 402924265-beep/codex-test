@@ -1,8 +1,14 @@
-import { BASELINE_25_ACCOUNTS, REFERENCE_4PLUS8 } from "./baseline-data.js";
-import * as XLSX from "../vendor/xlsx.mjs";
-import { MONTHS, extractSapActualFromWorkbook } from "./parser.js";
+import {
+  BASELINE_25_BY_MONTH,
+  BUDGET_26_BY_MONTH,
+  CATEGORY_ORDER,
+  FORECAST_4PLUS8_BY_MONTH,
+  MONTH_NARRATIVES
+} from "./baseline-data.js";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js";
 import { buildReconciliation } from "./reconcile.js";
 import { exportAnalysisWorkbook } from "./export.js";
+import { loadXlsx } from "./xlsx-loader.js";
 
 const state = {
   workbook: null,
@@ -25,9 +31,14 @@ const els = {
   total25: document.getElementById("total25"),
   diffAmount: document.getElementById("diffAmount"),
   diffUnit: document.getElementById("diffUnit"),
+  budget26: document.getElementById("budget26"),
+  forecast26: document.getElementById("forecast26"),
+  manufacturingDiff: document.getElementById("manufacturingDiff"),
   statusCount: document.getElementById("statusCount"),
   referenceStatus: document.getElementById("referenceStatus"),
   referenceNote: document.getElementById("referenceNote"),
+  narrativeText: document.getElementById("narrativeText"),
+  sharedAnalysis: document.getElementById("sharedAnalysis"),
   validationChips: document.getElementById("validationChips"),
   categoryChart: document.getElementById("categoryChart"),
   emptyChart: document.getElementById("emptyChart"),
@@ -42,7 +53,13 @@ els.searchInput.addEventListener("input", renderTable);
 els.statusFilter.addEventListener("change", renderTable);
 els.categoryFilter.addEventListener("change", renderTable);
 els.sortBy.addEventListener("change", renderTable);
-els.exportBtn.addEventListener("click", () => exportAnalysisWorkbook(state.result, state.analysisByCode));
+els.exportBtn.addEventListener("click", async () => {
+  try {
+    await exportAnalysisWorkbook(state.result, state.analysisByCode);
+  } catch (error) {
+    toast(error.message || String(error), true);
+  }
+});
 els.categoryChart.addEventListener("click", handleChartClick);
 window.addEventListener("resize", () => {
   if (state.result) renderChart();
@@ -55,6 +72,7 @@ async function handleFileChange(event) {
   if (!file) return;
   try {
     toast(`正在读取 ${file.name}`);
+    const XLSX = await loadXlsx();
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer, { type: "array", cellDates: false });
     state.workbook = workbook;
@@ -63,12 +81,15 @@ async function handleFileChange(event) {
 
     for (const item of MONTHS) {
       try {
-        const actual26 = extractSapActualFromWorkbook(workbook, item.month, XLSX);
+        const actual26 = extractActualFromWorkbook(workbook, item.month, XLSX);
         const result = buildReconciliation({
-          baseline25: BASELINE_25_ACCOUNTS,
+          baseline25: BASELINE_25_BY_MONTH[item.month],
+          budget26: BUDGET_26_BY_MONTH[item.month],
           actual26,
-          reference4plus8: REFERENCE_4PLUS8,
-          month: item.month
+          forecast4plus8: FORECAST_4PLUS8_BY_MONTH[item.month],
+          month: item.month,
+          categoryOrder: CATEGORY_ORDER,
+          narrative: MONTH_NARRATIVES[item.month]
         });
         state.actualByMonth.set(item.month, actual26);
         state.resultByMonth.set(item.month, result);
@@ -101,6 +122,7 @@ function renderAll() {
   renderSummary();
   renderCategoryFilter();
   renderValidationChips();
+  renderNarrative();
   renderChart();
   renderTable();
 }
@@ -111,30 +133,39 @@ function renderEmpty() {
   els.total25.textContent = "--";
   els.diffAmount.textContent = "--";
   els.diffUnit.textContent = "--";
+  els.budget26.textContent = "--";
+  els.forecast26.textContent = "--";
+  els.manufacturingDiff.textContent = "--";
   els.statusCount.textContent = "--";
   els.referenceStatus.textContent = "--";
   els.referenceNote.textContent = "待导入";
   els.validationChips.innerHTML = "";
+  els.narrativeText.textContent = "导入SAP报表后显示本月总结和原因分析";
+  els.sharedAnalysis.innerHTML = "";
   els.emptyChart.style.display = "grid";
   els.rowCount.textContent = "0 项";
-  els.detailBody.innerHTML = '<tr><td colspan="10" class="empty-cell">导入SAP报表后显示科目明细</td></tr>';
+  els.detailBody.innerHTML = '<tr><td colspan="12" class="empty-cell">导入SAP报表后显示科目明细</td></tr>';
 }
 
 function renderSummary() {
   const { summary, referenceChecks } = state.result;
   els.total26.textContent = formatMoney(summary.totalAmount26);
   els.total25.textContent = formatMoney(summary.totalAmount25);
+  els.budget26.textContent = formatMoney(summary.totalAmountBudget);
+  els.forecast26.textContent = formatMoney(summary.totalAmountForecast);
   els.diffAmount.textContent = formatMoney(summary.totalAmountDiff);
   els.diffAmount.className = valueClass(summary.totalAmountDiff);
   els.diffUnit.textContent = formatUnit(summary.totalUnitDiff);
   els.diffUnit.className = valueClass(summary.totalUnitDiff);
-  els.statusCount.textContent = `${summary.highImpactCount} / ${summary.only25Count} / ${summary.only26Count}`;
+  els.manufacturingDiff.textContent = formatMoney(summary.manufacturingDiff);
+  els.manufacturingDiff.className = valueClass(summary.manufacturingDiff);
+  els.statusCount.textContent = `${summary.highImpactCount} / ${summary.budgetMissingCount}`;
   if (referenceChecks.available) {
-    els.referenceStatus.textContent = referenceChecks.totalStatus === "ok" ? "对上" : "有差异";
-    els.referenceNote.textContent = `差异 ${formatMoney(referenceChecks.totalDiff)} K€`;
+    els.referenceStatus.textContent = formatMoney(referenceChecks.totalReference);
+    els.referenceNote.textContent = `4+8预测口径，和SAP差 ${formatMoney(referenceChecks.totalDiff)} K€`;
   } else {
-    els.referenceStatus.textContent = "未校验";
-    els.referenceNote.textContent = "无4+8基准";
+    els.referenceStatus.textContent = "--";
+    els.referenceNote.textContent = "无4+8预测";
   }
 }
 
@@ -143,8 +174,21 @@ function renderValidationChips() {
     const result = state.resultByMonth.get(item.month);
     if (!result) return `<span class="chip">${item.label}无数据</span>`;
     const status = result.referenceChecks?.totalStatus || "missing";
-    return `<span class="chip ${status}">${item.label}${status === "ok" ? "对上" : "有差异"}</span>`;
+    return `<span class="chip ${status}">${item.label} 4+8${status === "ok" ? "对上" : "有差异"}</span>`;
   }).join("");
+}
+
+function renderNarrative() {
+  const blocks = state.result.narrative?.blocks || [];
+  els.narrativeText.textContent = blocks.join("\n\n") || "暂无三张表总结";
+  const rows = state.result.rows
+    .filter((row) => row.isHighImpact)
+    .slice(0, 8)
+    .map((row) => {
+      const analysis = state.analysisByCode[row.code] || "";
+      return `<li><strong>${escapeHtml(row.code)}</strong> ${escapeHtml(row.descEn)}：${escapeHtml(analysis || "待填写原因")}</li>`;
+    });
+  els.sharedAnalysis.innerHTML = rows.length ? rows.join("") : "<li>暂无重点差异科目</li>";
 }
 
 function renderCategoryFilter() {
@@ -164,11 +208,12 @@ function renderTable() {
   const rows = visibleRows();
   els.rowCount.textContent = `${rows.length} 项`;
   els.detailBody.innerHTML =
-    rows.map(rowToHtml).join("") || '<tr><td colspan="10" class="empty-cell">没有符合条件的科目</td></tr>';
+    rows.map(rowToHtml).join("") || '<tr><td colspan="12" class="empty-cell">没有符合条件的科目</td></tr>';
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
     textarea.addEventListener("input", (event) => {
       state.analysisByCode[event.target.dataset.code] = event.target.value;
       saveAnalysis();
+      renderNarrative();
     });
   }
 }
@@ -200,12 +245,14 @@ function rowToHtml(row) {
       <td><div class="account-code">${escapeHtml(row.code)}</div><div class="desc">${escapeHtml(row.descEn)}</div></td>
       <td>${escapeHtml(row.category)}</td>
       <td>${formatMoney(row.amount25)}</td>
+      <td>${formatMoney(row.amountBudget)}</td>
       <td>${formatMoney(row.amount26)}</td>
       <td class="${valueClass(row.amountDiff)}">${formatMoney(row.amountDiff)}</td>
+      <td class="${valueClass(row.manufacturingDiff)}">${formatMoney(row.manufacturingDiff)}</td>
       <td>${formatUnit(row.unit25)}</td>
+      <td>${formatUnit(row.unitBudget)}</td>
       <td>${formatUnit(row.unit26)}</td>
       <td class="${valueClass(row.unitDiff)}">${formatUnit(row.unitDiff)}</td>
-      <td><span class="status ${row.status}">${escapeHtml(row.statusLabel)}</span></td>
       <td><textarea data-code="${escapeHtml(row.code)}">${escapeHtml(analysis)}</textarea></td>
     </tr>
   `;
