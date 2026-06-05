@@ -1,6 +1,6 @@
 const STORAGE_KEYS = {
-  analyses: "dw-shared-analyses-v1",
-  factors: "dw-shared-factors-v1",
+  analyses: "dw-shared-analyses-v2",
+  factors: "dw-shared-factors-v2",
   user: "dw-user-name"
 };
 
@@ -73,12 +73,17 @@ export class SupabaseStore {
   }
 
   async saveFactors(items) {
+    await this.request("/rest/v1/dw_factor_projects?id=neq.__never__", {
+      method: "DELETE",
+      headers: { Prefer: "return=minimal" }
+    });
     const payload = items.map((item, index) => ({
-      id: item.id,
+      id: item.id || String(index + 1),
       sort_order: index,
-      payload: item,
+      payload: { ...item, id: item.id || String(index + 1) },
       updated_at: new Date().toISOString()
     }));
+    if (!payload.length) return items;
     await this.request("/rest/v1/dw_factor_projects", {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates" },

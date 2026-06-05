@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>洗碗机制造费三表工作台</title>
+    <title>洗碗机制造费三张表工作台</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js?v=20260604-three-table-v1"></script>
+    <script type="module" src="./src/app.js?v=20260605-upload-dashboard-v1"></script>
   </head>
   <body>
     <header class="app-header">
       <div>
-        <h1 data-i18n="appTitle">洗碗机制造费三表工作台</h1>
-        <p data-i18n="appSubtitle">全年驾驶舱 · 月度差异 · 项目因素</p>
+        <h1 data-i18n="appTitle">洗碗机制造费三张表工作台</h1>
+        <p data-i18n="appSubtitle">导入财务数据，输出全年驾驶舱、月度差异、项目因素</p>
       </div>
       <div class="header-actions">
         <label class="field compact">
@@ -26,19 +26,23 @@
           <span data-i18n="author">填写人</span>
           <input id="userName" placeholder="姓名" />
         </label>
+        <label class="file-button secondary">
+          <input id="forecastFile" type="file" accept=".xlsx,.xls,.xlsm" />
+          <span data-i18n="importForecast">导入4+8预测</span>
+        </label>
         <label class="file-button">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importSap">导入SAP报表</span>
+          <span data-i18n="importSap">导入SAP实际</span>
         </label>
-        <button id="exportBtn" type="button" disabled data-i18n="exportAnalysis">导出分析表</button>
+        <button id="exportBtn" type="button" disabled data-i18n="exportAnalysis">导出三张表</button>
       </div>
     </header>
 
     <main class="workspace">
       <section class="top-strip" aria-label="当前状态">
         <div class="status-pill" id="saveMode">本机保存</div>
-        <div class="status-pill muted" id="fileStatus">待导入SAP</div>
-        <div class="status-pill muted">4+8预测总数已隐藏</div>
+        <div class="status-pill muted" id="sapStatus">待导入 SAP 实际</div>
+        <div class="status-pill muted" id="forecastStatus">待导入 4+8 预测</div>
       </section>
 
       <nav class="tabbar" aria-label="页面">
@@ -64,9 +68,9 @@
         <div class="field">
           <label for="analysisFilter" data-i18n="analysisFilter">差异筛选</label>
           <select id="analysisFilter">
-            <option value="all">全部</option>
-            <option value="high">单台差≥0.5</option>
-            <option value="blank">待填写原因</option>
+            <option value="all" data-i18n-option="all">全部</option>
+            <option value="high" data-i18n-option="unitOver">单台差≥0.5</option>
+            <option value="blank" data-i18n-option="blankReason">待填写原因</option>
           </select>
         </div>
         <div class="field">
@@ -78,14 +82,19 @@
         <div class="field">
           <label for="sortBy" data-i18n="sort">排序</label>
           <select id="sortBy">
-            <option value="unit">按单台差异</option>
-            <option value="amount">按额差异</option>
-            <option value="code">按账户编码</option>
+            <option value="unit" data-i18n-option="sortUnit">按单台差异</option>
+            <option value="amount" data-i18n-option="sortAmount">按额差异</option>
+            <option value="code" data-i18n-option="sortCode">按账户编码</option>
           </select>
         </div>
       </section>
 
       <section class="summary-grid" aria-label="总览">
+        <article class="metric focus">
+          <span data-i18n="unitCost26">26单台制造费</span>
+          <strong id="unitCost26">--</strong>
+          <small>€/台</small>
+        </article>
         <article class="metric">
           <span data-i18n="actual26">26实际</span>
           <strong id="total26">--</strong>
@@ -106,12 +115,12 @@
           <strong id="diffAmount">--</strong>
           <small>K€</small>
         </article>
-        <article class="metric">
+        <article class="metric focus">
           <span data-i18n="unitDiff">单台差异</span>
           <strong id="diffUnit">--</strong>
           <small>€/台</small>
         </article>
-        <article class="metric">
+        <article class="metric focus">
           <span data-i18n="manufacturingDiff">制造费差额</span>
           <strong id="manufacturingDiff">--</strong>
           <small>单台差 × 26产量</small>
@@ -119,35 +128,25 @@
         <article class="metric">
           <span data-i18n="factorNet">因素净影响</span>
           <strong id="factorNet">--</strong>
-          <small>K€ 累计</small>
-        </article>
-        <article class="metric">
-          <span data-i18n="openItems">待解释重点</span>
-          <strong id="openItems">--</strong>
-          <small>单台差≥0.5且未填写</small>
+          <small>K€累计</small>
         </article>
       </section>
 
       <section id="dashboardView" class="view active">
         <section class="panel dashboard-panel">
           <div class="panel-title">
-            <h2 data-i18n="dashboardTitle">全年数据驾驶舱</h2>
-            <span id="dashboardMonthLabel">4月实际</span>
+            <div>
+              <h2 data-i18n="dashboardTitle">全年数据驾驶舱</h2>
+              <p data-i18n="dashboardHint">上传 4+8 预测后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。</p>
+            </div>
+            <span id="dashboardStatus">等待4+8预测文件</span>
           </div>
+          <div id="dashboardCards" class="dashboard-cards"></div>
           <div class="dashboard-table-wrap">
             <table class="dashboard-table">
-              <thead>
-                <tr>
-                  <th data-i18n="indicator">指标</th>
-                  <th data-i18n="samePeriod">同期</th>
-                  <th data-i18n="target">目标/预算</th>
-                  <th data-i18n="actual">实际</th>
-                  <th data-i18n="variance">差异</th>
-                  <th data-i18n="amplitude">幅度</th>
-                </tr>
-              </thead>
+              <thead id="dashboardHead"></thead>
               <tbody id="dashboardBody">
-                <tr><td colspan="6" class="empty-cell">导入SAP报表前显示三张表全年基础数据</td></tr>
+                <tr><td colspan="14" class="empty-cell">导入4+8预测文件后显示1-12月全年驾驶舱</td></tr>
               </tbody>
             </table>
           </div>
@@ -157,8 +156,17 @@
       <section id="varianceView" class="view">
         <section class="panel narrative-panel" aria-label="原因分析">
           <div class="panel-title">
-            <h2 data-i18n="monthSummary">月度总结与原因分析</h2>
+            <div>
+              <h2 data-i18n="monthSummary">月度总结与原因分析</h2>
+              <p data-i18n="summaryHint">围绕单台制造费、制造费差额和重点科目自动汇总。</p>
+            </div>
             <span data-i18n="autoFromSite">由网站填写内容自动汇总</span>
+          </div>
+          <div class="variance-hero">
+            <div><span data-i18n="heroUnit">单台制造费</span><strong id="heroUnitCost">--</strong></div>
+            <div><span data-i18n="heroUnitDiff">单台同比差</span><strong id="heroUnitDiff">--</strong></div>
+            <div><span data-i18n="heroAmountDiff">制造费差额</span><strong id="heroAmountDiff">--</strong></div>
+            <div><span data-i18n="heroOpen">待解释重点</span><strong id="openItems">--</strong></div>
           </div>
           <pre id="summaryText" class="narrative-text">导入SAP报表后生成本月总结。</pre>
           <ul id="analysisList" class="analysis-list"></ul>
@@ -168,7 +176,7 @@
           <section class="panel chart-panel" aria-label="大科目对比">
             <div class="panel-title">
               <h2 data-i18n="categoryCompare">大科目对比</h2>
-              <span data-i18n="redBadGreenGood">红色为恶化，绿色为优化</span>
+              <span data-i18n="redBadGreenGood">红色为同比恶化，绿色为同比优化</span>
             </div>
             <canvas id="categoryChart" width="900" height="320"></canvas>
             <div id="emptyChart" class="empty-state">导入SAP报表后显示大科目对比</div>
@@ -208,31 +216,34 @@
       <section id="projectsView" class="view">
         <section class="panel factor-panel">
           <div class="panel-title">
-            <h2 data-i18n="factorProjects">上涨因素 / 下降因素</h2>
+            <div>
+              <h2 data-i18n="factorProjects">上涨因素 / 下降因素</h2>
+              <p data-i18n="factorHint">用于沉淀项目原因，后续自动进入月度总结和导出三张表。</p>
+            </div>
             <div class="factor-actions">
-              <button id="addIncreaseBtn" type="button">添加上涨因素</button>
-              <button id="addDecreaseBtn" type="button">添加下降因素</button>
-              <button id="saveFactorsBtn" type="button">保存项目</button>
+              <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加上涨因素</button>
+              <button id="addDecreaseBtn" type="button" data-i18n="addDecrease">添加下降因素</button>
+              <button id="saveFactorsBtn" type="button" data-i18n="saveProjects">保存项目</button>
             </div>
           </div>
           <div class="factor-summary">
-            <div><span>上涨累计</span><strong id="increaseTotal">--</strong></div>
-            <div><span>下降累计</span><strong id="decreaseTotal">--</strong></div>
-            <div><span>净影响</span><strong id="factorNetDetail">--</strong></div>
+            <div><span data-i18n="increaseTotal">上涨累计</span><strong id="increaseTotal">--</strong></div>
+            <div><span data-i18n="decreaseTotal">下降累计</span><strong id="decreaseTotal">--</strong></div>
+            <div><span data-i18n="netImpact">净影响</span><strong id="factorNetDetail">--</strong></div>
           </div>
           <div class="table-wrap project-wrap">
             <table class="project-table">
               <thead>
                 <tr>
-                  <th>类型</th>
-                  <th>分类</th>
-                  <th>核心策略/路径</th>
-                  <th>关键项目</th>
-                  <th>责任人</th>
-                  <th>到位时间</th>
-                  <th>预计影响 K€</th>
-                  <th>实际月累 K€</th>
-                  <th>进展</th>
+                  <th data-i18n="type">类型</th>
+                  <th data-i18n="category">分类</th>
+                  <th data-i18n="path">原因/路径</th>
+                  <th data-i18n="project">关键项目</th>
+                  <th data-i18n="owner">责任人</th>
+                  <th data-i18n="timing">到位时间</th>
+                  <th data-i18n="impact">影响 K€</th>
+                  <th data-i18n="progress">进展</th>
+                  <th data-i18n="action">操作</th>
                 </tr>
               </thead>
               <tbody id="factorBody"></tbody>
