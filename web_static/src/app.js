@@ -16,7 +16,7 @@ import {
   parseEditableNumber
 } from "./workbench.js";
 
-const VERSION = "20260605-dashboard-v2";
+const VERSION = "20260605-dashboard-v3";
 
 const i18n = {
   zh: {
@@ -481,13 +481,21 @@ function renderDashboard() {
   const rowBy = (label, scenario) => state.dashboardRows.find((row) => row.label === label && row.scenario === scenario);
   const volumeTotal = valueAtYear(rowBy("产量", "26年"));
   const amountTotal = valueAtYear(rowBy("制造费用金额", "26年"));
+  const budgetAmountTotal = valueAtYear(rowBy("制造费用金额", "预算"));
   const averageUnit = valueAtYear(rowBy("单台制造费累计", "26年"));
+  const sameUnitGap = valueAtYear(rowBy("单台制造费累计", "26年")) - valueAtYear(rowBy("单台制造费累计", "同期"));
+  const budgetGapTotal = valueAtYear(rowBy("累计预算制造费差额", "累计差额"));
   const mfgDiffTotal = valueAtYear(rowBy("累计制造费差额", "累计差额"));
+  const productivity = valueAtYear(rowBy("累计人均产量", "26年"));
   els.dashboardCards.innerHTML = [
     dashboardCard("全年产量", formatNumber(volumeTotal), "台"),
     dashboardCard("全年制造费", formatMoney(amountTotal), "K€"),
+    dashboardCard("全年预算", formatMoney(budgetAmountTotal), "K€"),
     dashboardCard("累计单台", formatUnit(averageUnit), "€/台"),
-    dashboardCard("累计制造费差额", formatMoney(mfgDiffTotal), "K€", valueClass(mfgDiffTotal))
+    dashboardCard("单台同比差", formatUnit(sameUnitGap), "€/台", valueClass(sameUnitGap)),
+    dashboardCard("累计制造费差额", formatMoney(mfgDiffTotal), "K€", valueClass(mfgDiffTotal)),
+    dashboardCard("累计预算差额", formatMoney(budgetGapTotal), "K€", valueClass(budgetGapTotal)),
+    dashboardCard("累计人均产量", formatUnit(productivity), "台/人")
   ].join("");
   els.dashboardBody.innerHTML = state.dashboardRows.map((row) => `
     <tr class="dashboard-row group-${escapeHtml(row.group)}">
@@ -506,7 +514,7 @@ function dashboardCard(title, value, unit, className = "") {
 
 function valueAtYear(row) {
   if (!row) return null;
-  if (row.unit === "€/台") {
+  if (["€/台", "台/人"].includes(row.unit)) {
     const last = [...row.values].reverse().find((value) => Number.isFinite(value));
     return last ?? null;
   }

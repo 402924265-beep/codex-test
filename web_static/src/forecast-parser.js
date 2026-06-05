@@ -97,8 +97,11 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const actualSource = forecast.totalAll || forecast.totalIncludingFc || forecast.totalMfg;
   const sameAmount = monthsFromObject(options.baseline25ByMonth, (item) => sumAccounts(item?.accounts, 1));
   const sameVolume = monthsFromObject(options.baseline25ByMonth, (item) => item?.volume ?? null);
-  const budgetAmount = monthsFromObject(options.budget26ByMonth, (item) => sumAccounts(item?.accounts, 1));
-  const budgetVolume = monthsFromObject(options.budget26ByMonth, (item) => item?.volume ?? null);
+  const baselineBudgetAmount = monthsFromObject(options.budget26ByMonth, (item) => sumAccounts(item?.accounts, 1));
+  const baselineBudgetVolume = monthsFromObject(options.budget26ByMonth, (item) => item?.volume ?? null);
+  const budgetAmount = preferSeries(actualSource?.budgetMonths, baselineBudgetAmount);
+  const budgetVolume = preferSeries(forecast.volume.budget, baselineBudgetVolume);
+  const stdVolume = normalizeMonths(forecast.volume.std);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
     return result?.summary?.totalAmount26 ?? actualSource?.amountMonths?.[index] ?? null;
@@ -111,16 +114,21 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
   const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
   const amountDiff = actualAmount.map((value, index) => nullableDiff(value, sameAmount[index]));
+  const budgetAmountDiff = actualAmount.map((value, index) => nullableDiff(value, budgetAmount[index]));
   const unitDiff = actualUnit.map((value, index) => nullableDiff(value, sameUnit[index]));
+  const budgetUnitDiff = actualUnit.map((value, index) => nullableDiff(value, budgetUnit[index]));
   const mfgDiff = unitDiff.map((value, index) => value === null || !actualVolume[index] ? null : (value * actualVolume[index]) / 1000);
+  const budgetMfgDiff = budgetUnitDiff.map((value, index) => value === null || !actualVolume[index] ? null : (value * actualVolume[index]) / 1000);
 
   const rows = [
     metric("核心", "产量", "同期", "台", sameVolume, "higher"),
     metric("核心", "产量", "预算", "台", budgetVolume, "higher"),
     metric("核心", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
+    metric("核心", "标准台", "26年", "台", stdVolume, "higher", budgetVolume),
     metric("核心", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
     metric("核心", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
     metric("核心", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
+    metric("核心", "标准台累计", "26年", "台", cumulative(stdVolume), "higher", cumulative(budgetVolume)),
     metric("核心", "制造费用金额", "同期", "K€", sameAmount, "lower"),
     metric("核心", "制造费用金额", "预算", "K€", budgetAmount, "lower"),
     metric("核心", "制造费用金额", "26年", "K€", actualAmount, "lower", budgetAmount),
@@ -134,20 +142,32 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
     metric("核心", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
     metric("核心", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
     metric("差异", "实际-同期金额", "差额", "K€", amountDiff, "lower"),
+    metric("差异", "实际-预算金额", "差额", "K€", budgetAmountDiff, "lower"),
     metric("差异", "制造费差额", "差额", "K€", mfgDiff, "lower"),
-    metric("差异", "累计制造费差额", "累计差额", "K€", cumulative(mfgDiff), "lower")
+    metric("差异", "预算制造费差额", "差额", "K€", budgetMfgDiff, "lower"),
+    metric("差异", "累计制造费差额", "累计差额", "K€", cumulative(mfgDiff), "lower"),
+    metric("差异", "累计预算制造费差额", "累计差额", "K€", cumulative(budgetMfgDiff), "lower")
   ];
 
   if (forecast.hc?.actualTotal?.some(isNumber)) {
     const hcActual = forecast.hc.actualTotal;
     const hcBudget = forecast.hc.budgetTotal;
+    const productivityActual = actualVolume.map((value, index) => perHead(value, hcActual[index]));
+    const productivityBudget = budgetVolume.map((value, index) => perHead(value, hcBudget[index]));
     rows.push(
       metric("效率", "用人", "预算", "人", hcBudget, "lower"),
       metric("效率", "用人", "26年", "人", hcActual, "lower", hcBudget),
       metric("效率", "累计用人", "预算", "人", cumulative(hcBudget), "lower"),
       metric("效率", "累计用人", "26年", "人", cumulative(hcActual), "lower", cumulative(hcBudget)),
+      metric("效率", "人均产量", "预算", "台/人", productivityBudget, "higher"),
+      metric("效率", "人均产量", "26年", "台/人", productivityActual, "higher", productivityBudget),
+      metric("效率", "累计人均产量", "预算", "台/人", cumulativeProductivity(budgetVolume, hcBudget), "higher"),
+      metric("效率", "累计人均产量", "26年", "台/人", cumulativeProductivity(actualVolume, hcActual), "higher", cumulativeProductivity(budgetVolume, hcBudget)),
+      metric("效率", "直接用人", "预算", "人", forecast.hc.budgetDirect, "lower"),
       metric("效率", "直接用人", "26年", "人", forecast.hc.actualDirect, "lower"),
+      metric("效率", "间接用人", "预算", "人", forecast.hc.budgetIndirect, "lower"),
       metric("效率", "间接用人", "26年", "人", forecast.hc.actualIndirect, "lower"),
+      metric("效率", "固定用人", "预算", "人", forecast.hc.budgetFixed, "lower"),
       metric("效率", "固定用人", "26年", "人", forecast.hc.actualFixed, "lower")
     );
   }
@@ -236,6 +256,12 @@ function normalizeMonths(values) {
   });
 }
 
+function preferSeries(primary, fallback) {
+  const first = normalizeMonths(primary);
+  const second = normalizeMonths(fallback);
+  return first.map((value, index) => Number.isFinite(value) ? value : second[index]);
+}
+
 function rowsFromSheet(workbook, XLSX, candidates) {
   const sheetName = findSheetName(workbook, candidates);
   if (!sheetName) throw new Error(`找不到 ${candidates.join(" / ")} sheet`);
@@ -292,6 +318,17 @@ function cumulativeUnit(amounts, volumes) {
   const amountCum = cumulative(amounts);
   const volumeCum = cumulative(volumes);
   return amountCum.map((amount, index) => unit(amount, volumeCum[index]));
+}
+
+function cumulativeProductivity(volumes, headcounts) {
+  const volumeCum = cumulative(volumes);
+  const hcCum = cumulative(headcounts);
+  return volumeCum.map((volume, index) => perHead(volume, hcCum[index]));
+}
+
+function perHead(value, headcount) {
+  if (Number.isFinite(value) && Number.isFinite(headcount) && headcount) return value / headcount;
+  return null;
 }
 
 function unit(amount, volume, fallback = null) {

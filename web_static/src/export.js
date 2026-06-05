@@ -29,11 +29,11 @@ function buildDashboardSheet(rows, forecast) {
     row.values.forEach((value, index) => {
       record[MONTHS[index]] = round(value);
     });
-    record.年度合计 = row.unit === "欧/台" ? "" : round(sum(row.values));
+    record.年度口径 = round(annualValue(row));
     return record;
   });
   if (forecast?.parsedAt) {
-    output.push({ 指标: "数据来源", 单位: forecast.source || "4+8 forecast", 年度合计: forecast.parsedAt });
+    output.push({ 指标: "数据来源", 单位: forecast.source || "4+8 forecast", 年度口径: forecast.parsedAt });
   }
   return output;
 }
@@ -109,4 +109,21 @@ function round(value) {
 
 function sum(values) {
   return (values || []).reduce((total, value) => total + (Number.isFinite(value) ? value : 0), 0);
+}
+
+function annualValue(row) {
+  const values = row.values || [];
+  if (row.label?.includes("累计") || ["€/台", "台/人"].includes(row.unit)) return lastNumber(values);
+  if (row.unit === "人") {
+    const valid = values.filter(Number.isFinite);
+    return valid.length ? sum(valid) / valid.length : null;
+  }
+  return sum(values);
+}
+
+function lastNumber(values) {
+  for (let index = values.length - 1; index >= 0; index -= 1) {
+    if (Number.isFinite(values[index])) return values[index];
+  }
+  return null;
 }
