@@ -12,6 +12,8 @@ export async function exportAnalysisWorkbook(input = {}) {
   for (const sheet of sheets) {
     const ws = XLSX.utils.json_to_sheet(sheet.rows);
     ws["!cols"] = sheet.cols || defaultColumns(sheet.rows);
+    if (sheet.merges) ws["!merges"] = sheet.merges;
+    if (sheet.freeze) ws["!freeze"] = sheet.freeze;
     XLSX.utils.book_append_sheet(wb, ws, sheet.name);
   }
 
@@ -28,10 +30,10 @@ export function buildAnalysisWorkbookSheets({
   forecast = null
 } = {}) {
   return [
-    { name: "洗碗机成本数据", rows: buildCostDataSheet(dashboardRows, forecast), cols: wideMonthColumns() },
-    { name: "费用指标到月测算汇总表", rows: buildMonthlyMetricSheet(result), cols: monthlyMetricColumns() },
-    { name: "月度差异明细", rows: buildVarianceDetailSheet(result, analyses), cols: varianceColumns() },
-    { name: "26年降费项目-洗碗机", rows: buildFactorSheet(factors, factorSummary), cols: factorColumns() },
+    { name: "洗碗机成本数据", rows: buildCostDataSheet(dashboardRows, forecast), cols: wideMonthColumns(), merges: costDataMerges(), freeze: { xSplit: 3, ySplit: 1 } },
+    { name: "费用指标到月测算汇总表", rows: buildMonthlyMetricSheet(result), cols: monthlyMetricColumns(), freeze: { xSplit: 1, ySplit: 1 } },
+    { name: "月度差异明细", rows: buildVarianceDetailSheet(result, analyses), cols: varianceColumns(), freeze: { xSplit: 4, ySplit: 1 } },
+    { name: "26年降费项目-洗碗机", rows: buildFactorSheet(factors, factorSummary), cols: factorColumns(), freeze: { xSplit: 3, ySplit: 1 } },
     { name: "口径说明", rows: buildFormulaSheet(forecast, result), cols: [{ wch: 22 }, { wch: 90 }] }
   ];
 }
@@ -58,7 +60,9 @@ function buildCostDataSheet(rows, forecast) {
         record[`${MONTHS[index]}${row.scenario}`] = round(row.values[index]);
       }
     }
-    record.年度 = round(annualValue(ordered.find((row) => row.scenario === "26年") || ordered.at(-1)));
+    for (const row of ordered) {
+      record[`全年${row.scenario}`] = round(annualValue(row));
+    }
     output.push(record);
   }
 
@@ -66,7 +70,7 @@ function buildCostDataSheet(rows, forecast) {
     分组: "数据来源",
     指标: "滚动预测",
     单位: forecast?.source || "4+8/5+7 forecast",
-    年度: forecast?.parsedAt || ""
+    全年26年: forecast?.parsedAt || ""
   });
   return output;
 }
@@ -215,7 +219,14 @@ function absText(value) {
 }
 
 function wideMonthColumns() {
-  return [{ wch: 12 }, { wch: 22 }, { wch: 10 }, ...Array(48).fill({ wch: 11 }), { wch: 12 }];
+  return [{ wch: 12 }, { wch: 22 }, { wch: 10 }, ...Array(52).fill({ wch: 11 })];
+}
+
+function costDataMerges() {
+  return MONTHS.map((_, index) => {
+    const start = 3 + index * 4;
+    return { s: { r: 0, c: start }, e: { r: 0, c: start + 3 } };
+  });
 }
 
 function monthlyMetricColumns() {

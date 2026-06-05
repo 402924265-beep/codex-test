@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js?v=20260605-dashboard-v5"></script>
+    <script type="module" src="./src/app.js?v=20260605-dashboard-v6"></script>
   </head>
   <body>
     <header class="app-header">
@@ -60,23 +60,13 @@
             </div>
             <span id="dashboardStatus">等待4+8预测文件</span>
           </div>
-          <div class="dashboard-toolbar">
-            <div class="field">
-              <label for="dashboardGroupSelect" data-i18n="dashboardGroup">指标组</label>
-              <select id="dashboardGroupSelect">
-                <option value="all" data-i18n-option="all">全部</option>
-                <option value="unit" data-i18n-option="groupUnit">单</option>
-                <option value="time" data-i18n-option="groupTime">时</option>
-                <option value="people" data-i18n-option="groupPeople">人</option>
-                <option value="efficiency" data-i18n-option="groupEfficiency">效</option>
-                <option value="cost" data-i18n-option="groupCost">费</option>
-              </select>
-            </div>
+          <div id="annualSummary" class="smart-summary">??4+8??????????</div>
+          <div class="dashboard-toolbar dashboard-basis-field">
             <div class="field dashboard-basis-field">
-              <label for="dashboardBasisSelect" data-i18n="dashboardBasis">对比基准</label>
+              <label for="dashboardBasisSelect" data-i18n="dashboardBasis">????</label>
               <select id="dashboardBasisSelect">
-                <option value="budget" data-i18n-option="budget26">26预算</option>
-                <option value="same" data-i18n-option="same25">25同期</option>
+                <option value="budget" data-i18n-option="budget26">26??</option>
+                <option value="same" data-i18n-option="same25">25??</option>
               </select>
             </div>
           </div>
@@ -108,6 +98,7 @@
                 <h3 data-i18n="detailTitle">指标明细</h3>
                 <button id="toggleDashboardTable" class="ghost-button" type="button" data-i18n="showDetail">展开明细</button>
               </div>
+              <div id="metricFilterBar" class="metric-filter-bar"></div>
               <div class="dashboard-table-wrap" id="dashboardTableWrap">
                 <table class="dashboard-table">
                   <thead id="dashboardHead"></thead>
@@ -122,7 +113,7 @@
       </section>
 
       <section id="varianceView" class="view">
-        <section class="summary-grid" aria-label="总览">
+        <section id="monthlyKpiGrid" class="summary-grid" aria-label="总览">
           <article class="metric focus">
             <span data-i18n="unitCost26">26单台制造费</span>
             <strong id="unitCost26">--</strong>
@@ -181,12 +172,14 @@
           <div id="summaryText" class="compact-summary">导入SAP报表后生成本月简洁摘要。</div>
         </section>
 
+        <section id="monthlySummary" class="smart-summary smart-summary-month">??SAP??????????</section>
         <section class="split-view">
           <section class="panel chart-panel" aria-label="大科目对比">
             <div class="panel-title">
               <h2 data-i18n="categoryCompare">大科目对比</h2>
               <span data-i18n="redBadGreenGood">红色为同比恶化，绿色为同比优化</span>
             </div>
+            <div id="categoryDiagnostics" class="category-diagnostics"></div>
             <canvas id="categoryChart" width="900" height="320"></canvas>
             <div id="emptyChart" class="empty-state" data-i18n="emptyCategoryChart">导入SAP报表后显示大科目对比</div>
           </section>
@@ -272,6 +265,7 @@
               <button id="saveFactorsBtn" type="button" data-i18n="saveProjects">保存项目</button>
             </div>
           </div>
+          <div id="projectSummary" class="smart-summary smart-summary-project">???????????/?????????</div>
           <div class="factor-summary">
             <div><span data-i18n="increaseTotal">上涨累计</span><strong id="increaseTotal">--</strong></div>
             <div><span data-i18n="decreaseTotal">下降累计</span><strong id="decreaseTotal">--</strong></div>

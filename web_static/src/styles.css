@@ -257,7 +257,7 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 10px 12px;
   background: #102033;
@@ -290,6 +290,24 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   font-size: 11px;
 }
 
+.smart-summary {
+  margin: 0;
+  padding: 12px 16px;
+  color: #102033;
+  background: linear-gradient(90deg, #f5fbff, #edf8f4);
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.smart-summary-month,
+.smart-summary-project {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  border-left: 5px solid var(--teal);
+  background: #fff;
+}
+
 .dashboard-toolbar {
   display: flex;
   gap: 12px;
@@ -301,6 +319,40 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .dashboard-basis-field {
   display: none;
+}
+
+.metric-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.3fr) repeat(4, minmax(130px, 0.5fr));
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #f7fafc;
+}
+
+.segment-control {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.segment-control button {
+  height: 32px;
+  min-width: 52px;
+  padding: 0 13px;
+  color: #234055;
+  background: #eaf2f8;
+}
+
+.segment-control button.active {
+  color: #fff;
+  background: var(--navy);
+}
+
+.metric-filter-bar select {
+  min-width: 0;
+  height: 32px;
 }
 
 .cockpit-grid {
@@ -410,6 +462,28 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 .wf-label { text-anchor: middle; fill: #bdd2df; }
 .wf-value { text-anchor: middle; fill: #fff; font-weight: 700; }
 .waterfall-total { font-size: 14px; font-weight: 700; fill: #fff; }
+.wf-axis-label,
+.wf-side-value,
+.bar-value {
+  font: 12px "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+  dominant-baseline: middle;
+}
+.wf-axis-label { fill: #d8e8f2; }
+.wf-side-value.good,
+.bar-value.good { fill: #48d6a3; }
+.wf-side-value.bad,
+.bar-value.bad { fill: #ff7a70; }
+.budget-good { fill: rgba(246, 200, 95, 0.82); }
+.budget-bad { fill: rgba(218, 122, 30, 0.88); }
+.center-axis,
+.zero-line {
+  stroke: rgba(255, 255, 255, 0.42);
+}
+.animated-bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: growBar 0.7s ease-out both;
+}
 
 .heatmap-grid {
   display: grid;
@@ -490,6 +564,7 @@ td {
   text-align: right;
   vertical-align: top;
   font-size: 13px;
+  white-space: nowrap;
 }
 
 th {
@@ -514,6 +589,20 @@ td:nth-child(2) { text-align: left; }
 .dashboard-table td.month-cell {
   font-variant-numeric: tabular-nums;
   border-left: 1px solid #edf2f6;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 8px 9px;
+}
+
+.full-year-cell {
+  font-weight: 700;
+  background: #f8fbff;
+}
+
+.merged-label:empty {
+  border-top-color: transparent;
 }
 
 .group-chip,
@@ -575,6 +664,11 @@ td:nth-child(2) { text-align: left; }
   to { stroke-dashoffset: 0; }
 }
 
+@keyframes growBar {
+  from { transform: scaleY(0.08); opacity: 0.35; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
 .variance-hero {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -608,6 +702,49 @@ td:nth-child(2) { text-align: left; }
   display: block;
   width: 100%;
   height: 320px;
+}
+
+.category-diagnostics {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.category-diagnostic {
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(4, minmax(110px, 0.55fr));
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--green);
+  text-align: left;
+}
+
+.category-diagnostic.bad {
+  border-left-color: var(--red);
+  background: #fff8f6;
+}
+
+.category-diagnostic.good {
+  background: #f4fbf8;
+}
+
+.category-diagnostic span {
+  font-weight: 700;
+}
+
+.category-diagnostic strong {
+  font-size: 18px;
+  color: inherit;
+}
+
+.category-diagnostic em {
+  font-style: normal;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .empty-state {

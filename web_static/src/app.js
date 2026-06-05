@@ -24,7 +24,7 @@ import {
   parseEditableNumber
 } from "./workbench.js";
 
-const VERSION = "20260605-dashboard-v5";
+const VERSION = "20260605-dashboard-v6";
 
 const i18n = {
   zh: {
@@ -109,6 +109,16 @@ const i18n = {
     waterfallTitle: "全年差异瀑布",
     waterfallHint: "红色恶化，绿色优化",
     other: "其他",
+    fullYear: "全年",
+    annualSummaryEmpty: "导入4+8预测后生成全年总结。",
+    monthlySummaryEmpty: "导入SAP实际后生成月度总结。",
+    allIndicators: "全部指标",
+    allScenarios: "全部口径",
+    allStatus: "全部状态",
+    monthlyMfgVarianceTitle: "到月制造费差异",
+    yoyVariance: "同比差异",
+    budgetVariance: "预算差异",
+    annualCategoryDivergence: "全年大科目同比差异",
     heatmapTitle: "月度异常热力",
     heatmapHint: "颜色越深差异越大",
     detailTitle: "指标明细",
@@ -234,6 +244,16 @@ const i18n = {
     waterfallTitle: "Full-Year Variance Waterfall",
     waterfallHint: "Red is worse, green is better",
     other: "Other",
+    fullYear: "Full year",
+    annualSummaryEmpty: "Import the 4+8 forecast to generate the annual summary.",
+    monthlySummaryEmpty: "Import SAP actuals to generate the monthly summary.",
+    allIndicators: "All metrics",
+    allScenarios: "All bases",
+    allStatus: "All status",
+    monthlyMfgVarianceTitle: "Monthly MFG variance",
+    yoyVariance: "YoY variance",
+    budgetVariance: "Budget variance",
+    annualCategoryDivergence: "Annual category YoY variance",
     heatmapTitle: "Monthly Exception Heatmap",
     heatmapHint: "Darker color means larger variance",
     detailTitle: "Metric Detail",
@@ -359,6 +379,16 @@ const i18n = {
     waterfallTitle: "Yıllık Fark Şelalesi",
     waterfallHint: "Kırmızı kötüleşme, yeşil iyileşme",
     other: "Diğer",
+    fullYear: "Yıl",
+    annualSummaryEmpty: "Yıllık özet için 4+8 tahminini yükleyin.",
+    monthlySummaryEmpty: "Aylık özet için SAP gerçekleşeni yükleyin.",
+    allIndicators: "Tüm göstergeler",
+    allScenarios: "Tüm bazlar",
+    allStatus: "Tüm durumlar",
+    monthlyMfgVarianceTitle: "Aylık üretim gideri farkı",
+    yoyVariance: "YoY fark",
+    budgetVariance: "Bütçe farkı",
+    annualCategoryDivergence: "Yıllık kategori YoY farkı",
     heatmapTitle: "Aylık İstisna Isı Haritası",
     heatmapHint: "Renk koyulaştıkça fark büyür",
     detailTitle: "Gösterge Detayı",
@@ -418,6 +448,10 @@ const state = {
   language: "zh",
   dashboardGroup: "all",
   dashboardBasis: "same",
+  metricScenario: "all",
+  metricMonth: "all",
+  metricStatus: "all",
+  metricIndicator: "all",
   dashboardTableOpen: true,
   sapFileName: "",
   forecastFileName: ""
@@ -452,9 +486,14 @@ const els = {
   dashboardHead: document.getElementById("dashboardHead"),
   dashboardBody: document.getElementById("dashboardBody"),
   dashboardCards: document.getElementById("dashboardCards"),
+  annualSummary: document.getElementById("annualSummary"),
+  monthlySummary: document.getElementById("monthlySummary"),
+  projectSummary: document.getElementById("projectSummary"),
+  monthlyKpiGrid: document.getElementById("monthlyKpiGrid"),
   dashboardStatus: document.getElementById("dashboardStatus"),
   dashboardGroupSelect: document.getElementById("dashboardGroupSelect"),
   dashboardBasisSelect: document.getElementById("dashboardBasisSelect"),
+  metricFilterBar: document.getElementById("metricFilterBar"),
   trendChart: document.getElementById("trendChart"),
   waterfallChart: document.getElementById("waterfallChart"),
   heatmapGrid: document.getElementById("heatmapGrid"),
@@ -463,6 +502,7 @@ const els = {
   summaryText: document.getElementById("summaryText"),
   analysisList: document.getElementById("analysisList"),
   categoryChart: document.getElementById("categoryChart"),
+  categoryDiagnostics: document.getElementById("categoryDiagnostics"),
   emptyChart: document.getElementById("emptyChart"),
   detailBody: document.getElementById("detailBody"),
   rowCount: document.getElementById("rowCount"),
@@ -485,6 +525,7 @@ async function bootstrap() {
   try {
     state.analyses = await store.loadAnalyses();
     state.factors = normalizeFactorsForUi(await store.loadFactors([]));
+    if (!state.factors.length) state.factors = seedOriginalFactors();
   } catch (error) {
     toast(error.message || String(error), true);
   }
@@ -504,12 +545,26 @@ function bindEvents() {
   els.analysisFilter.addEventListener("change", renderTable);
   els.categoryFilter.addEventListener("change", renderTable);
   els.sortBy.addEventListener("change", renderTable);
-  els.dashboardGroupSelect.addEventListener("change", () => {
+  els.dashboardGroupSelect?.addEventListener("change", () => {
     state.dashboardGroup = els.dashboardGroupSelect.value;
     renderDashboard();
   });
-  els.dashboardBasisSelect.addEventListener("change", () => {
+  els.dashboardBasisSelect?.addEventListener("change", () => {
     state.dashboardBasis = els.dashboardBasisSelect.value;
+    renderDashboard();
+  });
+  els.metricFilterBar?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-metric-group]");
+    if (!button) return;
+    state.dashboardGroup = button.dataset.metricGroup;
+    renderDashboard();
+  });
+  els.metricFilterBar?.addEventListener("change", (event) => {
+    const target = event.target;
+    if (target.id === "metricScenarioFilter") state.metricScenario = target.value;
+    if (target.id === "metricMonthFilter") state.metricMonth = target.value;
+    if (target.id === "metricStatusFilter") state.metricStatus = target.value;
+    if (target.id === "metricIndicatorFilter") state.metricIndicator = target.value;
     renderDashboard();
   });
   els.toggleDashboardTable.addEventListener("click", () => {
@@ -642,77 +697,68 @@ function buildDashboardRows() {
 }
 
 function renderSummaryCards() {
-  const summary = state.result?.summary || {};
-  const forecast = monthSnapshot(state.forecast, Number(els.monthSelect.value));
-  const unit26 = summary.totalUnit26 ?? forecast.unitCost;
-  els.unitCost26.textContent = formatUnit(unit26);
-  els.total26.textContent = formatMoney(summary.totalAmount26);
-  els.total25.textContent = formatMoney(summary.totalAmount25);
-  els.budget26.textContent = formatMoney(summary.totalAmountBudget);
-  els.diffAmount.textContent = formatMoney(summary.totalAmountDiff);
-  els.diffAmount.className = valueClass(summary.totalAmountDiff);
-  els.diffUnit.textContent = formatUnit(summary.totalUnitDiff);
-  els.diffUnit.className = valueClass(summary.totalUnitDiff);
-  els.manufacturingDiff.textContent = formatMoney(summary.manufacturingDiff);
-  els.manufacturingDiff.className = valueClass(summary.manufacturingDiff);
-  els.factorNet.textContent = formatMoney(state.factorSummary?.netCumulative);
-  els.factorNet.className = valueClass(state.factorSummary?.netCumulative);
-  els.heroUnitCost.textContent = formatUnit(unit26);
-  els.heroUnitDiff.textContent = formatUnit(summary.totalUnitDiff);
-  els.heroUnitDiff.className = valueClass(summary.totalUnitDiff);
-  els.heroAmountDiff.textContent = formatMoney(summary.manufacturingDiff);
-  els.heroAmountDiff.className = valueClass(summary.manufacturingDiff);
-  els.openItems.textContent = state.result ? String(countOpenHighRows()) : "--";
+  if (els.monthlyKpiGrid) {
+    els.monthlyKpiGrid.innerHTML = buildFiveKpiCards("month").map((card) => kpiCardHtml(card, "metric")).join("");
+  }
+  if (els.monthlySummary) els.monthlySummary.innerHTML = buildMonthlySummaryText();
+  if (els.factorNet) {
+    els.factorNet.textContent = formatMoney(state.factorSummary?.netCumulative);
+    els.factorNet.className = valueClass(state.factorSummary?.netCumulative);
+  }
+  if (els.heroUnitCost && state.result) {
+    const summary = state.result.summary || {};
+    els.heroUnitCost.textContent = formatUnit(summary.totalUnit26);
+    els.heroUnitDiff.textContent = formatUnit(summary.totalUnitDiff);
+    els.heroUnitDiff.className = valueClass(summary.totalUnitDiff);
+    els.heroAmountDiff.textContent = formatMoney(summary.manufacturingDiff);
+    els.heroAmountDiff.className = valueClass(summary.manufacturingDiff);
+    els.openItems.textContent = String(countOpenHighRows());
+  }
 }
 
 function renderDashboard() {
   const months = Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language));
-  els.dashboardHead.innerHTML = `<tr><th>${escapeHtml(t("group"))}</th><th>${escapeHtml(t("indicator"))}</th><th>${escapeHtml(t("scenario"))}</th><th>${escapeHtml(t("unit"))}</th>${months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}</tr>`;
+  els.dashboardHead.innerHTML = `<tr><th>${escapeHtml(t("group"))}</th><th>${escapeHtml(t("indicator"))}</th><th>${escapeHtml(t("scenario"))}</th><th>${escapeHtml(t("unit"))}</th>${months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
   els.dashboardTableWrap.classList.toggle("collapsed", !state.dashboardTableOpen);
   els.toggleDashboardTable.textContent = t(state.dashboardTableOpen ? "hideDetail" : "showDetail");
+  renderMetricFilters();
   if (!state.forecast || !state.dashboardRows.length) {
     els.dashboardStatus.textContent = t("waitingForecast");
     els.dashboardCards.innerHTML = "";
+    if (els.annualSummary) els.annualSummary.textContent = t("annualSummaryEmpty");
     els.trendChart.innerHTML = "";
     els.waterfallChart.innerHTML = "";
     els.heatmapGrid.innerHTML = `<div class="empty-cell">${t("emptyForecast")}</div>`;
-    els.dashboardBody.innerHTML = `<tr><td colspan="16" class="empty-cell">${t("emptyForecast")}</td></tr>`;
+    els.dashboardBody.innerHTML = `<tr><td colspan="17" class="empty-cell">${t("emptyForecast")}</td></tr>`;
     return;
   }
   els.dashboardStatus.textContent = t("loadedYearModel");
   const rowBy = (label, scenario) => state.dashboardRows.find((row) => row.label === label && row.scenario === scenario);
-  const volumeTotal = valueAtYear(rowBy("产量", "26年"));
-  const amountTotal = valueAtYear(rowBy("制造费用金额", "26年"));
-  const budgetAmountTotal = valueAtYear(rowBy("制造费用金额", "预算"));
-  const sameAmountTotal = valueAtYear(rowBy("制造费用金额", "同期"));
-  const annualUnit = annualUnitCost(rowBy("制造费用金额", "26年"), rowBy("产量", "26年"));
-  const annualSameUnit = annualUnitCost(rowBy("制造费用金额", "同期"), rowBy("产量", "同期"));
-  const unitGap = annualUnit === null || annualSameUnit === null ? null : annualUnit - annualSameUnit;
-  const mfgDiffByUnit = unitGap === null || !volumeTotal ? null : (unitGap * volumeTotal) / 1000;
-  els.dashboardCards.innerHTML = [
-    dashboardCard(localizeDashboardText("labels", "单台制造费", state.language), formatUnit(annualUnit), localizeDashboardText("units", "€/台", state.language), valueClass(unitGap), `${t("same25")} ${formatUnit(annualSameUnit)} / ${t("unitDiff")} ${formatUnit(unitGap)}`),
-    dashboardCard(t("manufacturingDiff"), formatMoney(mfgDiffByUnit), "K€", valueClass(mfgDiffByUnit), t("mfgDiffFormula")),
-    dashboardCard(localizeDashboardText("labels", "产量", state.language), formatNumber(volumeTotal), localizeDashboardText("units", "台", state.language)),
-    dashboardCard(localizeDashboardText("labels", "制造费用金额", state.language), formatMoney(amountTotal), "K€"),
-    dashboardCard(t("budget26"), formatMoney(budgetAmountTotal), "K€"),
-    dashboardCard(t("same25"), formatMoney(sameAmountTotal), "K€"),
-    dashboardCard(t("unitDiff"), formatUnit(unitGap), localizeDashboardText("units", "€/台", state.language), valueClass(unitGap))
-  ].join("");
+  if (els.annualSummary) els.annualSummary.innerHTML = buildAnnualSummaryText();
+  els.dashboardCards.innerHTML = buildFiveKpiCards("annual").map((card) => kpiCardHtml(card, "dashboard-card")).join("");
 
-  const metrics = dashboardMetricsForGroup();
-  renderTrendSvg(metrics, rowBy);
+  renderTrendSvg([], rowBy);
   renderWaterfallSvg(rowBy);
-  renderHeatmap(metrics, rowBy);
+  renderHeatmap(["单台制造费", "制造费用金额", "产量"], rowBy);
 
-  els.dashboardBody.innerHTML = state.dashboardRows.map((row) => `
-    <tr class="dashboard-row group-${escapeHtml(row.group)}">
-      <td><span class="group-chip">${escapeHtml(localizeDashboardRow(row, state.language).group)}</span></td>
-      <td>${escapeHtml(localizeDashboardRow(row, state.language).label)}</td>
-      <td><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localizeDashboardRow(row, state.language).scenario)}</span></td>
-      <td>${escapeHtml(localizeDashboardRow(row, state.language).unit)}</td>
-      ${row.values.map((value, index) => `<td class="month-cell ${heatClass(row, index)}">${formatDashboardValue(value, row.unit)}</td>`).join("")}
-    </tr>
-  `).join("");
+  const rows = visibleDashboardRows();
+  let lastLabel = "";
+  els.dashboardBody.innerHTML = rows.map((row) => {
+    const localized = localizeDashboardRow(row, state.language);
+    const family = metricFamily(row.label);
+    const showLabel = row.label !== lastLabel;
+    lastLabel = row.label;
+    return `
+      <tr class="dashboard-row family-${family}">
+        <td><span class="group-chip">${escapeHtml(metricFamilyLabel(family))}</span></td>
+        <td class="merged-label">${showLabel ? escapeHtml(localized.label) : ""}</td>
+        <td><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
+        <td>${escapeHtml(localized.unit)}</td>
+        ${row.values.map((value, index) => `<td class="month-cell ${heatClass(row, index)}">${formatDashboardValue(value, row.unit)}</td>`).join("")}
+        <td class="month-cell full-year-cell">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
+      </tr>
+    `;
+  }).join("") || `<tr><td colspan="17" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
 }
 
 function dashboardMetricsForGroup() {
@@ -727,6 +773,220 @@ function dashboardMetricsForGroup() {
   return map[state.dashboardGroup] || map.all;
 }
 
+function renderMetricFilters() {
+  if (!els.metricFilterBar) return;
+  const groups = [
+    ["all", t("all")],
+    ["unit", t("groupUnit")],
+    ["time", t("groupTime")],
+    ["people", t("groupPeople")],
+    ["efficiency", t("groupEfficiency")],
+    ["cost", t("groupCost")]
+  ];
+  const indicators = [...new Set(state.dashboardRows.map((row) => row.label))]
+    .filter((labelText) => state.dashboardGroup === "all" || metricFamily(labelText) === state.dashboardGroup);
+  const months = Array.from({ length: 12 }, (_, index) => `<option value="${index}" ${state.metricMonth === String(index) ? "selected" : ""}>${escapeHtml(localizeMonthLabel(index, state.language))}</option>`).join("");
+  els.metricFilterBar.innerHTML = `
+    <div class="segment-control">${groups.map(([value, labelText]) => `<button type="button" class="${state.dashboardGroup === value ? "active" : ""}" data-metric-group="${value}">${escapeHtml(labelText)}</button>`).join("")}</div>
+    <select id="metricIndicatorFilter"><option value="all">${escapeHtml(t("allIndicators"))}</option>${indicators.map((item) => `<option value="${escapeHtml(item)}" ${state.metricIndicator === item ? "selected" : ""}>${escapeHtml(localizeDashboardText("labels", item, state.language))}</option>`).join("")}</select>
+    <select id="metricScenarioFilter">
+      <option value="all" ${state.metricScenario === "all" ? "selected" : ""}>${escapeHtml(t("allScenarios"))}</option>
+      <option value="同期" ${state.metricScenario === "同期" ? "selected" : ""}>${escapeHtml(t("same25"))}</option>
+      <option value="预算" ${state.metricScenario === "预算" ? "selected" : ""}>${escapeHtml(t("budget26"))}</option>
+      <option value="26年" ${state.metricScenario === "26年" ? "selected" : ""}>${escapeHtml(t("actual26"))}</option>
+      <option value="差额" ${state.metricScenario === "差额" ? "selected" : ""}>${escapeHtml(t("varianceValue"))}</option>
+    </select>
+    <select id="metricMonthFilter"><option value="all" ${state.metricMonth === "all" ? "selected" : ""}>${escapeHtml(t("fullYear"))}</option>${months}</select>
+    <select id="metricStatusFilter">
+      <option value="all" ${state.metricStatus === "all" ? "selected" : ""}>${escapeHtml(t("allStatus"))}</option>
+      <option value="bad" ${state.metricStatus === "bad" ? "selected" : ""}>${escapeHtml(t("worse"))}</option>
+      <option value="good" ${state.metricStatus === "good" ? "selected" : ""}>${escapeHtml(t("better"))}</option>
+    </select>
+  `;
+}
+
+function visibleDashboardRows() {
+  const monthIndex = state.metricMonth === "all" ? null : Number(state.metricMonth);
+  return state.dashboardRows.filter((row) => {
+    if (state.dashboardGroup !== "all" && metricFamily(row.label) !== state.dashboardGroup) return false;
+    if (state.metricIndicator !== "all" && row.label !== state.metricIndicator) return false;
+    if (state.metricScenario !== "all" && row.scenario !== state.metricScenario) return false;
+    if (state.metricStatus !== "all") {
+      const status = metricRowStatus(row, monthIndex);
+      if (status !== state.metricStatus) return false;
+    }
+    return true;
+  });
+}
+
+function metricFamily(labelText) {
+  if (/单台/.test(labelText)) return "unit";
+  if (/工时|出勤|标准工时/.test(labelText)) return "time";
+  if (/用人|人数/.test(labelText)) return "people";
+  if (/UPPH|效率|标准台|产量/.test(labelText)) return "efficiency";
+  return "cost";
+}
+
+function metricFamilyLabel(family) {
+  const map = {
+    unit: t("groupUnit"),
+    time: t("groupTime"),
+    people: t("groupPeople"),
+    efficiency: t("groupEfficiency"),
+    cost: t("groupCost"),
+    all: t("all")
+  };
+  return map[family] || family;
+}
+
+function metricRowStatus(row, monthIndex = null) {
+  const value = monthIndex === null ? annualMetricValue(row) : row.values[monthIndex];
+  if (!Number.isFinite(value)) return "neutral";
+  let diff = value;
+  if (row.scenario === "26年") {
+    const same = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "同期");
+    const sameValue = monthIndex === null ? annualMetricValue(same) : same?.values?.[monthIndex];
+    diff = diffNullableLocal(value, sameValue);
+  }
+  if (!Number.isFinite(diff) || Math.abs(diff) < 0.0001) return "neutral";
+  const higherGood = row.direction === "higher";
+  return higherGood ? (diff > 0 ? "good" : "bad") : (diff < 0 ? "good" : "bad");
+}
+
+function annualMetricValue(row) {
+  if (!row) return null;
+  if (row.label?.includes("累计") || ["€/台", "台/人"].includes(row.unit)) return lastFinite(row.values);
+  return sum(row.values);
+}
+
+function buildFiveKpiCards(scope) {
+  const stats = scope === "annual" ? annualStats() : monthStats();
+  return [
+    ratioCard("单", stats.unit26, stats.unit25, "€/台", "lower", "26单台 / 25单台"),
+    ratioCard("时", stats.days26, stats.days25, "天", "lower", "26出勤天数 / 25出勤天数"),
+    ratioCard("人", stats.people26, stats.people25, "人", "lower", "26总用人 / 25总用人"),
+    ratioCard("效", stats.upph26, stats.upph25, "UPPH", "higher", "26 UPPH / 25 UPPH"),
+    ratioCard("费", stats.rate26, stats.rate25, "%", "lower", "26制造费率 / 25制造费率")
+  ];
+}
+
+function ratioCard(title, actual, same, unit, direction, formula) {
+  const diff = diffNullableLocal(actual, same);
+  const ratio = Number.isFinite(diff) && Number.isFinite(same) && same !== 0 ? diff / same : null;
+  const good = ratio === null ? null : direction === "higher" ? ratio > 0 : ratio < 0;
+  return {
+    title,
+    value: ratio,
+    className: good === null ? "" : good ? "positive" : "negative",
+    note: `${formatPlain(actual)}${unit} / ${formatPlain(same)}${unit}`,
+    formula
+  };
+}
+
+function annualStats() {
+  const rowBy = (labelText, scenario) => state.dashboardRows.find((row) => row.label === labelText && row.scenario === scenario);
+  const amount26 = rowBy("制造费用金额", "26年");
+  const amount25 = rowBy("制造费用金额", "同期");
+  const volume26 = rowBy("产量", "26年");
+  const volume25 = rowBy("产量", "同期");
+  return {
+    unit26: annualUnitCost(amount26, volume26),
+    unit25: annualUnitCost(amount25, volume25),
+    days26: null,
+    days25: null,
+    people26: annualMetricValue(rowBy("用人", "26年")),
+    people25: annualMetricValue(rowBy("用人", "同期")),
+    upph26: null,
+    upph25: null,
+    rate26: null,
+    rate25: null
+  };
+}
+
+function monthStats() {
+  const summary = state.result?.summary || {};
+  return {
+    unit26: summary.totalUnit26,
+    unit25: summary.totalUnit25,
+    days26: null,
+    days25: null,
+    people26: null,
+    people25: null,
+    upph26: null,
+    upph25: null,
+    rate26: null,
+    rate25: null
+  };
+}
+
+function kpiCardHtml(card, className) {
+  return `
+    <article class="${className} kpi-card ${card.className}">
+      <span>${escapeHtml(card.title)}</span>
+      <strong>${formatPercent(card.value)}</strong>
+      <small>${escapeHtml(card.note)}</small>
+      <em>${escapeHtml(card.formula)}</em>
+    </article>
+  `;
+}
+
+function buildAnnualSummaryText() {
+  const stats = annualStats();
+  if (!Number.isFinite(stats.unit26) || !Number.isFinite(stats.unit25)) return t("annualSummaryEmpty");
+  const unitDiff = stats.unit26 - stats.unit25;
+  const ratio = stats.unit25 ? unitDiff / stats.unit25 : null;
+  const volume26 = annualMetricValue(state.dashboardRows.find((row) => row.label === "产量" && row.scenario === "26年"));
+  const impact = Number.isFinite(unitDiff) && Number.isFinite(volume26) ? unitDiff * volume26 / 1000 : null;
+  const topCats = annualCategoryDiffs().slice(0, 3).map((item) => localizeCategory(item.label, state.language)).join("、");
+  return `2026年洗碗机全年滚动预测单台制造费为 ${formatUnit(stats.unit26)} €/台，较同期${unitDiff <= 0 ? "优化" : "恶化"} ${formatPercent(Math.abs(ratio))}，对应制造费影响 ${formatMoney(impact)} K€。主要差异集中在 ${topCats || "重点大科目"}，请结合下方到月差异和大科目中轴图跟踪。`;
+}
+
+function buildMonthlySummaryText() {
+  if (!state.result) return t("monthlySummaryEmpty");
+  const summary = state.result.summary || {};
+  const topCategories = monthlyCategoryDiagnostics().slice(0, 3).map((item) => localizeCategory(item.category, state.language)).join("、");
+  const topRows = state.result.rows.slice().sort((a, b) => Math.abs(b.manufacturingDiff || 0) - Math.abs(a.manufacturingDiff || 0)).slice(0, 3).map((row) => row.code).join("、");
+  return `${state.result.month}月洗碗机单台制造费为 ${formatUnit(summary.totalUnit26)} €/台，较同期${(summary.totalUnitDiff || 0) <= 0 ? "优化" : "恶化"} ${formatUnit(Math.abs(summary.totalUnitDiff || 0))} €/台，对应制造费影响 ${formatMoney(summary.manufacturingDiff)} K€。差异主要来自 ${topCategories || "重点大科目"}，重点小科目为 ${topRows || "待导入科目"}，原因可在下方科目明细补充。`;
+}
+
+function annualCategoryDiffs() {
+  return state.dashboardRows
+    .filter((row) => row.group === "大科目" && row.scenario === "26年")
+    .map((row) => {
+      const same = state.dashboardRows.find((item) => item.group === "大科目" && item.label === row.label && item.scenario === "同期");
+      return { label: row.label, diff: sum(row.values) - sum(same?.values || []) };
+    })
+    .filter((item) => Number.isFinite(item.diff) && Math.abs(item.diff) > 0.01)
+    .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+}
+
+function monthlyCategoryDiagnostics() {
+  if (!state.result) return [];
+  const volume = state.result.volume26 || 0;
+  return (state.result.categories || [])
+    .map((item) => {
+      const unitDiff = item.unitDiff ?? (volume ? (item.amountDiff / volume) * 1000 : null);
+      return {
+        ...item,
+        unitDiff,
+        manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : item.manufacturingDiff,
+        yoyRate: item.amount25 ? item.amountDiff / item.amount25 : null
+      };
+    })
+    .sort((a, b) => Math.abs(b.manufacturingDiff || b.amountDiff || 0) - Math.abs(a.manufacturingDiff || a.amountDiff || 0));
+}
+
+function diffNullableLocal(left, right) {
+  return Number.isFinite(left) && Number.isFinite(right) ? left - right : null;
+}
+
+function lastFinite(values = []) {
+  for (let index = values.length - 1; index >= 0; index -= 1) {
+    if (Number.isFinite(values[index])) return values[index];
+  }
+  return null;
+}
+
 function annualUnitCost(amountRow, volumeRow) {
   const amount = sum(amountRow?.values || []);
   const volume = sum(volumeRow?.values || []);
@@ -734,32 +994,34 @@ function annualUnitCost(amountRow, volumeRow) {
 }
 
 function renderTrendSvg(metrics, rowBy) {
+  const actual = rowBy("制造费用金额", "26年");
+  const same = rowBy("制造费用金额", "同期");
+  const budget = rowBy("制造费用金额", "预算");
+  if (!actual || !same || !budget) {
+    els.trendChart.innerHTML = emptySvgMessage(t("emptyForecast"));
+    return;
+  }
   const width = 980;
   const height = 310;
   const left = 54;
   const right = 24;
-  const top = 28;
-  const bottom = 44;
+  const top = 34;
+  const bottom = 50;
   const plotW = width - left - right;
   const plotH = height - top - bottom;
-  const actualMonths = countActualMonths();
-  const labelText = metrics.find((metric) => rowBy(metric, "26年") && rowBy(metric, "同期")) || "单台制造费";
-  const actual = rowBy(labelText, "26年");
-  const same = rowBy(labelText, "同期");
-  const budget = rowBy(labelText, "预算");
-  if (!actual || !same) {
-    els.trendChart.innerHTML = emptySvgMessage(t(state.dashboardGroup === "time" ? "noTimeData" : "emptyForecast"));
-    return;
-  }
-  const values = [...actual.values, ...(same?.values || []), ...(budget?.values || [])].filter(Number.isFinite);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const span = max - min || 1;
-  const x = (index) => left + (plotW / 11) * index;
-  const y = (value) => top + plotH - ((value - min) / span) * plotH;
-  const line = (row, cls, color) => {
-    const points = row?.values.map((value, month) => Number.isFinite(value) ? `${x(month)},${y(value)}` : null).filter(Boolean).join(" ");
-    return points ? `<polyline class="trend-line ${cls}" style="stroke:${color}" points="${points}" />` : "";
+  const yoy = actual.values.map((value, index) => diffNullableLocal(value, same.values[index]));
+  const budgetDiff = actual.values.map((value, index) => diffNullableLocal(value, budget.values[index]));
+  const values = [...yoy, ...budgetDiff].filter(Number.isFinite);
+  const maxAbs = Math.max(1, ...values.map((value) => Math.abs(value)));
+  const zeroY = top + plotH / 2;
+  const barW = Math.max(16, plotW / 12 / 3.2);
+  const x = (index) => left + (plotW / 12) * index + plotW / 24;
+  const bar = (value, index, offset, cls) => {
+    if (!Number.isFinite(value)) return "";
+    const h = Math.max(3, Math.abs(value) / maxAbs * (plotH / 2 - 14));
+    const y = value >= 0 ? zeroY - h : zeroY;
+    return `<rect x="${x(index) + offset}" y="${y}" width="${barW}" height="${h}" rx="4" class="${cls} animated-bar" />
+      <text x="${x(index) + offset + barW / 2}" y="${value >= 0 ? y - 7 : y + h + 13}" class="bar-value ${value > 0 ? "bad" : "good"}">${formatMoney(value)}</text>`;
   };
   const grid = Array.from({ length: 12 }, (_, index) => `
     <g>
@@ -767,94 +1029,51 @@ function renderTrendSvg(metrics, rowBy) {
       <text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(localizeMonthLabel(index, state.language))}</text>
     </g>
   `).join("");
-  const diffLabels = actual.values.map((value, index) => {
-    if (!Number.isFinite(value) || !Number.isFinite(same.values[index])) return "";
-    const diff = value - same.values[index];
-    const good = actual.direction === "higher" ? diff > 0 : diff < 0;
-    return `<text x="${x(index)}" y="${Math.max(top + 14, y(value) - 10)}" class="${good ? "trend-diff-good" : "trend-diff-bad"}">${formatDashboardValue(diff, actual.unit)}</text>`;
-  }).join("");
   els.trendChart.innerHTML = `
     <rect x="0" y="0" width="${width}" height="${height}" class="chart-bg" />
     ${grid}
-    <line x1="${left}" y1="${top + plotH}" x2="${width - right}" y2="${top + plotH}" class="axis-line" />
-    <rect x="${x(actualMonths - 0.5)}" y="${top}" width="${Math.max(0, width - right - x(actualMonths - 0.5))}" height="${plotH}" class="forecast-zone" />
-    ${line(same, "compare", "rgba(255,255,255,0.46)")}
-    ${line(budget, "budget-line", "#f6c85f")}
-    ${line(actual, "", "#48d6c1")}
-    ${actual.values.map((value, month) => Number.isFinite(value) ? `<circle cx="${x(month)}" cy="${y(value)}" r="${month < actualMonths ? 4.5 : 3.5}" class="${month < actualMonths ? "dot actual" : "dot forecast"}" style="fill:#48d6c1" />` : "").join("")}
-    ${diffLabels}
-    <text x="${left + 10}" y="24" class="legend" style="fill:#48d6c1">${escapeSvg(localizeDashboardText("labels", labelText, state.language))} ${escapeSvg(t("actual26"))}</text>
-    <text x="${left + 210}" y="24" class="legend" style="fill:#f6c85f">${escapeSvg(t("budget26"))}</text>
-    <text x="${left + 330}" y="24" class="legend">${escapeSvg(t("same25"))}</text>
-    <text x="${width - 180}" y="24" class="phase-label">${escapeSvg(t("actualMonths"))} / ${escapeSvg(t("forecastMonths"))}</text>
+    <line x1="${left}" y1="${zeroY}" x2="${width - right}" y2="${zeroY}" class="axis-line zero-line" />
+    ${yoy.map((value, index) => bar(value, index, -barW - 3, value > 0 ? "wf-bad" : "wf-good")).join("")}
+    ${budgetDiff.map((value, index) => bar(value, index, 3, value > 0 ? "budget-bad" : "budget-good")).join("")}
+    <text x="${left}" y="22" class="legend" style="fill:#48d6c1">${escapeSvg(t("monthlyMfgVarianceTitle"))}</text>
+    <text x="${left + 260}" y="22" class="legend" style="fill:#49d9a4">${escapeSvg(t("yoyVariance"))}</text>
+    <text x="${left + 390}" y="22" class="legend" style="fill:#f6c85f">${escapeSvg(t("budgetVariance"))}</text>
   `;
 }
 
 function renderWaterfallSvg(rowBy) {
-  const actual = rowBy("制造费用金额", "26年");
-  const same = rowBy("制造费用金额", "同期");
-  if (!actual || !same) {
+  const categoryRows = annualCategoryDiffs().slice(0, 14);
+  if (!categoryRows.length) {
     els.waterfallChart.innerHTML = emptySvgMessage(t("emptyForecast"));
     return;
   }
-  const actualTotal = sum(actual.values);
-  const sameTotal = sum(same.values);
-  const rawCategoryRows = state.dashboardRows
-    .filter((row) => row.group === "大科目" && row.scenario === "26年")
-    .map((row) => {
-      const sameRow = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "同期");
-      return {
-        label: row.label,
-        diff: sum(row.values) - sum(sameRow?.values || [])
-      };
-    })
-    .filter((item) => Number.isFinite(item.diff) && Math.abs(item.diff) > 0.01)
-    .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
-  const topRows = rawCategoryRows.slice(0, 6);
-  const otherDiff = rawCategoryRows.slice(6).reduce((total, item) => total + item.diff, 0);
-  const categoryRows = Math.abs(otherDiff) > 0.01
-    ? [...topRows, { label: t("other"), diff: otherDiff }]
-    : topRows;
   const width = 980;
-  const height = 340;
-  const left = 52;
-  const top = 42;
-  const bottom = 58;
-  const plotH = height - top - bottom;
-  const minValue = Math.min(sameTotal, actualTotal, sameTotal + Math.min(0, ...categoryRows.map((item) => item.diff)));
-  const maxValue = Math.max(sameTotal, actualTotal, sameTotal + Math.max(0, ...categoryRows.map((item) => item.diff)));
-  const span = maxValue - minValue || 1;
-  const y = (value) => top + plotH - ((value - minValue) / span) * plotH;
-  const barW = 72;
-  const gap = (width - left * 2 - barW * (categoryRows.length + 2)) / Math.max(1, categoryRows.length + 1);
-  let cursor = sameTotal;
-  const startBar = totalBar(left, sameTotal, "wf-start", t("same25"), sameTotal, y, plotH, top, barW);
+  const rowHeight = 24;
+  const height = Math.max(340, 74 + categoryRows.length * rowHeight);
+  const left = 250;
+  const right = 110;
+  const center = left + (width - left - right) / 2;
+  const maxAbs = Math.max(1, ...categoryRows.map((item) => Math.abs(item.diff)));
+  const scale = (width - left - right) / 2 / maxAbs;
   const bars = categoryRows.map((item, index) => {
-    const x = left + (index + 1) * (barW + gap);
-    const before = cursor;
-    cursor += item.diff;
-    const y1 = y(before);
-    const y2 = y(cursor);
-    const rectY = Math.min(y1, y2);
-    const h = Math.max(8, Math.abs(y2 - y1));
-    const cls = item.diff > 0 ? "wf-bad" : "wf-good";
+    const y = 52 + index * rowHeight;
+    const w = Math.max(4, Math.abs(item.diff) * scale);
+    const isBad = item.diff > 0;
+    const x = isBad ? center : center - w;
     return `
-      <rect x="${x}" y="${rectY}" width="${barW}" height="${h}" rx="5" class="${cls}" />
-      <line x1="${x - gap}" y1="${y1}" x2="${x}" y2="${y1}" class="wf-connector" />
-      <text x="${x + barW / 2}" y="${rectY - 9}" class="wf-value">${formatMoney(item.diff)}</text>
-      <text x="${x + barW / 2}" y="${height - 24}" class="wf-label">${escapeSvg(shortText(localizeCategory(item.label, state.language), 12))}</text>
+      <text x="24" y="${y + 8}" class="wf-axis-label">${escapeSvg(shortText(localizeCategory(item.label, state.language), 24))}</text>
+      <rect x="${x}" y="${y}" width="${w}" height="14" rx="7" class="${isBad ? "wf-bad" : "wf-good"} animated-bar" />
+      <text x="${isBad ? x + w + 8 : x - 8}" y="${y + 8}" class="wf-side-value ${isBad ? "bad" : "good"}" text-anchor="${isBad ? "start" : "end"}">${formatMoney(item.diff)} K€</text>
     `;
   }).join("");
-  const endX = left + (categoryRows.length + 1) * (barW + gap);
-  const endBar = totalBar(endX, actualTotal, "wf-end", t("actual26"), actualTotal, y, plotH, top, barW);
-  const totalDiff = actualTotal - sameTotal;
+  els.waterfallChart.setAttribute("viewBox", `0 0 ${width} ${height}`);
   els.waterfallChart.innerHTML = `
     <rect x="0" y="0" width="${width}" height="${height}" class="chart-bg" />
-    <line x1="${left - 20}" y1="${y(sameTotal)}" x2="${width - left + 20}" y2="${y(sameTotal)}" class="axis-line" />
-    ${startBar}
+    <line x1="${center}" y1="42" x2="${center}" y2="${height - 22}" class="axis-line center-axis" />
+    <text x="24" y="26" class="waterfall-total">${escapeSvg(t("annualCategoryDivergence"))}</text>
+    <text x="${center - 10}" y="26" class="phase-label" text-anchor="end">${escapeSvg(t("better"))}</text>
+    <text x="${center + 10}" y="26" class="phase-label" text-anchor="start">${escapeSvg(t("worse"))}</text>
     ${bars}
-    ${endBar}
-    <text x="26" y="28" class="waterfall-total">${escapeSvg(t("varianceValue"))}: ${formatMoney(totalDiff)} K€</text>
   `;
 }
 
@@ -1044,50 +1263,32 @@ function rowToHtml(row) {
 }
 
 function renderChart() {
-  const canvas = els.categoryChart;
-  const ctx = canvas.getContext("2d");
-  const rect = canvas.getBoundingClientRect();
-  const ratio = window.devicePixelRatio || 1;
-  canvas.width = Math.floor(rect.width * ratio);
-  canvas.height = Math.floor(rect.height * ratio);
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-  ctx.clearRect(0, 0, rect.width, rect.height);
   state.chartHitZones = [];
   if (!state.result) {
-    els.emptyChart.style.display = "grid";
+    if (els.emptyChart) els.emptyChart.style.display = "grid";
+    if (els.categoryDiagnostics) els.categoryDiagnostics.innerHTML = "";
     return;
   }
-  els.emptyChart.style.display = "none";
-  const categories = state.result.categories
-    .slice()
-    .sort((a, b) => Math.abs(b.unitDiff || 0) - Math.abs(a.unitDiff || 0))
-    .slice(0, 12);
-  const padding = { left: 170, right: 58, top: 18, bottom: 28 };
-  const chartWidth = rect.width - padding.left - padding.right;
-  const rowHeight = (rect.height - padding.top - padding.bottom) / Math.max(categories.length, 1);
-  const maxValue = Math.max(1, ...categories.flatMap((item) => [Math.abs(item.amount25 || 0), Math.abs(item.amount26 || 0)]));
-  ctx.font = "12px Microsoft YaHei, Segoe UI, Arial";
-  ctx.textBaseline = "middle";
-  categories.forEach((item, index) => {
-    const y = padding.top + index * rowHeight;
-    const y25 = y + rowHeight * 0.35;
-    const y26 = y + rowHeight * 0.67;
-    const w25 = (Math.abs(item.amount25 || 0) / maxValue) * chartWidth;
-    const w26 = (Math.abs(item.amount26 || 0) / maxValue) * chartWidth;
-    ctx.fillStyle = "#263545";
-    ctx.fillText(localizeCategory(item.category, state.language), 12, y + rowHeight * 0.5);
-    ctx.fillStyle = "#dbe5ec";
-    ctx.fillRect(padding.left, y25 - 5, chartWidth, 8);
-    ctx.fillRect(padding.left, y26 - 5, chartWidth, 8);
-    ctx.fillStyle = "#245b93";
-    ctx.fillRect(padding.left, y25 - 5, w25, 8);
-    ctx.fillStyle = item.amountDiff > 0 ? "#b42318" : "#08775d";
-    ctx.fillRect(padding.left, y26 - 5, w26, 8);
-    ctx.fillStyle = "#607080";
-    ctx.fillText(`25 ${formatMoney(item.amount25)}`, padding.left + Math.min(w25 + 6, chartWidth - 86), y25);
-    ctx.fillText(`26 ${formatMoney(item.amount26)}`, padding.left + Math.min(w26 + 6, chartWidth - 86), y26);
-    state.chartHitZones.push({ category: item.category, y, height: rowHeight });
-  });
+  if (els.emptyChart) els.emptyChart.style.display = "none";
+  if (els.categoryChart) els.categoryChart.style.display = "none";
+  const rows = monthlyCategoryDiagnostics();
+  if (els.categoryDiagnostics) {
+    els.categoryDiagnostics.innerHTML = rows.map((item) => `
+      <button class="category-diagnostic ${item.amountDiff > 0 ? "bad" : "good"}" type="button" data-category="${escapeHtml(item.category)}">
+        <span>${escapeHtml(localizeCategory(item.category, state.language))}</span>
+        <strong>${formatUnit(item.unitDiff)} €/台</strong>
+        <em>${formatMoney(item.amountDiff)} K€</em>
+        <em>${formatMoney(item.manufacturingDiff)} K€</em>
+        <em>${formatPercent(item.yoyRate)}</em>
+      </button>
+    `).join("");
+    for (const button of els.categoryDiagnostics.querySelectorAll("[data-category]")) {
+      button.addEventListener("click", () => {
+        els.categoryFilter.value = button.dataset.category;
+        renderTable();
+      });
+    }
+  }
 }
 
 function handleChartClick(event) {
@@ -1103,6 +1304,7 @@ function handleChartClick(event) {
 
 function renderFactors() {
   recalcFactors();
+  if (els.projectSummary) els.projectSummary.innerHTML = buildProjectSummaryText();
   els.increaseTotal.textContent = formatMoney(state.factorSummary.increaseCumulative);
   els.decreaseTotal.textContent = formatMoney(state.factorSummary.decreaseCumulative);
   els.factorNetDetail.textContent = formatMoney(state.factorSummary.netCumulative);
@@ -1176,6 +1378,78 @@ function addFactor(type) {
   renderFactors();
 }
 
+function seedOriginalFactors() {
+  return [
+    {
+      id: "seed-inventory-release",
+      type: "decrease",
+      category: "存货跌价准备",
+      strategy: "存货跌价准备释放预提",
+      project: "超期库存钢卷加工成本成品",
+      owner: "",
+      timing: "4月",
+      actualCumulative: 180,
+      progress: "三张表原始因素"
+    },
+    {
+      id: "seed-fixed-labor-release",
+      type: "decrease",
+      category: "固定人工",
+      strategy: "同期释放预提",
+      project: "固定人工预提释放",
+      owner: "",
+      timing: "4月",
+      actualCumulative: 41.9,
+      progress: "三张表原始因素"
+    },
+    {
+      id: "seed-steel-scrap",
+      type: "increase",
+      category: "物耗",
+      strategy: "钢卷制成半成品料废",
+      project: "钢卷半成品料废",
+      owner: "",
+      timing: "4月",
+      actualCumulative: 26,
+      progress: "三张表原始因素"
+    },
+    {
+      id: "seed-stale-wip",
+      type: "increase",
+      category: "生产耗用",
+      strategy: "钢卷半成品呆滞",
+      project: "呆滞半成品消耗",
+      owner: "",
+      timing: "4月",
+      actualCumulative: 66,
+      progress: "三张表原始因素"
+    },
+    {
+      id: "seed-oil-purchase",
+      type: "increase",
+      category: "生产耗用",
+      strategy: "一次性购买5/6/7月oil预防涨价",
+      project: "Oil提前采购",
+      owner: "",
+      timing: "4月",
+      actualCumulative: 40,
+      progress: "三张表原始因素"
+    }
+  ];
+}
+
+function buildProjectSummaryText() {
+  const increaseCount = state.factors.filter((item) => item.type === "increase").length;
+  const decreaseCount = state.factors.filter((item) => item.type !== "increase").length;
+  const top = state.factors
+    .slice()
+    .sort((a, b) => Math.abs(b.actualCumulative || 0) - Math.abs(a.actualCumulative || 0))
+    .slice(0, 3)
+    .map((item) => item.project || item.strategy || item.category)
+    .join("、");
+  return `当前项目库共沉淀上涨因素 ${increaseCount} 项、下降因素 ${decreaseCount} 项；上涨累计 ${formatMoney(state.factorSummary?.increaseCumulative)} K€，下降累计 ${formatMoney(state.factorSummary?.decreaseCumulative)} K€，净影响 ${formatMoney(state.factorSummary?.netCumulative)} K€。重点项目为 ${top || "待补充"}。`;
+}
+
 function recalcFactors() {
   state.factorSummary = buildFactorSummary(state.factors, Number(els.monthSelect.value));
 }
@@ -1242,6 +1516,16 @@ function formatUnit(value) {
 function formatNumber(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
   return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+}
+
+function formatPercent(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "--";
+  return `${(Number(value) * 100).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+}
+
+function formatPlain(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "--";
+  return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
 }
 
 function formatDashboardValue(value, unit) {
