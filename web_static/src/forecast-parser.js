@@ -5,6 +5,90 @@ export const DASHBOARD_MONTHS = [
   "7月", "8月", "9月", "10月", "11月", "12月"
 ];
 
+const MONTH_LABELS = {
+  zh: DASHBOARD_MONTHS,
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  tr: ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"]
+};
+
+const DASHBOARD_TEXT = {
+  groups: {
+    "核心": { en: "Core", tr: "Çekirdek" },
+    "差异": { en: "Variance", tr: "Fark" },
+    "效率": { en: "Efficiency", tr: "Verimlilik" },
+    "大科目": { en: "Category", tr: "Kategori" }
+  },
+  scenarios: {
+    "同期": { en: "Same period", tr: "Aynı dönem" },
+    "预算": { en: "Budget", tr: "Bütçe" },
+    "26年": { en: "2026", tr: "2026" },
+    "差额": { en: "Variance", tr: "Fark" },
+    "累计差额": { en: "YTD variance", tr: "YTD fark" }
+  },
+  units: {
+    "台": { en: "pcs", tr: "adet" },
+    "人": { en: "HC", tr: "kişi" },
+    "€/台": { en: "€/pc", tr: "€/adet" },
+    "台/人": { en: "pcs/HC", tr: "adet/kişi" },
+    "K€": { en: "K€", tr: "K€" }
+  },
+  labels: {
+    "产量": { en: "Volume", tr: "Hacim" },
+    "标准台": { en: "STD volume", tr: "STD hacim" },
+    "产量累计": { en: "YTD volume", tr: "YTD hacim" },
+    "标准台累计": { en: "YTD STD volume", tr: "YTD STD hacim" },
+    "制造费用金额": { en: "Manufacturing cost", tr: "Üretim gideri" },
+    "制造费用金额累计": { en: "YTD manufacturing cost", tr: "YTD üretim gideri" },
+    "单台制造费": { en: "Unit manufacturing cost", tr: "Birim üretim gideri" },
+    "单台制造费累计": { en: "YTD unit manufacturing cost", tr: "YTD birim üretim gideri" },
+    "实际-同期金额": { en: "Actual vs same period", tr: "Gerçekleşen - aynı dönem" },
+    "实际-预算金额": { en: "Actual vs budget", tr: "Gerçekleşen - bütçe" },
+    "制造费差额": { en: "MFG variance", tr: "Üretim gideri farkı" },
+    "预算制造费差额": { en: "Budget MFG variance", tr: "Bütçe üretim farkı" },
+    "累计制造费差额": { en: "YTD MFG variance", tr: "YTD üretim farkı" },
+    "累计预算制造费差额": { en: "YTD budget MFG variance", tr: "YTD bütçe üretim farkı" },
+    "用人": { en: "Headcount", tr: "Kişi sayısı" },
+    "累计用人": { en: "YTD headcount", tr: "YTD kişi sayısı" },
+    "人均产量": { en: "Output per HC", tr: "Kişi başı çıktı" },
+    "累计人均产量": { en: "YTD output per HC", tr: "YTD kişi başı çıktı" },
+    "直接用人": { en: "Direct HC", tr: "Direkt kişi" },
+    "间接用人": { en: "Indirect HC", tr: "Endirekt kişi" },
+    "固定用人": { en: "White-collar HC", tr: "Beyaz yaka kişi" }
+  },
+  categories: {
+    "直接人工": { en: "Direct labor", tr: "Direkt işçilik" },
+    "变动能源": { en: "Variable utilities", tr: "Değişken enerji" },
+    "生产耗用": { en: "Production consumables", tr: "Üretim sarf" },
+    "生产耗用品": { en: "Production consumables", tr: "Üretim sarf" },
+    "变动制造费": { en: "Variable conversion", tr: "Değişken dönüşüm" },
+    "间接人工": { en: "Indirect labor", tr: "Endirekt işçilik" },
+    "固定人工": { en: "Fixed labor", tr: "Sabit işçilik" },
+    "半固定费用": { en: "Semifixed", tr: "Yarı sabit" },
+    "固定能源": { en: "Fixed utilities", tr: "Sabit enerji" },
+    "固定费用": { en: "Fixed cost", tr: "Sabit gider" },
+    "折旧": { en: "Depreciation", tr: "Amortisman" },
+    "FC汇率影响": { en: "FC FX impact", tr: "FC kur etkisi" },
+    "报废": { en: "Scrap", tr: "Hurda" },
+    "卖废": { en: "Scrap reselling", tr: "Hurda satışı" },
+    "库存调整": { en: "Inventory adjustment", tr: "Stok düzeltmesi" },
+    "存货跌价准备": { en: "Obsolescence", tr: "Stok değer düşüklüğü" },
+    "IT Global": { en: "IT Global", tr: "IT Global" },
+    "G&A": { en: "G&A", tr: "G&A" },
+    "制造费用合计": { en: "Total manufacturing cost", tr: "Toplam üretim gideri" },
+    "折旧（含FC）": { en: "Depreciation incl. FC", tr: "FC dahil amortisman" },
+    "运营费": { en: "Operating cost", tr: "Operasyon gideri" },
+    "可回收废料": { en: "Recoverable scrap", tr: "Geri kazanılabilir hurda" },
+    "废品回收": { en: "Scrap recovery", tr: "Hurda geliri" },
+    "固定能源费": { en: "Fixed utilities", tr: "Sabit enerji" },
+    "变动能源费": { en: "Variable utilities", tr: "Değişken enerji" },
+    "间接人工成本-辅助人员": { en: "Indirect labor - support", tr: "Endirekt işçilik - destek" },
+    "固定人工-白领": { en: "Fixed labor - white collar", tr: "Sabit işçilik - beyaz yaka" },
+    "半固定-班车/工作服": { en: "Semifixed - shuttle/uniform", tr: "Yarı sabit - servis/üniforma" },
+    "分摊费用": { en: "Allocation", tr: "Dağıtım" },
+    "其他制造费": { en: "Other manufacturing cost", tr: "Diğer üretim gideri" }
+  }
+};
+
 const CATEGORY_ROWS = [
   "Direct Labor",
   "Variable Utilities",
@@ -173,6 +257,8 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   }
 
   for (const item of forecast.categories.filter((category) => isVisibleCategory(category.label))) {
+    const sameCategoryMonths = categoryMonthsFromObject(options.baseline25ByMonth, item.labelZh, "amount25");
+    if (sameCategoryMonths.some(isNumber)) rows.push(metric("大科目", item.labelZh, "同期", "K€", sameCategoryMonths, "lower"));
     rows.push(metric("大科目", item.labelZh, "预算", "K€", item.budgetMonths, "lower"));
     rows.push(metric("大科目", item.labelZh, "26年", "K€", item.amountMonths, "lower", item.budgetMonths));
   }
@@ -192,6 +278,32 @@ export function monthSnapshot(forecast, month) {
     amount: total.amountMonths[index] ?? null,
     budgetDelta: total.varianceMonths[index] ?? null
   };
+}
+
+export function localizeDashboardRow(row, language = "zh") {
+  return {
+    group: translateDashboardText("groups", row.group, language),
+    label: translateDashboardText("labels", row.label, language),
+    scenario: translateDashboardText("scenarios", row.scenario, language),
+    unit: translateDashboardText("units", row.unit, language)
+  };
+}
+
+export function localizeDashboardText(type, value, language = "zh") {
+  return translateDashboardText(type, value, language);
+}
+
+export function localizeMonthLabel(index, language = "zh") {
+  return MONTH_LABELS[language]?.[index] || MONTH_LABELS.zh[index] || `${index + 1}月`;
+}
+
+export function localizeCategory(value, language = "zh") {
+  return translateDashboardText("categories", value, language);
+}
+
+function translateDashboardText(type, value, language) {
+  if (language === "zh") return value;
+  return DASHBOARD_TEXT[type]?.[value]?.[language] || value;
 }
 
 function metric(group, label, scenario, unitLabel, values, direction = "lower", compareValues = null) {
@@ -297,6 +409,13 @@ function monthsFromObject(source, getter) {
   return Array.from({ length: 12 }, (_, index) => {
     const value = getter(source?.[index + 1]);
     return Number.isFinite(value) ? value : null;
+  });
+}
+
+function categoryMonthsFromObject(source, label, valueKey) {
+  return monthsFromObject(source, (item) => {
+    const found = item?.categories?.find((category) => sameLabel(category.label, label));
+    return found?.[valueKey] ?? null;
   });
 }
 
