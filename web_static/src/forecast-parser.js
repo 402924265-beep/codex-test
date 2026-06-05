@@ -70,6 +70,7 @@ const DASHBOARD_TEXT = {
     "FC汇率影响": { en: "FC FX impact", tr: "FC kur etkisi" },
     "报废": { en: "Scrap", tr: "Hurda" },
     "卖废": { en: "Scrap reselling", tr: "Hurda satışı" },
+    "Scrap selling": { en: "Scrap selling", tr: "Hurda satışı" },
     "库存调整": { en: "Inventory adjustment", tr: "Stok düzeltmesi" },
     "存货跌价准备": { en: "Obsolescence", tr: "Stok değer düşüklüğü" },
     "IT Global": { en: "IT Global", tr: "IT Global" },
@@ -263,7 +264,40 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
     rows.push(metric("大科目", item.labelZh, "26年", "K€", item.amountMonths, "lower", item.budgetMonths));
   }
 
-  return rows.filter((item) => item.values.some((value) => value !== null && value !== undefined));
+  return prioritizeDashboardRows(rows.filter((item) => item.values.some((value) => value !== null && value !== undefined)));
+}
+
+function prioritizeDashboardRows(rows) {
+  const metricOrder = [
+    "Unit manufacturing cost",
+    "YTD unit manufacturing cost",
+    "MFG variance",
+    "YTD MFG variance",
+    "Manufacturing cost",
+    "YTD manufacturing cost",
+    "Volume",
+    "YTD volume",
+    "STD volume",
+    "YTD STD volume",
+    "Headcount",
+    "YTD headcount",
+    "Direct HC",
+    "Indirect HC",
+    "Fixed labor - white collar"
+  ];
+  const scenarioOrder = ["Same period", "Budget", "2026", "Variance", "YTD variance"];
+  const groupOrder = ["Core", "Variance", "Efficiency", "Category"];
+  const orderOf = (list, value) => {
+    const index = list.indexOf(value);
+    return index === -1 ? 999 : index;
+  };
+  return [...rows].sort((left, right) => {
+    const leftLocal = localizeDashboardRow(left, "en");
+    const rightLocal = localizeDashboardRow(right, "en");
+    return orderOf(groupOrder, leftLocal.group) - orderOf(groupOrder, rightLocal.group)
+      || orderOf(metricOrder, leftLocal.label) - orderOf(metricOrder, rightLocal.label)
+      || orderOf(scenarioOrder, leftLocal.scenario) - orderOf(scenarioOrder, rightLocal.scenario);
+  });
 }
 
 export function monthSnapshot(forecast, month) {

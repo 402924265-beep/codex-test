@@ -230,6 +230,10 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .panel { overflow: hidden; }
 
+.narrative-panel {
+  display: none;
+}
+
 .panel-title {
   min-height: 52px;
   padding: 12px 14px;
@@ -279,6 +283,13 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   font-size: 19px;
 }
 
+.dashboard-card em {
+  min-height: 16px;
+  color: #cde0ec;
+  font-style: normal;
+  font-size: 11px;
+}
+
 .dashboard-toolbar {
   display: flex;
   gap: 12px;
@@ -288,9 +299,13 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   background: #f7fafc;
 }
 
+.dashboard-basis-field {
+  display: none;
+}
+
 .cockpit-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(360px, 0.85fr);
+  grid-template-columns: 1fr;
   gap: 12px;
   padding: 12px;
   background:
@@ -335,7 +350,7 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 #waterfallChart {
   display: block;
   width: 100%;
-  height: 310px;
+  height: 340px;
 }
 
 .chart-bg { fill: #0f2234; }
@@ -369,11 +384,29 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   stroke-dasharray: 6 6;
   filter: none;
 }
+.trend-line.budget-line {
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 4px rgba(246, 200, 95, 0.25));
+}
+.trend-diff-good,
+.trend-diff-bad {
+  font: 700 11px "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+  text-anchor: middle;
+}
+.trend-diff-good { fill: #49d9a4; }
+.trend-diff-bad { fill: #ff7a70; }
 .forecast-zone { fill: rgba(255,255,255,0.05); }
 .dot { stroke: #0f2234; stroke-width: 1.5; }
 .dot.forecast { opacity: 0.65; }
 .wf-bad { fill: rgba(180, 35, 24, 0.84); }
 .wf-good { fill: rgba(8, 119, 93, 0.86); }
+.wf-start,
+.wf-end { fill: rgba(73, 125, 182, 0.88); }
+.wf-connector {
+  stroke: rgba(255,255,255,0.34);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
 .wf-label { text-anchor: middle; fill: #bdd2df; }
 .wf-value { text-anchor: middle; fill: #fff; font-weight: 700; }
 .waterfall-total { font-size: 14px; font-weight: 700; fill: #fff; }
@@ -404,6 +437,14 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   border-radius: 5px;
   border: 1px solid rgba(16,32,51,0.04);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  color: #0e2c42;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .heat-cell:hover {
@@ -431,7 +472,7 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   overflow: auto;
 }
 
-.dashboard-table-wrap { max-height: 420px; }
+.dashboard-table-wrap { max-height: none; }
 .table-wrap { max-height: calc(100vh - 430px); min-height: 360px; }
 .project-wrap { max-height: calc(100vh - 360px); }
 
@@ -578,7 +619,7 @@ td:nth-child(2) { text-align: left; }
   background: rgba(255, 255, 255, 0.86);
 }
 
-.narrative-panel {
+.narrative-panel.legacy-summary {
   display: grid;
   gap: 12px;
 }

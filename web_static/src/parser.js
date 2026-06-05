@@ -20,7 +20,7 @@ export const SAP_SUMMARY_LABELS = {
   "CS_FIX COST": "运营费",
   "CS_VARIABLE COST": "生产耗用品",
   "CS_OBSOLESCENCE": "存货跌价准备",
-  "CS_RESELLING": "废品回收",
+  "CS_RESELLING": "Scrap selling",
   "CS_FIX UTILITIES": "固定能源费",
   "CS_VARIABLE UTILITIES": "变动能源费",
   "CS_INDIRECT LABOUR": "间接人工成本-辅助人员",

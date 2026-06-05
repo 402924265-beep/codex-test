@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js?v=20260605-dashboard-v4"></script>
+    <script type="module" src="./src/app.js?v=20260605-dashboard-v5"></script>
   </head>
   <body>
     <header class="app-header">
@@ -72,7 +72,7 @@
                 <option value="cost" data-i18n-option="groupCost">费</option>
               </select>
             </div>
-            <div class="field">
+            <div class="field dashboard-basis-field">
               <label for="dashboardBasisSelect" data-i18n="dashboardBasis">对比基准</label>
               <select id="dashboardBasisSelect">
                 <option value="budget" data-i18n-option="budget26">26预算</option>
@@ -94,7 +94,7 @@
                 <h3 data-i18n="waterfallTitle">全年差异瀑布</h3>
                 <span data-i18n="waterfallHint">红色恶化，绿色优化</span>
               </div>
-              <svg id="waterfallChart" viewBox="0 0 520 310" role="img" aria-label="全年差异瀑布"></svg>
+              <svg id="waterfallChart" viewBox="0 0 980 340" role="img" aria-label="全年差异瀑布"></svg>
             </section>
             <section class="cockpit-card heatmap-card">
               <div class="cockpit-title">
@@ -108,7 +108,7 @@
                 <h3 data-i18n="detailTitle">指标明细</h3>
                 <button id="toggleDashboardTable" class="ghost-button" type="button" data-i18n="showDetail">展开明细</button>
               </div>
-              <div class="dashboard-table-wrap collapsed" id="dashboardTableWrap">
+              <div class="dashboard-table-wrap" id="dashboardTableWrap">
                 <table class="dashboard-table">
                   <thead id="dashboardHead"></thead>
                   <tbody id="dashboardBody">

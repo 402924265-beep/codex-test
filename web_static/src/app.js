@@ -24,7 +24,7 @@ import {
   parseEditableNumber
 } from "./workbench.js";
 
-const VERSION = "20260605-dashboard-v4";
+const VERSION = "20260605-dashboard-v5";
 
 const i18n = {
   zh: {
@@ -108,6 +108,7 @@ const i18n = {
     trendHint: "实线为已发生，虚线为预测段",
     waterfallTitle: "全年差异瀑布",
     waterfallHint: "红色恶化，绿色优化",
+    other: "其他",
     heatmapTitle: "月度异常热力",
     heatmapHint: "颜色越深差异越大",
     detailTitle: "指标明细",
@@ -232,6 +233,7 @@ const i18n = {
     trendHint: "Solid line is actual period; dashed line is forecast period",
     waterfallTitle: "Full-Year Variance Waterfall",
     waterfallHint: "Red is worse, green is better",
+    other: "Other",
     heatmapTitle: "Monthly Exception Heatmap",
     heatmapHint: "Darker color means larger variance",
     detailTitle: "Metric Detail",
@@ -356,6 +358,7 @@ const i18n = {
     trendHint: "Düz çizgi gerçekleşen, kesikli çizgi tahmin dönemidir",
     waterfallTitle: "Yıllık Fark Şelalesi",
     waterfallHint: "Kırmızı kötüleşme, yeşil iyileşme",
+    other: "Diğer",
     heatmapTitle: "Aylık İstisna Isı Haritası",
     heatmapHint: "Renk koyulaştıkça fark büyür",
     detailTitle: "Gösterge Detayı",
@@ -414,8 +417,8 @@ const state = {
   chartHitZones: [],
   language: "zh",
   dashboardGroup: "all",
-  dashboardBasis: "budget",
-  dashboardTableOpen: false,
+  dashboardBasis: "same",
+  dashboardTableOpen: true,
   sapFileName: "",
   forecastFileName: ""
 };
@@ -683,17 +686,17 @@ function renderDashboard() {
   const budgetAmountTotal = valueAtYear(rowBy("制造费用金额", "预算"));
   const sameAmountTotal = valueAtYear(rowBy("制造费用金额", "同期"));
   const annualUnit = annualUnitCost(rowBy("制造费用金额", "26年"), rowBy("产量", "26年"));
-  const annualBudgetUnit = annualUnitCost(rowBy("制造费用金额", "预算"), rowBy("产量", "预算"));
-  const unitGap = annualUnit === null || annualBudgetUnit === null ? null : annualUnit - annualBudgetUnit;
-  const productivity = valueAtYear(rowBy("累计人均产量", "26年"));
+  const annualSameUnit = annualUnitCost(rowBy("制造费用金额", "同期"), rowBy("产量", "同期"));
+  const unitGap = annualUnit === null || annualSameUnit === null ? null : annualUnit - annualSameUnit;
+  const mfgDiffByUnit = unitGap === null || !volumeTotal ? null : (unitGap * volumeTotal) / 1000;
   els.dashboardCards.innerHTML = [
+    dashboardCard(localizeDashboardText("labels", "单台制造费", state.language), formatUnit(annualUnit), localizeDashboardText("units", "€/台", state.language), valueClass(unitGap), `${t("same25")} ${formatUnit(annualSameUnit)} / ${t("unitDiff")} ${formatUnit(unitGap)}`),
+    dashboardCard(t("manufacturingDiff"), formatMoney(mfgDiffByUnit), "K€", valueClass(mfgDiffByUnit), t("mfgDiffFormula")),
     dashboardCard(localizeDashboardText("labels", "产量", state.language), formatNumber(volumeTotal), localizeDashboardText("units", "台", state.language)),
     dashboardCard(localizeDashboardText("labels", "制造费用金额", state.language), formatMoney(amountTotal), "K€"),
     dashboardCard(t("budget26"), formatMoney(budgetAmountTotal), "K€"),
     dashboardCard(t("same25"), formatMoney(sameAmountTotal), "K€"),
-    dashboardCard(localizeDashboardText("labels", "单台制造费", state.language), formatUnit(annualUnit), localizeDashboardText("units", "€/台", state.language), valueClass(unitGap)),
-    dashboardCard(t("unitDiff"), formatUnit(unitGap), localizeDashboardText("units", "€/台", state.language), valueClass(unitGap)),
-    dashboardCard(localizeDashboardText("labels", "人均产量", state.language), formatUnit(productivity), localizeDashboardText("units", "台/人", state.language))
+    dashboardCard(t("unitDiff"), formatUnit(unitGap), localizeDashboardText("units", "€/台", state.language), valueClass(unitGap))
   ].join("");
 
   const metrics = dashboardMetricsForGroup();
@@ -714,11 +717,11 @@ function renderDashboard() {
 
 function dashboardMetricsForGroup() {
   const map = {
-    all: ["产量", "单台制造费", "用人", "人均产量", "制造费用金额"],
+    all: ["单台制造费", "制造费用金额", "产量", "用人"],
     unit: ["产量", "标准台"],
     time: ["标准台"],
     people: ["用人", "直接用人", "间接用人", "固定用人"],
-    efficiency: ["人均产量"],
+    efficiency: ["用人"],
     cost: ["单台制造费", "制造费用金额"]
   };
   return map[state.dashboardGroup] || map.all;
@@ -740,89 +743,128 @@ function renderTrendSvg(metrics, rowBy) {
   const plotW = width - left - right;
   const plotH = height - top - bottom;
   const actualMonths = countActualMonths();
-  const rows = metrics.map((labelText) => ({
-    label: labelText,
-    actual: rowBy(labelText, "26年"),
-    compare: rowBy(labelText, state.dashboardBasis === "same" ? "同期" : "预算")
-  })).filter((item) => item.actual);
-  if (!rows.length) {
+  const labelText = metrics.find((metric) => rowBy(metric, "26年") && rowBy(metric, "同期")) || "单台制造费";
+  const actual = rowBy(labelText, "26年");
+  const same = rowBy(labelText, "同期");
+  const budget = rowBy(labelText, "预算");
+  if (!actual || !same) {
     els.trendChart.innerHTML = emptySvgMessage(t(state.dashboardGroup === "time" ? "noTimeData" : "emptyForecast"));
     return;
   }
-  const values = rows.flatMap((item) => [...item.actual.values, ...(item.compare?.values || [])]).filter(Number.isFinite);
+  const values = [...actual.values, ...(same?.values || []), ...(budget?.values || [])].filter(Number.isFinite);
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
   const x = (index) => left + (plotW / 11) * index;
   const y = (value) => top + plotH - ((value - min) / span) * plotH;
+  const line = (row, cls, color) => {
+    const points = row?.values.map((value, month) => Number.isFinite(value) ? `${x(month)},${y(value)}` : null).filter(Boolean).join(" ");
+    return points ? `<polyline class="trend-line ${cls}" style="stroke:${color}" points="${points}" />` : "";
+  };
   const grid = Array.from({ length: 12 }, (_, index) => `
     <g>
       <line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${top + plotH}" class="grid-line" />
       <text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(localizeMonthLabel(index, state.language))}</text>
     </g>
   `).join("");
-  const palette = ["#48d6c1", "#5aa4ff", "#f6c85f", "#9d7dff", "#ff8a65"];
-  const lines = rows.map((item, index) => {
-    const color = palette[index % palette.length];
-    const actualPoints = item.actual.values.map((value, month) => Number.isFinite(value) ? `${x(month)},${y(value)}` : null).filter(Boolean).join(" ");
-    const comparePoints = item.compare?.values.map((value, month) => Number.isFinite(value) ? `${x(month)},${y(value)}` : null).filter(Boolean).join(" ") || "";
-    const localized = localizeDashboardText("labels", item.label, state.language);
-    const last = item.actual.values.findLast?.(Number.isFinite) ?? [...item.actual.values].reverse().find(Number.isFinite);
-    return `
-      ${comparePoints ? `<polyline class="trend-line compare" points="${comparePoints}" />` : ""}
-      <polyline class="trend-line" style="stroke:${color}" points="${actualPoints}" />
-      ${item.actual.values.map((value, month) => Number.isFinite(value) ? `<circle cx="${x(month)}" cy="${y(value)}" r="${month < actualMonths ? 4.5 : 3.5}" class="${month < actualMonths ? "dot actual" : "dot forecast"}" style="fill:${color}" />` : "").join("")}
-      <text x="${left + 10}" y="${24 + index * 18}" class="legend" style="fill:${color}">${escapeSvg(localized)} ${formatDashboardValue(last, item.actual.unit)}</text>
-    `;
+  const diffLabels = actual.values.map((value, index) => {
+    if (!Number.isFinite(value) || !Number.isFinite(same.values[index])) return "";
+    const diff = value - same.values[index];
+    const good = actual.direction === "higher" ? diff > 0 : diff < 0;
+    return `<text x="${x(index)}" y="${Math.max(top + 14, y(value) - 10)}" class="${good ? "trend-diff-good" : "trend-diff-bad"}">${formatDashboardValue(diff, actual.unit)}</text>`;
   }).join("");
   els.trendChart.innerHTML = `
     <rect x="0" y="0" width="${width}" height="${height}" class="chart-bg" />
     ${grid}
     <line x1="${left}" y1="${top + plotH}" x2="${width - right}" y2="${top + plotH}" class="axis-line" />
     <rect x="${x(actualMonths - 0.5)}" y="${top}" width="${Math.max(0, width - right - x(actualMonths - 0.5))}" height="${plotH}" class="forecast-zone" />
-    ${lines}
+    ${line(same, "compare", "rgba(255,255,255,0.46)")}
+    ${line(budget, "budget-line", "#f6c85f")}
+    ${line(actual, "", "#48d6c1")}
+    ${actual.values.map((value, month) => Number.isFinite(value) ? `<circle cx="${x(month)}" cy="${y(value)}" r="${month < actualMonths ? 4.5 : 3.5}" class="${month < actualMonths ? "dot actual" : "dot forecast"}" style="fill:#48d6c1" />` : "").join("")}
+    ${diffLabels}
+    <text x="${left + 10}" y="24" class="legend" style="fill:#48d6c1">${escapeSvg(localizeDashboardText("labels", labelText, state.language))} ${escapeSvg(t("actual26"))}</text>
+    <text x="${left + 210}" y="24" class="legend" style="fill:#f6c85f">${escapeSvg(t("budget26"))}</text>
+    <text x="${left + 330}" y="24" class="legend">${escapeSvg(t("same25"))}</text>
     <text x="${width - 180}" y="24" class="phase-label">${escapeSvg(t("actualMonths"))} / ${escapeSvg(t("forecastMonths"))}</text>
   `;
 }
 
 function renderWaterfallSvg(rowBy) {
   const actual = rowBy("制造费用金额", "26年");
-  const compare = rowBy("制造费用金额", state.dashboardBasis === "same" ? "同期" : "预算");
-  if (!actual || !compare) {
+  const same = rowBy("制造费用金额", "同期");
+  if (!actual || !same) {
     els.waterfallChart.innerHTML = emptySvgMessage(t("emptyForecast"));
     return;
   }
-  const categoryRows = state.dashboardRows
+  const actualTotal = sum(actual.values);
+  const sameTotal = sum(same.values);
+  const rawCategoryRows = state.dashboardRows
     .filter((row) => row.group === "大科目" && row.scenario === "26年")
-    .map((row) => ({
-      label: row.label,
-      diff: sum(row.values) - sum(state.dashboardRows.find((item) => item.label === row.label && item.scenario === (state.dashboardBasis === "same" ? "同期" : "预算"))?.values || [])
-    }))
+    .map((row) => {
+      const sameRow = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "同期");
+      return {
+        label: row.label,
+        diff: sum(row.values) - sum(sameRow?.values || [])
+      };
+    })
     .filter((item) => Number.isFinite(item.diff) && Math.abs(item.diff) > 0.01)
     .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
-    .slice(0, 7);
-  const maxAbs = Math.max(1, ...categoryRows.map((item) => Math.abs(item.diff)));
-  const baseY = 258;
-  const barW = 44;
-  const gap = 18;
-  const startX = 34;
+  const topRows = rawCategoryRows.slice(0, 6);
+  const otherDiff = rawCategoryRows.slice(6).reduce((total, item) => total + item.diff, 0);
+  const categoryRows = Math.abs(otherDiff) > 0.01
+    ? [...topRows, { label: t("other"), diff: otherDiff }]
+    : topRows;
+  const width = 980;
+  const height = 340;
+  const left = 52;
+  const top = 42;
+  const bottom = 58;
+  const plotH = height - top - bottom;
+  const minValue = Math.min(sameTotal, actualTotal, sameTotal + Math.min(0, ...categoryRows.map((item) => item.diff)));
+  const maxValue = Math.max(sameTotal, actualTotal, sameTotal + Math.max(0, ...categoryRows.map((item) => item.diff)));
+  const span = maxValue - minValue || 1;
+  const y = (value) => top + plotH - ((value - minValue) / span) * plotH;
+  const barW = 72;
+  const gap = (width - left * 2 - barW * (categoryRows.length + 2)) / Math.max(1, categoryRows.length + 1);
+  let cursor = sameTotal;
+  const startBar = totalBar(left, sameTotal, "wf-start", t("same25"), sameTotal, y, plotH, top, barW);
   const bars = categoryRows.map((item, index) => {
-    const h = Math.max(6, Math.abs(item.diff) / maxAbs * 170);
-    const x = startX + index * (barW + gap);
-    const y = item.diff > 0 ? baseY - h : baseY;
+    const x = left + (index + 1) * (barW + gap);
+    const before = cursor;
+    cursor += item.diff;
+    const y1 = y(before);
+    const y2 = y(cursor);
+    const rectY = Math.min(y1, y2);
+    const h = Math.max(8, Math.abs(y2 - y1));
     const cls = item.diff > 0 ? "wf-bad" : "wf-good";
     return `
-      <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="6" class="${cls}" />
-      <text x="${x + barW / 2}" y="${y - 8}" class="wf-value">${formatMoney(item.diff)}</text>
-      <text x="${x + barW / 2}" y="288" class="wf-label">${escapeSvg(shortText(localizeCategory(item.label, state.language), 10))}</text>
+      <rect x="${x}" y="${rectY}" width="${barW}" height="${h}" rx="5" class="${cls}" />
+      <line x1="${x - gap}" y1="${y1}" x2="${x}" y2="${y1}" class="wf-connector" />
+      <text x="${x + barW / 2}" y="${rectY - 9}" class="wf-value">${formatMoney(item.diff)}</text>
+      <text x="${x + barW / 2}" y="${height - 24}" class="wf-label">${escapeSvg(shortText(localizeCategory(item.label, state.language), 12))}</text>
     `;
   }).join("");
-  const totalDiff = sum(actual.values) - sum(compare.values);
+  const endX = left + (categoryRows.length + 1) * (barW + gap);
+  const endBar = totalBar(endX, actualTotal, "wf-end", t("actual26"), actualTotal, y, plotH, top, barW);
+  const totalDiff = actualTotal - sameTotal;
   els.waterfallChart.innerHTML = `
-    <rect x="0" y="0" width="520" height="310" class="chart-bg" />
-    <line x1="24" y1="${baseY}" x2="496" y2="${baseY}" class="axis-line" />
+    <rect x="0" y="0" width="${width}" height="${height}" class="chart-bg" />
+    <line x1="${left - 20}" y1="${y(sameTotal)}" x2="${width - left + 20}" y2="${y(sameTotal)}" class="axis-line" />
+    ${startBar}
     ${bars}
+    ${endBar}
     <text x="26" y="28" class="waterfall-total">${escapeSvg(t("varianceValue"))}: ${formatMoney(totalDiff)} K€</text>
+  `;
+}
+
+function totalBar(x, value, cls, label, displayValue, y, plotH, top, barW) {
+  const barTop = y(value);
+  const h = top + plotH - barTop;
+  return `
+    <rect x="${x}" y="${barTop}" width="${barW}" height="${Math.max(8, h)}" rx="5" class="${cls}" />
+    <text x="${x + barW / 2}" y="${barTop - 9}" class="wf-value">${formatMoney(displayValue)}</text>
+    <text x="${x + barW / 2}" y="316" class="wf-label">${escapeSvg(label)}</text>
   `;
 }
 
@@ -847,7 +889,7 @@ function renderHeatmap(metrics, rowBy) {
       ${row.diffs.map((value, index) => {
         const good = row.actual.direction === "higher" ? value > 0 : value < 0;
         const intensity = Math.min(1, Math.abs(value || 0) / row.max);
-        return `<div class="heat-cell ${value === null ? "missing" : good ? "good" : "bad"}" style="--a:${0.18 + intensity * 0.62}" title="${escapeHtml(monthLabels[index])} ${formatDashboardValue(value, row.actual.unit)}"></div>`;
+        return `<div class="heat-cell ${value === null ? "missing" : good ? "good" : "bad"}" style="--a:${0.18 + intensity * 0.62}" title="${escapeHtml(monthLabels[index])} ${formatDashboardValue(value, row.actual.unit)}">${value === null ? "" : formatDashboardValue(value, row.actual.unit)}</div>`;
       }).join("")}
     `).join("")}
   `;
@@ -861,8 +903,8 @@ function emptySvgMessage(message) {
   return `<rect x="0" y="0" width="100%" height="100%" class="chart-bg" /><text x="50%" y="50%" text-anchor="middle" class="empty-svg">${escapeSvg(message)}</text>`;
 }
 
-function dashboardCard(title, value, unit, className = "") {
-  return `<div class="dashboard-card"><span>${escapeHtml(title)}</span><strong class="${className}">${value}</strong><small>${escapeHtml(unit)}</small></div>`;
+function dashboardCard(title, value, unit, className = "", note = "") {
+  return `<div class="dashboard-card"><span>${escapeHtml(title)}</span><strong class="${className}">${value}</strong><small>${escapeHtml(unit)}</small>${note ? `<em>${escapeHtml(note)}</em>` : ""}</div>`;
 }
 
 function valueAtYear(row) {
