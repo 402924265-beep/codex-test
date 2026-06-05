@@ -25,7 +25,7 @@ export async function exportAnalysisWorkbook({
 function buildDashboardSheet(rows, forecast) {
   if (!rows?.length) return [{ 说明: "未导入4+8预测文件，全年驾驶舱为空。" }];
   const output = rows.map((row) => {
-    const record = { 指标: row.label, 单位: row.unit };
+    const record = { 分组: row.group || "", 指标: row.label, 口径: row.scenario || "", 单位: row.unit };
     row.values.forEach((value, index) => {
       record[MONTHS[index]] = round(value);
     });

@@ -16,7 +16,7 @@ import {
   parseEditableNumber
 } from "./workbench.js";
 
-const VERSION = "20260605-upload-dashboard-v1";
+const VERSION = "20260605-dashboard-v2";
 
 const i18n = {
   zh: {
@@ -368,7 +368,7 @@ async function handleForecastFileChange(event) {
     const XLSX = await loadXlsx();
     const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
     state.forecast = extractForecastWorkbook(workbook, XLSX);
-    state.dashboardRows = buildAnnualDashboardRows(state.forecast);
+    state.dashboardRows = buildDashboardRows();
     els.forecastStatus.textContent = `已导入4+8：${file.name}`;
     els.forecastStatus.classList.remove("muted", "warning");
     els.exportBtn.disabled = false;
@@ -410,6 +410,7 @@ async function handleSapFileChange(event) {
       els.monthSelect.value = String([...state.resultByMonth.keys()][0]);
     }
     selectCurrentMonth();
+    state.dashboardRows = buildDashboardRows();
     els.exportBtn.disabled = false;
     els.sapStatus.textContent = `已导入SAP：${file.name}`;
     els.sapStatus.classList.remove("muted", "warning");
@@ -434,6 +435,14 @@ function renderAll() {
   renderChart();
   renderTable();
   renderFactors();
+}
+
+function buildDashboardRows() {
+  return buildAnnualDashboardRows(state.forecast, {
+    baseline25ByMonth: BASELINE_25_BY_MONTH,
+    budget26ByMonth: BUDGET_26_BY_MONTH,
+    resultByMonth: state.resultByMonth
+  });
 }
 
 function renderSummaryCards() {
@@ -461,28 +470,30 @@ function renderSummaryCards() {
 }
 
 function renderDashboard() {
-  els.dashboardHead.innerHTML = `<tr><th>${escapeHtml(label("indicator", "指标"))}</th><th>${escapeHtml(label("unit", "单位"))}</th>${state.forecast?.months?.map((month) => `<th>${month}</th>`).join("") || Array.from({ length: 12 }, (_, index) => `<th>${index + 1}月</th>`).join("")}</tr>`;
+  els.dashboardHead.innerHTML = `<tr><th>分组</th><th>${escapeHtml(label("indicator", "指标"))}</th><th>口径</th><th>${escapeHtml(label("unit", "单位"))}</th>${state.forecast?.months?.map((month) => `<th>${month}</th>`).join("") || Array.from({ length: 12 }, (_, index) => `<th>${index + 1}月</th>`).join("")}</tr>`;
   if (!state.forecast || !state.dashboardRows.length) {
     els.dashboardStatus.textContent = t("waitingForecast");
     els.dashboardCards.innerHTML = "";
-    els.dashboardBody.innerHTML = `<tr><td colspan="14" class="empty-cell">${t("emptyForecast")}</td></tr>`;
+    els.dashboardBody.innerHTML = `<tr><td colspan="16" class="empty-cell">${t("emptyForecast")}</td></tr>`;
     return;
   }
-  els.dashboardStatus.textContent = "4+8预测已加载";
-  const total = state.forecast.totalAll || state.forecast.totalIncludingFc || state.forecast.totalMfg;
-  const volumeTotal = sum(state.forecast.volume.actual);
-  const amountTotal = sum(total?.amountMonths || []);
-  const averageUnit = volumeTotal ? (amountTotal / volumeTotal) * 1000 : null;
-  const budgetDeltaTotal = sum(total?.varianceMonths || []);
+  els.dashboardStatus.textContent = "全年模型已加载";
+  const rowBy = (label, scenario) => state.dashboardRows.find((row) => row.label === label && row.scenario === scenario);
+  const volumeTotal = valueAtYear(rowBy("产量", "26年"));
+  const amountTotal = valueAtYear(rowBy("制造费用金额", "26年"));
+  const averageUnit = valueAtYear(rowBy("单台制造费累计", "26年"));
+  const mfgDiffTotal = valueAtYear(rowBy("累计制造费差额", "累计差额"));
   els.dashboardCards.innerHTML = [
-    dashboardCard("全年实际产量", formatNumber(volumeTotal), "台"),
+    dashboardCard("全年产量", formatNumber(volumeTotal), "台"),
     dashboardCard("全年制造费", formatMoney(amountTotal), "K€"),
-    dashboardCard("全年平均单台", formatUnit(averageUnit), "€/台"),
-    dashboardCard("全年实际-预算", formatMoney(budgetDeltaTotal), "K€", valueClass(budgetDeltaTotal))
+    dashboardCard("累计单台", formatUnit(averageUnit), "€/台"),
+    dashboardCard("累计制造费差额", formatMoney(mfgDiffTotal), "K€", valueClass(mfgDiffTotal))
   ].join("");
   els.dashboardBody.innerHTML = state.dashboardRows.map((row) => `
-    <tr>
+    <tr class="dashboard-row group-${escapeHtml(row.group)}">
+      <td><span class="group-chip">${escapeHtml(row.group)}</span></td>
       <td>${escapeHtml(row.label)}</td>
+      <td><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(row.scenario)}</span></td>
       <td>${escapeHtml(row.unit)}</td>
       ${row.values.map((value, index) => `<td class="month-cell ${heatClass(row, index)}">${formatDashboardValue(value, row.unit)}</td>`).join("")}
     </tr>
@@ -493,7 +504,24 @@ function dashboardCard(title, value, unit, className = "") {
   return `<div class="dashboard-card"><span>${escapeHtml(title)}</span><strong class="${className}">${value}</strong><small>${escapeHtml(unit)}</small></div>`;
 }
 
+function valueAtYear(row) {
+  if (!row) return null;
+  if (row.unit === "€/台") {
+    const last = [...row.values].reverse().find((value) => Number.isFinite(value));
+    return last ?? null;
+  }
+  return sum(row.values);
+}
+
+function scenarioClass(scenario) {
+  if (scenario === "26年") return "actual";
+  if (scenario === "预算" || scenario === "目标") return "budget";
+  if (scenario === "同期") return "same";
+  return "diff";
+}
+
 function heatClass(row, index) {
+  if (!["26年", "差额", "累计差额"].includes(row.scenario)) return "heat-neutral";
   const value = row.diffs?.[index];
   if (value === null || value === undefined || Math.abs(value) < 0.0001) return "heat-neutral";
   const good = row.direction === "higher" ? value > 0 : value < 0;
@@ -515,15 +543,17 @@ function renderCategoryFilter() {
 
 function renderNarrative() {
   const forecast = monthSnapshot(state.forecast, Number(els.monthSelect.value));
-  els.summaryText.textContent = buildAutoSummary(state.result, state.analyses, state.factorSummary, forecast);
-  const rows = state.result?.rows?.filter((row) => row.isHighImpact || Math.abs(row.unitDiff || 0) >= 0.5).slice(0, 8) || [];
-  els.analysisList.innerHTML = rows.length
-    ? rows.map((row) => {
-        const key = analysisKey(state.result.month, row.code);
-        const text = state.analyses[key] || "待填写原因";
-        return `<li><strong>${escapeHtml(row.code)}</strong> ${escapeHtml(row.descEn)}：${escapeHtml(text)}</li>`;
-      }).join("")
-    : `<li>${state.result ? "暂无重点科目。" : t("emptySap")}</li>`;
+  els.summaryText.textContent = buildCompactSummary(state.result, state.analyses, state.factorSummary, forecast);
+  if (els.analysisList) els.analysisList.innerHTML = "";
+}
+
+function buildCompactSummary(result, analyses, factorSummary, forecast) {
+  if (!result) return "导入 SAP 报表后，本月摘要会根据下方科目原因自动汇总。";
+  const highRows = result.rows.filter((row) => row.isHighImpact || Math.abs(row.unitDiff || 0) >= 0.5);
+  const filled = highRows.filter((row) => (analyses[analysisKey(result.month, row.code)] || "").trim()).length;
+  const direction = (result.summary.totalUnitDiff || 0) <= 0 ? "优化" : "恶化";
+  const forecastText = forecast?.unitCost ? `；4+8本月单台 ${formatUnit(forecast.unitCost)} €/台` : "";
+  return `${result.month}月单台同比${direction} ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/台，制造费差额 ${formatMoney(result.summary.manufacturingDiff)} K€；重点原因 ${filled}/${highRows.length} 已填写；上涨因素 ${formatMoney(factorSummary?.increaseCumulative)} K€，下降因素 ${formatMoney(factorSummary?.decreaseCumulative)} K€${forecastText}`;
 }
 
 function renderTable() {
@@ -800,7 +830,7 @@ function formatNumber(value) {
 
 function formatDashboardValue(value, unit) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
-  const digits = unit === "台" ? 0 : 2;
+  const digits = unit === "台" || unit === "人" ? 0 : 2;
   return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
