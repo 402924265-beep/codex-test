@@ -32,7 +32,7 @@ import {
 } from "./metrics.js";
 import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js";
 
-const VERSION = "20260606-dashboard-v8";
+const VERSION = "20260606-dashboard-v9";
 
 const i18n = {
   zh: {
@@ -128,6 +128,7 @@ const i18n = {
     monthlyMfgVarianceTitle: "到月制造费差异",
     yoyVariance: "同比差异",
     budgetVariance: "预算差异",
+    targetCompletion: "目标完成率",
     annualCategoryDivergence: "全年大科目同比差异",
     heatmapTitle: "月度异常热力",
     heatmapHint: "颜色越深差异越大",
@@ -265,6 +266,7 @@ const i18n = {
     monthlyMfgVarianceTitle: "Monthly MFG variance",
     yoyVariance: "YoY variance",
     budgetVariance: "Budget variance",
+    targetCompletion: "Target completion",
     annualCategoryDivergence: "Annual category YoY variance",
     heatmapTitle: "Monthly Exception Heatmap",
     heatmapHint: "Darker color means larger variance",
@@ -402,6 +404,7 @@ const i18n = {
     monthlyMfgVarianceTitle: "Aylık üretim gideri farkı",
     yoyVariance: "YoY fark",
     budgetVariance: "Bütçe farkı",
+    targetCompletion: "Hedef gerçekleşme",
     annualCategoryDivergence: "Yıllık kategori YoY farkı",
     heatmapTitle: "Aylık İstisna Isı Haritası",
     heatmapHint: "Renk koyulaştıkça fark büyür",
@@ -526,6 +529,7 @@ bootstrap();
 
 async function bootstrap() {
   bindEvents();
+  installMetricHoverTooltip();
   els.saveMode.textContent = store.label;
   els.userName.value = store.getUser();
   try {
@@ -785,8 +789,11 @@ function renderDashboard() {
         <td class="merged-label">${showLabel ? escapeHtml(localized.label) : ""}</td>
         <td><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
         <td>${escapeHtml(localized.unit)}</td>
-        ${row.values.map((value, index) => `<td class="month-cell ${heatClass(row, index)}" title="${escapeHtml(metricTooltip(row, index))}">${formatDashboardValue(value, row.unit)}</td>`).join("")}
-        <td class="month-cell full-year-cell">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
+        ${row.values.map((value, index) => {
+          const tooltip = metricTooltip(row, index);
+          return `<td class="month-cell ${heatClass(row, index)}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
+        }).join("")}
+        <td class="month-cell full-year-cell" tabindex="0" data-metric-tooltip="${escapeHtml(metricTooltip(row, null))}">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
       </tr>
     `;
   }).join("") || `<tr><td colspan="17" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
@@ -1067,12 +1074,13 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
     { row: budget, color: "#f6c85f", name: t("budget26") },
     { row: same, color: "#91a7bd", name: t("same25") }
   ];
-  const paths = series.map((item) => {
+  const paths = series.map((item, seriesIndex) => {
     const points = item.row.values.map((value, index) => Number.isFinite(value) ? `${x(index)},${y(value)}` : null).filter(Boolean).join(" ");
     const dots = item.row.values.map((value, index) => Number.isFinite(value) ? `
       <circle cx="${x(index)}" cy="${y(value)}" r="${item.row === actual ? 5 : 3.5}" fill="${item.color}" class="chart-dot">
         <title>${localizeMonthLabel(index, state.language)} ${item.name}: ${formatDashboardValue(value, unitLabel)}</title>
-      </circle>` : "").join("");
+      </circle>
+      <text x="${x(index)}" y="${y(value) + [-12, 19, -27][seriesIndex]}" class="chart-value-label chart-value-${seriesIndex}" fill="${item.color}">${escapeSvg(formatDashboardValue(value, unitLabel))}</text>` : "").join("");
     return `<polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.row === actual ? 4 : 2.5}" class="animated-line" />${dots}`;
   }).join("");
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -1158,24 +1166,67 @@ function heatClass(row, index) {
 }
 
 function metricTooltip(row, index) {
-  const value = row.values?.[index];
-  if (!Number.isFinite(value)) return "";
-  if (row.scenario !== "26年") return `${row.scenario}: ${formatDashboardValue(value, row.unit)}`;
-  const same = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "同期")?.values?.[index];
-  const budget = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "预算")?.values?.[index];
-  const yoy = diffNullableLocal(value, same);
-  const budgetDiff = diffNullableLocal(value, budget);
+  const annual = index === null;
+  const valueFor = (scenario) => {
+    const item = state.dashboardRows.find((candidate) => candidate.label === row.label && candidate.scenario === scenario);
+    return annual ? annualMetricValue(item) : item?.values?.[index];
+  };
+  const actual = valueFor("26年");
+  const same = valueFor("同期");
+  const budget = valueFor("预算");
+  if (![actual, same, budget].some(Number.isFinite)) return "";
+  const yoy = diffNullableLocal(actual, same);
+  const budgetDiff = diffNullableLocal(actual, budget);
   const higherGood = row.direction === "higher";
   const optimized = Number.isFinite(yoy) ? (higherGood ? yoy >= 0 : yoy <= 0) : null;
-  const completion = targetCompletionRate(value, budget);
+  const completion = targetCompletionRate(actual, budget);
   return [
-    `26年: ${formatDashboardValue(value, row.unit)}`,
-    `同期: ${formatDashboardValue(same, row.unit)}`,
-    `预算: ${formatDashboardValue(budget, row.unit)}`,
-    Number.isFinite(yoy) ? `同比${optimized ? "优化" : "恶化"}: ${formatDashboardValue(Math.abs(yoy), row.unit)}` : "",
-    Number.isFinite(budgetDiff) ? `预算差: ${formatDashboardValue(budgetDiff, row.unit)}` : "",
-    Number.isFinite(completion) ? `目标完成率: ${formatPercent(completion)}` : ""
+    `${annual ? t("fullYear") : localizeMonthLabel(index, state.language)} · ${localizeDashboardText("labels", row.label, state.language)}`,
+    `${t("actual26")}: ${formatDashboardValue(actual, row.unit)}`,
+    `${t("same25")}: ${formatDashboardValue(same, row.unit)}`,
+    `${t("budget26")}: ${formatDashboardValue(budget, row.unit)}`,
+    Number.isFinite(yoy) ? `${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}` : "",
+    Number.isFinite(budgetDiff) ? `${t("budgetVariance")}: ${formatDashboardValue(budgetDiff, row.unit)}` : "",
+    Number.isFinite(completion) ? `${t("targetCompletion")}: ${formatPercent(completion)}` : ""
   ].filter(Boolean).join("\n");
+}
+
+function installMetricHoverTooltip() {
+  const tooltip = document.createElement("div");
+  tooltip.className = "metric-hover-tooltip";
+  tooltip.setAttribute("role", "tooltip");
+  document.body.appendChild(tooltip);
+
+  const show = (target, event) => {
+    const text = target?.dataset?.metricTooltip;
+    if (!text) return;
+    tooltip.textContent = text;
+    tooltip.classList.add("visible");
+    positionMetricTooltip(tooltip, event?.clientX, event?.clientY, target);
+  };
+  const hide = () => tooltip.classList.remove("visible");
+
+  document.addEventListener("pointerover", (event) => show(event.target.closest?.("[data-metric-tooltip]"), event));
+  document.addEventListener("pointermove", (event) => {
+    if (tooltip.classList.contains("visible")) positionMetricTooltip(tooltip, event.clientX, event.clientY);
+  });
+  document.addEventListener("pointerout", (event) => {
+    if (event.target.closest?.("[data-metric-tooltip]")) hide();
+  });
+  document.addEventListener("focusin", (event) => show(event.target.closest?.("[data-metric-tooltip]"), null));
+  document.addEventListener("focusout", (event) => {
+    if (event.target.closest?.("[data-metric-tooltip]")) hide();
+  });
+}
+
+function positionMetricTooltip(tooltip, clientX, clientY, target) {
+  const rect = target?.getBoundingClientRect?.();
+  const x = Number.isFinite(clientX) ? clientX + 14 : (rect?.left || 0) + 8;
+  const y = Number.isFinite(clientY) ? clientY + 14 : (rect?.bottom || 0) + 8;
+  const maxX = Math.max(8, window.innerWidth - tooltip.offsetWidth - 12);
+  const maxY = Math.max(8, window.innerHeight - tooltip.offsetHeight - 12);
+  tooltip.style.left = `${Math.min(x, maxX)}px`;
+  tooltip.style.top = `${Math.min(y, maxY)}px`;
 }
 
 function renderCategoryFilter() {

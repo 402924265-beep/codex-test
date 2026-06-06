@@ -228,7 +228,13 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const workdaysActual = preferSeries(jiang?.workdays?.actual, OPERATIONAL_BASELINE.workdays.actual);
   const hcSame = preferSeries(jiang?.headcount?.same, OPERATIONAL_BASELINE.headcount.same);
   const hcBudget = preferSeries(jiang?.headcount?.budget, forecast.hc?.budgetTotal);
-  const hcActual = preferSeries(jiang?.headcount?.actual, preferSeries(forecast.hc?.actualTotal, OPERATIONAL_BASELINE.headcount.actual));
+  const actualMonthCount = inferActualMonthCount(options, jiang);
+  const forecastHeadcount = preferSeries(forecast.hc?.actualTotal, OPERATIONAL_BASELINE.headcount.actual);
+  const hcActual = mergeRealizedAndForecast(
+    preferSeries(jiang?.headcount?.actual, OPERATIONAL_BASELINE.headcount.actual),
+    forecastHeadcount,
+    actualMonthCount
+  );
   const upphSame = sameVolume.map((value, index) => monthlyUpph(value, hcSame[index], 0, workdaysSame[index]));
   const upphBudget = budgetVolume.map((value, index) => monthlyUpph(value, hcBudget[index], 0, workdaysBudget[index]));
   const upphActual = actualVolume.map((value, index) => monthlyUpph(value, hcActual[index], 0, workdaysActual[index]));
@@ -285,6 +291,25 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   ];
 
   return prioritizeDashboardRows(rows.filter((item) => item.values.some((value) => value !== null && value !== undefined)));
+}
+
+function inferActualMonthCount(options, jiang) {
+  const resultMonths = [...(options.resultByMonth?.keys?.() || [])]
+    .map(Number)
+    .filter((value) => Number.isInteger(value) && value >= 1 && value <= 12);
+  if (resultMonths.length) return Math.max(...resultMonths);
+
+  const jiangActualMonths = normalizeMonths(jiang?.volume?.actual)
+    .reduce((last, value, index) => Number.isFinite(value) ? index + 1 : last, 0);
+  return jiangActualMonths || 4;
+}
+
+function mergeRealizedAndForecast(realized, forecast, actualMonthCount) {
+  return Array.from({ length: 12 }, (_, index) => {
+    const primary = index < actualMonthCount ? realized?.[index] : forecast?.[index];
+    const fallback = index < actualMonthCount ? forecast?.[index] : realized?.[index];
+    return Number.isFinite(primary) ? primary : Number.isFinite(fallback) ? fallback : null;
+  });
 }
 
 function prioritizeDashboardRows(rows) {

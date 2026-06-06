@@ -496,6 +496,16 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   animation: chartPulse 2.4s ease-in-out infinite;
 }
 
+.chart-value-label {
+  font: 700 9px "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #0f2234;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
 @keyframes chartPulse {
   50% { opacity: 0.7; }
 }
@@ -658,6 +668,28 @@ td:nth-child(2) { text-align: left; }
 .dashboard-table td.month-cell {
   font-variant-numeric: tabular-nums;
   border-left: 1px solid #edf2f6;
+  cursor: help;
+}
+
+.metric-hover-tooltip {
+  position: fixed;
+  z-index: 9999;
+  display: none;
+  max-width: 320px;
+  padding: 10px 12px;
+  border: 1px solid rgba(66, 224, 205, 0.5);
+  border-radius: 6px;
+  color: #f4fbff;
+  background: rgba(8, 28, 44, 0.97);
+  box-shadow: 0 12px 32px rgba(8, 28, 44, 0.32);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-line;
+  pointer-events: none;
+}
+
+.metric-hover-tooltip.visible {
+  display: block;
 }
 
 .dashboard-table th,
