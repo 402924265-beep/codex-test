@@ -42,7 +42,7 @@ export function buildFactorSummary(items, month = 4) {
   };
 }
 
-export function buildAutoSummary(result, analyses, factorSummary, forecastSnapshot = null) {
+export function buildAutoSummary(result, analyses, _factorSummary, forecastSnapshot = null) {
   if (!result) return "导入 SAP 报表后生成本月总结。";
   const totalUnit = result.summary.totalUnitDiff;
   const manufacturingDiff = result.summary.manufacturingDiff;
@@ -57,15 +57,11 @@ export function buildAutoSummary(result, analyses, factorSummary, forecastSnapsh
     const reason = analyses?.[analysisKey(result.month, row.code)] || analyses?.[row.code] || "待填写原因";
     return `${index + 1}. ${row.code} ${row.descEn}: ${reason}`;
   });
-  const factorLine = factorSummary
-    ? `上涨因素累计 ${formatKeur(factorSummary.increaseCumulative)}，下降因素累计 ${formatKeur(factorSummary.decreaseCumulative)}，净影响 ${formatKeur(factorSummary.netCumulative)}。`
-    : "";
   const forecastLine = forecastSnapshot?.unitCost
     ? `4+8预测口径：本月单台 ${formatNumber(forecastSnapshot.unitCost)} 欧/台，金额 ${formatKeur(forecastSnapshot.amount)}。`
     : "";
   return [
     `总结：${result.month}月洗碗机单台制造费同比${direction}${Math.abs(totalUnit || 0).toFixed(2)}欧，表现为${quality}；制造费差额 ${formatKeur(manufacturingDiff)}。`,
-    factorLine,
     forecastLine,
     reasonLines.length ? `重点科目原因：\n${reasonLines.join("\n")}` : "重点科目原因：暂无需要解释的科目。"
   ].filter(Boolean).join("\n");

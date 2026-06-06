@@ -23,8 +23,16 @@ import {
   buildFactorSummary,
   parseEditableNumber
 } from "./workbench.js";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js";
+import {
+  annualManufacturingRate,
+  annualUpph,
+  averageFinite,
+  targetCompletionRate
+} from "./metrics.js";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js";
 
-const VERSION = "20260605-dashboard-v6";
+const VERSION = "20260606-dashboard-v8";
 
 const i18n = {
   zh: {
@@ -33,11 +41,13 @@ const i18n = {
     language: "语言",
     author: "填写人",
     importForecast: "导入4+8预测",
+    importJiang: "导入姜月表",
     importSap: "导入SAP实际",
     exportAnalysis: "导出三张表",
     tabDashboard: "全年驾驶舱",
     tabVariance: "月度差异",
-    tabProjects: "项目因素",
+    tabProjects: "降费项目",
+    actualMonth: "实际月份",
     month: "月份",
     accountSearch: "科目搜索",
     analysisFilter: "差异筛选",
@@ -65,20 +75,20 @@ const i18n = {
     accountDetail: "科目明细",
     account: "账户",
     analysis: "差异分析",
-    factorProjects: "上涨因素 / 下降因素",
-    factorHint: "用于沉淀项目原因，后续自动进入月度总结和导出三张表。",
-    addIncrease: "添加上涨因素",
-    addDecrease: "添加下降因素",
+    factorProjects: "26年降费项目",
+    factorHint: "管理正式降费项目；月度差异原因在第二张表的小科目明细中填写。",
+    addIncrease: "添加项目",
+    addDecrease: "添加项目",
     saveProjects: "保存项目",
-    increaseTotal: "上涨累计",
-    decreaseTotal: "下降累计",
-    netImpact: "净影响",
-    type: "类型",
-    path: "原因/路径",
+    increaseTotal: "预计收益",
+    decreaseTotal: "实际收益",
+    netImpact: "达成差额",
+    type: "主导方",
+    path: "核心策略/路径",
     project: "关键项目",
     owner: "责任人",
     timing: "到位时间",
-    impact: "影响 K€",
+    impact: "实际月累差额 K€",
     progress: "进展",
     action: "操作",
     all: "全部",
@@ -104,10 +114,10 @@ const i18n = {
     groupPeople: "人",
     groupEfficiency: "效",
     groupCost: "费",
-    trendTitle: "趋势轨道",
-    trendHint: "实线为已发生，虚线为预测段",
-    waterfallTitle: "全年差异瀑布",
-    waterfallHint: "红色恶化，绿色优化",
+    trendTitle: "单台制造费趋势",
+    trendHint: "26滚动预测 / 预算 / 同期",
+    waterfallTitle: "制造费率趋势",
+    waterfallHint: "制造费 ÷ 产值",
     other: "其他",
     fullYear: "全年",
     annualSummaryEmpty: "导入4+8预测后生成全年总结。",
@@ -153,7 +163,7 @@ const i18n = {
     noMatchingAccounts: "没有符合条件的科目",
     analysisSaved: "原因已保存",
     projectsSaved: "项目已保存",
-    emptyFactors: "添加上涨因素或下降因素后，这里会形成项目原因库。",
+    emptyFactors: "添加正式降费项目后，这里会形成项目库。",
     localStore: "本机保存"
     ,mfgDiffFormula: "单台差 × 26产量",
     keurYtd: "K€累计",
@@ -168,11 +178,13 @@ const i18n = {
     language: "Language",
     author: "Author",
     importForecast: "Import 4+8 forecast",
+    importJiang: "Import Jiang Yue table",
     importSap: "Import SAP actuals",
     exportAnalysis: "Export workbook",
     tabDashboard: "Year dashboard",
     tabVariance: "Monthly variance",
-    tabProjects: "Project factors",
+    tabProjects: "Cost reduction projects",
+    actualMonth: "Actual month",
     month: "Month",
     accountSearch: "Account search",
     analysisFilter: "Variance filter",
@@ -200,20 +212,20 @@ const i18n = {
     accountDetail: "Account Detail",
     account: "Account",
     analysis: "Analysis",
-    factorProjects: "Increase / Decrease Factors",
-    factorHint: "Keep project causes here, then roll them into summaries and export.",
-    addIncrease: "Add increase",
-    addDecrease: "Add decrease",
+    factorProjects: "2026 Cost Reduction Projects",
+    factorHint: "Manage formal projects here. Enter monthly variance reasons in Account Detail.",
+    addIncrease: "Add project",
+    addDecrease: "Add project",
     saveProjects: "Save projects",
-    increaseTotal: "Increase total",
-    decreaseTotal: "Decrease total",
-    netImpact: "Net impact",
-    type: "Type",
-    path: "Cause / path",
+    increaseTotal: "Planned benefit",
+    decreaseTotal: "Actual benefit",
+    netImpact: "Achievement gap",
+    type: "Lead party",
+    path: "Core strategy / path",
     project: "Project",
     owner: "Owner",
     timing: "Timing",
-    impact: "Impact K€",
+    impact: "Actual YTD impact K€",
     progress: "Progress",
     action: "Action",
     all: "All",
@@ -239,10 +251,10 @@ const i18n = {
     groupPeople: "People",
     groupEfficiency: "Efficiency",
     groupCost: "Cost",
-    trendTitle: "Trend Track",
-    trendHint: "Solid line is actual period; dashed line is forecast period",
-    waterfallTitle: "Full-Year Variance Waterfall",
-    waterfallHint: "Red is worse, green is better",
+    trendTitle: "Unit Cost Trend",
+    trendHint: "2026 rolling forecast / budget / same period",
+    waterfallTitle: "Manufacturing Rate Trend",
+    waterfallHint: "Manufacturing cost / output value",
     other: "Other",
     fullYear: "Full year",
     annualSummaryEmpty: "Import the 4+8 forecast to generate the annual summary.",
@@ -288,7 +300,7 @@ const i18n = {
     noMatchingAccounts: "No matching accounts",
     analysisSaved: "Reason saved",
     projectsSaved: "Projects saved",
-    emptyFactors: "Add increase or decrease factors to build the project reason library.",
+    emptyFactors: "Add formal cost reduction projects to build the project library.",
     localStore: "Local save"
     ,mfgDiffFormula: "Unit gap × 2026 volume",
     keurYtd: "K€ YTD",
@@ -303,11 +315,13 @@ const i18n = {
     language: "Dil",
     author: "Yazan",
     importForecast: "4+8 tahmin yükle",
+    importJiang: "Jiang Yue tablosunu yükle",
     importSap: "SAP gerçekleşen yükle",
     exportAnalysis: "Çalışma kitabı indir",
     tabDashboard: "Yıllık pano",
     tabVariance: "Aylık fark",
-    tabProjects: "Proje faktörleri",
+    tabProjects: "Maliyet düşürme projeleri",
+    actualMonth: "Gerçekleşen ay",
     month: "Ay",
     accountSearch: "Hesap ara",
     analysisFilter: "Fark filtresi",
@@ -335,20 +349,20 @@ const i18n = {
     accountDetail: "Hesap Detayı",
     account: "Hesap",
     analysis: "Analiz",
-    factorProjects: "Artış / Azalış Faktörleri",
-    factorHint: "Proje nedenlerini burada tut, özet ve çıktıya aktar.",
+    factorProjects: "2026 Maliyet Düşürme Projeleri",
+    factorHint: "Resmi maliyet düşürme projelerini burada yönetin. Aylık fark nedenlerini hesap detayında girin.",
     addIncrease: "Artış ekle",
     addDecrease: "Azalış ekle",
     saveProjects: "Projeleri kaydet",
-    increaseTotal: "Artış toplamı",
-    decreaseTotal: "Azalış toplamı",
-    netImpact: "Net etki",
-    type: "Tip",
-    path: "Neden / yol",
+    increaseTotal: "Planlanan fayda",
+    decreaseTotal: "Gerçekleşen fayda",
+    netImpact: "Gerçekleşme farkı",
+    type: "Lider taraf",
+    path: "Ana strateji / yol",
     project: "Proje",
     owner: "Sorumlu",
     timing: "Zaman",
-    impact: "Etki K€",
+    impact: "Gerçekleşen YTD etki K€",
     progress: "İlerleme",
     action: "İşlem",
     all: "Tümü",
@@ -374,9 +388,9 @@ const i18n = {
     groupPeople: "Kişi",
     groupEfficiency: "Verim",
     groupCost: "Gider",
-    trendTitle: "Trend İzleme",
+    trendTitle: "Birim Maliyet Trendi",
     trendHint: "Düz çizgi gerçekleşen, kesikli çizgi tahmin dönemidir",
-    waterfallTitle: "Yıllık Fark Şelalesi",
+    waterfallTitle: "Üretim Gider Oranı Trendi",
     waterfallHint: "Kırmızı kötüleşme, yeşil iyileşme",
     other: "Diğer",
     fullYear: "Yıl",
@@ -423,7 +437,7 @@ const i18n = {
     noMatchingAccounts: "Eşleşen hesap yok",
     analysisSaved: "Neden kaydedildi",
     projectsSaved: "Projeler kaydedildi",
-    emptyFactors: "Proje neden kitaplığı için artış veya azalış faktörleri ekleyin.",
+    emptyFactors: "Resmi maliyet düşürme projesi ekleyin.",
     localStore: "Yerel kayıt"
     ,mfgDiffFormula: "Birim fark × 2026 hacim",
     keurYtd: "K€ YTD",
@@ -438,6 +452,7 @@ const store = createStore();
 const state = {
   workbook: null,
   forecast: null,
+  jiangyue: null,
   dashboardRows: [],
   resultByMonth: new Map(),
   result: null,
@@ -454,12 +469,14 @@ const state = {
   metricIndicator: "all",
   dashboardTableOpen: true,
   sapFileName: "",
-  forecastFileName: ""
+  forecastFileName: "",
+  jiangFileName: ""
 };
 
 const els = {
   sapFile: document.getElementById("sapFile"),
   forecastFile: document.getElementById("forecastFile"),
+  jiangFile: document.getElementById("jiangFile"),
   exportBtn: document.getElementById("exportBtn"),
   monthSelect: document.getElementById("monthSelect"),
   searchInput: document.getElementById("searchInput"),
@@ -471,23 +488,12 @@ const els = {
   saveMode: document.getElementById("saveMode"),
   sapStatus: document.getElementById("sapStatus"),
   forecastStatus: document.getElementById("forecastStatus"),
-  total26: document.getElementById("total26"),
-  total25: document.getElementById("total25"),
-  budget26: document.getElementById("budget26"),
-  unitCost26: document.getElementById("unitCost26"),
-  diffAmount: document.getElementById("diffAmount"),
-  diffUnit: document.getElementById("diffUnit"),
-  manufacturingDiff: document.getElementById("manufacturingDiff"),
-  factorNet: document.getElementById("factorNet"),
-  heroUnitCost: document.getElementById("heroUnitCost"),
-  heroUnitDiff: document.getElementById("heroUnitDiff"),
-  heroAmountDiff: document.getElementById("heroAmountDiff"),
-  openItems: document.getElementById("openItems"),
+  jiangStatus: document.getElementById("jiangStatus"),
+  monthButtons: document.getElementById("monthButtons"),
   dashboardHead: document.getElementById("dashboardHead"),
   dashboardBody: document.getElementById("dashboardBody"),
   dashboardCards: document.getElementById("dashboardCards"),
   annualSummary: document.getElementById("annualSummary"),
-  monthlySummary: document.getElementById("monthlySummary"),
   projectSummary: document.getElementById("projectSummary"),
   monthlyKpiGrid: document.getElementById("monthlyKpiGrid"),
   dashboardStatus: document.getElementById("dashboardStatus"),
@@ -525,7 +531,9 @@ async function bootstrap() {
   try {
     state.analyses = await store.loadAnalyses();
     state.factors = normalizeFactorsForUi(await store.loadFactors([]));
-    if (!state.factors.length) state.factors = seedOriginalFactors();
+    if (!state.factors.length || state.factors.every((item) => item.plannedImpact === undefined)) {
+      state.factors = seedCostReductionProjects();
+    }
   } catch (error) {
     toast(error.message || String(error), true);
   }
@@ -537,7 +545,15 @@ async function bootstrap() {
 function bindEvents() {
   els.sapFile.addEventListener("change", handleSapFileChange);
   els.forecastFile.addEventListener("change", handleForecastFileChange);
+  els.jiangFile?.addEventListener("change", handleJiangFileChange);
   els.monthSelect.addEventListener("change", () => {
+    selectCurrentMonth();
+    renderAll();
+  });
+  els.monthButtons?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-month]");
+    if (!button) return;
+    els.monthSelect.value = button.dataset.month;
     selectCurrentMonth();
     renderAll();
   });
@@ -593,7 +609,7 @@ function bindEvents() {
   });
   els.categoryChart.addEventListener("click", handleChartClick);
   els.addIncreaseBtn.addEventListener("click", () => addFactor("increase"));
-  els.addDecreaseBtn.addEventListener("click", () => addFactor("decrease"));
+  els.addDecreaseBtn?.addEventListener("click", () => addFactor("decrease"));
   els.saveFactorsBtn.addEventListener("click", saveFactorsFromTable);
   els.factorBody.addEventListener("click", (event) => {
     const button = event.target.closest("[data-delete-index]");
@@ -629,6 +645,25 @@ async function handleForecastFileChange(event) {
   }
 }
 
+async function handleJiangFileChange(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    toast(`${t("readingFile")} ${file.name}`);
+    const XLSX = await loadXlsx();
+    const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
+    state.jiangyue = extractJiangYueWorkbook(workbook, XLSX);
+    state.jiangFileName = file.name;
+    state.dashboardRows = buildDashboardRows();
+    els.jiangStatus.textContent = `${t("importJiang")}: ${file.name}`;
+    els.jiangStatus.classList.remove("muted", "warning");
+    renderAll();
+    toast(`姜月表已读取: ${file.name}`);
+  } catch (error) {
+    toast(error.message || String(error), true);
+  }
+}
+
 async function handleSapFileChange(event) {
   const file = event.target.files?.[0];
   if (!file) return;
@@ -657,9 +692,9 @@ async function handleSapFileChange(event) {
     }
 
     if (!state.resultByMonth.size) throw new Error("没有解析到可用SAP实际数");
-    if (!state.resultByMonth.has(Number(els.monthSelect.value))) {
-      els.monthSelect.value = String([...state.resultByMonth.keys()][0]);
-    }
+    const importedMonths = [...state.resultByMonth.keys()].sort((a, b) => a - b);
+    els.monthSelect.innerHTML = importedMonths.map((month) => `<option value="${month}">${month}月</option>`).join("");
+    els.monthSelect.value = String(importedMonths.at(-1));
     selectCurrentMonth();
     state.dashboardRows = buildDashboardRows();
     els.exportBtn.disabled = false;
@@ -679,6 +714,7 @@ function selectCurrentMonth() {
 }
 
 function renderAll() {
+  renderMonthButtons();
   renderSummaryCards();
   renderDashboard();
   renderCategoryFilter();
@@ -692,27 +728,22 @@ function buildDashboardRows() {
   return buildAnnualDashboardRows(state.forecast, {
     baseline25ByMonth: BASELINE_25_BY_MONTH,
     budget26ByMonth: BUDGET_26_BY_MONTH,
-    resultByMonth: state.resultByMonth
+    resultByMonth: state.resultByMonth,
+    jiangyue: state.jiangyue
   });
+}
+
+function renderMonthButtons() {
+  if (!els.monthButtons) return;
+  const months = [...state.resultByMonth.keys()].sort((a, b) => a - b);
+  els.monthButtons.innerHTML = months.length
+    ? months.map((month) => `<button type="button" data-month="${month}" class="${Number(els.monthSelect.value) === month ? "active" : ""}">${month}月</button>`).join("")
+    : `<span class="muted">${t("waitingSap")}</span>`;
 }
 
 function renderSummaryCards() {
   if (els.monthlyKpiGrid) {
     els.monthlyKpiGrid.innerHTML = buildFiveKpiCards("month").map((card) => kpiCardHtml(card, "metric")).join("");
-  }
-  if (els.monthlySummary) els.monthlySummary.innerHTML = buildMonthlySummaryText();
-  if (els.factorNet) {
-    els.factorNet.textContent = formatMoney(state.factorSummary?.netCumulative);
-    els.factorNet.className = valueClass(state.factorSummary?.netCumulative);
-  }
-  if (els.heroUnitCost && state.result) {
-    const summary = state.result.summary || {};
-    els.heroUnitCost.textContent = formatUnit(summary.totalUnit26);
-    els.heroUnitDiff.textContent = formatUnit(summary.totalUnitDiff);
-    els.heroUnitDiff.className = valueClass(summary.totalUnitDiff);
-    els.heroAmountDiff.textContent = formatMoney(summary.manufacturingDiff);
-    els.heroAmountDiff.className = valueClass(summary.manufacturingDiff);
-    els.openItems.textContent = String(countOpenHighRows());
   }
 }
 
@@ -739,7 +770,7 @@ function renderDashboard() {
 
   renderTrendSvg([], rowBy);
   renderWaterfallSvg(rowBy);
-  renderHeatmap(["单台制造费", "制造费用金额", "产量"], rowBy);
+  renderHeatmap(["单台制造费", "UPPH", "制造费率"], rowBy);
 
   const rows = visibleDashboardRows();
   let lastLabel = "";
@@ -754,7 +785,7 @@ function renderDashboard() {
         <td class="merged-label">${showLabel ? escapeHtml(localized.label) : ""}</td>
         <td><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
         <td>${escapeHtml(localized.unit)}</td>
-        ${row.values.map((value, index) => `<td class="month-cell ${heatClass(row, index)}">${formatDashboardValue(value, row.unit)}</td>`).join("")}
+        ${row.values.map((value, index) => `<td class="month-cell ${heatClass(row, index)}" title="${escapeHtml(metricTooltip(row, index))}">${formatDashboardValue(value, row.unit)}</td>`).join("")}
         <td class="month-cell full-year-cell">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
       </tr>
     `;
@@ -855,19 +886,29 @@ function metricRowStatus(row, monthIndex = null) {
 
 function annualMetricValue(row) {
   if (!row) return null;
-  if (row.label?.includes("累计") || ["€/台", "台/人"].includes(row.unit)) return lastFinite(row.values);
+  if (row.label === "制造费率") {
+    const cumulativeRow = state.dashboardRows.find((item) => item.label === "制造费率累计" && item.scenario === row.scenario);
+    return lastFinite(cumulativeRow?.values || row.values);
+  }
+  if (row.label === "UPPH") {
+    const stats = annualStats();
+    return row.scenario === "同期" ? stats.upph25 : row.scenario === "26年" ? stats.upph26 : averageFinite(row.values);
+  }
+  if (row.label === "用人") return averageFinite(row.values);
+  if (row.label?.includes("累计") || ["€/台", "%"].includes(row.unit)) return lastFinite(row.values);
   return sum(row.values);
 }
 
 function buildFiveKpiCards(scope) {
   const stats = scope === "annual" ? annualStats() : monthStats();
-  return [
-    ratioCard("单", stats.unit26, stats.unit25, "€/台", "lower", "26单台 / 25单台"),
-    ratioCard("时", stats.days26, stats.days25, "天", "lower", "26出勤天数 / 25出勤天数"),
-    ratioCard("人", stats.people26, stats.people25, "人", "lower", "26总用人 / 25总用人"),
-    ratioCard("效", stats.upph26, stats.upph25, "UPPH", "higher", "26 UPPH / 25 UPPH"),
-    ratioCard("费", stats.rate26, stats.rate25, "%", "lower", "26制造费率 / 25制造费率")
-  ];
+  return buildKpiDefinitions(state.language).map((definition) => ratioCard(
+    definition.title,
+    stats[`${definition.key}26`],
+    stats[`${definition.key}25`],
+    definition.unit,
+    definition.direction,
+    definition.formula
+  ));
 }
 
 function ratioCard(title, actual, same, unit, direction, formula) {
@@ -889,33 +930,41 @@ function annualStats() {
   const amount25 = rowBy("制造费用金额", "同期");
   const volume26 = rowBy("产量", "26年");
   const volume25 = rowBy("产量", "同期");
+  const days26 = rowBy("工作日", "26年");
+  const days25 = rowBy("工作日", "同期");
+  const people26 = rowBy("用人", "26年");
+  const people25 = rowBy("用人", "同期");
+  const output26 = rowBy("产值", "26年");
+  const output25 = rowBy("产值", "同期");
   return {
     unit26: annualUnitCost(amount26, volume26),
     unit25: annualUnitCost(amount25, volume25),
-    days26: null,
-    days25: null,
-    people26: annualMetricValue(rowBy("用人", "26年")),
-    people25: annualMetricValue(rowBy("用人", "同期")),
-    upph26: null,
-    upph25: null,
-    rate26: null,
-    rate25: null
+    days26: sum(days26?.values || []),
+    days25: sum(days25?.values || []),
+    people26: averageFinite(people26?.values || []),
+    people25: averageFinite(people25?.values || []),
+    upph26: annualUpph(volume26?.values || [], people26?.values || [], [], days26?.values || []),
+    upph25: annualUpph(volume25?.values || [], people25?.values || [], [], days25?.values || []),
+    rate26: annualManufacturingRate(amount26?.values || [], output26?.values || []),
+    rate25: annualManufacturingRate(amount25?.values || [], output25?.values || [])
   };
 }
 
 function monthStats() {
+  const monthIndex = Math.max(0, Number(els.monthSelect.value || 1) - 1);
+  const rowValue = (labelText, scenario) => state.dashboardRows.find((row) => row.label === labelText && row.scenario === scenario)?.values?.[monthIndex];
   const summary = state.result?.summary || {};
   return {
     unit26: summary.totalUnit26,
     unit25: summary.totalUnit25,
-    days26: null,
-    days25: null,
-    people26: null,
-    people25: null,
-    upph26: null,
-    upph25: null,
-    rate26: null,
-    rate25: null
+    days26: rowValue("工作日", "26年"),
+    days25: rowValue("工作日", "同期"),
+    people26: rowValue("用人", "26年"),
+    people25: rowValue("用人", "同期"),
+    upph26: rowValue("UPPH", "26年"),
+    upph25: rowValue("UPPH", "同期"),
+    rate26: rowValue("制造费率", "26年"),
+    rate25: rowValue("制造费率", "同期")
   };
 }
 
@@ -939,14 +988,6 @@ function buildAnnualSummaryText() {
   const impact = Number.isFinite(unitDiff) && Number.isFinite(volume26) ? unitDiff * volume26 / 1000 : null;
   const topCats = annualCategoryDiffs().slice(0, 3).map((item) => localizeCategory(item.label, state.language)).join("、");
   return `2026年洗碗机全年滚动预测单台制造费为 ${formatUnit(stats.unit26)} €/台，较同期${unitDiff <= 0 ? "优化" : "恶化"} ${formatPercent(Math.abs(ratio))}，对应制造费影响 ${formatMoney(impact)} K€。主要差异集中在 ${topCats || "重点大科目"}，请结合下方到月差异和大科目中轴图跟踪。`;
-}
-
-function buildMonthlySummaryText() {
-  if (!state.result) return t("monthlySummaryEmpty");
-  const summary = state.result.summary || {};
-  const topCategories = monthlyCategoryDiagnostics().slice(0, 3).map((item) => localizeCategory(item.category, state.language)).join("、");
-  const topRows = state.result.rows.slice().sort((a, b) => Math.abs(b.manufacturingDiff || 0) - Math.abs(a.manufacturingDiff || 0)).slice(0, 3).map((row) => row.code).join("、");
-  return `${state.result.month}月洗碗机单台制造费为 ${formatUnit(summary.totalUnit26)} €/台，较同期${(summary.totalUnitDiff || 0) <= 0 ? "优化" : "恶化"} ${formatUnit(Math.abs(summary.totalUnitDiff || 0))} €/台，对应制造费影响 ${formatMoney(summary.manufacturingDiff)} K€。差异主要来自 ${topCategories || "重点大科目"}，重点小科目为 ${topRows || "待导入科目"}，原因可在下方科目明细补充。`;
 }
 
 function annualCategoryDiffs() {
@@ -994,86 +1035,52 @@ function annualUnitCost(amountRow, volumeRow) {
 }
 
 function renderTrendSvg(metrics, rowBy) {
-  const actual = rowBy("制造费用金额", "26年");
-  const same = rowBy("制造费用金额", "同期");
-  const budget = rowBy("制造费用金额", "预算");
-  if (!actual || !same || !budget) {
-    els.trendChart.innerHTML = emptySvgMessage(t("emptyForecast"));
+  renderTripleSeriesChart(els.trendChart, rowBy, "单台制造费", "€/台");
+}
+
+function renderWaterfallSvg(rowBy) {
+  renderTripleSeriesChart(els.waterfallChart, rowBy, "制造费率", "%");
+}
+
+function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
+  const actual = rowBy(labelText, "26年");
+  const budget = rowBy(labelText, "预算");
+  const same = rowBy(labelText, "同期");
+  if (!actual || !budget || !same) {
+    svg.innerHTML = emptySvgMessage(t("emptyForecast"));
     return;
   }
   const width = 980;
   const height = 310;
   const left = 54;
   const right = 24;
-  const top = 34;
-  const bottom = 50;
-  const plotW = width - left - right;
-  const plotH = height - top - bottom;
-  const yoy = actual.values.map((value, index) => diffNullableLocal(value, same.values[index]));
-  const budgetDiff = actual.values.map((value, index) => diffNullableLocal(value, budget.values[index]));
-  const values = [...yoy, ...budgetDiff].filter(Number.isFinite);
-  const maxAbs = Math.max(1, ...values.map((value) => Math.abs(value)));
-  const zeroY = top + plotH / 2;
-  const barW = Math.max(16, plotW / 12 / 3.2);
-  const x = (index) => left + (plotW / 12) * index + plotW / 24;
-  const bar = (value, index, offset, cls) => {
-    if (!Number.isFinite(value)) return "";
-    const h = Math.max(3, Math.abs(value) / maxAbs * (plotH / 2 - 14));
-    const y = value >= 0 ? zeroY - h : zeroY;
-    return `<rect x="${x(index) + offset}" y="${y}" width="${barW}" height="${h}" rx="4" class="${cls} animated-bar" />
-      <text x="${x(index) + offset + barW / 2}" y="${value >= 0 ? y - 7 : y + h + 13}" class="bar-value ${value > 0 ? "bad" : "good"}">${formatMoney(value)}</text>`;
-  };
-  const grid = Array.from({ length: 12 }, (_, index) => `
-    <g>
-      <line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${top + plotH}" class="grid-line" />
-      <text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(localizeMonthLabel(index, state.language))}</text>
-    </g>
-  `).join("");
-  els.trendChart.innerHTML = `
-    <rect x="0" y="0" width="${width}" height="${height}" class="chart-bg" />
-    ${grid}
-    <line x1="${left}" y1="${zeroY}" x2="${width - right}" y2="${zeroY}" class="axis-line zero-line" />
-    ${yoy.map((value, index) => bar(value, index, -barW - 3, value > 0 ? "wf-bad" : "wf-good")).join("")}
-    ${budgetDiff.map((value, index) => bar(value, index, 3, value > 0 ? "budget-bad" : "budget-good")).join("")}
-    <text x="${left}" y="22" class="legend" style="fill:#48d6c1">${escapeSvg(t("monthlyMfgVarianceTitle"))}</text>
-    <text x="${left + 260}" y="22" class="legend" style="fill:#49d9a4">${escapeSvg(t("yoyVariance"))}</text>
-    <text x="${left + 390}" y="22" class="legend" style="fill:#f6c85f">${escapeSvg(t("budgetVariance"))}</text>
-  `;
-}
-
-function renderWaterfallSvg(rowBy) {
-  const categoryRows = annualCategoryDiffs().slice(0, 14);
-  if (!categoryRows.length) {
-    els.waterfallChart.innerHTML = emptySvgMessage(t("emptyForecast"));
-    return;
-  }
-  const width = 980;
-  const rowHeight = 24;
-  const height = Math.max(340, 74 + categoryRows.length * rowHeight);
-  const left = 250;
-  const right = 110;
-  const center = left + (width - left - right) / 2;
-  const maxAbs = Math.max(1, ...categoryRows.map((item) => Math.abs(item.diff)));
-  const scale = (width - left - right) / 2 / maxAbs;
-  const bars = categoryRows.map((item, index) => {
-    const y = 52 + index * rowHeight;
-    const w = Math.max(4, Math.abs(item.diff) * scale);
-    const isBad = item.diff > 0;
-    const x = isBad ? center : center - w;
-    return `
-      <text x="24" y="${y + 8}" class="wf-axis-label">${escapeSvg(shortText(localizeCategory(item.label, state.language), 24))}</text>
-      <rect x="${x}" y="${y}" width="${w}" height="14" rx="7" class="${isBad ? "wf-bad" : "wf-good"} animated-bar" />
-      <text x="${isBad ? x + w + 8 : x - 8}" y="${y + 8}" class="wf-side-value ${isBad ? "bad" : "good"}" text-anchor="${isBad ? "start" : "end"}">${formatMoney(item.diff)} K€</text>
-    `;
+  const top = 44;
+  const bottom = 46;
+  const all = [...actual.values, ...budget.values, ...same.values].filter(Number.isFinite);
+  const min = Math.min(...all);
+  const max = Math.max(...all);
+  const span = Math.max(max - min, Math.abs(max) * 0.1, 1);
+  const x = (index) => left + index * ((width - left - right) / 11);
+  const y = (value) => top + (max - value) / span * (height - top - bottom);
+  const series = [
+    { row: actual, color: "#42e0cd", name: t("actual26") },
+    { row: budget, color: "#f6c85f", name: t("budget26") },
+    { row: same, color: "#91a7bd", name: t("same25") }
+  ];
+  const paths = series.map((item) => {
+    const points = item.row.values.map((value, index) => Number.isFinite(value) ? `${x(index)},${y(value)}` : null).filter(Boolean).join(" ");
+    const dots = item.row.values.map((value, index) => Number.isFinite(value) ? `
+      <circle cx="${x(index)}" cy="${y(value)}" r="${item.row === actual ? 5 : 3.5}" fill="${item.color}" class="chart-dot">
+        <title>${localizeMonthLabel(index, state.language)} ${item.name}: ${formatDashboardValue(value, unitLabel)}</title>
+      </circle>` : "").join("");
+    return `<polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.row === actual ? 4 : 2.5}" class="animated-line" />${dots}`;
   }).join("");
-  els.waterfallChart.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  els.waterfallChart.innerHTML = `
-    <rect x="0" y="0" width="${width}" height="${height}" class="chart-bg" />
-    <line x1="${center}" y1="42" x2="${center}" y2="${height - 22}" class="axis-line center-axis" />
-    <text x="24" y="26" class="waterfall-total">${escapeSvg(t("annualCategoryDivergence"))}</text>
-    <text x="${center - 10}" y="26" class="phase-label" text-anchor="end">${escapeSvg(t("better"))}</text>
-    <text x="${center + 10}" y="26" class="phase-label" text-anchor="start">${escapeSvg(t("worse"))}</text>
-    ${bars}
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.innerHTML = `
+    <rect width="${width}" height="${height}" class="chart-bg" />
+    ${Array.from({ length: 12 }, (_, index) => `<line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${height - bottom}" class="grid-line" /><text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(localizeMonthLabel(index, state.language))}</text>`).join("")}
+    ${paths}
+    ${series.map((item, index) => `<circle cx="${left + index * 170}" cy="22" r="5" fill="${item.color}" /><text x="${left + 12 + index * 170}" y="27" class="legend">${escapeSvg(item.name)}</text>`).join("")}
   `;
 }
 
@@ -1150,6 +1157,27 @@ function heatClass(row, index) {
   return good ? "heat-good" : "heat-bad";
 }
 
+function metricTooltip(row, index) {
+  const value = row.values?.[index];
+  if (!Number.isFinite(value)) return "";
+  if (row.scenario !== "26年") return `${row.scenario}: ${formatDashboardValue(value, row.unit)}`;
+  const same = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "同期")?.values?.[index];
+  const budget = state.dashboardRows.find((item) => item.label === row.label && item.scenario === "预算")?.values?.[index];
+  const yoy = diffNullableLocal(value, same);
+  const budgetDiff = diffNullableLocal(value, budget);
+  const higherGood = row.direction === "higher";
+  const optimized = Number.isFinite(yoy) ? (higherGood ? yoy >= 0 : yoy <= 0) : null;
+  const completion = targetCompletionRate(value, budget);
+  return [
+    `26年: ${formatDashboardValue(value, row.unit)}`,
+    `同期: ${formatDashboardValue(same, row.unit)}`,
+    `预算: ${formatDashboardValue(budget, row.unit)}`,
+    Number.isFinite(yoy) ? `同比${optimized ? "优化" : "恶化"}: ${formatDashboardValue(Math.abs(yoy), row.unit)}` : "",
+    Number.isFinite(budgetDiff) ? `预算差: ${formatDashboardValue(budgetDiff, row.unit)}` : "",
+    Number.isFinite(completion) ? `目标完成率: ${formatPercent(completion)}` : ""
+  ].filter(Boolean).join("\n");
+}
+
 function renderCategoryFilter() {
   const current = els.categoryFilter.value;
   els.categoryFilter.innerHTML = `<option value="all">${t("all")}</option>`;
@@ -1165,26 +1193,30 @@ function renderCategoryFilter() {
 
 function renderNarrative() {
   const forecast = monthSnapshot(state.forecast, Number(els.monthSelect.value));
-  els.summaryText.textContent = buildCompactSummary(state.result, state.analyses, state.factorSummary, forecast);
+  els.summaryText.textContent = state.language === "zh"
+    ? buildAutoSummary(state.result, state.analyses, null, forecast)
+    : buildCompactSummary(state.result, state.analyses, null, forecast);
   if (els.analysisList) els.analysisList.innerHTML = "";
 }
 
-function buildCompactSummary(result, analyses, factorSummary, forecast) {
+function buildCompactSummary(result, analyses, _factorSummary, forecast) {
   if (!result) return t("summaryEmpty");
   const highRows = result.rows.filter((row) => row.isHighImpact || Math.abs(row.unitDiff || 0) >= 0.5);
   const filled = highRows.filter((row) => (analyses[analysisKey(result.month, row.code)] || "").trim()).length;
   const direction = (result.summary.totalUnitDiff || 0) <= 0 ? t("better") : t("worse");
   const forecastText = forecast?.unitCost ? t("forecastUnitLine").replace("{unit}", formatUnit(forecast.unitCost)) : "";
-  return t("compactSummary")
-    .replace("{month}", localizeMonthLabel(result.month - 1, state.language))
-    .replace("{direction}", direction)
-    .replace("{unitDiff}", formatUnit(Math.abs(result.summary.totalUnitDiff || 0)))
-    .replace("{mfgDiff}", formatMoney(result.summary.manufacturingDiff))
-    .replace("{filled}", filled)
-    .replace("{total}", highRows.length)
-    .replace("{increase}", formatMoney(factorSummary?.increaseCumulative))
-    .replace("{decrease}", formatMoney(factorSummary?.decreaseCumulative))
-    .replace("{forecast}", forecastText);
+  const reasonText = highRows
+    .map((row) => analyses[analysisKey(result.month, row.code)]?.trim())
+    .filter(Boolean)
+    .slice(0, 5)
+    .join("; ");
+  if (state.language === "en") {
+    return `${localizeMonthLabel(result.month - 1, state.language)} unit cost ${direction} by ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/pc; MFG impact ${formatMoney(result.summary.manufacturingDiff)} K€. Reasons completed ${filled}/${highRows.length}${reasonText ? `: ${reasonText}` : "."} ${forecastText}`;
+  }
+  if (state.language === "tr") {
+    return `${localizeMonthLabel(result.month - 1, state.language)} birim maliyet ${direction}: ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/adet; üretim gider etkisi ${formatMoney(result.summary.manufacturingDiff)} K€. Nedenler ${filled}/${highRows.length}${reasonText ? `: ${reasonText}` : "."} ${forecastText}`;
+  }
+  return "";
 }
 
 function renderTable() {
@@ -1273,15 +1305,24 @@ function renderChart() {
   if (els.categoryChart) els.categoryChart.style.display = "none";
   const rows = monthlyCategoryDiagnostics();
   if (els.categoryDiagnostics) {
-    els.categoryDiagnostics.innerHTML = rows.map((item) => `
-      <button class="category-diagnostic ${item.amountDiff > 0 ? "bad" : "good"}" type="button" data-category="${escapeHtml(item.category)}">
-        <span>${escapeHtml(localizeCategory(item.category, state.language))}</span>
-        <strong>${formatUnit(item.unitDiff)} €/台</strong>
-        <em>${formatMoney(item.amountDiff)} K€</em>
-        <em>${formatMoney(item.manufacturingDiff)} K€</em>
-        <em>${formatPercent(item.yoyRate)}</em>
-      </button>
-    `).join("");
+    const headers = categoryComparisonHeaders(state.language);
+    els.categoryDiagnostics.innerHTML = `
+      <div class="category-comparison-head">
+        ${headers.map((header) => `<span>${escapeHtml(header)}</span>`).join("")}
+      </div>
+      ${rows.map((item) => `
+        <button class="category-diagnostic category-comparison-row ${item.unitDiff > 0 ? "bad" : "good"}" type="button" data-category="${escapeHtml(item.category)}">
+          <span>${escapeHtml(localizeCategory(item.category, state.language))}</span>
+          <em>${formatUnit(item.unit25)}</em>
+          <em>${formatUnit(item.unitBudget)}</em>
+          <strong>${formatUnit(item.unit26)}</strong>
+          <strong>${formatUnit(item.unitDiff)}</strong>
+          <em>${formatUnit(item.unitBudgetDiff)}</em>
+          <em>${formatMoney(item.manufacturingDiff)}</em>
+          <em>${formatMoney(Number.isFinite(item.unitBudgetDiff) ? item.unitBudgetDiff * (state.result.volume26 || 0) / 1000 : null)}</em>
+          <em>${formatPercent(item.yoyRate)}</em>
+        </button>
+      `).join("")}`;
     for (const button of els.categoryDiagnostics.querySelectorAll("[data-category]")) {
       button.addEventListener("click", () => {
         els.categoryFilter.value = button.dataset.category;
@@ -1305,28 +1346,28 @@ function handleChartClick(event) {
 function renderFactors() {
   recalcFactors();
   if (els.projectSummary) els.projectSummary.innerHTML = buildProjectSummaryText();
-  els.increaseTotal.textContent = formatMoney(state.factorSummary.increaseCumulative);
-  els.decreaseTotal.textContent = formatMoney(state.factorSummary.decreaseCumulative);
-  els.factorNetDetail.textContent = formatMoney(state.factorSummary.netCumulative);
+  const planned = sum(state.factors.map((item) => Number(item.plannedImpact) || 0));
+  const actual = sum(state.factors.map((item) => Number(item.actualCumulative) || 0));
+  els.increaseTotal.textContent = formatMoney(planned);
+  els.decreaseTotal.textContent = formatMoney(actual);
+  els.factorNetDetail.textContent = formatMoney(actual - planned);
   els.factorBody.innerHTML = state.factors.length
     ? state.factors.map((item, index) => factorRowHtml(item, index)).join("")
-    : `<tr><td colspan="9" class="empty-cell">${t("emptyFactors")}</td></tr>`;
+    : `<tr><td colspan="10" class="empty-cell">${t("emptyFactors")}</td></tr>`;
 }
 
 function factorRowHtml(item, index) {
   return `
     <tr data-index="${index}">
       <td>
-        <select data-field="type">
-          <option value="increase" ${item.type === "increase" ? "selected" : ""}>${t("increase")}</option>
-          <option value="decrease" ${item.type !== "increase" ? "selected" : ""}>${t("decrease")}</option>
-        </select>
+        <input data-field="lead" value="${escapeHtml(item.lead || "")}" />
       </td>
       <td><input data-field="category" value="${escapeHtml(item.category || "")}" /></td>
       <td><textarea data-field="strategy">${escapeHtml(item.strategy || "")}</textarea></td>
       <td><textarea data-field="project">${escapeHtml(item.project || "")}</textarea></td>
       <td><input data-field="owner" value="${escapeHtml(item.owner || "")}" /></td>
       <td><input data-field="timing" value="${escapeHtml(item.timing || "")}" /></td>
+      <td><input data-field="plannedImpact" value="${formatEditable(item.plannedImpact)}" /></td>
       <td><input data-field="actualCumulative" value="${formatEditable(item.actualCumulative)}" /></td>
       <td><textarea data-field="progress">${escapeHtml(item.progress || "")}</textarea></td>
       <td><button class="delete-btn" type="button" data-delete-index="${index}" title="${t("delete")}">×</button></td>
@@ -1342,12 +1383,14 @@ async function saveFactorsFromTable() {
     return {
       ...existing,
       id: existing.id || String(index + 1),
-      type: get("type"),
+      type: "decrease",
+      lead: get("lead"),
       category: get("category"),
       strategy: get("strategy"),
       project: get("project"),
       owner: get("owner"),
       timing: get("timing"),
+      plannedImpact: parseEditableNumber(get("plannedImpact")),
       actualCumulative: parseEditableNumber(get("actualCumulative")),
       progress: get("progress")
     };
@@ -1363,12 +1406,14 @@ async function saveFactorsFromTable() {
 function addFactor(type) {
   state.factors.unshift({
     id: `new-${Date.now()}`,
-    type,
-    category: t(type === "increase" ? "increase" : "decrease"),
+    type: "decrease",
+    lead: "",
+    category: "",
     strategy: "",
     project: "",
     owner: els.userName.value.trim(),
     timing: "",
+    plannedImpact: 0,
     actualCumulative: 0,
     progress: "",
     budgetMonths: Array(12).fill(0),
@@ -1378,76 +1423,99 @@ function addFactor(type) {
   renderFactors();
 }
 
-function seedOriginalFactors() {
+function seedCostReductionProjects() {
   return [
     {
-      id: "seed-inventory-release",
+      id: "project-carryover",
       type: "decrease",
-      category: "存货跌价准备",
-      strategy: "存货跌价准备释放预提",
-      project: "超期库存钢卷加工成本成品",
-      owner: "",
-      timing: "4月",
-      actualCumulative: 180,
-      progress: "三张表原始因素"
+      lead: "土方",
+      category: "延续项目",
+      strategy: "25年延续项目",
+      project: "轮毂和油底壳螺钉紧固自动化；QS部件喂料自动化；人力成本减少",
+      owner: "李想",
+      timing: "2026年1月",
+      plannedImpact: 73.57,
+      actualCumulative: 70.79,
+      progress: "持续收益"
     },
     {
-      id: "seed-fixed-labor-release",
+      id: "project-upph",
       type: "decrease",
-      category: "固定人工",
-      strategy: "同期释放预提",
-      project: "固定人工预提释放",
-      owner: "",
-      timing: "4月",
-      actualCumulative: 41.9,
-      progress: "三张表原始因素"
+      lead: "土方",
+      category: "提效",
+      strategy: "提升单台生产效率，减少单台成本",
+      project: "UPH提升至130",
+      owner: "李想",
+      timing: "2026年1月",
+      plannedImpact: 72.67,
+      actualCumulative: 21.25,
+      progress: "已落地"
     },
     {
-      id: "seed-steel-scrap",
-      type: "increase",
-      category: "物耗",
-      strategy: "钢卷制成半成品料废",
-      project: "钢卷半成品料废",
-      owner: "",
-      timing: "4月",
-      actualCumulative: 26,
-      progress: "三张表原始因素"
+      id: "project-contract",
+      type: "decrease",
+      lead: "土方",
+      category: "直接员工降费",
+      strategy: "用工结构调整",
+      project: "蓝领合同工替换高工资正式工",
+      owner: "李想",
+      timing: "2026年1月",
+      plannedImpact: 189,
+      actualCumulative: 35,
+      progress: "已替换81人"
     },
     {
-      id: "seed-stale-wip",
-      type: "increase",
-      category: "生产耗用",
-      strategy: "钢卷半成品呆滞",
-      project: "呆滞半成品消耗",
-      owner: "",
-      timing: "4月",
-      actualCumulative: 66,
-      progress: "三张表原始因素"
+      id: "project-balanced",
+      type: "decrease",
+      lead: "土方、中方",
+      category: "直接员工降费",
+      strategy: "锁定到月需求、生产、库存，均衡生产",
+      project: "26年不产生分流费、加班费",
+      owner: "李想",
+      timing: "2026年1月",
+      plannedImpact: 400,
+      actualCumulative: 38.1,
+      progress: "1月加班费减少5,100欧，2月减少3,000欧"
     },
     {
-      id: "seed-oil-purchase",
-      type: "increase",
-      category: "生产耗用",
-      strategy: "一次性购买5/6/7月oil预防涨价",
-      project: "Oil提前采购",
-      owner: "",
-      timing: "4月",
-      actualCumulative: 40,
-      progress: "三张表原始因素"
+      id: "project-depreciation",
+      type: "decrease",
+      lead: "中方",
+      category: "折旧降费",
+      strategy: "折旧费用优化",
+      project: "部分设备、模具折旧年限10年调整至30年",
+      owner: "李想",
+      timing: "2026年4月",
+      plannedImpact: 530,
+      actualCumulative: 530,
+      progress: "已落地53万欧，全年预算160万欧"
+    },
+    {
+      id: "project-obsolete",
+      type: "decrease",
+      lead: "中方、土方",
+      category: "降存货跌价准备",
+      strategy: "超期原材料、半成品消耗",
+      project: "超期原材料加工成半成品",
+      owner: "李想",
+      timing: "2026年4月",
+      plannedImpact: 88,
+      actualCumulative: 88,
+      progress: "已落地"
     }
   ];
 }
 
 function buildProjectSummaryText() {
-  const increaseCount = state.factors.filter((item) => item.type === "increase").length;
-  const decreaseCount = state.factors.filter((item) => item.type !== "increase").length;
+  const planned = sum(state.factors.map((item) => Number(item.plannedImpact) || 0));
+  const actual = sum(state.factors.map((item) => Number(item.actualCumulative) || 0));
   const top = state.factors
     .slice()
     .sort((a, b) => Math.abs(b.actualCumulative || 0) - Math.abs(a.actualCumulative || 0))
     .slice(0, 3)
     .map((item) => item.project || item.strategy || item.category)
     .join("、");
-  return `当前项目库共沉淀上涨因素 ${increaseCount} 项、下降因素 ${decreaseCount} 项；上涨累计 ${formatMoney(state.factorSummary?.increaseCumulative)} K€，下降累计 ${formatMoney(state.factorSummary?.decreaseCumulative)} K€，净影响 ${formatMoney(state.factorSummary?.netCumulative)} K€。重点项目为 ${top || "待补充"}。`;
+  return `当前降费项目库共 ${state.factors.length} 项，预计收益 ${formatMoney(planned)} K€，实际累计收益 ${formatMoney(actual)} K€，达成率 ${formatPercent(planned ? actual / planned : null)}。重点项目为 ${top || "待补充"}。`;
 }
 
 function recalcFactors() {
@@ -1478,6 +1546,7 @@ function applyLanguage(language) {
   els.saveMode.textContent = storeLabel();
   els.sapStatus.textContent = state.resultByMonth.size ? `${t("importedSap")}: ${state.sapFileName}` : t("waitingSap");
   els.forecastStatus.textContent = state.forecast ? `${t("importedForecast")}: ${state.forecastFileName}` : t("waitingForecastPill");
+  if (els.jiangStatus) els.jiangStatus.textContent = state.jiangyue ? `${t("importJiang")}: ${state.jiangFileName}` : t("importJiang");
 }
 
 function countOpenHighRows() {

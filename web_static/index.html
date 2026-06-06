@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js?v=20260605-dashboard-v6"></script>
+    <script type="module" src="./src/app.js?v=20260606-dashboard-v8"></script>
   </head>
   <body>
     <header class="app-header">
@@ -30,6 +30,10 @@
           <input id="forecastFile" type="file" accept=".xlsx,.xls,.xlsm" />
           <span data-i18n="importForecast">导入4+8预测</span>
         </label>
+        <label class="file-button secondary">
+          <input id="jiangFile" type="file" accept=".xlsx,.xls,.xlsm" />
+          <span data-i18n="importJiang">导入姜月表</span>
+        </label>
         <label class="file-button">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
           <span data-i18n="importSap">导入SAP实际</span>
@@ -43,6 +47,7 @@
         <div class="status-pill" id="saveMode">本机保存</div>
         <div class="status-pill muted" id="sapStatus">待导入 SAP 实际</div>
         <div class="status-pill muted" id="forecastStatus">待导入 4+8 预测</div>
+        <div class="status-pill muted" id="jiangStatus">待导入姜月表</div>
       </section>
 
       <nav class="tabbar" aria-label="页面">
@@ -61,28 +66,19 @@
             <span id="dashboardStatus">等待4+8预测文件</span>
           </div>
           <div id="annualSummary" class="smart-summary">??4+8??????????</div>
-          <div class="dashboard-toolbar dashboard-basis-field">
-            <div class="field dashboard-basis-field">
-              <label for="dashboardBasisSelect" data-i18n="dashboardBasis">????</label>
-              <select id="dashboardBasisSelect">
-                <option value="budget" data-i18n-option="budget26">26??</option>
-                <option value="same" data-i18n-option="same25">25??</option>
-              </select>
-            </div>
-          </div>
           <div id="dashboardCards" class="dashboard-cards cockpit-cards"></div>
           <div class="cockpit-grid">
             <section class="cockpit-card trend-card">
               <div class="cockpit-title">
-                <h3 data-i18n="trendTitle">趋势轨道</h3>
-                <span data-i18n="trendHint">实线为已发生，虚线为预测段</span>
+                <h3 data-i18n="trendTitle">单台制造费趋势</h3>
+                <span data-i18n="trendHint">26滚动预测 / 预算 / 同期</span>
               </div>
               <svg id="trendChart" viewBox="0 0 980 310" role="img" aria-label="趋势轨道"></svg>
             </section>
             <section class="cockpit-card waterfall-card">
               <div class="cockpit-title">
-                <h3 data-i18n="waterfallTitle">全年差异瀑布</h3>
-                <span data-i18n="waterfallHint">红色恶化，绿色优化</span>
+                <h3 data-i18n="waterfallTitle">制造费率趋势</h3>
+                <span data-i18n="waterfallHint">制造费 ÷ 产值</span>
               </div>
               <svg id="waterfallChart" viewBox="0 0 980 340" role="img" aria-label="全年差异瀑布"></svg>
             </section>
@@ -113,48 +109,11 @@
       </section>
 
       <section id="varianceView" class="view">
-        <section id="monthlyKpiGrid" class="summary-grid" aria-label="总览">
-          <article class="metric focus">
-            <span data-i18n="unitCost26">26单台制造费</span>
-            <strong id="unitCost26">--</strong>
-            <small data-i18n="unitEuroPc">€/台</small>
-          </article>
-          <article class="metric">
-            <span data-i18n="actual26">26实际</span>
-            <strong id="total26">--</strong>
-            <small>K€</small>
-          </article>
-          <article class="metric">
-            <span data-i18n="same25">25同期</span>
-            <strong id="total25">--</strong>
-            <small>K€</small>
-          </article>
-          <article class="metric">
-            <span data-i18n="budget26">26预算</span>
-            <strong id="budget26">--</strong>
-            <small>K€</small>
-          </article>
-          <article class="metric">
-            <span data-i18n="actualVsSame">实际-同期</span>
-            <strong id="diffAmount">--</strong>
-            <small>K€</small>
-          </article>
-          <article class="metric focus">
-            <span data-i18n="unitDiff">单台差异</span>
-            <strong id="diffUnit">--</strong>
-            <small data-i18n="unitEuroPc">€/台</small>
-          </article>
-          <article class="metric focus">
-            <span data-i18n="manufacturingDiff">制造费差额</span>
-            <strong id="manufacturingDiff">--</strong>
-            <small data-i18n="mfgDiffFormula">单台差 × 26产量</small>
-          </article>
-          <article class="metric">
-            <span data-i18n="factorNet">因素净影响</span>
-            <strong id="factorNet">--</strong>
-            <small data-i18n="keurYtd">K€累计</small>
-          </article>
+        <section class="month-switch-panel">
+          <span data-i18n="actualMonth">实际月份</span>
+          <div id="monthButtons" class="segment-control month-buttons"></div>
         </section>
+        <section id="monthlyKpiGrid" class="summary-grid" aria-label="当月单时人效费"></section>
         <section class="panel narrative-panel" aria-label="原因分析">
           <div class="panel-title">
             <div>
@@ -163,16 +122,9 @@
             </div>
             <span data-i18n="autoFromSite">由网站填写内容自动汇总</span>
           </div>
-          <div class="variance-hero">
-            <div><span data-i18n="heroUnit">单台制造费</span><strong id="heroUnitCost">--</strong></div>
-            <div><span data-i18n="heroUnitDiff">单台同比差</span><strong id="heroUnitDiff">--</strong></div>
-            <div><span data-i18n="heroAmountDiff">制造费差额</span><strong id="heroAmountDiff">--</strong></div>
-            <div><span data-i18n="heroOpen">待解释重点</span><strong id="openItems">--</strong></div>
-          </div>
           <div id="summaryText" class="compact-summary">导入SAP报表后生成本月简洁摘要。</div>
         </section>
 
-        <section id="monthlySummary" class="smart-summary smart-summary-month">??SAP??????????</section>
         <section class="split-view">
           <section class="panel chart-panel" aria-label="大科目对比">
             <div class="panel-title">
@@ -256,32 +208,32 @@
         <section class="panel factor-panel">
           <div class="panel-title">
             <div>
-              <h2 data-i18n="factorProjects">上涨因素 / 下降因素</h2>
-              <p data-i18n="factorHint">用于沉淀项目原因，后续自动进入月度总结和导出三张表。</p>
+              <h2 data-i18n="factorProjects">26年降费项目</h2>
+              <p data-i18n="factorHint">管理正式降费项目；月度差异原因请在第二张表的小科目明细中填写。</p>
             </div>
             <div class="factor-actions">
-              <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加上涨因素</button>
-              <button id="addDecreaseBtn" type="button" data-i18n="addDecrease">添加下降因素</button>
+              <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加项目</button>
               <button id="saveFactorsBtn" type="button" data-i18n="saveProjects">保存项目</button>
             </div>
           </div>
           <div id="projectSummary" class="smart-summary smart-summary-project">???????????/?????????</div>
           <div class="factor-summary">
-            <div><span data-i18n="increaseTotal">上涨累计</span><strong id="increaseTotal">--</strong></div>
-            <div><span data-i18n="decreaseTotal">下降累计</span><strong id="decreaseTotal">--</strong></div>
-            <div><span data-i18n="netImpact">净影响</span><strong id="factorNetDetail">--</strong></div>
+            <div><span data-i18n="increaseTotal">预计收益</span><strong id="increaseTotal">--</strong></div>
+            <div><span data-i18n="decreaseTotal">实际收益</span><strong id="decreaseTotal">--</strong></div>
+            <div><span data-i18n="netImpact">达成差额</span><strong id="factorNetDetail">--</strong></div>
           </div>
           <div class="table-wrap project-wrap">
             <table class="project-table">
               <thead>
                 <tr>
-                  <th data-i18n="type">类型</th>
+                  <th data-i18n="type">主导方</th>
                   <th data-i18n="category">分类</th>
-                  <th data-i18n="path">原因/路径</th>
+                  <th data-i18n="path">核心策略/路径</th>
                   <th data-i18n="project">关键项目</th>
                   <th data-i18n="owner">责任人</th>
                   <th data-i18n="timing">到位时间</th>
-                  <th data-i18n="impact">影响 K€</th>
+                  <th>预计影响 K€</th>
+                  <th data-i18n="impact">实际月累差额 K€</th>
                   <th data-i18n="progress">进展</th>
                   <th data-i18n="action">操作</th>
                 </tr>

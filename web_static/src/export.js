@@ -45,7 +45,7 @@ function buildCostDataSheet(rows, forecast) {
 
   const grouped = new Map();
   for (const row of rows) {
-    if (!["核心", "差异", "效率"].includes(row.group)) continue;
+    if (!["单", "时", "人", "效", "费", "核心", "差异", "效率"].includes(row.group)) continue;
     const key = `${row.group}|${row.label}|${row.unit}`;
     if (!grouped.has(key)) grouped.set(key, { group: row.group, label: row.label, unit: row.unit, rows: [] });
     grouped.get(key).rows.push(row);
@@ -104,6 +104,13 @@ function metricRow(name, same, budget, actual, diff, unit) {
 function buildVarianceDetailSheet(result, analyses) {
   if (!result) return [{ 类型: "说明", 账户编码: "", 英文描述: "待导入SAP实际报表", 大科目: "", 差异分析: "" }];
   const summary = result.summary || {};
+  const reasonSummary = (result.rows || [])
+    .map((row) => {
+      const reason = analyses[analysisKey(result.month, row.code)] || analyses[row.code] || "";
+      return reason.trim() ? `${row.code} ${reason.trim()}` : "";
+    })
+    .filter(Boolean)
+    .join("；");
   const summaryRows = [
     {
       类型: "月度总结",
@@ -115,7 +122,7 @@ function buildVarianceDetailSheet(result, analyses) {
       "26实际K€": round(summary.totalAmount26),
       "实际-同期K€": round(summary.totalAmountDiff),
       "单台差异€/台": round(summary.totalUnitDiff),
-      差异分析: "由下方大科目和小科目原因汇总"
+      差异分析: reasonSummary || "待在下方小科目填写差异原因"
     }
   ];
   const categoryRows = (result.summaryCategories || []).map((item) => ({
@@ -152,31 +159,37 @@ function buildVarianceDetailSheet(result, analyses) {
 
 function buildFactorSheet(factors, summary) {
   const rows = [];
-  if (summary) {
+  if (factors?.length) {
+    const planned = factors.reduce((total, item) => total + (Number(item.plannedImpact) || 0), 0);
+    const actual = factors.reduce((total, item) => total + (Number(item.actualCumulative) || 0), 0);
     rows.push({
-      类型: "汇总",
+      序号: "",
+      主导方: "汇总",
       分类: "",
-      原因路径: "",
+      核心策略路径: "",
       关键项目: "",
       责任人: "",
       到位时间: "",
-      "影响K€": round(summary.netCumulative),
-      进展: `上涨累计 ${round(summary.increaseCumulative)} K€；下降累计 ${round(summary.decreaseCumulative)} K€`
+      "预计影响K€": round(planned),
+      "实际月累差额K€": round(actual),
+      进展: `项目 ${factors.length} 项；达成差额 ${round(actual - planned)} K€`
     });
   }
-  for (const item of factors || []) {
+  for (const [index, item] of (factors || []).entries()) {
     rows.push({
-      类型: item.type === "increase" ? "上涨因素" : "下降因素",
+      序号: index + 1,
+      主导方: item.lead || "",
       分类: item.category || "",
-      原因路径: item.strategy || "",
+      核心策略路径: item.strategy || "",
       关键项目: item.project || "",
       责任人: item.owner || "",
       到位时间: item.timing || "",
-      "影响K€": round(item.actualCumulative),
+      "预计影响K€": round(item.plannedImpact),
+      "实际月累差额K€": round(item.actualCumulative),
       进展: item.progress || ""
     });
   }
-  return rows.length ? rows : [{ 类型: "说明", 进展: "尚未填写上涨/下降因素。" }];
+  return rows.length ? rows : [{ 主导方: "说明", 进展: "尚未填写降费项目。" }];
 }
 
 function buildFormulaSheet(forecast, result) {
@@ -238,7 +251,7 @@ function varianceColumns() {
 }
 
 function factorColumns() {
-  return [{ wch: 14 }, { wch: 14 }, { wch: 22 }, { wch: 34 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 44 }];
+  return [{ wch: 8 }, { wch: 14 }, { wch: 18 }, { wch: 32 }, { wch: 42 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 18 }, { wch: 46 }];
 }
 
 function defaultColumns(rows) {

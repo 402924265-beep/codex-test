@@ -1,4 +1,12 @@
 import { cellText, normalizeNumber } from "./parser.js";
+import {
+  annualManufacturingRate,
+  combineHeadcount,
+  manufacturingRate,
+  monthlyUpph,
+  outputValue
+} from "./metrics.js";
+import { OPERATIONAL_BASELINE } from "./operational-data.js";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
@@ -16,7 +24,12 @@ const DASHBOARD_TEXT = {
     "核心": { en: "Core", tr: "Çekirdek" },
     "差异": { en: "Variance", tr: "Fark" },
     "效率": { en: "Efficiency", tr: "Verimlilik" },
-    "大科目": { en: "Category", tr: "Kategori" }
+    "大科目": { en: "Category", tr: "Kategori" },
+    "单": { en: "Unit", tr: "Birim" },
+    "时": { en: "Time", tr: "Zaman" },
+    "人": { en: "People", tr: "Kişi" },
+    "效": { en: "Efficiency", tr: "Verimlilik" },
+    "费": { en: "Rate", tr: "Oran" }
   },
   scenarios: {
     "同期": { en: "Same period", tr: "Aynı dönem" },
@@ -31,6 +44,9 @@ const DASHBOARD_TEXT = {
     "€/台": { en: "€/pc", tr: "€/adet" },
     "台/人": { en: "pcs/HC", tr: "adet/kişi" },
     "K€": { en: "K€", tr: "K€" }
+    ,"天": { en: "days", tr: "gün" }
+    ,"UPPH": { en: "UPPH", tr: "UPPH" }
+    ,"%": { en: "%", tr: "%" }
   },
   labels: {
     "产量": { en: "Volume", tr: "Hacim" },
@@ -54,6 +70,12 @@ const DASHBOARD_TEXT = {
     "直接用人": { en: "Direct HC", tr: "Direkt kişi" },
     "间接用人": { en: "Indirect HC", tr: "Endirekt kişi" },
     "固定用人": { en: "White-collar HC", tr: "Beyaz yaka kişi" }
+    ,"工作日": { en: "Workdays", tr: "İş günü" }
+    ,"UPPH": { en: "UPPH", tr: "UPPH" }
+    ,"产值": { en: "Output value", tr: "Üretim değeri" }
+    ,"产值累计": { en: "YTD output value", tr: "YTD üretim değeri" }
+    ,"制造费率": { en: "Manufacturing rate", tr: "Üretim gider oranı" }
+    ,"制造费率累计": { en: "YTD manufacturing rate", tr: "YTD üretim gider oranı" }
   },
   categories: {
     "直接人工": { en: "Direct labor", tr: "Direkt işçilik" },
@@ -179,90 +201,88 @@ export function extractForecastWorkbook(workbook, XLSX) {
 
 export function buildAnnualDashboardRows(forecast, options = {}) {
   if (!forecast) return [];
+  const jiang = options.jiangyue || null;
   const actualSource = forecast.totalAll || forecast.totalIncludingFc || forecast.totalMfg;
-  const sameAmount = monthsFromObject(options.baseline25ByMonth, (item) => sumAccounts(item?.accounts, 1));
-  const sameVolume = monthsFromObject(options.baseline25ByMonth, (item) => item?.volume ?? null);
+  const baselineSameAmount = monthsFromObject(options.baseline25ByMonth, (item) => sumAccounts(item?.accounts, 1));
+  const baselineSameVolume = monthsFromObject(options.baseline25ByMonth, (item) => item?.volume ?? null);
+  const sameAmount = preferSeries(jiang?.amount?.same, baselineSameAmount);
+  const sameVolume = preferSeries(jiang?.volume?.same, baselineSameVolume);
   const baselineBudgetAmount = monthsFromObject(options.budget26ByMonth, (item) => sumAccounts(item?.accounts, 1));
   const baselineBudgetVolume = monthsFromObject(options.budget26ByMonth, (item) => item?.volume ?? null);
-  const budgetAmount = preferSeries(actualSource?.budgetMonths, baselineBudgetAmount);
-  const budgetVolume = preferSeries(forecast.volume.budget, baselineBudgetVolume);
+  const budgetAmount = preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount));
+  const budgetVolume = preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume));
   const stdVolume = normalizeMonths(forecast.volume.std);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
-    return result?.summary?.totalAmount26 ?? actualSource?.amountMonths?.[index] ?? null;
+    return result?.summary?.totalAmount26 ?? actualSource?.amountMonths?.[index] ?? jiang?.amount?.actual?.[index] ?? null;
   });
   const actualVolume = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
-    return result?.volume26 ?? forecast.volume.actual[index] ?? null;
+    return result?.volume26 ?? forecast.volume.actual[index] ?? jiang?.volume?.actual?.[index] ?? null;
   });
   const actualUnit = actualAmount.map((value, index) => unit(value, actualVolume[index], actualSource?.unitMonths?.[index]));
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
   const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
-  const amountDiff = actualAmount.map((value, index) => nullableDiff(value, sameAmount[index]));
-  const budgetAmountDiff = actualAmount.map((value, index) => nullableDiff(value, budgetAmount[index]));
-  const unitDiff = actualUnit.map((value, index) => nullableDiff(value, sameUnit[index]));
-  const budgetUnitDiff = actualUnit.map((value, index) => nullableDiff(value, budgetUnit[index]));
-  const mfgDiff = unitDiff.map((value, index) => value === null || !actualVolume[index] ? null : (value * actualVolume[index]) / 1000);
-  const budgetMfgDiff = budgetUnitDiff.map((value, index) => value === null || !actualVolume[index] ? null : (value * actualVolume[index]) / 1000);
+  const workdaysSame = preferSeries(jiang?.workdays?.same, OPERATIONAL_BASELINE.workdays.same);
+  const workdaysBudget = preferSeries(jiang?.workdays?.budget, OPERATIONAL_BASELINE.workdays.budget);
+  const workdaysActual = preferSeries(jiang?.workdays?.actual, OPERATIONAL_BASELINE.workdays.actual);
+  const hcSame = preferSeries(jiang?.headcount?.same, OPERATIONAL_BASELINE.headcount.same);
+  const hcBudget = preferSeries(jiang?.headcount?.budget, forecast.hc?.budgetTotal);
+  const hcActual = preferSeries(jiang?.headcount?.actual, preferSeries(forecast.hc?.actualTotal, OPERATIONAL_BASELINE.headcount.actual));
+  const upphSame = sameVolume.map((value, index) => monthlyUpph(value, hcSame[index], 0, workdaysSame[index]));
+  const upphBudget = budgetVolume.map((value, index) => monthlyUpph(value, hcBudget[index], 0, workdaysBudget[index]));
+  const upphActual = actualVolume.map((value, index) => monthlyUpph(value, hcActual[index], 0, workdaysActual[index]));
+  const priceSame = normalizeMonths(jiang?.price?.same);
+  const priceBudget = normalizeMonths(jiang?.price?.budget);
+  const priceActual = normalizeMonths(jiang?.price?.actual).map((value, index) => Number.isFinite(value) ? value : priceBudget[index]);
+  const outputSame = sameVolume.map((value, index) => outputValue(priceSame[index], value));
+  const outputBudget = budgetVolume.map((value, index) => outputValue(priceBudget[index], value));
+  const outputActual = actualVolume.map((value, index) => outputValue(priceActual[index], value));
+  const rateSame = sameAmount.map((value, index) => manufacturingRate(value, priceSame[index], sameVolume[index]));
+  const rateBudget = budgetAmount.map((value, index) => manufacturingRate(value, priceBudget[index], budgetVolume[index]));
+  const rateActual = actualAmount.map((value, index) => manufacturingRate(value, priceActual[index], actualVolume[index]));
 
   const rows = [
-    metric("核心", "产量", "同期", "台", sameVolume, "higher"),
-    metric("核心", "产量", "预算", "台", budgetVolume, "higher"),
-    metric("核心", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
-    metric("核心", "标准台", "26年", "台", stdVolume, "higher", budgetVolume),
-    metric("核心", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
-    metric("核心", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
-    metric("核心", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
-    metric("核心", "标准台累计", "26年", "台", cumulative(stdVolume), "higher", cumulative(budgetVolume)),
-    metric("核心", "制造费用金额", "同期", "K€", sameAmount, "lower"),
-    metric("核心", "制造费用金额", "预算", "K€", budgetAmount, "lower"),
-    metric("核心", "制造费用金额", "26年", "K€", actualAmount, "lower", budgetAmount),
-    metric("核心", "制造费用金额累计", "同期", "K€", cumulative(sameAmount), "lower"),
-    metric("核心", "制造费用金额累计", "预算", "K€", cumulative(budgetAmount), "lower"),
-    metric("核心", "制造费用金额累计", "26年", "K€", cumulative(actualAmount), "lower", cumulative(budgetAmount)),
-    metric("核心", "单台制造费", "同期", "€/台", sameUnit, "lower"),
-    metric("核心", "单台制造费", "预算", "€/台", budgetUnit, "lower"),
-    metric("核心", "单台制造费", "26年", "€/台", actualUnit, "lower", budgetUnit),
-    metric("核心", "单台制造费累计", "同期", "€/台", cumulativeUnit(sameAmount, sameVolume), "lower"),
-    metric("核心", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
-    metric("核心", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
-    metric("差异", "实际-同期金额", "差额", "K€", amountDiff, "lower"),
-    metric("差异", "实际-预算金额", "差额", "K€", budgetAmountDiff, "lower"),
-    metric("差异", "制造费差额", "差额", "K€", mfgDiff, "lower"),
-    metric("差异", "预算制造费差额", "差额", "K€", budgetMfgDiff, "lower"),
-    metric("差异", "累计制造费差额", "累计差额", "K€", cumulative(mfgDiff), "lower"),
-    metric("差异", "累计预算制造费差额", "累计差额", "K€", cumulative(budgetMfgDiff), "lower")
+    metric("单", "单台制造费", "同期", "€/台", sameUnit, "lower"),
+    metric("单", "单台制造费", "预算", "€/台", budgetUnit, "lower"),
+    metric("单", "单台制造费", "26年", "€/台", actualUnit, "lower", budgetUnit),
+    metric("单", "单台制造费累计", "同期", "€/台", cumulativeUnit(sameAmount, sameVolume), "lower"),
+    metric("单", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
+    metric("单", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
+    metric("时", "工作日", "同期", "天", workdaysSame, "higher"),
+    metric("时", "工作日", "预算", "天", workdaysBudget, "higher"),
+    metric("时", "工作日", "26年", "天", workdaysActual, "higher", workdaysBudget),
+    metric("人", "用人", "同期", "人", hcSame, "lower"),
+    metric("人", "用人", "预算", "人", hcBudget, "lower"),
+    metric("人", "用人", "26年", "人", hcActual, "lower", hcBudget),
+    metric("效", "产量", "同期", "台", sameVolume, "higher"),
+    metric("效", "产量", "预算", "台", budgetVolume, "higher"),
+    metric("效", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
+    metric("效", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
+    metric("效", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
+    metric("效", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
+    metric("效", "UPPH", "同期", "UPPH", upphSame, "higher"),
+    metric("效", "UPPH", "预算", "UPPH", upphBudget, "higher"),
+    metric("效", "UPPH", "26年", "UPPH", upphActual, "higher", upphBudget),
+    metric("费", "产值", "同期", "K€", outputSame, "higher"),
+    metric("费", "产值", "预算", "K€", outputBudget, "higher"),
+    metric("费", "产值", "26年", "K€", outputActual, "higher", outputBudget),
+    metric("费", "产值累计", "同期", "K€", cumulative(outputSame), "higher"),
+    metric("费", "产值累计", "预算", "K€", cumulative(outputBudget), "higher"),
+    metric("费", "产值累计", "26年", "K€", cumulative(outputActual), "higher", cumulative(outputBudget)),
+    metric("费", "制造费用金额", "同期", "K€", sameAmount, "lower"),
+    metric("费", "制造费用金额", "预算", "K€", budgetAmount, "lower"),
+    metric("费", "制造费用金额", "26年", "K€", actualAmount, "lower", budgetAmount),
+    metric("费", "制造费用金额累计", "同期", "K€", cumulative(sameAmount), "lower"),
+    metric("费", "制造费用金额累计", "预算", "K€", cumulative(budgetAmount), "lower"),
+    metric("费", "制造费用金额累计", "26年", "K€", cumulative(actualAmount), "lower", cumulative(budgetAmount)),
+    metric("费", "制造费率", "同期", "%", rateSame, "lower"),
+    metric("费", "制造费率", "预算", "%", rateBudget, "lower"),
+    metric("费", "制造费率", "26年", "%", rateActual, "lower", rateBudget),
+    metric("费", "制造费率累计", "同期", "%", cumulativeRate(sameAmount, outputSame), "lower"),
+    metric("费", "制造费率累计", "预算", "%", cumulativeRate(budgetAmount, outputBudget), "lower"),
+    metric("费", "制造费率累计", "26年", "%", cumulativeRate(actualAmount, outputActual), "lower", cumulativeRate(budgetAmount, outputBudget))
   ];
-
-  if (forecast.hc?.actualTotal?.some(isNumber)) {
-    const hcActual = forecast.hc.actualTotal;
-    const hcBudget = forecast.hc.budgetTotal;
-    const productivityActual = actualVolume.map((value, index) => perHead(value, hcActual[index]));
-    const productivityBudget = budgetVolume.map((value, index) => perHead(value, hcBudget[index]));
-    rows.push(
-      metric("效率", "用人", "预算", "人", hcBudget, "lower"),
-      metric("效率", "用人", "26年", "人", hcActual, "lower", hcBudget),
-      metric("效率", "累计用人", "预算", "人", cumulative(hcBudget), "lower"),
-      metric("效率", "累计用人", "26年", "人", cumulative(hcActual), "lower", cumulative(hcBudget)),
-      metric("效率", "人均产量", "预算", "台/人", productivityBudget, "higher"),
-      metric("效率", "人均产量", "26年", "台/人", productivityActual, "higher", productivityBudget),
-      metric("效率", "累计人均产量", "预算", "台/人", cumulativeProductivity(budgetVolume, hcBudget), "higher"),
-      metric("效率", "累计人均产量", "26年", "台/人", cumulativeProductivity(actualVolume, hcActual), "higher", cumulativeProductivity(budgetVolume, hcBudget)),
-      metric("效率", "直接用人", "预算", "人", forecast.hc.budgetDirect, "lower"),
-      metric("效率", "直接用人", "26年", "人", forecast.hc.actualDirect, "lower"),
-      metric("效率", "间接用人", "预算", "人", forecast.hc.budgetIndirect, "lower"),
-      metric("效率", "间接用人", "26年", "人", forecast.hc.actualIndirect, "lower"),
-      metric("效率", "固定用人", "预算", "人", forecast.hc.budgetFixed, "lower"),
-      metric("效率", "固定用人", "26年", "人", forecast.hc.actualFixed, "lower")
-    );
-  }
-
-  for (const item of forecast.categories.filter((category) => isVisibleCategory(category.label))) {
-    const sameCategoryMonths = categoryMonthsFromObject(options.baseline25ByMonth, item.labelZh, "amount25");
-    if (sameCategoryMonths.some(isNumber)) rows.push(metric("大科目", item.labelZh, "同期", "K€", sameCategoryMonths, "lower"));
-    rows.push(metric("大科目", item.labelZh, "预算", "K€", item.budgetMonths, "lower"));
-    rows.push(metric("大科目", item.labelZh, "26年", "K€", item.amountMonths, "lower", item.budgetMonths));
-  }
 
   return prioritizeDashboardRows(rows.filter((item) => item.values.some((value) => value !== null && value !== undefined)));
 }
@@ -271,22 +291,20 @@ function prioritizeDashboardRows(rows) {
   const metricOrder = [
     "Unit manufacturing cost",
     "YTD unit manufacturing cost",
-    "MFG variance",
-    "YTD MFG variance",
-    "Manufacturing cost",
-    "YTD manufacturing cost",
+    "Workdays",
+    "Headcount",
     "Volume",
     "YTD volume",
-    "STD volume",
-    "YTD STD volume",
-    "Headcount",
-    "YTD headcount",
-    "Direct HC",
-    "Indirect HC",
-    "Fixed labor - white collar"
+    "UPPH",
+    "Output value",
+    "YTD output value",
+    "Manufacturing cost",
+    "YTD manufacturing cost",
+    "Manufacturing rate",
+    "YTD manufacturing rate"
   ];
   const scenarioOrder = ["Same period", "Budget", "2026", "Variance", "YTD variance"];
-  const groupOrder = ["Core", "Variance", "Efficiency", "Category"];
+  const groupOrder = ["Unit", "Time", "People", "Efficiency", "Rate"];
   const orderOf = (list, value) => {
     const index = list.indexOf(value);
     return index === -1 ? 999 : index;
@@ -378,8 +396,8 @@ function extractHc(rows) {
     budgetIndirect,
     actualFixed,
     budgetFixed,
-    actualTotal: addMonths(actualDirect, actualIndirect, actualFixed),
-    budgetTotal: addMonths(budgetDirect, budgetIndirect, budgetFixed)
+    actualTotal: addMonths(actualDirect, actualIndirect),
+    budgetTotal: addMonths(budgetDirect, budgetIndirect)
   };
 }
 
@@ -471,6 +489,12 @@ function cumulativeUnit(amounts, volumes) {
   const amountCum = cumulative(amounts);
   const volumeCum = cumulative(volumes);
   return amountCum.map((amount, index) => unit(amount, volumeCum[index]));
+}
+
+function cumulativeRate(costs, outputs) {
+  const costCum = cumulative(costs);
+  const outputCum = cumulative(outputs);
+  return costCum.map((cost, index) => annualManufacturingRate([cost], [outputCum[index]]));
 }
 
 function cumulativeProductivity(volumes, headcounts) {
