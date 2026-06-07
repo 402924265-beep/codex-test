@@ -1488,15 +1488,12 @@ function renderFactors() {
   renderProjectImpactCards();
   els.factorBody.innerHTML = state.factors.length
     ? state.factors.map((item, index) => factorRowHtml(item, index)).join("")
-    : `<tr><td colspan="10" class="empty-cell">${t("emptyFactors")}</td></tr>`;
+    : `<tr><td colspan="9" class="empty-cell">${t("emptyFactors")}</td></tr>`;
 }
 
 function factorRowHtml(item, index) {
   return `
     <tr data-index="${index}">
-      <td>
-        <input data-field="lead" value="${escapeHtml(item.lead || "")}" />
-      </td>
       <td><input data-field="category" value="${escapeHtml(item.category || "")}" /></td>
       <td><textarea data-field="strategy">${escapeHtml(item.strategy || "")}</textarea></td>
       <td><textarea data-field="project">${escapeHtml(item.project || "")}</textarea></td>
@@ -1519,7 +1516,7 @@ async function saveFactorsFromTable() {
       ...existing,
       id: existing.id || String(index + 1),
       type: "decrease",
-      lead: get("lead"),
+      lead: existing.lead || "",
       category: get("category"),
       strategy: get("strategy"),
       project: get("project"),
