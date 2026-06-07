@@ -1834,6 +1834,9 @@ function formatPlain(value) {
 
 function formatDashboardValue(value, unit) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
+  if (unit === "%") {
+    return `${(Number(value) * 100).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  }
   const digits = unit === "台" || unit === "人" ? 0 : 2;
   return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
