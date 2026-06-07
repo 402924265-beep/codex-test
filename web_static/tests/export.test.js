@@ -55,8 +55,10 @@ test("export workbook uses three-sheet style names and core Chinese columns", ()
     ["洗碗机成本数据", "费用指标到月测算汇总表", "月度差异明细", "26年降费项目-洗碗机", "口径说明"]
   );
   assert.equal(sheets[0].rows[0]["指标"], "单台制造费");
-  assert.equal(sheets[0].rows[0]["1月同期"], 35);
-  assert.equal(sheets[0].rows[0]["1月26年"], 33);
+  assert.equal(sheets[0].rows[0]["口径"], "同期");
+  assert.equal(sheets[0].rows[0]["1月"], 35);
+  assert.equal(sheets[0].rows[2]["口径"], "26年");
+  assert.equal(sheets[0].rows[2]["1月"], 33);
   assert.match(sheets[2].rows[0]["差异分析"], /6666010188.*工资释放预提/);
   assert.equal(sheets[2].rows.some((row) => row["差异分析"] === "工资释放预提"), true);
 });
@@ -71,9 +73,9 @@ test("export cost sheet includes full-year columns and merge metadata", () => {
   });
   const costSheet = sheets.find((sheet) => sheet.name === "洗碗机成本数据");
 
-  assert.ok(costSheet.rows[0].hasOwnProperty("全年同期"));
-  assert.ok(costSheet.rows[0].hasOwnProperty("全年预算"));
-  assert.ok(costSheet.rows[0].hasOwnProperty("全年26年"));
+  assert.ok(costSheet.rows[0].hasOwnProperty("年度"));
+  assert.equal(costSheet.rows[0]["口径"], "同期");
+  assert.equal(costSheet.rows[2]["口径"], "26年");
   assert.ok(Array.isArray(costSheet.merges));
   assert.ok(costSheet.freeze);
 });

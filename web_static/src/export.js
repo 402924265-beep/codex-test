@@ -40,37 +40,25 @@ export function buildAnalysisWorkbookSheets({
 
 function buildCostDataSheet(rows, forecast) {
   if (!rows?.length) {
-    return [{ 指标: "说明", 口径: "待导入4+8/5+7滚动预测", 单位: "", 年度: "" }];
-  }
-
-  const grouped = new Map();
-  for (const row of rows) {
-    if (!["单", "时", "人", "效", "费", "核心", "差异", "效率"].includes(row.group)) continue;
-    const key = `${row.group}|${row.label}|${row.unit}`;
-    if (!grouped.has(key)) grouped.set(key, { group: row.group, label: row.label, unit: row.unit, rows: [] });
-    grouped.get(key).rows.push(row);
+    return [{ 分组: "数据来源", 指标: "说明", 口径: "待导入4+8/5+7滚动预测" }];
   }
 
   const output = [];
-  for (const item of grouped.values()) {
-    const ordered = [...item.rows].sort((a, b) => SCENARIO_ORDER.indexOf(a.scenario) - SCENARIO_ORDER.indexOf(b.scenario));
-    const record = { 分组: item.group, 指标: item.label, 单位: item.unit };
+  for (const row of rows) {
+    if (!["单", "时", "人", "效", "费", "核心", "差异", "效率"].includes(row.group)) continue;
+    const record = { 分组: row.group, 指标: row.label, 口径: row.scenario };
     for (let index = 0; index < 12; index += 1) {
-      for (const row of ordered) {
-        record[`${MONTHS[index]}${row.scenario}`] = round(row.values[index]);
-      }
+      record[MONTHS[index]] = round(row.values[index]);
     }
-    for (const row of ordered) {
-      record[`全年${row.scenario}`] = round(annualValue(row));
-    }
+    record["年度"] = round(annualValue(row));
     output.push(record);
   }
 
   output.push({
     分组: "数据来源",
     指标: "滚动预测",
-    单位: forecast?.source || "4+8/5+7 forecast",
-    全年26年: forecast?.parsedAt || ""
+    口径: forecast?.source || "4+8/5+7 forecast",
+    年度: forecast?.parsedAt || ""
   });
   return output;
 }
@@ -232,14 +220,11 @@ function absText(value) {
 }
 
 function wideMonthColumns() {
-  return [{ wch: 12 }, { wch: 22 }, { wch: 10 }, ...Array(52).fill({ wch: 11 })];
+  return [{ wch: 10 }, { wch: 24 }, { wch: 12 }, ...Array(13).fill({ wch: 12 })];
 }
 
 function costDataMerges() {
-  return MONTHS.map((_, index) => {
-    const start = 3 + index * 4;
-    return { s: { r: 0, c: start }, e: { r: 0, c: start + 3 } };
-  });
+  return [];
 }
 
 function monthlyMetricColumns() {
