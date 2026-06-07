@@ -488,6 +488,7 @@ const state = {
   metricStatus: "all",
   metricIndicator: "all",
   dashboardTableOpen: true,
+  factorMonth: 4,
   sapFileName: "",
   forecastFileName: "",
   jiangFileName: ""
@@ -539,6 +540,7 @@ const els = {
   factorNetDetail: document.getElementById("factorNetDetail"),
   addIncreaseBtn: document.getElementById("addIncreaseBtn"),
   addDecreaseBtn: document.getElementById("addDecreaseBtn"),
+  factorMonthSelect: document.getElementById("factorMonthSelect"),
   saveFactorsBtn: document.getElementById("saveFactorsBtn"),
   toast: document.getElementById("toast")
 };
@@ -635,6 +637,10 @@ function bindEvents() {
   els.categoryChart.addEventListener("click", handleChartClick);
   els.addIncreaseBtn.addEventListener("click", () => addFactor("increase"));
   els.addDecreaseBtn?.addEventListener("click", () => addFactor("decrease"));
+  els.factorMonthSelect?.addEventListener("change", () => {
+    state.factorMonth = Number(els.factorMonthSelect.value) || 4;
+    renderFactors();
+  });
   els.saveFactorsBtn.addEventListener("click", saveFactorsFromTable);
   els.factorBody.addEventListener("click", (event) => {
     const button = event.target.closest("[data-delete-index]");
@@ -1530,7 +1536,7 @@ async function saveFactorsFromTable() {
 }
 
 function addFactor(type) {
-  state.factors.unshift({
+  state.factors.push({
     id: `new-${Date.now()}`,
     type: "decrease",
     lead: "",
@@ -1571,13 +1577,32 @@ function cloneProject(item) {
 
 function renderProjectImpactCards() {
   if (!els.projectImpactCards) return;
+  const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
+  const monthValue = (item, field, fallbackField) => {
+    const series = Array.isArray(item[field]) ? item[field] : null;
+    const value = Number(series?.[monthIndex]);
+    if (Number.isFinite(value) && value !== 0) return value;
+    return Number(item[fallbackField]) || 0;
+  };
   const projectRows = state.factors.filter((item) => item.impactType === "project");
-  const planned = sum(projectRows.map((item) => Number(item.plannedImpact) || 0));
-  const actual = sum(projectRows.map((item) => Number(item.actualCumulative) || 0));
-  const impacts = projectImpactSummary(state.factors);
+  const planned = sum(projectRows.map((item) => monthValue(item, "budgetMonths", "plannedImpact")));
+  const actual = sum(projectRows.map((item) => monthValue(item, "actualMonths", "actualCumulative")));
+  const impactBucket = (impactType) => {
+    const rows = state.factors.filter((item) => item.impactType === impactType);
+    return {
+      planned: sum(rows.map((item) => monthValue(item, "budgetMonths", "plannedImpact"))),
+      actual: sum(rows.map((item) => monthValue(item, "actualMonths", "actualCumulative")))
+    };
+  };
+  const impacts = {
+    scale: impactBucket("scale"),
+    wage: impactBucket("wage"),
+    inflation: impactBucket("inflation")
+  };
+  const monthLabel = `${state.factorMonth}月`;
   const impactCard = (title, data) => `
     <div class="impact-card ${data.actual <= 0 ? "bad" : "good"}">
-      <span>${escapeHtml(title)}</span>
+      <span>${escapeHtml(monthLabel)} · ${escapeHtml(title)}</span>
       <strong>${formatMoney(data.actual)} K€</strong>
       <small>${escapeHtml(t("plannedShort"))}: ${formatMoney(data.planned)} K€ / ${escapeHtml(t("actualShort"))}: ${formatMoney(data.actual)} K€</small>
     </div>`;
@@ -1585,24 +1610,32 @@ function renderProjectImpactCards() {
     ${impactCard(t("scaleImpact"), impacts.scale)}
     ${impactCard(t("wageImpact"), impacts.wage)}
     ${impactCard(t("inflationImpact"), impacts.inflation)}
-    <div><span>${escapeHtml(t("increaseTotal"))}</span><strong>${formatMoney(planned)} K€</strong></div>
-    <div><span>${escapeHtml(t("decreaseTotal"))}</span><strong>${formatMoney(actual)} K€</strong></div>
-    <div><span>${escapeHtml(t("netImpact"))}</span><strong class="${valueClass(actual - planned)}">${formatMoney(actual - planned)} K€</strong></div>
+    <div><span>${escapeHtml(monthLabel)} · ${escapeHtml(t("increaseTotal"))}</span><strong>${formatMoney(planned)} K€</strong></div>
+    <div><span>${escapeHtml(monthLabel)} · ${escapeHtml(t("decreaseTotal"))}</span><strong>${formatMoney(actual)} K€</strong></div>
+    <div><span>${escapeHtml(monthLabel)} · ${escapeHtml(t("netImpact"))}</span><strong class="${valueClass(actual - planned)}">${formatMoney(actual - planned)} K€</strong></div>
   `;
 }
 
 function buildProjectSummaryText() {
+  const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
+  const monthValue = (item, field, fallbackField) => {
+    const series = Array.isArray(item[field]) ? item[field] : null;
+    const value = Number(series?.[monthIndex]);
+    if (Number.isFinite(value) && value !== 0) return value;
+    return Number(item[fallbackField]) || 0;
+  };
   const projectRows = state.factors.filter((item) => item.impactType === "project");
-  const planned = sum(projectRows.map((item) => Number(item.plannedImpact) || 0));
-  const actual = sum(projectRows.map((item) => Number(item.actualCumulative) || 0));
-  const impacts = projectImpactSummary(state.factors);
+  const planned = sum(projectRows.map((item) => monthValue(item, "budgetMonths", "plannedImpact")));
+  const actual = sum(projectRows.map((item) => monthValue(item, "actualMonths", "actualCumulative")));
+  const impactActual = (type) => sum(state.factors.filter((item) => item.impactType === type).map((item) => monthValue(item, "actualMonths", "actualCumulative")));
   const top = projectRows
     .slice()
-    .sort((a, b) => Math.abs(b.actualCumulative || 0) - Math.abs(a.actualCumulative || 0))
+    .sort((a, b) => Math.abs(monthValue(b, "actualMonths", "actualCumulative")) - Math.abs(monthValue(a, "actualMonths", "actualCumulative")))
     .slice(0, 3)
     .map((item) => item.project || item.strategy || item.category)
     .join("、");
-  return `当前模型包含 ${state.factors.length} 项因素与降费项目；降费项目预计收益 ${formatMoney(planned)} K€，实际累计收益 ${formatMoney(actual)} K€，达成率 ${formatPercent(planned ? actual / planned : null)}。规模变化、工资上涨、通胀影响分别为 ${formatMoney(impacts.scale.actual)} K€、${formatMoney(impacts.wage.actual)} K€、${formatMoney(impacts.inflation.actual)} K€；重点项目为 ${top || "待补充"}。`;
+  const monthLabel = `${state.factorMonth}月`;
+  return `${monthLabel}模型包含 ${state.factors.length} 项因素与降费项目；当月降费项目预计收益 ${formatMoney(planned)} K€，实际收益 ${formatMoney(actual)} K€，达成率 ${formatPercent(planned ? actual / planned : null)}。规模变化、工资上涨、通胀影响分别为 ${formatMoney(impactActual("scale"))} K€、${formatMoney(impactActual("wage"))} K€、${formatMoney(impactActual("inflation"))} K€；重点项目为 ${top || "待补充"}。`;
 }
 
 function legacySeedCostReductionProjects() {

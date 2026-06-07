@@ -2,14 +2,30 @@ export const MONTHS = [
   { month: 1, key: "jan", label: "1月" },
   { month: 2, key: "feb", label: "2月" },
   { month: 3, key: "mar", label: "3月" },
-  { month: 4, key: "apr", label: "4月" }
+  { month: 4, key: "apr", label: "4月" },
+  { month: 5, key: "may", label: "5月" },
+  { month: 6, key: "jun", label: "6月" },
+  { month: 7, key: "jul", label: "7月" },
+  { month: 8, key: "aug", label: "8月" },
+  { month: 9, key: "sep", label: "9月" },
+  { month: 10, key: "oct", label: "10月" },
+  { month: 11, key: "nov", label: "11月" },
+  { month: 12, key: "dec", label: "12月" }
 ];
 
 const MONTH_TOKENS = {
   1: ["jan", "january", "1月"],
   2: ["feb", "february", "2月"],
   3: ["mar", "march", "3月"],
-  4: ["apr", "april", "4月"]
+  4: ["apr", "april", "4月"],
+  5: ["may", "5月"],
+  6: ["jun", "june", "6月"],
+  7: ["jul", "july", "7月"],
+  8: ["aug", "august", "8月"],
+  9: ["sep", "sept", "september", "9月"],
+  10: ["oct", "october", "10月"],
+  11: ["nov", "november", "11月"],
+  12: ["dec", "december", "12月"]
 };
 
 export const SAP_SUMMARY_LABELS = {
@@ -239,6 +255,19 @@ export function detectFcstVolume(workbook, month, xlsx) {
   const sheetName = findSheetName(workbook, ["FCST CPU"]);
   if (!sheetName) return null;
   const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, raw: true, defval: null });
+  const tokens = MONTH_TOKENS[month] || [];
+  const headerRow = rows.find((row) => row?.some((cell) => tokens.some((token) => cellText(cell).toLowerCase().includes(token))));
+  if (headerRow) {
+    for (let colIndex = 0; colIndex < headerRow.length; colIndex += 1) {
+      const label = cellText(headerRow[colIndex]).toLowerCase();
+      if (tokens.some((token) => label === token || label.includes(token))) {
+        for (let rowIndex = 1; rowIndex < Math.min(rows.length, 8); rowIndex += 1) {
+          const value = normalizeNumber(rows[rowIndex]?.[colIndex]);
+          if (value !== null && value > 100) return value;
+        }
+      }
+    }
+  }
   return normalizeNumber(rows?.[1]?.[month]) || null;
 }
 

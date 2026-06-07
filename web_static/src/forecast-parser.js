@@ -161,7 +161,7 @@ export function extractForecastWorkbook(workbook, XLSX) {
     varianceByLabel.set(normalizeLabel(label), rowMonths(row, 1));
   }
 
-  const categories = CATEGORY_ROWS
+  const rawCategories = CATEGORY_ROWS
     .map((label) => {
       const sourceRow = findRow(cpuRows, label);
       if (!sourceRow) return null;
@@ -181,6 +181,8 @@ export function extractForecastWorkbook(workbook, XLSX) {
       };
     })
     .filter(Boolean);
+
+  const categories = mergeDepreciationWithFc(rawCategories);
 
   const totalAll = categories.find((item) => sameLabel(item.label, "TOTAL ALL"));
   const totalMfg = categories.find((item) => sameLabel(item.label, "TOTAL MFG COST w/ SHARES"));
@@ -212,13 +214,16 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const budgetAmount = preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount));
   const budgetVolume = preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume));
   const stdVolume = normalizeMonths(forecast.volume.std);
+  const actualMonthCount = inferActualMonthCount(options, jiang);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
-    return result?.summary?.totalAmount26 ?? actualSource?.amountMonths?.[index] ?? jiang?.amount?.actual?.[index] ?? null;
+    if (result?.summary?.totalAmount26 !== undefined) return result.summary.totalAmount26;
+    return actualSource?.amountMonths?.[index] ?? null;
   });
   const actualVolume = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
-    return result?.volume26 ?? forecast.volume.actual[index] ?? jiang?.volume?.actual?.[index] ?? null;
+    if (result?.volume26 !== undefined) return result.volume26;
+    return forecast.volume.actual[index] ?? null;
   });
   const actualUnit = actualAmount.map((value, index) => unit(value, actualVolume[index], actualSource?.unitMonths?.[index]));
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
@@ -228,7 +233,6 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const workdaysActual = preferSeries(jiang?.workdays?.actual, OPERATIONAL_BASELINE.workdays.actual);
   const hcSame = preferSeries(jiang?.headcount?.same, OPERATIONAL_BASELINE.headcount.same);
   const hcBudget = preferSeries(jiang?.headcount?.budget, forecast.hc?.budgetTotal);
-  const actualMonthCount = inferActualMonthCount(options, jiang);
   const forecastHeadcount = preferSeries(forecast.hc?.actualTotal, OPERATIONAL_BASELINE.headcount.actual);
   const hcActual = mergeRealizedAndForecast(
     preferSeries(jiang?.headcount?.actual, OPERATIONAL_BASELINE.headcount.actual),
@@ -299,9 +303,7 @@ function inferActualMonthCount(options, jiang) {
     .filter((value) => Number.isInteger(value) && value >= 1 && value <= 12);
   if (resultMonths.length) return Math.max(...resultMonths);
 
-  const jiangActualMonths = normalizeMonths(jiang?.volume?.actual)
-    .reduce((last, value, index) => Number.isFinite(value) ? index + 1 : last, 0);
-  return jiangActualMonths || 4;
+  return 4;
 }
 
 function mergeRealizedAndForecast(realized, forecast, actualMonthCount) {
@@ -345,7 +347,7 @@ function prioritizeDashboardRows(rows) {
 
 export function monthSnapshot(forecast, month) {
   const index = Math.max(0, Math.min(11, Number(month || 1) - 1));
-  const total = forecast?.totalAll || forecast?.totalIncludingFc || forecast?.totalMfg;
+  const total = forecast?.totalIncludingFc || forecast?.totalAll || forecast?.totalMfg;
   if (!forecast || !total) {
     return { volume: null, unitCost: null, amount: null, budgetDelta: null };
   }
@@ -559,6 +561,32 @@ function isNumber(value) {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+function sumNullable(left, right) {
+  const a = Number.isFinite(left) ? left : 0;
+  const b = Number.isFinite(right) ? right : 0;
+  return Number.isFinite(left) || Number.isFinite(right) ? a + b : null;
+}
+
+function mergeDepreciationWithFc(categories) {
+  const depreciation = categories.find((item) => sameLabel(item.label, "Depreciation"));
+  const fc = categories.find((item) => sameLabel(item.label, "Functional Currency Impact"));
+  if (!depreciation || !fc) return categories;
+  const merged = {
+    ...depreciation,
+    label: "Depreciation incl. FC",
+    labelZh: "折旧（含FC）",
+    amountMonths: depreciation.amountMonths.map((value, index) => sumNullable(value, fc.amountMonths[index])),
+    budgetMonths: depreciation.budgetMonths.map((value, index) => sumNullable(value, fc.budgetMonths[index])),
+    varianceMonths: depreciation.varianceMonths.map((value, index) => sumNullable(value, fc.varianceMonths[index])),
+    unitMonths: depreciation.unitMonths.map((value, index) => sumNullable(value, fc.unitMonths[index]))
+  };
+  merged.total = sumNullable(depreciation.total, fc.total);
+  return [
+    ...categories.filter((item) => !sameLabel(item.label, "Depreciation") && !sameLabel(item.label, "Functional Currency Impact")),
+    merged
+  ];
+}
+
 function normalizeLabel(value) {
   return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
 }
@@ -578,8 +606,7 @@ function isVisibleCategory(label) {
     "Semifixed",
     "Fixed utilities",
     "Fixed Cost",
-    "Depreciation",
-    "Functional Currency Impact",
+    "Depreciation incl. FC",
     "Scrap",
     "Scrap Reselling",
     "Other Variable (Inventory Adj)",
@@ -601,6 +628,7 @@ function zhCategory(label) {
     Semifixed: "半固定费用",
     "Fixed utilities": "固定能源",
     "Fixed Cost": "固定费用",
+    "Depreciation incl. FC": "折旧（含FC）",
     Depreciation: "折旧",
     "Functional Currency Impact": "FC汇率影响",
     Scrap: "报废",

@@ -30,7 +30,10 @@ export function extractJiangYueWorkbook(workbook, XLSX) {
     ["unit manufacturing", "unit cost"]
   ]));
 
-  const operational = extractOperationalRows(rows);
+  const operational = mergeOperational(
+    extractOperationalRows(rows),
+    extractPeopleSheetOperational(workbook, XLSX)
+  );
   const output = mapScenarios((scenario, index) => outputValue(price[scenario][index], volume[scenario][index]));
   const rate = mapScenarios((scenario, index) => {
     const explicit = findRateValue(rows, scenario, index);
@@ -111,6 +114,67 @@ function extractOperationalRows(rows) {
   };
 }
 
+function extractPeopleSheetOperational(workbook, XLSX) {
+  const sheetName = (workbook.SheetNames || []).find((name) => /人数|headcount|labou?r/i.test(name));
+  if (!sheetName) return null;
+  const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+    header: 1,
+    raw: true,
+    defval: null
+  });
+  const direct = findPeopleBlock(rows, ["直接人工人数"], "洗碗机");
+  const indirect = findPeopleBlock(rows, ["间接人工人数"], "洗碗机");
+  const headcount = emptyScenarios();
+  for (const scenario of ["same", "actual"]) {
+    headcount[scenario] = Array.from({ length: MONTH_COUNT }, (_, index) => {
+      const value = sumNullable(direct?.[scenario]?.[index], indirect?.[scenario]?.[index]);
+      return value;
+    });
+  }
+  return { headcount };
+}
+
+function mergeOperational(primary, secondary) {
+  if (!secondary) return primary;
+  return {
+    workdays: mergeScenarios(primary.workdays, secondary.workdays || emptyScenarios()),
+    headcount: mergeScenarios(primary.headcount, secondary.headcount || emptyScenarios()),
+    upph: mergeScenarios(primary.upph, secondary.upph || emptyScenarios())
+  };
+}
+
+function findPeopleBlock(rows, labels, productName) {
+  let inBlock = false;
+  const result = emptyScenarios();
+  for (const row of rows) {
+    const text = rowText(row);
+    if (labels.some((label) => text.includes(normalize(label))) && text.includes(normalize(productName))) {
+      inBlock = true;
+      continue;
+    }
+    if (!inBlock) continue;
+    const year = normalize(row?.[1]);
+    if (year.includes("25年") || year.includes("2025")) result.same = monthsFromPeopleRow(row);
+    else if (year.includes("26年") || year.includes("2026")) result.actual = monthsFromPeopleRow(row);
+    else if (year && !year.includes("24年") && !year.includes("january")) break;
+  }
+  return result;
+}
+
+function monthsFromPeopleRow(row) {
+  return Array.from({ length: MONTH_COUNT }, (_, index) => {
+    const value = normalizeNumber(row?.[2 + index]);
+    return value === null ? null : value;
+  });
+}
+
+function sumNullable(left, right) {
+  const hasLeft = Number.isFinite(left);
+  const hasRight = Number.isFinite(right);
+  if (!hasLeft && !hasRight) return null;
+  return (hasLeft ? left : 0) + (hasRight ? right : 0);
+}
+
 function groupedScenarioRows(rows, labels) {
   const result = emptyScenarios();
   let activeMetric = false;
@@ -171,10 +235,12 @@ function monthsFromRow(row) {
   if (!row) return Array(MONTH_COUNT).fill(null);
   const start = firstMonthlyNumberIndex(row);
   if (start < 0) return Array(MONTH_COUNT).fill(null);
-  return Array.from({ length: MONTH_COUNT }, (_, index) => {
-    const value = normalizeNumber(row[start + index]);
-    return value === null ? null : value;
-  });
+  const values = [];
+  for (let index = start; index < row.length && values.length < MONTH_COUNT; index += 1) {
+    const value = normalizeNumber(row[index]);
+    if (value !== null) values.push(value);
+  }
+  return Array.from({ length: MONTH_COUNT }, (_, index) => values[index] ?? null);
 }
 
 function firstMonthlyNumberIndex(row) {

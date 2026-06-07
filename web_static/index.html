@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
     <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/app.js?v=20260606-dashboard-v10"></script>
+    <script>
+      window.DW_SUPABASE_CONFIG = {
+        url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
+        anonKey: "sb_publishable_kji34L4Yh1vCIPudrIKROA_hdwTjzuu"
+      };
+    </script>
+    <script type="module" src="./src/app.js?v=20260607-supabase-v1"></script>
   </head>
   <body>
     <header class="app-header">
@@ -212,6 +218,15 @@
               <p data-i18n="factorHint">管理正式降费项目；月度差异原因请在第二张表的小科目明细中填写。</p>
             </div>
             <div class="factor-actions">
+              <label class="field compact inline-field">
+                <span>发生月份</span>
+                <select id="factorMonthSelect">
+                  <option value="1">1月</option>
+                  <option value="2">2月</option>
+                  <option value="3">3月</option>
+                  <option value="4">4月</option>
+                </select>
+              </label>
               <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加项目</button>
               <button id="saveFactorsBtn" type="button" data-i18n="saveProjects">保存项目</button>
             </div>
