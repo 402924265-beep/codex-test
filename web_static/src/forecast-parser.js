@@ -223,7 +223,11 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const actualVolume = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
     if (result?.volume26 !== undefined) return result.volume26;
-    return forecast.volume.actual[index] ?? null;
+    const forecastVolume = forecast.volume.actual[index];
+    if (Number.isFinite(forecastVolume)) return forecastVolume;
+    const amount = actualSource?.amountMonths?.[index];
+    const unitValue = actualSource?.unitMonths?.[index];
+    return Number.isFinite(amount) && Number.isFinite(unitValue) && unitValue ? amount * 1000 / unitValue : null;
   });
   const actualUnit = actualAmount.map((value, index) => unit(value, actualVolume[index], actualSource?.unitMonths?.[index]));
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
