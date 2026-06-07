@@ -23,9 +23,9 @@ const KPI_COPY = {
 };
 
 const CATEGORY_HEADERS = {
-  zh: ["大科目", "25同期单台", "26目标单台", "26实际单台", "同比单台差", "目标单台差", "同比影响额", "目标影响额", "同比"],
-  en: ["Category", "2025 unit", "2026 target unit", "2026 actual unit", "YoY unit gap", "Target unit gap", "YoY impact", "Target impact", "YoY %"],
-  tr: ["Kategori", "2025 birim", "2026 hedef birim", "2026 gerçekleşen birim", "YoY birim farkı", "Hedef birim farkı", "YoY etki", "Hedef etki", "YoY %"]
+  zh: ["大科目", "25同期单台 €/台", "26目标单台 €/台", "26实际单台 €/台", "同比单台差 €/台", "目标单台差 €/台", "同比影响额 K€", "目标影响额 K€", "同比"],
+  en: ["Category", "2025 unit €/pc", "2026 target unit €/pc", "2026 actual unit €/pc", "YoY unit gap €/pc", "Target unit gap €/pc", "YoY impact K€", "Target impact K€", "YoY %"],
+  tr: ["Kategori", "2025 birim €/adet", "2026 hedef birim €/adet", "2026 gerçekleşen birim €/adet", "YoY birim farkı €/adet", "Hedef birim farkı €/adet", "YoY etki K€", "Hedef etki K€", "YoY %"]
 };
 
 export function buildKpiDefinitions(language = "zh") {

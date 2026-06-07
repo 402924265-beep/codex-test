@@ -26,13 +26,15 @@ import {
 import { extractJiangYueWorkbook } from "./jiangyue-parser.js";
 import {
   annualManufacturingRate,
+  annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
 } from "./metrics.js";
 import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js";
 
-const VERSION = "20260606-dashboard-v9";
+const VERSION = "20260606-dashboard-v10";
 
 const i18n = {
   zh: {
@@ -129,6 +131,11 @@ const i18n = {
     yoyVariance: "同比差异",
     budgetVariance: "预算差异",
     targetCompletion: "目标完成率",
+    inflationImpact: "通胀影响",
+    wageImpact: "工资上涨影响",
+    scaleImpact: "规模变化影响",
+    plannedShort: "预计",
+    actualShort: "实际",
     annualCategoryDivergence: "全年大科目同比差异",
     heatmapTitle: "月度异常热力",
     heatmapHint: "颜色越深差异越大",
@@ -267,6 +274,11 @@ const i18n = {
     yoyVariance: "YoY variance",
     budgetVariance: "Budget variance",
     targetCompletion: "Target completion",
+    inflationImpact: "Inflation impact",
+    wageImpact: "Wage increase impact",
+    scaleImpact: "Scale impact",
+    plannedShort: "Plan",
+    actualShort: "Actual",
     annualCategoryDivergence: "Annual category YoY variance",
     heatmapTitle: "Monthly Exception Heatmap",
     heatmapHint: "Darker color means larger variance",
@@ -405,6 +417,11 @@ const i18n = {
     yoyVariance: "YoY fark",
     budgetVariance: "Bütçe farkı",
     targetCompletion: "Hedef gerçekleşme",
+    inflationImpact: "Enflasyon etkisi",
+    wageImpact: "Ücret artışı etkisi",
+    scaleImpact: "Ölçek etkisi",
+    plannedShort: "Plan",
+    actualShort: "Gerçek",
     annualCategoryDivergence: "Yıllık kategori YoY farkı",
     heatmapTitle: "Aylık İstisna Isı Haritası",
     heatmapHint: "Renk koyulaştıkça fark büyür",
@@ -516,6 +533,7 @@ const els = {
   detailBody: document.getElementById("detailBody"),
   rowCount: document.getElementById("rowCount"),
   factorBody: document.getElementById("factorBody"),
+  projectImpactCards: document.getElementById("projectImpactCards"),
   increaseTotal: document.getElementById("increaseTotal"),
   decreaseTotal: document.getElementById("decreaseTotal"),
   factorNetDetail: document.getElementById("factorNetDetail"),
@@ -534,10 +552,13 @@ async function bootstrap() {
   els.userName.value = store.getUser();
   try {
     state.analyses = await store.loadAnalyses();
-    state.factors = normalizeFactorsForUi(await store.loadFactors([]));
-    if (!state.factors.length || state.factors.every((item) => item.plannedImpact === undefined)) {
-      state.factors = seedCostReductionProjects();
-    }
+    const storedFactors = normalizeFactorsForUi(await store.loadFactors([]));
+    const legacySeedData = storedFactors.length > 0
+      && storedFactors.length <= 6
+      && storedFactors.every((item) => String(item.id || "").startsWith("project-"));
+    state.factors = (!storedFactors.length || legacySeedData)
+      ? seedCostReductionProjects()
+      : mergeMissingProjectSeeds(storedFactors);
   } catch (error) {
     toast(error.message || String(error), true);
   }
@@ -893,6 +914,11 @@ function metricRowStatus(row, monthIndex = null) {
 
 function annualMetricValue(row) {
   if (!row) return null;
+  if (row.label === "单台制造费") {
+    const amount = state.dashboardRows.find((item) => item.label === "制造费用金额" && item.scenario === row.scenario);
+    const volume = state.dashboardRows.find((item) => item.label === "产量" && item.scenario === row.scenario);
+    return annualUnitCost(amount?.values || [], volume?.values || []);
+  }
   if (row.label === "制造费率") {
     const cumulativeRow = state.dashboardRows.find((item) => item.label === "制造费率累计" && item.scenario === row.scenario);
     return lastFinite(cumulativeRow?.values || row.values);
@@ -944,8 +970,8 @@ function annualStats() {
   const output26 = rowBy("产值", "26年");
   const output25 = rowBy("产值", "同期");
   return {
-    unit26: annualUnitCost(amount26, volume26),
-    unit25: annualUnitCost(amount25, volume25),
+    unit26: annualUnitCostFromRows(amount26, volume26),
+    unit25: annualUnitCostFromRows(amount25, volume25),
     days26: sum(days26?.values || []),
     days25: sum(days25?.values || []),
     people26: averageFinite(people26?.values || []),
@@ -1035,7 +1061,7 @@ function lastFinite(values = []) {
   return null;
 }
 
-function annualUnitCost(amountRow, volumeRow) {
+function annualUnitCostFromRows(amountRow, volumeRow) {
   const amount = sum(amountRow?.values || []);
   const volume = sum(volumeRow?.values || []);
   return amount && volume ? (amount / volume) * 1000 : null;
@@ -1064,9 +1090,10 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   const top = 44;
   const bottom = 46;
   const all = [...actual.values, ...budget.values, ...same.values].filter(Number.isFinite);
-  const min = Math.min(...all);
-  const max = Math.max(...all);
-  const span = Math.max(max - min, Math.abs(max) * 0.1, 1);
+  const bounds = unitLabel === "%" ? rateAxisBounds(all) : valueAxisBounds(all);
+  const min = bounds.min;
+  const max = bounds.max;
+  const span = Math.max(max - min, 1e-9);
   const x = (index) => left + index * ((width - left - right) / 11);
   const y = (value) => top + (max - value) / span * (height - top - bottom);
   const series = [
@@ -1074,13 +1101,23 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
     { row: budget, color: "#f6c85f", name: t("budget26") },
     { row: same, color: "#91a7bd", name: t("same25") }
   ];
+  const labelItems = [];
   const paths = series.map((item, seriesIndex) => {
     const points = item.row.values.map((value, index) => Number.isFinite(value) ? `${x(index)},${y(value)}` : null).filter(Boolean).join(" ");
-    const dots = item.row.values.map((value, index) => Number.isFinite(value) ? `
+    const dots = item.row.values.map((value, index) => {
+      if (!Number.isFinite(value)) return "";
+      labelItems.push({
+        x: x(index),
+        y: y(value),
+        seriesIndex,
+        color: item.color,
+        text: formatDashboardValue(value, unitLabel)
+      });
+      return `
       <circle cx="${x(index)}" cy="${y(value)}" r="${item.row === actual ? 5 : 3.5}" fill="${item.color}" class="chart-dot">
         <title>${localizeMonthLabel(index, state.language)} ${item.name}: ${formatDashboardValue(value, unitLabel)}</title>
-      </circle>
-      <text x="${x(index)}" y="${y(value) + [-12, 19, -27][seriesIndex]}" class="chart-value-label chart-value-${seriesIndex}" fill="${item.color}">${escapeSvg(formatDashboardValue(value, unitLabel))}</text>` : "").join("");
+      </circle>`;
+    }).join("");
     return `<polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.row === actual ? 4 : 2.5}" class="animated-line" />${dots}`;
   }).join("");
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -1088,8 +1125,47 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
     <rect width="${width}" height="${height}" class="chart-bg" />
     ${Array.from({ length: 12 }, (_, index) => `<line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${height - bottom}" class="grid-line" /><text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(localizeMonthLabel(index, state.language))}</text>`).join("")}
     ${paths}
+    ${placeChartLabels(labelItems, top, height - bottom)}
     ${series.map((item, index) => `<circle cx="${left + index * 170}" cy="22" r="5" fill="${item.color}" /><text x="${left + 12 + index * 170}" y="27" class="legend">${escapeSvg(item.name)}</text>`).join("")}
   `;
+}
+
+function valueAxisBounds(values) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const pad = Math.max((max - min) * 0.18, Math.abs(max) * 0.08, 1);
+  return { min: min - pad, max: max + pad };
+}
+
+function rateAxisBounds(values) {
+  const max = Math.max(...values, 0.01);
+  return { min: 0, max: max * 1.42 };
+}
+
+function placeChartLabels(items, top, bottom) {
+  const offsets = [-12, 17, -27];
+  const groups = new Map();
+  for (const item of items) {
+    const key = Math.round(item.x);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ ...item, labelY: item.y + offsets[item.seriesIndex] });
+  }
+  const labels = [];
+  for (const group of groups.values()) {
+    group.sort((a, b) => a.labelY - b.labelY);
+    for (let index = 1; index < group.length; index += 1) {
+      if (group[index].labelY - group[index - 1].labelY < 15) group[index].labelY = group[index - 1].labelY + 15;
+    }
+    for (let index = group.length - 1; index >= 0; index -= 1) {
+      if (group[index].labelY > bottom - 4) group[index].labelY = bottom - 4;
+      if (index > 0 && group[index].labelY - group[index - 1].labelY < 15) group[index - 1].labelY = group[index].labelY - 15;
+    }
+    for (const item of group) {
+      const yPos = Math.max(top + 10, Math.min(bottom - 4, item.labelY));
+      labels.push(`<text x="${item.x}" y="${yPos}" class="chart-value-label chart-value-${item.seriesIndex}" fill="${item.color}">${escapeSvg(item.text)}</text>`);
+    }
+  }
+  return labels.join("");
 }
 
 function totalBar(x, value, cls, label, displayValue, y, plotH, top, barW) {
@@ -1103,12 +1179,13 @@ function totalBar(x, value, cls, label, displayValue, y, plotH, top, barW) {
 }
 
 function renderHeatmap(metrics, rowBy) {
-  const monthLabels = Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language));
+  const monthLabels = [...Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language)), t("fullYear")];
   const rows = metrics.map((labelText) => {
     const actual = rowBy(labelText, "26年");
     const compare = rowBy(labelText, state.dashboardBasis === "same" ? "同期" : "预算");
     if (!actual || !compare) return null;
     const diffs = actual.values.map((value, index) => Number.isFinite(value) && Number.isFinite(compare.values[index]) ? value - compare.values[index] : null);
+    diffs.push(diffNullableLocal(annualMetricValue(actual), annualMetricValue(compare)));
     const max = Math.max(1, ...diffs.map((value) => Math.abs(value || 0)));
     return { label: labelText, actual, diffs, max };
   }).filter(Boolean);
@@ -1182,13 +1259,15 @@ function metricTooltip(row, index) {
   const completion = targetCompletionRate(actual, budget);
   return [
     `${annual ? t("fullYear") : localizeMonthLabel(index, state.language)} · ${localizeDashboardText("labels", row.label, state.language)}`,
-    `${t("actual26")}: ${formatDashboardValue(actual, row.unit)}`,
-    `${t("same25")}: ${formatDashboardValue(same, row.unit)}`,
-    `${t("budget26")}: ${formatDashboardValue(budget, row.unit)}`,
-    Number.isFinite(yoy) ? `${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}` : "",
-    Number.isFinite(budgetDiff) ? `${t("budgetVariance")}: ${formatDashboardValue(budgetDiff, row.unit)}` : "",
-    Number.isFinite(completion) ? `${t("targetCompletion")}: ${formatPercent(completion)}` : ""
+    Number.isFinite(yoy) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}</span>` : "",
+    Number.isFinite(budgetDiff) ? `<span class="${tooltipDiffClass(budgetDiff, row.direction)}">${t("budgetVariance")}: ${formatDashboardValue(budgetDiff, row.unit)}</span>` : "",
+    Number.isFinite(completion) ? `<span class="${completion >= 1 ? "tooltip-good" : "tooltip-bad"}">${t("targetCompletion")}: ${formatPercent(completion)}</span>` : ""
   ].filter(Boolean).join("\n");
+}
+
+function tooltipDiffClass(value, direction) {
+  const good = direction === "higher" ? value >= 0 : value <= 0;
+  return good ? "tooltip-good" : "tooltip-bad";
 }
 
 function installMetricHoverTooltip() {
@@ -1200,7 +1279,7 @@ function installMetricHoverTooltip() {
   const show = (target, event) => {
     const text = target?.dataset?.metricTooltip;
     if (!text) return;
-    tooltip.textContent = text;
+    tooltip.innerHTML = text;
     tooltip.classList.add("visible");
     positionMetricTooltip(tooltip, event?.clientX, event?.clientY, target);
   };
@@ -1397,11 +1476,7 @@ function handleChartClick(event) {
 function renderFactors() {
   recalcFactors();
   if (els.projectSummary) els.projectSummary.innerHTML = buildProjectSummaryText();
-  const planned = sum(state.factors.map((item) => Number(item.plannedImpact) || 0));
-  const actual = sum(state.factors.map((item) => Number(item.actualCumulative) || 0));
-  els.increaseTotal.textContent = formatMoney(planned);
-  els.decreaseTotal.textContent = formatMoney(actual);
-  els.factorNetDetail.textContent = formatMoney(actual - planned);
+  renderProjectImpactCards();
   els.factorBody.innerHTML = state.factors.length
     ? state.factors.map((item, index) => factorRowHtml(item, index)).join("")
     : `<tr><td colspan="10" class="empty-cell">${t("emptyFactors")}</td></tr>`;
@@ -1475,6 +1550,62 @@ function addFactor(type) {
 }
 
 function seedCostReductionProjects() {
+  return PROJECT_SEEDS.map(cloneProject);
+}
+
+function mergeMissingProjectSeeds(storedFactors) {
+  const existingIds = new Set(storedFactors.map((item) => String(item.id)));
+  return [
+    ...storedFactors,
+    ...PROJECT_SEEDS.filter((item) => !existingIds.has(String(item.id))).map(cloneProject)
+  ];
+}
+
+function cloneProject(item) {
+  return {
+    ...item,
+    budgetMonths: [...(item.budgetMonths || Array(12).fill(0))],
+    actualMonths: [...(item.actualMonths || Array(12).fill(0))]
+  };
+}
+
+function renderProjectImpactCards() {
+  if (!els.projectImpactCards) return;
+  const projectRows = state.factors.filter((item) => item.impactType === "project");
+  const planned = sum(projectRows.map((item) => Number(item.plannedImpact) || 0));
+  const actual = sum(projectRows.map((item) => Number(item.actualCumulative) || 0));
+  const impacts = projectImpactSummary(state.factors);
+  const impactCard = (title, data) => `
+    <div class="impact-card ${data.actual <= 0 ? "bad" : "good"}">
+      <span>${escapeHtml(title)}</span>
+      <strong>${formatMoney(data.actual)} K€</strong>
+      <small>${escapeHtml(t("plannedShort"))}: ${formatMoney(data.planned)} K€ / ${escapeHtml(t("actualShort"))}: ${formatMoney(data.actual)} K€</small>
+    </div>`;
+  els.projectImpactCards.innerHTML = `
+    ${impactCard(t("scaleImpact"), impacts.scale)}
+    ${impactCard(t("wageImpact"), impacts.wage)}
+    ${impactCard(t("inflationImpact"), impacts.inflation)}
+    <div><span>${escapeHtml(t("increaseTotal"))}</span><strong>${formatMoney(planned)} K€</strong></div>
+    <div><span>${escapeHtml(t("decreaseTotal"))}</span><strong>${formatMoney(actual)} K€</strong></div>
+    <div><span>${escapeHtml(t("netImpact"))}</span><strong class="${valueClass(actual - planned)}">${formatMoney(actual - planned)} K€</strong></div>
+  `;
+}
+
+function buildProjectSummaryText() {
+  const projectRows = state.factors.filter((item) => item.impactType === "project");
+  const planned = sum(projectRows.map((item) => Number(item.plannedImpact) || 0));
+  const actual = sum(projectRows.map((item) => Number(item.actualCumulative) || 0));
+  const impacts = projectImpactSummary(state.factors);
+  const top = projectRows
+    .slice()
+    .sort((a, b) => Math.abs(b.actualCumulative || 0) - Math.abs(a.actualCumulative || 0))
+    .slice(0, 3)
+    .map((item) => item.project || item.strategy || item.category)
+    .join("、");
+  return `当前模型包含 ${state.factors.length} 项因素与降费项目；降费项目预计收益 ${formatMoney(planned)} K€，实际累计收益 ${formatMoney(actual)} K€，达成率 ${formatPercent(planned ? actual / planned : null)}。规模变化、工资上涨、通胀影响分别为 ${formatMoney(impacts.scale.actual)} K€、${formatMoney(impacts.wage.actual)} K€、${formatMoney(impacts.inflation.actual)} K€；重点项目为 ${top || "待补充"}。`;
+}
+
+function legacySeedCostReductionProjects() {
   return [
     {
       id: "project-carryover",
@@ -1557,7 +1688,7 @@ function seedCostReductionProjects() {
   ];
 }
 
-function buildProjectSummaryText() {
+function legacyBuildProjectSummaryText() {
   const planned = sum(state.factors.map((item) => Number(item.plannedImpact) || 0));
   const actual = sum(state.factors.map((item) => Number(item.actualCumulative) || 0));
   const top = state.factors

@@ -566,7 +566,7 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .heatmap-grid {
   display: grid;
-  grid-template-columns: 150px repeat(12, minmax(28px, 1fr));
+  grid-template-columns: 150px repeat(13, minmax(28px, 1fr));
   gap: 5px;
   padding: 12px;
 }
@@ -691,6 +691,14 @@ td:nth-child(2) { text-align: left; }
 .metric-hover-tooltip.visible {
   display: block;
 }
+
+.metric-hover-tooltip span {
+  display: block;
+  font-weight: 700;
+}
+
+.metric-hover-tooltip .tooltip-good { color: #49d9a4; }
+.metric-hover-tooltip .tooltip-bad { color: #ff7a70; }
 
 .dashboard-table th,
 .dashboard-table td {
@@ -862,6 +870,13 @@ td:nth-child(2) { text-align: left; }
   text-align: left;
 }
 
+.category-comparison-row.category-diagnostic {
+  grid-template-columns: minmax(180px, 1.6fr) repeat(8, minmax(92px, 1fr));
+  gap: 0;
+  min-width: 1080px;
+  border-width: 0 0 1px 5px;
+}
+
 .category-diagnostic.bad {
   border-left-color: var(--red);
   background: #fff8f6;
@@ -978,6 +993,22 @@ tr.high td:first-child {
 
 .factor-summary strong { font-size: 20px; }
 
+.factor-summary .impact-card {
+  color: #fff;
+  background: linear-gradient(180deg, #20384f, #12283c);
+  border-color: #31556d;
+}
+
+.factor-summary .impact-card span,
+.factor-summary .impact-card small {
+  color: #c5d8e5;
+}
+
+.factor-summary .impact-card strong { font-size: 26px; }
+.factor-summary .impact-card small { font-size: 11px; }
+.factor-summary .impact-card.good strong { color: #31e6b1; }
+.factor-summary .impact-card.bad strong { color: #ff665f; }
+
 .project-table th:nth-child(1) { width: 112px; }
 .project-table th:nth-child(2) { width: 140px; }
 .project-table th:nth-child(3) { width: 230px; }
@@ -1042,7 +1073,7 @@ tr.high td:first-child {
   .dashboard-cards,
   .variance-hero { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cockpit-grid { grid-template-columns: 1fr; }
-  .heatmap-grid { grid-template-columns: 120px repeat(12, minmax(24px, 1fr)); overflow-x: auto; }
+  .heatmap-grid { grid-template-columns: 120px repeat(13, minmax(24px, 1fr)); overflow-x: auto; }
   .factor-summary { grid-template-columns: 1fr; }
   .table-wrap { max-height: none; }
 }

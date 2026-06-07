@@ -47,6 +47,12 @@ export function annualManufacturingRate(costsKeur = [], outputValuesKeur = []) {
   return cost !== null && isPositive(revenue) ? cost / revenue : null;
 }
 
+export function annualUnitCost(costsKeur = [], volumes = []) {
+  const cost = sumFinite(costsKeur);
+  const volume = sumFinite(volumes);
+  return cost !== null && isPositive(volume) ? cost * 1000 / volume : null;
+}
+
 export function targetCompletionRate(actual, budget) {
   if (!Number.isFinite(actual) || !isPositive(budget)) return null;
   return 2 - actual / budget;
