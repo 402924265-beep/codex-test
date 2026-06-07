@@ -204,7 +204,7 @@ export function extractForecastWorkbook(workbook, XLSX) {
 export function buildAnnualDashboardRows(forecast, options = {}) {
   if (!forecast) return [];
   const jiang = options.jiangyue || null;
-  const actualSource = forecast.totalIncludingFc || forecast.totalAll || forecast.totalMfg;
+  const actualSource = forecast.totalAll || forecast.totalIncludingFc || forecast.totalMfg;
   const baselineSameAmount = monthsFromObject(options.baseline25ByMonth, (item) => sumAccounts(item?.accounts, 1));
   const baselineSameVolume = monthsFromObject(options.baseline25ByMonth, (item) => item?.volume ?? null);
   const sameAmount = preferSeries(jiang?.amount?.same, baselineSameAmount);
