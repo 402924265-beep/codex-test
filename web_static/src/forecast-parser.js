@@ -214,24 +214,26 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const budgetAmount = preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount));
   const budgetVolume = preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume));
   const stdVolume = normalizeMonths(forecast.volume.std);
+  const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
+  const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
   const actualMonthCount = inferActualMonthCount(options, jiang);
+  const forecastAmount = preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount));
+  const forecastVolume = preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume));
+  const forecastUnit = preferNonZeroSeries(actualSource?.unitMonths, budgetUnit);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
     if (hasRealizedActual(result)) return result.summary.totalAmount26;
-    return actualSource?.amountMonths?.[index] ?? null;
+    return forecastAmount[index];
   });
   const actualVolume = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
     if (hasRealizedActual(result) && result?.volume26 !== undefined) return result.volume26;
-    const forecastVolume = forecast.volume.actual[index];
-    if (Number.isFinite(forecastVolume)) return forecastVolume;
-    const amount = actualSource?.amountMonths?.[index];
-    const unitValue = actualSource?.unitMonths?.[index];
+    if (Number.isFinite(forecastVolume[index])) return forecastVolume[index];
+    const amount = forecastAmount[index];
+    const unitValue = forecastUnit[index];
     return Number.isFinite(amount) && Number.isFinite(unitValue) && unitValue ? amount * 1000 / unitValue : null;
   });
-  const actualUnit = actualAmount.map((value, index) => unit(value, actualVolume[index], actualSource?.unitMonths?.[index]));
-  const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
-  const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
+  const actualUnit = actualAmount.map((value, index) => unit(value, actualVolume[index], forecastUnit[index]));
   const workdaysSame = preferSeries(jiang?.workdays?.same, OPERATIONAL_BASELINE.workdays.same);
   const workdaysBudget = preferSeries(jiang?.workdays?.budget, OPERATIONAL_BASELINE.workdays.budget);
   const workdaysActual = preferSeries(jiang?.workdays?.actual, OPERATIONAL_BASELINE.workdays.actual);
@@ -460,6 +462,12 @@ function preferSeries(primary, fallback) {
   const first = normalizeMonths(primary);
   const second = normalizeMonths(fallback);
   return first.map((value, index) => Number.isFinite(value) ? value : second[index]);
+}
+
+function preferNonZeroSeries(primary, fallback) {
+  const first = normalizeMonths(primary);
+  const second = normalizeMonths(fallback);
+  return first.map((value, index) => Number.isFinite(value) && Math.abs(value) > 0.0001 ? value : second[index]);
 }
 
 function rowsFromSheet(workbook, XLSX, candidates) {
