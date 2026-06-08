@@ -217,12 +217,12 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const actualMonthCount = inferActualMonthCount(options, jiang);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
-    if (result?.summary?.totalAmount26 !== undefined) return result.summary.totalAmount26;
+    if (hasRealizedActual(result)) return result.summary.totalAmount26;
     return actualSource?.amountMonths?.[index] ?? null;
   });
   const actualVolume = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
-    if (result?.volume26 !== undefined) return result.volume26;
+    if (hasRealizedActual(result) && result?.volume26 !== undefined) return result.volume26;
     const forecastVolume = forecast.volume.actual[index];
     if (Number.isFinite(forecastVolume)) return forecastVolume;
     const amount = actualSource?.amountMonths?.[index];
@@ -302,12 +302,17 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
 }
 
 function inferActualMonthCount(options, jiang) {
-  const resultMonths = [...(options.resultByMonth?.keys?.() || [])]
-    .map(Number)
+  const resultMonths = [...(options.resultByMonth?.entries?.() || [])]
+    .filter(([, result]) => hasRealizedActual(result))
+    .map(([month]) => Number(month))
     .filter((value) => Number.isInteger(value) && value >= 1 && value <= 12);
   if (resultMonths.length) return Math.max(...resultMonths);
 
   return 4;
+}
+
+function hasRealizedActual(result) {
+  return Number.isFinite(result?.summary?.totalAmount26) && Math.abs(result.summary.totalAmount26) > 0.0001;
 }
 
 function mergeRealizedAndForecast(realized, forecast, actualMonthCount) {

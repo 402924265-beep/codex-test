@@ -664,11 +664,46 @@ td:first-child,
 th:nth-child(2),
 td:nth-child(2) { text-align: left; }
 
-.dashboard-table th:first-child { width: 190px; }
-.dashboard-table th:first-child { width: 74px; }
-.dashboard-table th:nth-child(2) { width: 178px; }
-.dashboard-table th:nth-child(3) { width: 72px; }
-.dashboard-table th:nth-child(4) { width: 62px; }
+.dashboard-table {
+  min-width: 1680px;
+}
+
+.dashboard-table th:first-child,
+.dashboard-table td:first-child { width: 74px; min-width: 74px; }
+.dashboard-table th:nth-child(2),
+.dashboard-table td:nth-child(2) { width: 178px; min-width: 178px; }
+.dashboard-table th:nth-child(3),
+.dashboard-table td:nth-child(3) { width: 72px; min-width: 72px; }
+.dashboard-table th:nth-child(4),
+.dashboard-table td:nth-child(4) { width: 62px; min-width: 62px; }
+.dashboard-table th:nth-child(n+5),
+.dashboard-table td:nth-child(n+5) { width: 86px; min-width: 86px; }
+
+.dashboard-table th:nth-child(-n+7),
+.dashboard-table td:nth-child(-n+7) {
+  position: sticky;
+  background: #fff;
+  box-shadow: 1px 0 0 #dbe6ef;
+}
+.dashboard-table th:nth-child(-n+7) {
+  z-index: 6;
+  background: #edf3f8;
+}
+.dashboard-table td:nth-child(-n+7) { z-index: 4; }
+.dashboard-table th:nth-child(1),
+.dashboard-table td:nth-child(1) { left: 0; }
+.dashboard-table th:nth-child(2),
+.dashboard-table td:nth-child(2) { left: 74px; }
+.dashboard-table th:nth-child(3),
+.dashboard-table td:nth-child(3) { left: 252px; }
+.dashboard-table th:nth-child(4),
+.dashboard-table td:nth-child(4) { left: 324px; }
+.dashboard-table th:nth-child(5),
+.dashboard-table td:nth-child(5) { left: 386px; }
+.dashboard-table th:nth-child(6),
+.dashboard-table td:nth-child(6) { left: 472px; }
+.dashboard-table th:nth-child(7),
+.dashboard-table td:nth-child(7) { left: 558px; }
 .dashboard-table td.month-cell {
   font-variant-numeric: tabular-nums;
   border-left: 1px solid #edf2f6;
@@ -767,6 +802,10 @@ td:nth-child(2) { text-align: left; }
 }
 
 .heat-neutral { color: #314151; }
+.dashboard-table td.heat-good { background: #eefaf5; }
+.dashboard-table td.heat-bad { background: #fff3f0; }
+.dashboard-table td.heat-neutral { background: #fff; }
+.dashboard-table td.full-year-cell { background: #f8fbff; }
 
 @keyframes pulseBad {
   0%, 100% { box-shadow: inset 0 0 0 rgba(180, 35, 24, 0); }
