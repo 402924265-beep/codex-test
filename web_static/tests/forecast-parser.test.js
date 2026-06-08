@@ -105,6 +105,39 @@ test("dashboard rows expose complete English labels", () => {
   });
 });
 
+test("zero SAP future months do not overwrite forecast actuals", () => {
+  const forecast = {
+    volume: {
+      actual: [10, 20, 30, 40, null, null, null, null, null, null, null, null],
+      budget: Array(12).fill(100),
+      std: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]
+    },
+    hc: { actualTotal: Array(12).fill(10), budgetTotal: Array(12).fill(10) },
+    totalAll: {
+      amountMonths: [1, 2, 3, 4, null, null, null, null, null, null, null, null],
+      budgetMonths: [20, 20, 20, 20, 5, 6, 7, 8, 9, 10, 11, 12],
+      unitMonths: Array(12).fill(100)
+    }
+  };
+  const resultByMonth = new Map([
+    [4, { volume26: 40, summary: { totalAmount26: 400 } }],
+    [5, { volume26: null, summary: { totalAmount26: 0 } }]
+  ]);
+  const jiangyue = {
+    amount: { actual: [null, null, null, null, 15, 16] },
+    volume: { actual: [null, null, null, null, 150, 160] },
+    unit: { actual: [null, null, null, null, 100, 100] }
+  };
+
+  const rows = buildAnnualDashboardRows(forecast, { resultByMonth, jiangyue });
+  const amount = rows.find((row) => row.label === "制造费用金额" && row.scenario === "26年");
+  const volume = rows.find((row) => row.label === "产量" && row.scenario === "26年");
+
+  assert.equal(amount.values[3], 400);
+  assert.equal(amount.values[4], 15);
+  assert.equal(volume.values[4], 150);
+});
+
 test("UPPH uses realized direct plus indirect headcount for actual months", () => {
   const months = Array(12).fill(1000);
   const forecast = {

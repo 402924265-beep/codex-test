@@ -35,9 +35,19 @@ assert.equal(salary.unitDiff.toFixed(5), "0.09315");
 assert.equal(repairs.status, "only_25");
 assert.equal(january.rows.some((row) => row.code === "__FC__"), false);
 
+const actualMonthsInAprilFile = new Set([1, 2, 3, 4]);
+const budgetMonthsInPublicBaseline = new Set([1, 2, 3, 4]);
 for (const [month, result] of results) {
-  assert.ok(result.summary.totalAmount26 !== 0, `${month}月26实际不应为0`);
-  assert.ok(result.summary.totalAmountBudget > 0, `${month}月应有预算`);
+  if (actualMonthsInAprilFile.has(month)) {
+    assert.ok(result.summary.totalAmount26 !== 0, `${month}月26实际不应为0`);
+  } else {
+    assert.equal(result.summary.totalAmount26, 0, `${month}月在4月实际文件中应为空`);
+  }
+  if (budgetMonthsInPublicBaseline.has(month)) {
+    assert.ok(result.summary.totalAmountBudget > 0, `${month}月应有预算`);
+  } else {
+    assert.equal(result.summary.totalAmountBudget, 0, `${month}月公开预算基线尚未覆盖`);
+  }
 }
 
 console.log({

@@ -46,7 +46,7 @@ test("export workbook uses three-sheet style names and core Chinese columns", ()
       ]
     },
     analyses: { "4:6666010188": "工资释放预提" },
-    factors: [{ type: "decrease", category: "人工", project: "释放预提", actualCumulative: 41.9 }],
+    factors: [{ type: "decrease", category: "人工", project: "释放预提", actualCumulative: 41.9, budgetMonths: [10], actualMonths: [8] }],
     factorSummary: { increaseCumulative: 0, decreaseCumulative: 41.9, netCumulative: -41.9 }
   });
 
@@ -61,6 +61,9 @@ test("export workbook uses three-sheet style names and core Chinese columns", ()
   assert.equal(sheets[0].rows[2]["1月"], 33);
   assert.match(sheets[2].rows[0]["差异分析"], /6666010188.*工资释放预提/);
   assert.equal(sheets[2].rows.some((row) => row["差异分析"] === "工资释放预提"), true);
+  assert.equal(sheets[3].rows[1]["1月预算K€"], 10);
+  assert.equal(sheets[3].rows[1]["1月实际K€"], 8);
+  assert.ok(sheets.every((sheet) => sheet.autofilter));
 });
 
 test("export cost sheet includes full-year columns and merge metadata", () => {
