@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260608-sticky-sections-v7";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-sticky-sections-v7";
-import { buildReconciliation } from "./reconcile.js?v=20260608-sticky-sections-v7";
-import { exportAnalysisWorkbook } from "./export.js?v=20260608-sticky-sections-v7";
-import { loadXlsx } from "./xlsx-loader.js?v=20260608-sticky-sections-v7";
-import { createStore } from "./store.js?v=20260608-sticky-sections-v7";
+} from "./baseline-data.js?v=20260608-table-sticky-v8";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-table-sticky-v8";
+import { buildReconciliation } from "./reconcile.js?v=20260608-table-sticky-v8";
+import { exportAnalysisWorkbook } from "./export.js?v=20260608-table-sticky-v8";
+import { loadXlsx } from "./xlsx-loader.js?v=20260608-table-sticky-v8";
+import { createStore } from "./store.js?v=20260608-table-sticky-v8";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,23 +16,23 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260608-sticky-sections-v7";
+} from "./forecast-parser.js?v=20260608-table-sticky-v8";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260608-sticky-sections-v7";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-sticky-sections-v7";
+} from "./workbench.js?v=20260608-table-sticky-v8";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-table-sticky-v8";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260608-sticky-sections-v7";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-sticky-sections-v7";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-sticky-sections-v7";
+} from "./metrics.js?v=20260608-table-sticky-v8";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-table-sticky-v8";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-table-sticky-v8";
 
 const VERSION = "20260606-dashboard-v10";
 

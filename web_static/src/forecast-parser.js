@@ -1,12 +1,12 @@
-import { cellText, normalizeNumber } from "./parser.js?v=20260608-sticky-sections-v7";
+import { cellText, normalizeNumber } from "./parser.js?v=20260608-table-sticky-v8";
 import {
   annualManufacturingRate,
   combineHeadcount,
   manufacturingRate,
   monthlyUpph,
   outputValue
-} from "./metrics.js?v=20260608-sticky-sections-v7";
-import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-sticky-sections-v7";
+} from "./metrics.js?v=20260608-table-sticky-v8";
+import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-table-sticky-v8";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
