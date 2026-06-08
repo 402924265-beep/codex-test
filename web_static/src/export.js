@@ -1,5 +1,5 @@
-import { loadXlsx } from "./xlsx-loader.js?v=20260608-forecast-source-v6";
-import { analysisKey } from "./workbench.js?v=20260608-forecast-source-v6";
+import { loadXlsx } from "./xlsx-loader.js?v=20260608-sticky-sections-v7";
+import { analysisKey } from "./workbench.js?v=20260608-sticky-sections-v7";
 
 const MONTHS = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 const SCENARIO_ORDER = ["同期", "预算", "26年", "差额", "累计差额"];

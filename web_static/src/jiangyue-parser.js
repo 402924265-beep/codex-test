@@ -1,5 +1,5 @@
-import { normalizeNumber } from "./parser.js?v=20260608-forecast-source-v6";
-import { manufacturingRate, outputValue } from "./metrics.js?v=20260608-forecast-source-v6";
+import { normalizeNumber } from "./parser.js?v=20260608-sticky-sections-v7";
+import { manufacturingRate, outputValue } from "./metrics.js?v=20260608-sticky-sections-v7";
 
 const MONTH_COUNT = 12;
 

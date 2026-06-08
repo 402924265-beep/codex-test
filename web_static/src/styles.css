@@ -629,6 +629,30 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 .table-wrap { max-height: calc(100vh - 430px); min-height: 360px; }
 .project-wrap { max-height: none; overflow: visible; }
 
+.detail-card .cockpit-title,
+.chart-panel > .panel-title,
+.factor-panel > .panel-title {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #fff;
+  padding-bottom: 10px;
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.detail-card .metric-filter-bar {
+  position: sticky;
+  top: 58px;
+  z-index: 29;
+  background: #fff;
+  padding: 10px 0;
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.dashboard-table th { top: 126px; }
+.category-comparison-head { top: 64px; }
+.project-table th { top: 74px; }
+
 table {
   width: 100%;
   border-collapse: separate;
@@ -656,7 +680,9 @@ th {
 }
 
 .project-table th {
-  position: static;
+  position: sticky;
+  z-index: 12;
+  background: #edf3f8;
 }
 
 th:first-child,
@@ -865,8 +891,8 @@ td:nth-child(2) { text-align: left; }
 
 .category-comparison-head {
   position: sticky;
-  top: 0;
-  z-index: 2;
+  top: 64px;
+  z-index: 28;
   background: #eaf2f8;
   color: #17324d;
   font-weight: 700;
