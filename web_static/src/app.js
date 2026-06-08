@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260608-jiang-fallback-sticky-v4";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-jiang-fallback-sticky-v4";
-import { buildReconciliation } from "./reconcile.js?v=20260608-jiang-fallback-sticky-v4";
-import { exportAnalysisWorkbook } from "./export.js?v=20260608-jiang-fallback-sticky-v4";
-import { loadXlsx } from "./xlsx-loader.js?v=20260608-jiang-fallback-sticky-v4";
-import { createStore } from "./store.js?v=20260608-jiang-fallback-sticky-v4";
+} from "./baseline-data.js?v=20260608-forecast-source-v6";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-forecast-source-v6";
+import { buildReconciliation } from "./reconcile.js?v=20260608-forecast-source-v6";
+import { exportAnalysisWorkbook } from "./export.js?v=20260608-forecast-source-v6";
+import { loadXlsx } from "./xlsx-loader.js?v=20260608-forecast-source-v6";
+import { createStore } from "./store.js?v=20260608-forecast-source-v6";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,23 +16,23 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260608-jiang-fallback-sticky-v4";
+} from "./forecast-parser.js?v=20260608-forecast-source-v6";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260608-jiang-fallback-sticky-v4";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-jiang-fallback-sticky-v4";
+} from "./workbench.js?v=20260608-forecast-source-v6";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-forecast-source-v6";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260608-jiang-fallback-sticky-v4";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-jiang-fallback-sticky-v4";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-jiang-fallback-sticky-v4";
+} from "./metrics.js?v=20260608-forecast-source-v6";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-forecast-source-v6";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-forecast-source-v6";
 
 const VERSION = "20260606-dashboard-v10";
 
@@ -42,9 +42,9 @@ const i18n = {
     appSubtitle: "导入财务数据，输出全年驾驶舱、月度差异、项目因素",
     language: "语言",
     author: "填写人",
-    importForecast: "导入4+8预测",
-    importJiang: "导入姜月表",
-    importSap: "导入SAP实际",
+    importForecast: "导入预测表",
+    importJiang: "导入国内财务表",
+    importSap: "导入4月实际表",
     exportAnalysis: "导出三张表",
     tabDashboard: "全年驾驶舱",
     tabVariance: "月度差异",
@@ -64,7 +64,7 @@ const i18n = {
     manufacturingDiff: "制造费差额",
     factorNet: "因素净影响",
     dashboardTitle: "全年数据驾驶舱",
-    dashboardHint: "上传 4+8 预测后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。",
+    dashboardHint: "上传 预测表后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。",
     monthSummary: "月度总结与原因分析",
     summaryHint: "围绕单台制造费、制造费差额和重点科目自动汇总。",
     autoFromSite: "由网站填写内容自动汇总",
@@ -103,11 +103,11 @@ const i18n = {
     increase: "上涨因素",
     decrease: "下降因素",
     delete: "删",
-    emptyForecast: "导入4+8预测文件后显示1-12月全年驾驶舱",
+    emptyForecast: "导入预测表文件后显示1-12月全年驾驶舱",
     emptySap: "导入SAP报表后显示科目明细",
-    waitingForecast: "等待4+8预测文件",
-    waitingSap: "待导入 SAP 实际",
-    waitingForecastPill: "待导入 4+8 预测",
+    waitingForecast: "等待预测表文件",
+    waitingSap: "待导入4月实际表",
+    waitingForecastPill: "待导入预测表",
     placeholderMajor: "重点差异：填写原因、责任、行动和预计影响",
     placeholderSmall: "简要原因",
     dashboardGroup: "指标组",
@@ -123,8 +123,8 @@ const i18n = {
     waterfallHint: "制造费 ÷ 产值",
     other: "其他",
     fullYear: "全年",
-    annualSummaryEmpty: "导入4+8预测后生成全年总结。",
-    monthlySummaryEmpty: "导入SAP实际后生成月度总结。",
+    annualSummaryEmpty: "导入预测表后生成全年总结。",
+    monthlySummaryEmpty: "导入4月实际表后生成月度总结。",
     allIndicators: "全部指标",
     allScenarios: "全部口径",
     allStatus: "全部状态",
@@ -145,10 +145,10 @@ const i18n = {
     hideDetail: "收起明细",
     loadedYearModel: "全年模型已加载",
     readingFile: "正在读取",
-    importedForecast: "已导入4+8",
+    importedForecast: "已导入预测表",
     importedSap: "已导入SAP",
-    loadedForecast: "已读取4+8预测",
-    loadedSap: "已读取SAP实际",
+    loadedForecast: "已读取预测表",
+    loadedSap: "已读取4月实际表",
     noTimeData: "工时/工作日数据待接入",
     actualLine: "26年",
     budgetLine: "预算",
@@ -186,9 +186,9 @@ const i18n = {
     appSubtitle: "Import finance data and export the three-table analysis",
     language: "Language",
     author: "Author",
-    importForecast: "Import 4+8 forecast",
-    importJiang: "Import Jiang Yue table",
-    importSap: "Import SAP actuals",
+    importForecast: "Import forecast table",
+    importJiang: "Import domestic finance table",
+    importSap: "Import April actual table",
     exportAnalysis: "Export workbook",
     tabDashboard: "Year dashboard",
     tabVariance: "Monthly variance",
@@ -248,7 +248,7 @@ const i18n = {
     decrease: "Decrease",
     delete: "Del",
     emptyForecast: "Import a 4+8 forecast file to show the 12-month dashboard",
-    emptySap: "Import SAP actuals to show account details",
+    emptySap: "Import April actual table to show account details",
     waitingForecast: "Waiting for 4+8 forecast",
     waitingSap: "SAP actuals not imported",
     waitingForecastPill: "4+8 forecast not imported",
@@ -268,7 +268,7 @@ const i18n = {
     other: "Other",
     fullYear: "Full year",
     annualSummaryEmpty: "Import the 4+8 forecast to generate the annual summary.",
-    monthlySummaryEmpty: "Import SAP actuals to generate the monthly summary.",
+    monthlySummaryEmpty: "Import April actual table to generate the monthly summary.",
     allIndicators: "All metrics",
     allScenarios: "All bases",
     allStatus: "All status",
@@ -323,7 +323,7 @@ const i18n = {
     unit25: "2025 unit",
     unit26: "2026 unit"
     ,unitEuroPc: "€/pc",
-    emptyCategoryChart: "Import SAP actuals to show category comparison"
+    emptyCategoryChart: "Import April actual table to show category comparison"
   },
   tr: {
     appTitle: "Bulaşık Makinesi Üretim Gideri",
@@ -692,7 +692,7 @@ async function handleJiangFileChange(event) {
     els.jiangStatus.textContent = `${t("importJiang")}: ${file.name}`;
     els.jiangStatus.classList.remove("muted", "warning");
     renderAll();
-    toast(`姜月表已读取: ${file.name}`);
+    toast(`国内财务表已读取: ${file.name}`);
   } catch (error) {
     toast(error.message || String(error), true);
   }
@@ -725,7 +725,7 @@ async function handleSapFileChange(event) {
       }
     }
 
-    if (!state.resultByMonth.size) throw new Error("没有解析到可用SAP实际数");
+    if (!state.resultByMonth.size) throw new Error("没有解析到可用4月实际表数");
     const importedMonths = [...state.resultByMonth.keys()].sort((a, b) => a - b);
     els.monthSelect.innerHTML = importedMonths.map((month) => `<option value="${month}">${month}月</option>`).join("");
     els.monthSelect.value = String(importedMonths.at(-1));

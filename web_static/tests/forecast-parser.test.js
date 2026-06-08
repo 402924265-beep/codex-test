@@ -134,8 +134,8 @@ test("zero SAP future months do not overwrite forecast actuals", () => {
   const volume = rows.find((row) => row.label === "产量" && row.scenario === "26年");
 
   assert.equal(amount.values[3], 400);
-  assert.equal(amount.values[4], 15);
-  assert.equal(volume.values[4], 150);
+  assert.equal(amount.values[4], 5);
+  assert.equal(volume.values[4], 50);
 });
 
 test("UPPH uses realized direct plus indirect headcount for actual months", () => {

@@ -1,4 +1,4 @@
-import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-jiang-fallback-sticky-v4";
+import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-forecast-source-v6";
 
 const SUMMARY_LABELS = {
   CS_DEPRECIATION: "折旧（含FC）",

@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260608-jiang-fallback-sticky-v4" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260608-forecast-source-v6" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
         anonKey: "sb_publishable_kji34L4Yh1vCIPudrIKROA_hdwTjzuu"
       };
     </script>
-    <script type="module" src="./src/app.js?v=20260608-jiang-fallback-sticky-v4"></script>
+    <script type="module" src="./src/app.js?v=20260608-forecast-source-v6"></script>
   </head>
   <body>
     <header class="app-header">
@@ -34,15 +34,15 @@
         </label>
         <label class="file-button secondary">
           <input id="forecastFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importForecast">导入4+8预测</span>
+          <span data-i18n="importForecast">导入预测表</span>
         </label>
         <label class="file-button secondary">
           <input id="jiangFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importJiang">导入姜月表</span>
+          <span data-i18n="importJiang">导入国内财务表</span>
         </label>
         <label class="file-button">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importSap">导入SAP实际</span>
+          <span data-i18n="importSap">导入4月实际表</span>
         </label>
         <button id="exportBtn" type="button" disabled data-i18n="exportAnalysis">导出三张表</button>
       </div>
@@ -51,9 +51,9 @@
     <main class="workspace">
       <section class="top-strip" aria-label="当前状态">
         <div class="status-pill" id="saveMode">本机保存</div>
-        <div class="status-pill muted" id="sapStatus">待导入 SAP 实际</div>
-        <div class="status-pill muted" id="forecastStatus">待导入 4+8 预测</div>
-        <div class="status-pill muted" id="jiangStatus">待导入姜月表</div>
+        <div class="status-pill muted" id="sapStatus">待导入 4月实际表</div>
+        <div class="status-pill muted" id="forecastStatus">待导入预测表</div>
+        <div class="status-pill muted" id="jiangStatus">待导入国内财务表</div>
       </section>
 
       <nav class="tabbar" aria-label="页面">
