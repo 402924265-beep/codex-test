@@ -1,4 +1,4 @@
-import { ACCOUNT_INFO } from "./baseline-data.js";
+import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-forecast-fallback-v3";
 
 const SUMMARY_LABELS = {
   CS_DEPRECIATION: "折旧（含FC）",

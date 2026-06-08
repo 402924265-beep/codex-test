@@ -1,5 +1,5 @@
-import { normalizeNumber } from "./parser.js";
-import { manufacturingRate, outputValue } from "./metrics.js";
+import { normalizeNumber } from "./parser.js?v=20260608-forecast-fallback-v3";
+import { manufacturingRate, outputValue } from "./metrics.js?v=20260608-forecast-fallback-v3";
 
 const MONTH_COUNT = 12;
 

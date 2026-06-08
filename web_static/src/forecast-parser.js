@@ -1,12 +1,12 @@
-import { cellText, normalizeNumber } from "./parser.js";
+import { cellText, normalizeNumber } from "./parser.js?v=20260608-forecast-fallback-v3";
 import {
   annualManufacturingRate,
   combineHeadcount,
   manufacturingRate,
   monthlyUpph,
   outputValue
-} from "./metrics.js";
-import { OPERATIONAL_BASELINE } from "./operational-data.js";
+} from "./metrics.js?v=20260608-forecast-fallback-v3";
+import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-forecast-fallback-v3";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
