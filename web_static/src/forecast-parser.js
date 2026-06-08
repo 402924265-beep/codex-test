@@ -1,12 +1,12 @@
-import { cellText, normalizeNumber } from "./parser.js?v=20260608-forecast-fallback-v3";
+import { cellText, normalizeNumber } from "./parser.js?v=20260608-jiang-fallback-sticky-v4";
 import {
   annualManufacturingRate,
   combineHeadcount,
   manufacturingRate,
   monthlyUpph,
   outputValue
-} from "./metrics.js?v=20260608-forecast-fallback-v3";
-import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-forecast-fallback-v3";
+} from "./metrics.js?v=20260608-jiang-fallback-sticky-v4";
+import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-jiang-fallback-sticky-v4";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
@@ -217,9 +217,9 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
   const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
   const actualMonthCount = inferActualMonthCount(options, jiang);
-  const forecastAmount = preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount));
-  const forecastVolume = preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume));
-  const forecastUnit = preferNonZeroSeries(actualSource?.unitMonths, budgetUnit);
+  const forecastAmount = preferNonZeroSeries(jiang?.amount?.actual, preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount)));
+  const forecastVolume = preferNonZeroSeries(jiang?.volume?.actual, preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume)));
+  const forecastUnit = preferNonZeroSeries(jiang?.unit?.actual, preferNonZeroSeries(actualSource?.unitMonths, budgetUnit));
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
     if (hasRealizedActual(result)) return result.summary.totalAmount26;

@@ -1,5 +1,5 @@
-import { normalizeNumber } from "./parser.js?v=20260608-forecast-fallback-v3";
-import { manufacturingRate, outputValue } from "./metrics.js?v=20260608-forecast-fallback-v3";
+import { normalizeNumber } from "./parser.js?v=20260608-jiang-fallback-sticky-v4";
+import { manufacturingRate, outputValue } from "./metrics.js?v=20260608-jiang-fallback-sticky-v4";
 
 const MONTH_COUNT = 12;
 

@@ -123,14 +123,19 @@ test("zero SAP future months do not overwrite forecast actuals", () => {
     [4, { volume26: 40, summary: { totalAmount26: 400 } }],
     [5, { volume26: null, summary: { totalAmount26: 0 } }]
   ]);
+  const jiangyue = {
+    amount: { actual: [null, null, null, null, 15, 16] },
+    volume: { actual: [null, null, null, null, 150, 160] },
+    unit: { actual: [null, null, null, null, 100, 100] }
+  };
 
-  const rows = buildAnnualDashboardRows(forecast, { resultByMonth });
+  const rows = buildAnnualDashboardRows(forecast, { resultByMonth, jiangyue });
   const amount = rows.find((row) => row.label === "制造费用金额" && row.scenario === "26年");
   const volume = rows.find((row) => row.label === "产量" && row.scenario === "26年");
 
   assert.equal(amount.values[3], 400);
-  assert.equal(amount.values[4], 5);
-  assert.equal(volume.values[4], 50);
+  assert.equal(amount.values[4], 15);
+  assert.equal(volume.values[4], 150);
 });
 
 test("UPPH uses realized direct plus indirect headcount for actual months", () => {

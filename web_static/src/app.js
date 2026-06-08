@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260608-forecast-fallback-v3";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-forecast-fallback-v3";
-import { buildReconciliation } from "./reconcile.js?v=20260608-forecast-fallback-v3";
-import { exportAnalysisWorkbook } from "./export.js?v=20260608-forecast-fallback-v3";
-import { loadXlsx } from "./xlsx-loader.js?v=20260608-forecast-fallback-v3";
-import { createStore } from "./store.js?v=20260608-forecast-fallback-v3";
+} from "./baseline-data.js?v=20260608-jiang-fallback-sticky-v4";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-jiang-fallback-sticky-v4";
+import { buildReconciliation } from "./reconcile.js?v=20260608-jiang-fallback-sticky-v4";
+import { exportAnalysisWorkbook } from "./export.js?v=20260608-jiang-fallback-sticky-v4";
+import { loadXlsx } from "./xlsx-loader.js?v=20260608-jiang-fallback-sticky-v4";
+import { createStore } from "./store.js?v=20260608-jiang-fallback-sticky-v4";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,23 +16,23 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260608-forecast-fallback-v3";
+} from "./forecast-parser.js?v=20260608-jiang-fallback-sticky-v4";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260608-forecast-fallback-v3";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-forecast-fallback-v3";
+} from "./workbench.js?v=20260608-jiang-fallback-sticky-v4";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-jiang-fallback-sticky-v4";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260608-forecast-fallback-v3";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-forecast-fallback-v3";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-forecast-fallback-v3";
+} from "./metrics.js?v=20260608-jiang-fallback-sticky-v4";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-jiang-fallback-sticky-v4";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-jiang-fallback-sticky-v4";
 
 const VERSION = "20260606-dashboard-v10";
 
@@ -783,7 +783,7 @@ function renderSummaryCards() {
 
 function renderDashboard() {
   const months = Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language));
-  els.dashboardHead.innerHTML = `<tr><th>${escapeHtml(t("group"))}</th><th>${escapeHtml(t("indicator"))}</th><th>${escapeHtml(t("scenario"))}</th><th>${escapeHtml(t("unit"))}</th>${months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
+  els.dashboardHead.innerHTML = `<tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < 3 ? `sticky-col sticky-col-${index + 5}` : ""}">${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
   els.dashboardTableWrap.classList.toggle("collapsed", !state.dashboardTableOpen);
   els.toggleDashboardTable.textContent = t(state.dashboardTableOpen ? "hideDetail" : "showDetail");
   renderMetricFilters();
@@ -815,13 +815,14 @@ function renderDashboard() {
     lastLabel = row.label;
     return `
       <tr class="dashboard-row family-${family}">
-        <td><span class="group-chip">${escapeHtml(metricFamilyLabel(family))}</span></td>
-        <td class="merged-label">${showLabel ? escapeHtml(localized.label) : ""}</td>
-        <td><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
-        <td>${escapeHtml(localized.unit)}</td>
+        <td class="sticky-col sticky-col-1"><span class="group-chip">${escapeHtml(metricFamilyLabel(family))}</span></td>
+        <td class="merged-label sticky-col sticky-col-2">${showLabel ? escapeHtml(localized.label) : ""}</td>
+        <td class="sticky-col sticky-col-3"><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
+        <td class="sticky-col sticky-col-4">${escapeHtml(localized.unit)}</td>
         ${row.values.map((value, index) => {
           const tooltip = metricTooltip(row, index);
-          return `<td class="month-cell ${heatClass(row, index)}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
+          const stickyClass = index < 3 ? ` sticky-col sticky-col-${index + 5}` : "";
+          return `<td class="month-cell ${heatClass(row, index)}${stickyClass}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
         }).join("")}
         <td class="month-cell full-year-cell" tabindex="0" data-metric-tooltip="${escapeHtml(metricTooltip(row, null))}">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
       </tr>
