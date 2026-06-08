@@ -14,6 +14,7 @@ export async function exportAnalysisWorkbook(input = {}) {
     ws["!cols"] = sheet.cols || defaultColumns(sheet.rows);
     if (sheet.merges) ws["!merges"] = sheet.merges;
     if (sheet.freeze) ws["!freeze"] = sheet.freeze;
+    if (sheet.autofilter) ws["!autofilter"] = sheet.autofilter;
     XLSX.utils.book_append_sheet(wb, ws, sheet.name);
   }
 
@@ -29,48 +30,41 @@ export function buildAnalysisWorkbookSheets({
   factorSummary = null,
   forecast = null
 } = {}) {
+  const costRows = buildCostDataSheet(dashboardRows, forecast);
+  const metricRows = buildMonthlyMetricSheet(result);
+  const varianceRows = buildVarianceDetailSheet(result, analyses);
+  const factorRows = buildFactorSheet(factors, factorSummary);
+  const formulaRows = buildFormulaSheet(forecast, result);
   return [
-    { name: "洗碗机成本数据", rows: buildCostDataSheet(dashboardRows, forecast), cols: wideMonthColumns(), merges: costDataMerges(), freeze: { xSplit: 3, ySplit: 1 } },
-    { name: "费用指标到月测算汇总表", rows: buildMonthlyMetricSheet(result), cols: monthlyMetricColumns(), freeze: { xSplit: 1, ySplit: 1 } },
-    { name: "月度差异明细", rows: buildVarianceDetailSheet(result, analyses), cols: varianceColumns(), freeze: { xSplit: 4, ySplit: 1 } },
-    { name: "26年降费项目-洗碗机", rows: buildFactorSheet(factors, factorSummary), cols: factorColumns(), freeze: { xSplit: 3, ySplit: 1 } },
-    { name: "口径说明", rows: buildFormulaSheet(forecast, result), cols: [{ wch: 22 }, { wch: 90 }] }
+    { name: "洗碗机成本数据", rows: costRows, cols: wideMonthColumns(), merges: costDataMerges(costRows), freeze: { xSplit: 3, ySplit: 1 }, autofilter: sheetRange(costRows) },
+    { name: "费用指标到月测算汇总表", rows: metricRows, cols: monthlyMetricColumns(), freeze: { xSplit: 1, ySplit: 1 }, autofilter: sheetRange(metricRows) },
+    { name: "月度差异明细", rows: varianceRows, cols: varianceColumns(), freeze: { xSplit: 4, ySplit: 1 }, autofilter: sheetRange(varianceRows) },
+    { name: "26年降费项目-洗碗机", rows: factorRows, cols: factorColumns(), freeze: { xSplit: 3, ySplit: 1 }, autofilter: sheetRange(factorRows) },
+    { name: "口径说明", rows: formulaRows, cols: [{ wch: 22 }, { wch: 90 }], autofilter: sheetRange(formulaRows) }
   ];
 }
 
 function buildCostDataSheet(rows, forecast) {
   if (!rows?.length) {
-    return [{ 指标: "说明", 口径: "待导入4+8/5+7滚动预测", 单位: "", 年度: "" }];
-  }
-
-  const grouped = new Map();
-  for (const row of rows) {
-    if (!["单", "时", "人", "效", "费", "核心", "差异", "效率"].includes(row.group)) continue;
-    const key = `${row.group}|${row.label}|${row.unit}`;
-    if (!grouped.has(key)) grouped.set(key, { group: row.group, label: row.label, unit: row.unit, rows: [] });
-    grouped.get(key).rows.push(row);
+    return [{ 分组: "数据来源", 指标: "说明", 口径: "待导入4+8/5+7滚动预测" }];
   }
 
   const output = [];
-  for (const item of grouped.values()) {
-    const ordered = [...item.rows].sort((a, b) => SCENARIO_ORDER.indexOf(a.scenario) - SCENARIO_ORDER.indexOf(b.scenario));
-    const record = { 分组: item.group, 指标: item.label, 单位: item.unit };
+  for (const row of rows) {
+    if (!["单", "时", "人", "效", "费", "核心", "差异", "效率"].includes(row.group)) continue;
+    const record = { 分组: row.group, 指标: row.label, 口径: row.scenario };
     for (let index = 0; index < 12; index += 1) {
-      for (const row of ordered) {
-        record[`${MONTHS[index]}${row.scenario}`] = round(row.values[index]);
-      }
+      record[MONTHS[index]] = round(row.values[index]);
     }
-    for (const row of ordered) {
-      record[`全年${row.scenario}`] = round(annualValue(row));
-    }
+    record["年度"] = round(annualValue(row));
     output.push(record);
   }
 
   output.push({
     分组: "数据来源",
     指标: "滚动预测",
-    单位: forecast?.source || "4+8/5+7 forecast",
-    全年26年: forecast?.parsedAt || ""
+    口径: forecast?.source || "4+8/5+7 forecast",
+    年度: forecast?.parsedAt || ""
   });
   return output;
 }
@@ -162,7 +156,7 @@ function buildFactorSheet(factors, summary) {
   if (factors?.length) {
     const planned = factors.reduce((total, item) => total + (Number(item.plannedImpact) || 0), 0);
     const actual = factors.reduce((total, item) => total + (Number(item.actualCumulative) || 0), 0);
-    rows.push({
+    const summaryRow = {
       序号: "",
       主导方: "汇总",
       分类: "",
@@ -173,10 +167,12 @@ function buildFactorSheet(factors, summary) {
       "预计影响K€": round(planned),
       "实际月累差额K€": round(actual),
       进展: `项目 ${factors.length} 项；达成差额 ${round(actual - planned)} K€`
-    });
+    };
+    appendFactorMonths(summaryRow, summary?.items || factors, true);
+    rows.push(summaryRow);
   }
   for (const [index, item] of (factors || []).entries()) {
-    rows.push({
+    const row = {
       序号: index + 1,
       主导方: item.lead || "",
       分类: item.category || "",
@@ -187,9 +183,27 @@ function buildFactorSheet(factors, summary) {
       "预计影响K€": round(item.plannedImpact),
       "实际月累差额K€": round(item.actualCumulative),
       进展: item.progress || ""
-    });
+    };
+    appendFactorMonths(row, [item]);
+    rows.push(row);
   }
   return rows.length ? rows : [{ 主导方: "说明", 进展: "尚未填写降费项目。" }];
+}
+
+function appendFactorMonths(row, items, isSummary = false) {
+  for (let index = 0; index < 12; index += 1) {
+    row[`${MONTHS[index]}预算K€`] = round(sumFactorMonth(items, "budgetMonths", index, isSummary ? null : "plannedImpact"));
+    row[`${MONTHS[index]}实际K€`] = round(sumFactorMonth(items, "actualMonths", index, isSummary ? null : "actualCumulative"));
+  }
+}
+
+function sumFactorMonth(items, field, monthIndex, fallbackField) {
+  return (items || []).reduce((total, item) => {
+    const series = Array.isArray(item[field]) ? item[field] : null;
+    const value = Number(series?.[monthIndex]);
+    if (Number.isFinite(value) && value !== 0) return total + value;
+    return fallbackField ? total + (Number(item[fallbackField]) || 0) : total;
+  }, 0);
 }
 
 function buildFormulaSheet(forecast, result) {
@@ -232,14 +246,41 @@ function absText(value) {
 }
 
 function wideMonthColumns() {
-  return [{ wch: 12 }, { wch: 22 }, { wch: 10 }, ...Array(52).fill({ wch: 11 })];
+  return [{ wch: 10 }, { wch: 24 }, { wch: 12 }, ...Array(13).fill({ wch: 12 })];
 }
 
-function costDataMerges() {
-  return MONTHS.map((_, index) => {
-    const start = 3 + index * 4;
-    return { s: { r: 0, c: start }, e: { r: 0, c: start + 3 } };
-  });
+function costDataMerges(rows) {
+  const merges = [];
+  let groupStart = 0;
+  let currentGroup = rows?.[0]?.["分组"];
+  for (let index = 1; index <= (rows?.length || 0); index += 1) {
+    const group = rows?.[index]?.["分组"];
+    if (group !== currentGroup) {
+      if (currentGroup && index - groupStart > 1) {
+        merges.push({ s: { r: groupStart + 1, c: 0 }, e: { r: index, c: 0 } });
+      }
+      currentGroup = group;
+      groupStart = index;
+    }
+  }
+  return merges;
+}
+
+function sheetRange(rows) {
+  const colCount = Object.keys(rows?.[0] || {}).length;
+  if (!rows?.length || !colCount) return null;
+  return { ref: `A1:${columnName(colCount - 1)}${rows.length + 1}` };
+}
+
+function columnName(index) {
+  let name = "";
+  let value = index + 1;
+  while (value > 0) {
+    const mod = (value - 1) % 26;
+    name = String.fromCharCode(65 + mod) + name;
+    value = Math.floor((value - mod) / 26);
+  }
+  return name;
 }
 
 function monthlyMetricColumns() {
@@ -251,7 +292,11 @@ function varianceColumns() {
 }
 
 function factorColumns() {
-  return [{ wch: 8 }, { wch: 14 }, { wch: 18 }, { wch: 32 }, { wch: 42 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 18 }, { wch: 46 }];
+  return [
+    { wch: 8 }, { wch: 14 }, { wch: 18 }, { wch: 32 }, { wch: 42 },
+    { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 18 }, { wch: 46 },
+    ...Array(24).fill({ wch: 13 })
+  ];
 }
 
 function defaultColumns(rows) {

@@ -79,6 +79,7 @@ const i18n = {
     analysis: "差异分析",
     factorProjects: "26年降费项目",
     factorHint: "管理正式降费项目；月度差异原因在第二张表的小科目明细中填写。",
+    factorMonth: "发生月份",
     addIncrease: "添加项目",
     addDecrease: "添加项目",
     saveProjects: "保存项目",
@@ -222,6 +223,7 @@ const i18n = {
     analysis: "Analysis",
     factorProjects: "2026 Cost Reduction Projects",
     factorHint: "Manage formal projects here. Enter monthly variance reasons in Account Detail.",
+    factorMonth: "Impact month",
     addIncrease: "Add project",
     addDecrease: "Add project",
     saveProjects: "Save projects",
@@ -365,6 +367,7 @@ const i18n = {
     analysis: "Analiz",
     factorProjects: "2026 Maliyet Düşürme Projeleri",
     factorHint: "Resmi maliyet düşürme projelerini burada yönetin. Aylık fark nedenlerini hesap detayında girin.",
+    factorMonth: "Etki ayı",
     addIncrease: "Artış ekle",
     addDecrease: "Azalış ekle",
     saveProjects: "Projeleri kaydet",
@@ -1485,15 +1488,12 @@ function renderFactors() {
   renderProjectImpactCards();
   els.factorBody.innerHTML = state.factors.length
     ? state.factors.map((item, index) => factorRowHtml(item, index)).join("")
-    : `<tr><td colspan="10" class="empty-cell">${t("emptyFactors")}</td></tr>`;
+    : `<tr><td colspan="9" class="empty-cell">${t("emptyFactors")}</td></tr>`;
 }
 
 function factorRowHtml(item, index) {
   return `
     <tr data-index="${index}">
-      <td>
-        <input data-field="lead" value="${escapeHtml(item.lead || "")}" />
-      </td>
       <td><input data-field="category" value="${escapeHtml(item.category || "")}" /></td>
       <td><textarea data-field="strategy">${escapeHtml(item.strategy || "")}</textarea></td>
       <td><textarea data-field="project">${escapeHtml(item.project || "")}</textarea></td>
@@ -1516,7 +1516,7 @@ async function saveFactorsFromTable() {
       ...existing,
       id: existing.id || String(index + 1),
       type: "decrease",
-      lead: get("lead"),
+      lead: existing.lead || "",
       category: get("category"),
       strategy: get("strategy"),
       project: get("project"),
@@ -1577,6 +1577,23 @@ function cloneProject(item) {
 
 function renderProjectImpactCards() {
   if (!els.projectImpactCards) return;
+  if (state.factorMonth === 4) {
+    const card = (title, value, note, klass = "") => `
+      <div class="impact-card ${klass || (value < 0 ? "bad" : "good")}">
+        <span>4月 · ${escapeHtml(title)}</span>
+        <strong>${formatMoney(value)} K€</strong>
+        <small>${escapeHtml(note)}</small>
+      </div>`;
+    els.projectImpactCards.innerHTML = `
+      ${card("订单量/规模负影响", -1000, "三张表口径：订单量下降负影响100万欧", "bad")}
+      ${card("通胀负影响", -400, "三张表口径：通胀负影响40万欧", "bad")}
+      ${card("降费项目", 700, "新增63万欧 + 持续收益7万欧", "good")}
+      ${card("园区分摊", 10, "园区分摊下降1万欧", "good")}
+      <div><span>4月 · 上涨因素合计</span><strong class="bad">-1,400 K€</strong></div>
+      <div><span>4月 · 下降因素合计</span><strong class="good">710 K€</strong></div>
+    `;
+    return;
+  }
   const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
   const monthValue = (item, field, fallbackField) => {
     const series = Array.isArray(item[field]) ? item[field] : null;
@@ -1814,6 +1831,9 @@ function formatPlain(value) {
 
 function formatDashboardValue(value, unit) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
+  if (unit === "%") {
+    return `${(Number(value) * 100).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  }
   const digits = unit === "台" || unit === "人" ? 0 : 2;
   return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }

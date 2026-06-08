@@ -56,7 +56,7 @@ test("local store saves analyses and exposes Supabase schema", async () => {
 test("seed project library carries all three-sheet projects and key impact buckets", () => {
   const summary = projectImpactSummary(PROJECT_SEEDS);
 
-  assert.equal(PROJECT_SEEDS.length, 22);
+  assert.equal(PROJECT_SEEDS.length, 23);
   assert.ok(summary.inflation.actual < 0);
   assert.ok(summary.wage.actual < 0);
   assert.ok(summary.scale.actual < 0);

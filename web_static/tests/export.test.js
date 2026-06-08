@@ -46,7 +46,7 @@ test("export workbook uses three-sheet style names and core Chinese columns", ()
       ]
     },
     analyses: { "4:6666010188": "工资释放预提" },
-    factors: [{ type: "decrease", category: "人工", project: "释放预提", actualCumulative: 41.9 }],
+    factors: [{ type: "decrease", category: "人工", project: "释放预提", actualCumulative: 41.9, budgetMonths: [10], actualMonths: [8] }],
     factorSummary: { increaseCumulative: 0, decreaseCumulative: 41.9, netCumulative: -41.9 }
   });
 
@@ -55,10 +55,15 @@ test("export workbook uses three-sheet style names and core Chinese columns", ()
     ["洗碗机成本数据", "费用指标到月测算汇总表", "月度差异明细", "26年降费项目-洗碗机", "口径说明"]
   );
   assert.equal(sheets[0].rows[0]["指标"], "单台制造费");
-  assert.equal(sheets[0].rows[0]["1月同期"], 35);
-  assert.equal(sheets[0].rows[0]["1月26年"], 33);
+  assert.equal(sheets[0].rows[0]["口径"], "同期");
+  assert.equal(sheets[0].rows[0]["1月"], 35);
+  assert.equal(sheets[0].rows[2]["口径"], "26年");
+  assert.equal(sheets[0].rows[2]["1月"], 33);
   assert.match(sheets[2].rows[0]["差异分析"], /6666010188.*工资释放预提/);
   assert.equal(sheets[2].rows.some((row) => row["差异分析"] === "工资释放预提"), true);
+  assert.equal(sheets[3].rows[1]["1月预算K€"], 10);
+  assert.equal(sheets[3].rows[1]["1月实际K€"], 8);
+  assert.ok(sheets.every((sheet) => sheet.autofilter));
 });
 
 test("export cost sheet includes full-year columns and merge metadata", () => {
@@ -71,9 +76,9 @@ test("export cost sheet includes full-year columns and merge metadata", () => {
   });
   const costSheet = sheets.find((sheet) => sheet.name === "洗碗机成本数据");
 
-  assert.ok(costSheet.rows[0].hasOwnProperty("全年同期"));
-  assert.ok(costSheet.rows[0].hasOwnProperty("全年预算"));
-  assert.ok(costSheet.rows[0].hasOwnProperty("全年26年"));
+  assert.ok(costSheet.rows[0].hasOwnProperty("年度"));
+  assert.equal(costSheet.rows[0]["口径"], "同期");
+  assert.equal(costSheet.rows[2]["口径"], "26年");
   assert.ok(Array.isArray(costSheet.merges));
   assert.ok(costSheet.freeze);
 });
