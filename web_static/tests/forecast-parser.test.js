@@ -40,7 +40,7 @@ test("extracts 4+8 forecast volume, amount, unit, and budget variance", () => {
   assert.ok(rows.some((row) => row.label === "工作日"));
 });
 
-test("annual dashboard puts unit manufacturing cost before aggregate cards", () => {
+test("annual dashboard puts order volume before other metric cards", () => {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
     ["Budget Volume", 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
@@ -57,7 +57,7 @@ test("annual dashboard puts unit manufacturing cost before aggregate cards", () 
   ]), "FCST 26");
 
   const rows = buildAnnualDashboardRows(extractForecastWorkbook(wb, XLSX));
-  assert.equal(localizeDashboardRow(rows[0], "en").label, "Unit manufacturing cost");
+  assert.equal(localizeDashboardRow(rows[0], "en").label, "Volume");
 });
 
 test("annual indicator detail excludes category costs and keeps business KPI groups", () => {

@@ -1,12 +1,12 @@
-import { cellText, normalizeNumber } from "./parser.js?v=20260608-table-sticky-v8";
+import { cellText, normalizeNumber } from "./parser.js?v=20260608-metric-groups-v9";
 import {
   annualManufacturingRate,
   combineHeadcount,
   manufacturingRate,
   monthlyUpph,
   outputValue
-} from "./metrics.js?v=20260608-table-sticky-v8";
-import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-table-sticky-v8";
+} from "./metrics.js?v=20260608-metric-groups-v9";
+import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-metric-groups-v9";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
@@ -259,24 +259,24 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const rateActual = actualAmount.map((value, index) => manufacturingRate(value, priceActual[index], actualVolume[index]));
 
   const rows = [
-    metric("单", "单台制造费", "同期", "€/台", sameUnit, "lower"),
-    metric("单", "单台制造费", "预算", "€/台", budgetUnit, "lower"),
-    metric("单", "单台制造费", "26年", "€/台", actualUnit, "lower", budgetUnit),
-    metric("单", "单台制造费累计", "同期", "€/台", cumulativeUnit(sameAmount, sameVolume), "lower"),
-    metric("单", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
-    metric("单", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
+    metric("费", "单台制造费", "同期", "€/台", sameUnit, "lower"),
+    metric("费", "单台制造费", "预算", "€/台", budgetUnit, "lower"),
+    metric("费", "单台制造费", "26年", "€/台", actualUnit, "lower", budgetUnit),
+    metric("费", "单台制造费累计", "同期", "€/台", cumulativeUnit(sameAmount, sameVolume), "lower"),
+    metric("费", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
+    metric("费", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
     metric("时", "工作日", "同期", "天", workdaysSame, "higher"),
     metric("时", "工作日", "预算", "天", workdaysBudget, "higher"),
     metric("时", "工作日", "26年", "天", workdaysActual, "higher", workdaysBudget),
     metric("人", "用人", "同期", "人", hcSame, "lower"),
     metric("人", "用人", "预算", "人", hcBudget, "lower"),
     metric("人", "用人", "26年", "人", hcActual, "lower", hcBudget),
-    metric("效", "产量", "同期", "台", sameVolume, "higher"),
-    metric("效", "产量", "预算", "台", budgetVolume, "higher"),
-    metric("效", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
-    metric("效", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
-    metric("效", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
-    metric("效", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
+    metric("单", "产量", "同期", "台", sameVolume, "higher"),
+    metric("单", "产量", "预算", "台", budgetVolume, "higher"),
+    metric("单", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
+    metric("单", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
+    metric("单", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
+    metric("单", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
     metric("效", "UPPH", "同期", "UPPH", upphSame, "higher"),
     metric("效", "UPPH", "预算", "UPPH", upphBudget, "higher"),
     metric("效", "UPPH", "26年", "UPPH", upphActual, "higher", upphBudget),

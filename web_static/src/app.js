@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260608-table-sticky-v8";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-table-sticky-v8";
-import { buildReconciliation } from "./reconcile.js?v=20260608-table-sticky-v8";
-import { exportAnalysisWorkbook } from "./export.js?v=20260608-table-sticky-v8";
-import { loadXlsx } from "./xlsx-loader.js?v=20260608-table-sticky-v8";
-import { createStore } from "./store.js?v=20260608-table-sticky-v8";
+} from "./baseline-data.js?v=20260608-metric-groups-v9";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-metric-groups-v9";
+import { buildReconciliation } from "./reconcile.js?v=20260608-metric-groups-v9";
+import { exportAnalysisWorkbook } from "./export.js?v=20260608-metric-groups-v9";
+import { loadXlsx } from "./xlsx-loader.js?v=20260608-metric-groups-v9";
+import { createStore } from "./store.js?v=20260608-metric-groups-v9";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,23 +16,23 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260608-table-sticky-v8";
+} from "./forecast-parser.js?v=20260608-metric-groups-v9";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260608-table-sticky-v8";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-table-sticky-v8";
+} from "./workbench.js?v=20260608-metric-groups-v9";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-metric-groups-v9";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260608-table-sticky-v8";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-table-sticky-v8";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-table-sticky-v8";
+} from "./metrics.js?v=20260608-metric-groups-v9";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-metric-groups-v9";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-metric-groups-v9";
 
 const VERSION = "20260606-dashboard-v10";
 
@@ -832,12 +832,12 @@ function renderDashboard() {
 
 function dashboardMetricsForGroup() {
   const map = {
-    all: ["单台制造费", "制造费用金额", "产量", "用人"],
-    unit: ["产量", "标准台"],
-    time: ["标准台"],
+    all: ["产量", "工作日", "用人", "UPPH", "制造费率", "单台制造费"],
+    unit: ["产量", "产量累计"],
+    time: ["工作日"],
     people: ["用人", "直接用人", "间接用人", "固定用人"],
-    efficiency: ["用人"],
-    cost: ["单台制造费", "制造费用金额"]
+    efficiency: ["UPPH", "产值", "产值累计"],
+    cost: ["制造费率", "制造费率累计", "单台制造费", "单台制造费累计", "制造费用金额", "制造费用金额累计"]
   };
   return map[state.dashboardGroup] || map.all;
 }
@@ -889,10 +889,11 @@ function visibleDashboardRows() {
 }
 
 function metricFamily(labelText) {
-  if (/单台/.test(labelText)) return "unit";
-  if (/工时|出勤|标准工时/.test(labelText)) return "time";
+  if (/产量/.test(labelText)) return "unit";
+  if (/工作日|工时|出勤|标准工时/.test(labelText)) return "time";
   if (/用人|人数/.test(labelText)) return "people";
-  if (/UPPH|效率|标准台|产量/.test(labelText)) return "efficiency";
+  if (/UPPH|效率|标准台|产值/.test(labelText)) return "efficiency";
+  if (/单台|制造费率|制造费用/.test(labelText)) return "cost";
   return "cost";
 }
 
@@ -980,6 +981,8 @@ function annualStats() {
   const output26 = rowBy("产值", "26年");
   const output25 = rowBy("产值", "同期");
   return {
+    volume26: annualMetricValue(volume26),
+    volume25: annualMetricValue(volume25),
     unit26: annualUnitCostFromRows(amount26, volume26),
     unit25: annualUnitCostFromRows(amount25, volume25),
     days26: sum(days26?.values || []),
@@ -998,6 +1001,8 @@ function monthStats() {
   const rowValue = (labelText, scenario) => state.dashboardRows.find((row) => row.label === labelText && row.scenario === scenario)?.values?.[monthIndex];
   const summary = state.result?.summary || {};
   return {
+    volume26: rowValue("产量", "26年"),
+    volume25: rowValue("产量", "同期"),
     unit26: summary.totalUnit26,
     unit25: summary.totalUnit25,
     days26: rowValue("工作日", "26年"),

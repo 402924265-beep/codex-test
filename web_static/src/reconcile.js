@@ -1,4 +1,4 @@
-import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-table-sticky-v8";
+import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-metric-groups-v9";
 
 const SUMMARY_LABELS = {
   CS_DEPRECIATION: "折旧（含FC）",
