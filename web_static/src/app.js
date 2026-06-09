@@ -1089,33 +1089,62 @@ function monthlyCategoryDiagnostics() {
   if (!state.result) return [];
   const monthIndex = Math.max(0, Number(state.result.month || 1) - 1);
   const volume = dashboardMonthValue("产量", "26年", monthIndex) || state.result.volume26 || 0;
-  return (state.result.categories || [])
-    .map((item) => {
-      const forecast = forecastCategoryForMonth(item.category, monthIndex);
-      const amountBudget = chooseCategoryValue(item.amountBudget, forecast?.budgetAmount);
-      const amount26 = chooseCategoryValue(item.amount26, forecast?.actualAmount);
-      const unit25 = item.unit25;
-      const unitBudget = unitFromAmount(amountBudget, dashboardMonthValue("产量", "预算", monthIndex)) ?? item.unitBudget;
-      const unit26 = unitFromAmount(amount26, volume) ?? item.unit26;
-      const amount25 = item.amount25;
-      const amountDiff = diffNullableLocal(amount26, amount25) ?? item.amountDiff;
-      const unitDiff = diffNullableLocal(unit26, unit25) ?? item.unitDiff ?? (volume ? (amountDiff / volume) * 1000 : null);
-      const unitBudgetDiff = diffNullableLocal(unit26, unitBudget) ?? item.unitBudgetDiff;
-      return {
-        ...item,
-        amount26,
-        amountBudget,
-        amountDiff,
-        budgetDiff: diffNullableLocal(amount26, amountBudget) ?? item.budgetDiff,
-        unit26,
-        unitBudget,
-        unitDiff,
-        unitBudgetDiff,
-        manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : item.manufacturingDiff,
-        yoyRate: amount25 ? amountDiff / amount25 : null
-      };
-    })
-    .sort((a, b) => Math.abs(b.manufacturingDiff || b.amountDiff || 0) - Math.abs(a.manufacturingDiff || a.amountDiff || 0));
+  const volumeBudget = dashboardMonthValue("产量", "预算", monthIndex);
+  const rows = (state.result.categories || [])
+    .map((item) => enrichCategoryDiagnostic(item, monthIndex, volume, volumeBudget))
+    .sort((a, b) => (b.unitDiff || 0) - (a.unitDiff || 0));
+  const total = totalCategoryDiagnostic(monthIndex, volume, volumeBudget);
+  return total ? [total, ...rows] : rows;
+}
+
+function enrichCategoryDiagnostic(item, monthIndex, volume, volumeBudget) {
+  const forecast = forecastCategoryForMonth(item.category, monthIndex);
+  const amountBudget = chooseCategoryValue(item.amountBudget, forecast?.budgetAmount);
+  const amount26 = chooseCategoryValue(item.amount26, forecast?.actualAmount);
+  const unit25 = item.unit25;
+  const unitBudget = unitFromAmount(amountBudget, volumeBudget) ?? item.unitBudget;
+  const unit26 = unitFromAmount(amount26, volume) ?? item.unit26;
+  const amount25 = item.amount25;
+  const amountDiff = diffNullableLocal(amount26, amount25) ?? item.amountDiff;
+  const unitDiff = diffNullableLocal(unit26, unit25) ?? item.unitDiff ?? (volume ? (amountDiff / volume) * 1000 : null);
+  const unitBudgetDiff = diffNullableLocal(unit26, unitBudget) ?? item.unitBudgetDiff;
+  return {
+    ...item,
+    amount26,
+    amountBudget,
+    amountDiff,
+    budgetDiff: diffNullableLocal(amount26, amountBudget) ?? item.budgetDiff,
+    unit26,
+    unitBudget,
+    unitDiff,
+    unitBudgetDiff,
+    manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : item.manufacturingDiff,
+    targetImpact: Number.isFinite(unitBudgetDiff) && volume ? unitBudgetDiff * volume / 1000 : null,
+    yoyRate: amount25 ? amountDiff / amount25 : null,
+    targetCompletion: targetCompletionRate(unit26, unitBudget)
+  };
+}
+
+function totalCategoryDiagnostic(monthIndex, volume, volumeBudget) {
+  const unit25 = dashboardMonthValue("单台制造费", "同期", monthIndex);
+  const unitBudget = dashboardMonthValue("单台制造费", "预算", monthIndex);
+  const unit26 = dashboardMonthValue("单台制造费", "26年", monthIndex);
+  if (![unit25, unitBudget, unit26].some(Number.isFinite)) return null;
+  const unitDiff = diffNullableLocal(unit26, unit25);
+  const unitBudgetDiff = diffNullableLocal(unit26, unitBudget);
+  return {
+    category: "总单台",
+    unit25,
+    unitBudget,
+    unit26,
+    unitDiff,
+    unitBudgetDiff,
+    manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : null,
+    targetImpact: Number.isFinite(unitBudgetDiff) && volume ? unitBudgetDiff * volume / 1000 : null,
+    yoyRate: unit25 ? unitDiff / unit25 : null,
+    targetCompletion: targetCompletionRate(unit26, unitBudget),
+    isTotal: true
+  };
 }
 
 function chooseCategoryValue(primary, fallback) {
@@ -1555,16 +1584,16 @@ function renderChart() {
         ${headers.map((header) => `<span>${escapeHtml(header)}</span>`).join("")}
       </div>
       ${rows.map((item) => `
-        <button class="category-diagnostic category-comparison-row ${item.unitDiff > 0 ? "bad" : "good"}" type="button" data-category="${escapeHtml(item.category)}">
+        <button class="category-diagnostic category-comparison-row ${item.unitDiff > 0 ? "bad" : "good"} ${item.isTotal ? "total-row" : ""}" type="button" data-category="${escapeHtml(item.category)}" data-metric-tooltip="${escapeHtml(categoryTooltip(item))}">
           <span>${escapeHtml(localizeCategory(item.category, state.language))}</span>
           <em>${formatUnit(item.unit25)}</em>
           <em>${formatUnit(item.unitBudget)}</em>
-          <strong>${formatUnit(item.unit26)}</strong>
-          <strong>${formatUnit(item.unitDiff)}</strong>
-          <em>${formatUnit(item.unitBudgetDiff)}</em>
-          <em>${formatMoney(item.manufacturingDiff)}</em>
-          <em>${formatMoney(Number.isFinite(item.unitBudgetDiff) ? item.unitBudgetDiff * (state.result.volume26 || 0) / 1000 : null)}</em>
-          <em>${formatPercent(item.yoyRate)}</em>
+          <strong class="${valueClass(item.unit26 - item.unit25)}">${formatUnit(item.unit26)}</strong>
+          <strong class="${valueClass(item.unitDiff)}">${formatUnit(item.unitDiff)}</strong>
+          <em class="${valueClass(item.unitBudgetDiff)}">${formatUnit(item.unitBudgetDiff)}</em>
+          <em class="${valueClass(item.manufacturingDiff)}">${formatMoney(item.manufacturingDiff)}</em>
+          <em class="${valueClass(item.targetImpact)}">${formatMoney(item.targetImpact)}</em>
+          <em class="${valueClass(item.yoyRate)}">${formatPercent(item.yoyRate)}</em>
         </button>
       `).join("")}`;
     for (const button of els.categoryDiagnostics.querySelectorAll("[data-category]")) {
@@ -1574,6 +1603,16 @@ function renderChart() {
       });
     }
   }
+}
+
+function categoryTooltip(item) {
+  const optimized = Number.isFinite(item.unitDiff) ? item.unitDiff <= 0 : null;
+  return [
+    `${localizeCategory(item.category, state.language)} · ${state.result?.month || ""}月`,
+    Number.isFinite(item.unitDiff) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.unitDiff))} €/台</span>` : "",
+    Number.isFinite(item.unitBudgetDiff) ? `<span class="${tooltipDiffClass(item.unitBudgetDiff, "lower")}">${t("budgetVariance")}: ${formatUnit(item.unitBudgetDiff)} €/台</span>` : "",
+    Number.isFinite(item.targetCompletion) ? `<span class="${item.targetCompletion >= 1 ? "tooltip-good" : "tooltip-bad"}">${t("targetCompletion")}: ${formatPercent(item.targetCompletion)}</span>` : ""
+  ].filter(Boolean).join("\n");
 }
 
 function handleChartClick(event) {

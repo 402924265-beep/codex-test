@@ -966,6 +966,20 @@ td:nth-child(2) { text-align: left; }
   font-weight: 700;
 }
 
+.category-diagnostic.total-row {
+  position: sticky;
+  top: 44px;
+  z-index: 7;
+  background: #e9f6ff;
+  border-left-color: var(--blue);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.category-diagnostic.total-row span,
+.category-diagnostic.total-row strong {
+  font-weight: 800;
+}
+
 .category-diagnostic strong {
   font-size: 18px;
   color: inherit;
