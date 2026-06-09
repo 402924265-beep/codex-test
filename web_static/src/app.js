@@ -977,9 +977,15 @@ function ratioCard(title, actual, same, unit, direction, formula) {
     title,
     value: ratio,
     className: good === null ? "" : good ? "positive" : "negative",
-    note: `${formatPlain(actual)}${unit} / ${formatPlain(same)}${unit}`,
+    note: `${formatKpiRaw(actual, unit)} / ${formatKpiRaw(same, unit)}`,
     formula
   };
+}
+
+function formatKpiRaw(value, unit) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "--";
+  if (unit === "%") return formatDashboardValue(value, unit);
+  return `${formatPlain(value)}${unit}`;
 }
 
 function annualStats() {
@@ -1081,18 +1087,73 @@ function annualCategoryDiffs() {
 
 function monthlyCategoryDiagnostics() {
   if (!state.result) return [];
-  const volume = state.result.volume26 || 0;
+  const monthIndex = Math.max(0, Number(state.result.month || 1) - 1);
+  const volume = dashboardMonthValue("产量", "26年", monthIndex) || state.result.volume26 || 0;
   return (state.result.categories || [])
     .map((item) => {
-      const unitDiff = item.unitDiff ?? (volume ? (item.amountDiff / volume) * 1000 : null);
+      const forecast = forecastCategoryForMonth(item.category, monthIndex);
+      const amountBudget = chooseCategoryValue(item.amountBudget, forecast?.budgetAmount);
+      const amount26 = chooseCategoryValue(item.amount26, forecast?.actualAmount);
+      const unit25 = item.unit25;
+      const unitBudget = unitFromAmount(amountBudget, dashboardMonthValue("产量", "预算", monthIndex)) ?? item.unitBudget;
+      const unit26 = unitFromAmount(amount26, volume) ?? item.unit26;
+      const amount25 = item.amount25;
+      const amountDiff = diffNullableLocal(amount26, amount25) ?? item.amountDiff;
+      const unitDiff = diffNullableLocal(unit26, unit25) ?? item.unitDiff ?? (volume ? (amountDiff / volume) * 1000 : null);
+      const unitBudgetDiff = diffNullableLocal(unit26, unitBudget) ?? item.unitBudgetDiff;
       return {
         ...item,
+        amount26,
+        amountBudget,
+        amountDiff,
+        budgetDiff: diffNullableLocal(amount26, amountBudget) ?? item.budgetDiff,
+        unit26,
+        unitBudget,
         unitDiff,
+        unitBudgetDiff,
         manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : item.manufacturingDiff,
-        yoyRate: item.amount25 ? item.amountDiff / item.amount25 : null
+        yoyRate: amount25 ? amountDiff / amount25 : null
       };
     })
     .sort((a, b) => Math.abs(b.manufacturingDiff || b.amountDiff || 0) - Math.abs(a.manufacturingDiff || a.amountDiff || 0));
+}
+
+function chooseCategoryValue(primary, fallback) {
+  if (Number.isFinite(primary) && Math.abs(primary) > 0.0001) return primary;
+  return Number.isFinite(fallback) ? fallback : primary;
+}
+
+function unitFromAmount(amount, volume) {
+  return Number.isFinite(amount) && Number.isFinite(volume) && volume ? amount * 1000 / volume : null;
+}
+
+function dashboardMonthValue(labelText, scenario, monthIndex) {
+  return state.dashboardRows.find((row) => row.label === labelText && row.scenario === scenario)?.values?.[monthIndex] ?? null;
+}
+
+function forecastCategoryForMonth(category, monthIndex) {
+  const normalized = categoryAlias(category);
+  const item = state.forecast?.categories?.find((row) => categoryAlias(row.labelZh || row.label) === normalized);
+  if (!item) return null;
+  return {
+    actualAmount: item.amountMonths?.[monthIndex],
+    budgetAmount: item.budgetMonths?.[monthIndex]
+  };
+}
+
+function categoryAlias(category) {
+  const map = {
+    "生产耗用品": "生产耗用",
+    "变动能源费": "变动能源",
+    "固定能源费": "固定能源",
+    "间接人工成本-辅助人员": "间接人工",
+    "固定人工-白领": "固定人工",
+    "半固定-班车/工作服": "半固定费用",
+    "运营费": "固定费用",
+    "废品回收": "卖废",
+    "可回收废料": "报废"
+  };
+  return map[category] || category;
 }
 
 function diffNullableLocal(left, right) {
@@ -1110,6 +1171,10 @@ function annualUnitCostFromRows(amountRow, volumeRow) {
   const amount = sum(amountRow?.values || []);
   const volume = sum(volumeRow?.values || []);
   return amount && volume ? (amount / volume) * 1000 : null;
+}
+
+function withFullYearValue(row, unitLabel) {
+  return [...(row.values || []), annualMetricValue(row)];
 }
 
 function renderTrendSvg(metrics, rowBy) {
@@ -1134,22 +1199,26 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   const right = 24;
   const top = 44;
   const bottom = 46;
-  const all = [...actual.values, ...budget.values, ...same.values].filter(Number.isFinite);
+  const actualValues = withFullYearValue(actual, unitLabel);
+  const budgetValues = withFullYearValue(budget, unitLabel);
+  const sameValues = withFullYearValue(same, unitLabel);
+  const labels = [...Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language)), t("fullYear")];
+  const all = [...actualValues, ...budgetValues, ...sameValues].filter(Number.isFinite);
   const bounds = unitLabel === "%" ? rateAxisBounds(all) : valueAxisBounds(all);
   const min = bounds.min;
   const max = bounds.max;
   const span = Math.max(max - min, 1e-9);
-  const x = (index) => left + index * ((width - left - right) / 11);
+  const x = (index) => left + index * ((width - left - right) / 12);
   const y = (value) => top + (max - value) / span * (height - top - bottom);
   const series = [
-    { row: actual, color: "#42e0cd", name: t("actual26") },
-    { row: budget, color: "#f6c85f", name: t("budget26") },
-    { row: same, color: "#91a7bd", name: t("same25") }
+    { row: actual, values: actualValues, color: "#42e0cd", name: t("actual26") },
+    { row: budget, values: budgetValues, color: "#f6c85f", name: t("budget26") },
+    { row: same, values: sameValues, color: "#91a7bd", name: t("same25") }
   ];
   const labelItems = [];
   const paths = series.map((item, seriesIndex) => {
-    const points = item.row.values.map((value, index) => Number.isFinite(value) ? `${x(index)},${y(value)}` : null).filter(Boolean).join(" ");
-    const dots = item.row.values.map((value, index) => {
+    const points = item.values.map((value, index) => Number.isFinite(value) ? `${x(index)},${y(value)}` : null).filter(Boolean).join(" ");
+    const dots = item.values.map((value, index) => {
       if (!Number.isFinite(value)) return "";
       labelItems.push({
         x: x(index),
@@ -1160,7 +1229,7 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
       });
       return `
       <circle cx="${x(index)}" cy="${y(value)}" r="${item.row === actual ? 5 : 3.5}" fill="${item.color}" class="chart-dot">
-        <title>${localizeMonthLabel(index, state.language)} ${item.name}: ${formatDashboardValue(value, unitLabel)}</title>
+        <title>${labels[index]} ${item.name}: ${formatDashboardValue(value, unitLabel)}</title>
       </circle>`;
     }).join("");
     return `<polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.row === actual ? 4 : 2.5}" class="animated-line" />${dots}`;
@@ -1168,7 +1237,7 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.innerHTML = `
     <rect width="${width}" height="${height}" class="chart-bg" />
-    ${Array.from({ length: 12 }, (_, index) => `<line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${height - bottom}" class="grid-line" /><text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(localizeMonthLabel(index, state.language))}</text>`).join("")}
+    ${labels.map((label, index) => `<line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${height - bottom}" class="grid-line" /><text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(label)}</text>`).join("")}
     ${paths}
     ${placeChartLabels(labelItems, top, height - bottom)}
     ${series.map((item, index) => `<circle cx="${left + index * 170}" cy="22" r="5" fill="${item.color}" /><text x="${left + 12 + index * 170}" y="27" class="legend">${escapeSvg(item.name)}</text>`).join("")}
