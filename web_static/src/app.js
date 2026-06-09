@@ -118,7 +118,7 @@ const i18n = {
     groupEfficiency: "效",
     groupCost: "费",
     trendTitle: "单台制造费趋势",
-    trendHint: "26滚动预测 / 预算 / 同期",
+    trendHint: "月度单台：与下方“单台制造费”明细行一致",
     waterfallTitle: "制造费率趋势",
     waterfallHint: "制造费 ÷ 产值",
     other: "其他",
