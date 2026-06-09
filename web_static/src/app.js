@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260608-metric-groups-v9";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260608-metric-groups-v9";
-import { buildReconciliation } from "./reconcile.js?v=20260608-metric-groups-v9";
-import { exportAnalysisWorkbook } from "./export.js?v=20260608-metric-groups-v9";
-import { loadXlsx } from "./xlsx-loader.js?v=20260608-metric-groups-v9";
-import { createStore } from "./store.js?v=20260608-metric-groups-v9";
+} from "./baseline-data.js?v=20260610-shared-submit-v14";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260610-shared-submit-v14";
+import { buildReconciliation } from "./reconcile.js?v=20260610-shared-submit-v14";
+import { exportAnalysisWorkbook } from "./export.js?v=20260610-shared-submit-v14";
+import { loadXlsx } from "./xlsx-loader.js?v=20260610-shared-submit-v14";
+import { createStore } from "./store.js?v=20260610-shared-submit-v14";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,25 +16,26 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260608-metric-groups-v9";
+} from "./forecast-parser.js?v=20260610-shared-submit-v14";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260608-metric-groups-v9";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260608-metric-groups-v9";
+} from "./workbench.js?v=20260610-shared-submit-v14";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260610-shared-submit-v14";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260608-metric-groups-v9";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260608-metric-groups-v9";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260608-metric-groups-v9";
+} from "./metrics.js?v=20260610-shared-submit-v14";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260610-shared-submit-v14";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260610-shared-submit-v14";
+import { categoryAlias } from "./category-alias.js?v=20260610-shared-submit-v14";
 
-const VERSION = "20260606-dashboard-v10";
+const VERSION = "20260610-shared-submit-v14";
 
 const i18n = {
   zh: {
@@ -76,7 +77,17 @@ const i18n = {
     redBadGreenGood: "红色为同比恶化，绿色为同比优化",
     accountDetail: "科目明细",
     account: "账户",
-    analysis: "差异分析",
+    analysis: "同比差异分析",
+    targetVarianceAnalysis: "目标差异分析",
+    yoyVarianceAnalysis: "同比差异分析",
+    yoyPercent: "同比%",
+    submitAnalyses: "提交原因",
+    submitProjects: "提交项目",
+    analysisSubmitted: "原因已提交到后台共享",
+    projectsSubmitted: "项目已提交到后台共享",
+    saving: "正在提交...",
+    submitFailed: "提交失败",
+    unsavedChanges: "未提交",
     factorProjects: "26年降费项目",
     factorHint: "管理正式降费项目；月度差异原因在第二张表的小科目明细中填写。",
     factorMonth: "发生月份",
@@ -220,7 +231,17 @@ const i18n = {
     redBadGreenGood: "Red means worse, green means better",
     accountDetail: "Account Detail",
     account: "Account",
-    analysis: "Analysis",
+    analysis: "YoY variance",
+    targetVarianceAnalysis: "Target variance",
+    yoyVarianceAnalysis: "YoY variance",
+    yoyPercent: "YoY %",
+    submitAnalyses: "Submit reasons",
+    submitProjects: "Submit projects",
+    analysisSubmitted: "Reasons submitted to shared backend",
+    projectsSubmitted: "Projects submitted to shared backend",
+    saving: "Submitting...",
+    submitFailed: "Submit failed",
+    unsavedChanges: "Not submitted",
     factorProjects: "2026 Cost Reduction Projects",
     factorHint: "Manage formal projects here. Enter monthly variance reasons in Account Detail.",
     factorMonth: "Impact month",
@@ -364,7 +385,17 @@ const i18n = {
     redBadGreenGood: "Kırmızı kötüleşme, yeşil iyileşme",
     accountDetail: "Hesap Detayı",
     account: "Hesap",
-    analysis: "Analiz",
+    analysis: "Yıllık fark",
+    targetVarianceAnalysis: "Hedef fark",
+    yoyVarianceAnalysis: "Yıllık fark",
+    yoyPercent: "YoY %",
+    submitAnalyses: "Nedenleri gönder",
+    submitProjects: "Projeleri gönder",
+    analysisSubmitted: "Nedenler paylaşılan arka uca gönderildi",
+    projectsSubmitted: "Projeler paylaşılan arka uca gönderildi",
+    saving: "Gönderiliyor...",
+    submitFailed: "Gönderme başarısız",
+    unsavedChanges: "Gönderilmedi",
     factorProjects: "2026 Maliyet Düşürme Projeleri",
     factorHint: "Resmi maliyet düşürme projelerini burada yönetin. Aylık fark nedenlerini hesap detayında girin.",
     factorMonth: "Etki ayı",
@@ -510,6 +541,10 @@ const els = {
   languageSelect: document.getElementById("languageSelect"),
   userName: document.getElementById("userName"),
   saveMode: document.getElementById("saveMode"),
+  analysisAuthor: document.getElementById("analysisAuthor"),
+  submitAnalysesBtn: document.getElementById("submitAnalysesBtn"),
+  analysisSaveStatus: document.getElementById("analysisSaveStatus"),
+  factorSaveStatus: document.getElementById("factorSaveStatus"),
   sapStatus: document.getElementById("sapStatus"),
   forecastStatus: document.getElementById("forecastStatus"),
   jiangStatus: document.getElementById("jiangStatus"),
@@ -555,6 +590,7 @@ async function bootstrap() {
   installMetricHoverTooltip();
   els.saveMode.textContent = store.label;
   els.userName.value = store.getUser();
+  if (els.analysisAuthor) els.analysisAuthor.value = els.userName.value;
   try {
     state.analyses = await store.loadAnalyses();
     const storedFactors = normalizeFactorsForUi(await store.loadFactors([]));
@@ -621,7 +657,12 @@ function bindEvents() {
     applyLanguage(els.languageSelect.value);
     renderAll();
   });
-  els.userName.addEventListener("input", () => store.setUser(els.userName.value.trim()));
+  els.userName.addEventListener("input", () => {
+    store.setUser(els.userName.value.trim());
+    if (els.analysisAuthor) els.analysisAuthor.value = els.userName.value.trim();
+  });
+  if (els.submitAnalysesBtn) els.submitAnalysesBtn.addEventListener("click", submitCurrentMonthAnalyses);
+  if (els.saveFactorsBtn) els.saveFactorsBtn.addEventListener("click", submitProjects);
   els.exportBtn.addEventListener("click", async () => {
     try {
       await exportAnalysisWorkbook({
@@ -644,7 +685,6 @@ function bindEvents() {
     state.factorMonth = Number(els.factorMonthSelect.value) || 4;
     renderFactors();
   });
-  els.saveFactorsBtn.addEventListener("click", saveFactorsFromTable);
   els.factorBody.addEventListener("click", (event) => {
     const button = event.target.closest("[data-delete-index]");
     if (!button) return;
@@ -1092,7 +1132,12 @@ function monthlyCategoryDiagnostics() {
   const volumeBudget = dashboardMonthValue("产量", "预算", monthIndex);
   const rows = (state.result.categories || [])
     .map((item) => enrichCategoryDiagnostic(item, monthIndex, volume, volumeBudget))
-    .sort((a, b) => (b.unitDiff || 0) - (a.unitDiff || 0));
+    .sort((a, b) => {
+      const absA = Math.abs(a.unitDiff || 0);
+      const absB = Math.abs(b.unitDiff || 0);
+      if (absB !== absA) return absB - absA;
+      return (b.unitDiff || 0) - (a.unitDiff || 0);
+    });
   const total = totalCategoryDiagnostic(monthIndex, volume, volumeBudget);
   return total ? [total, ...rows] : rows;
 }
@@ -1120,9 +1165,25 @@ function enrichCategoryDiagnostic(item, monthIndex, volume, volumeBudget) {
     unitBudgetDiff,
     manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : item.manufacturingDiff,
     targetImpact: Number.isFinite(unitBudgetDiff) && volume ? unitBudgetDiff * volume / 1000 : null,
-    yoyRate: amount25 ? amountDiff / amount25 : null,
+    yoyRate: unit25 ? unitDiff / unit25 : null,
     targetCompletion: targetCompletionRate(unit26, unitBudget)
   };
+}
+
+function buildCategoryReasonText(item, mode) {
+  if (!state.result) return "";
+  const category = item.category;
+  const reasons = state.result.rows
+    .filter((row) => row.category === category && state.analyses[analysisKey(state.result.month, row.code)]?.trim())
+    .map((row) => state.analyses[analysisKey(state.result.month, row.code)].trim());
+  if (!reasons.length && !item.isTotal) return "";
+  if (item.isTotal) {
+    const allReasons = state.result.rows
+      .filter((row) => state.analyses[analysisKey(state.result.month, row.code)]?.trim())
+      .map((row) => state.analyses[analysisKey(state.result.month, row.code)].trim());
+    return allReasons.join("；");
+  }
+  return reasons.join("；");
 }
 
 function totalCategoryDiagnostic(monthIndex, volume, volumeBudget) {
@@ -1170,20 +1231,6 @@ function forecastCategoryForMonth(category, monthIndex) {
   };
 }
 
-function categoryAlias(category) {
-  const map = {
-    "生产耗用品": "生产耗用",
-    "变动能源费": "变动能源",
-    "固定能源费": "固定能源",
-    "间接人工成本-辅助人员": "间接人工",
-    "固定人工-白领": "固定人工",
-    "半固定-班车/工作服": "半固定费用",
-    "运营费": "固定费用",
-    "废品回收": "卖废",
-    "可回收废料": "报废"
-  };
-  return map[category] || category;
-}
 
 function diffNullableLocal(left, right) {
   return Number.isFinite(left) && Number.isFinite(right) ? left - right : null;
@@ -1495,32 +1542,93 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 function renderTable() {
   if (!state.result) {
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
-    els.detailBody.innerHTML = `<tr><td colspan="11" class="empty-cell">${t("emptySap")}</td></tr>`;
+    els.detailBody.innerHTML = `<tr><td colspan="13" class="empty-cell">${t("emptySap")}</td></tr>`;
     return;
   }
   const rows = visibleRows();
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}`;
   els.detailBody.innerHTML =
-    rows.map(rowToHtml).join("") || `<tr><td colspan="11" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
+    rows.map(rowToHtml).join("") || `<tr><td colspan="13" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
-    textarea.addEventListener("change", async (event) => {
+    textarea.addEventListener("change", (event) => {
       const key = event.target.dataset.key;
       state.analyses[key] = event.target.value;
-      await store.saveAnalysis({
-        key,
-        month: Number(event.target.dataset.month),
-        code: event.target.dataset.code,
-        text: event.target.value,
-        author: els.userName.value.trim()
-      });
-      renderNarrative();
-      renderSummaryCards();
-      toast(`${storeLabel()}: ${t("analysisSaved")}`);
+      if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("unsavedChanges");
     });
     textarea.addEventListener("input", (event) => {
       state.analyses[event.target.dataset.key] = event.target.value;
       renderNarrative();
+      renderChart();
     });
+  }
+}
+
+async function submitCurrentMonthAnalyses() {
+  if (!state.result) return;
+  const author = els.analysisAuthor?.value.trim() || els.userName.value.trim();
+  if (!author) {
+    toast("请填写提报人姓名", true);
+    return;
+  }
+  if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("saving");
+  try {
+    const saves = state.result.rows
+      .filter((row) => {
+        const key = analysisKey(state.result.month, row.code);
+        return state.analyses[key] !== undefined;
+      })
+      .map((row) => {
+        const key = analysisKey(state.result.month, row.code);
+        return store.saveAnalysis({
+          key,
+          month: state.result.month,
+          code: row.code,
+          text: state.analyses[key] || "",
+          author
+        });
+      });
+    await Promise.all(saves);
+    state.analyses = await store.loadAnalyses();
+    renderAll();
+    if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("analysisSubmitted");
+    toast(t("analysisSubmitted"));
+  } catch (error) {
+    if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("submitFailed");
+    toast(error.message || String(error), true);
+  }
+}
+
+async function submitProjects() {
+  const rows = [...els.factorBody.querySelectorAll("tr[data-index]")];
+  state.factors = rows.map((row, index) => {
+    const existing = state.factors[Number(row.dataset.index)] || {};
+    const get = (field) => row.querySelector(`[data-field="${field}"]`)?.value || "";
+    return {
+      ...existing,
+      id: existing.id || String(index + 1),
+      type: "decrease",
+      lead: existing.lead || "",
+      category: get("category"),
+      strategy: get("strategy"),
+      project: get("project"),
+      owner: get("owner"),
+      timing: get("timing"),
+      plannedImpact: parseEditableNumber(get("plannedImpact")),
+      actualCumulative: parseEditableNumber(get("actualCumulative")),
+      progress: get("progress")
+    };
+  });
+  if (els.factorSaveStatus) els.factorSaveStatus.textContent = t("saving");
+  try {
+    await store.saveFactors(state.factors);
+    renderFactors();
+    renderNarrative();
+    renderSummaryCards();
+    if (els.factorSaveStatus) els.factorSaveStatus.textContent = t("projectsSubmitted");
+    toast(t("projectsSubmitted"));
+  } catch (error) {
+    if (els.factorSaveStatus) els.factorSaveStatus.textContent = t("submitFailed");
+    toast(error.message || String(error), true);
   }
 }
 
@@ -1550,6 +1658,9 @@ function rowToHtml(row) {
   const key = analysisKey(state.result.month, row.code);
   const analysis = state.analyses[key] || "";
   const major = Math.abs(row.unitDiff || 0) >= 0.5;
+  const yoyRate = Number.isFinite(row.unit25) && row.unit25 !== 0 ? row.unitDiff / row.unit25 : null;
+  const targetDiff = Number.isFinite(row.unitBudget) && Number.isFinite(row.unit26) ? row.unit26 - row.unitBudget : null;
+  const targetText = Number.isFinite(targetDiff) ? `目标差 ${formatUnit(targetDiff)} €/台` : "";
   return `
     <tr class="${major ? "high" : ""}">
       <td><div class="account-code">${escapeHtml(row.code)}</div><div class="desc">${escapeHtml(row.descEn)}</div></td>
@@ -1562,6 +1673,8 @@ function rowToHtml(row) {
       <td>${formatUnit(row.unit25)}</td>
       <td>${formatUnit(row.unit26)}</td>
       <td class="${valueClass(row.unitDiff)}">${formatUnit(row.unitDiff)}</td>
+      <td class="${valueClass(yoyRate)}">${formatPercent(yoyRate)}</td>
+      <td class="analysis-cell">${escapeHtml(targetText)}</td>
       <td><textarea class="${major ? "major" : ""}" data-key="${escapeHtml(key)}" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${major ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(analysis)}</textarea></td>
     </tr>
   `;
@@ -1590,10 +1703,9 @@ function renderChart() {
           <em>${formatUnit(item.unitBudget)}</em>
           <strong class="${valueClass(item.unit26 - item.unit25)}">${formatUnit(item.unit26)}</strong>
           <strong class="${valueClass(item.unitDiff)}">${formatUnit(item.unitDiff)}</strong>
-          <em class="${valueClass(item.unitBudgetDiff)}">${formatUnit(item.unitBudgetDiff)}</em>
-          <em class="${valueClass(item.manufacturingDiff)}">${formatMoney(item.manufacturingDiff)}</em>
-          <em class="${valueClass(item.targetImpact)}">${formatMoney(item.targetImpact)}</em>
           <em class="${valueClass(item.yoyRate)}">${formatPercent(item.yoyRate)}</em>
+          <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "target"))}</em>
+          <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "yoy"))}</em>
         </button>
       `).join("")}`;
     for (const button of els.categoryDiagnostics.querySelectorAll("[data-category]")) {
@@ -1651,33 +1763,6 @@ function factorRowHtml(item, index) {
   `;
 }
 
-async function saveFactorsFromTable() {
-  const rows = [...els.factorBody.querySelectorAll("tr[data-index]")];
-  state.factors = rows.map((row, index) => {
-    const existing = state.factors[Number(row.dataset.index)] || {};
-    const get = (field) => row.querySelector(`[data-field="${field}"]`)?.value || "";
-    return {
-      ...existing,
-      id: existing.id || String(index + 1),
-      type: "decrease",
-      lead: existing.lead || "",
-      category: get("category"),
-      strategy: get("strategy"),
-      project: get("project"),
-      owner: get("owner"),
-      timing: get("timing"),
-      plannedImpact: parseEditableNumber(get("plannedImpact")),
-      actualCumulative: parseEditableNumber(get("actualCumulative")),
-      progress: get("progress")
-    };
-  });
-  await store.saveFactors(state.factors);
-  renderFactors();
-  renderNarrative();
-  renderSummaryCards();
-  els.exportBtn.disabled = false;
-  toast(`${storeLabel()}: ${t("projectsSaved")}`);
-}
 
 function addFactor(type) {
   state.factors.push({

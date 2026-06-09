@@ -899,7 +899,7 @@ td:nth-child(2) { text-align: left; }
 .category-comparison-head,
 .category-comparison-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1.6fr) repeat(8, minmax(92px, 1fr));
+  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr));
   align-items: center;
   min-width: 1080px;
 }
@@ -947,7 +947,7 @@ td:nth-child(2) { text-align: left; }
 }
 
 .category-comparison-row.category-diagnostic {
-  grid-template-columns: minmax(180px, 1.6fr) repeat(8, minmax(92px, 1fr));
+  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr));
   gap: 0;
   min-width: 1080px;
   border-width: 0 0 1px 5px;

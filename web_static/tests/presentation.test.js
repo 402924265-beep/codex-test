@@ -23,9 +23,8 @@ test("monthly category comparison headers are localized", () => {
     "2026 target unit €/pc",
     "2026 actual unit €/pc",
     "YoY unit gap €/pc",
-    "Target unit gap €/pc",
-    "YoY impact K€",
-    "Target impact K€",
-    "YoY %"
+    "YoY %",
+    "Target variance",
+    "YoY variance"
   ]);
 });

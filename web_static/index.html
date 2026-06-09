@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260609-category-diagnostics-v13" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260610-shared-submit-v14" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
         anonKey: "sb_publishable_kji34L4Yh1vCIPudrIKROA_hdwTjzuu"
       };
     </script>
-    <script type="module" src="./src/app.js?v=20260609-category-diagnostics-v13"></script>
+    <script type="module" src="./src/app.js?v=20260610-shared-submit-v14"></script>
   </head>
   <body>
     <header class="app-header">
@@ -145,8 +145,18 @@
 
         <section class="panel table-panel" aria-label="科目明细">
           <div class="panel-title">
-            <h2 data-i18n="accountDetail">科目明细</h2>
-            <span id="rowCount">0 项</span>
+            <div>
+              <h2 data-i18n="accountDetail">科目明细</h2>
+              <span id="rowCount">0 项</span>
+            </div>
+            <div class="factor-actions">
+              <label class="field compact inline-field">
+                <span data-i18n="author">提报人</span>
+                <input id="analysisAuthor" type="text" placeholder="姓名" />
+              </label>
+              <button id="submitAnalysesBtn" type="button" data-i18n="submitAnalyses">提交原因</button>
+              <span id="analysisSaveStatus" class="status-pill muted">未提交</span>
+            </div>
           </div>
           <section class="toolbar variance-toolbar" aria-label="筛选">
             <div class="field">
@@ -199,11 +209,13 @@
                   <th data-i18n="unit25">25单台</th>
                   <th data-i18n="unit26">26单台</th>
                   <th data-i18n="unitDiff">单台差异</th>
-                  <th data-i18n="analysis">差异分析</th>
+                  <th data-i18n="yoyPercent">同比%</th>
+                  <th data-i18n="targetVarianceAnalysis">目标差异分析</th>
+                  <th data-i18n="yoyVarianceAnalysis">同比差异分析</th>
                 </tr>
               </thead>
               <tbody id="detailBody">
-                <tr><td colspan="11" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
+                <tr><td colspan="13" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
               </tbody>
             </table>
           </div>
@@ -228,7 +240,8 @@
                 </select>
               </label>
               <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加项目</button>
-              <button id="saveFactorsBtn" type="button" data-i18n="saveProjects">保存项目</button>
+              <button id="saveFactorsBtn" type="button" data-i18n="submitProjects">提交项目</button>
+              <span id="factorSaveStatus" class="status-pill muted">未提交</span>
             </div>
           </div>
           <div id="projectSummary" class="smart-summary smart-summary-project">???????????/?????????</div>
