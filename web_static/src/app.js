@@ -945,14 +945,28 @@ function annualMetricValue(row) {
 
 function buildFiveKpiCards(scope) {
   const stats = scope === "annual" ? annualStats() : monthStats();
-  return buildKpiDefinitions(state.language).map((definition) => ratioCard(
-    definition.title,
-    stats[`${definition.key}26`],
-    stats[`${definition.key}25`],
-    definition.unit,
-    definition.direction,
-    definition.formula
-  ));
+  const definitions = buildKpiDefinitions(state.language);
+  const cards = definitions
+    .filter((definition) => !["rate", "unit"].includes(definition.key))
+    .map((definition) => ratioCard(
+      definition.title,
+      stats[`${definition.key}26`],
+      stats[`${definition.key}25`],
+      definition.unit,
+      definition.direction,
+      definition.formula
+    ));
+  const rate = definitions.find((definition) => definition.key === "rate");
+  const unit = definitions.find((definition) => definition.key === "unit");
+  cards.push({
+    title: state.language === "zh" ? "费" : state.language === "tr" ? "Maliyet" : "Cost",
+    type: "cost-combo",
+    items: [
+      ratioCard(rate?.title || "制造费率", stats.rate26, stats.rate25, rate?.unit || "%", rate?.direction || "lower", rate?.formula || ""),
+      ratioCard(unit?.title || "单台制造费", stats.unit26, stats.unit25, unit?.unit || "€/台", unit?.direction || "lower", unit?.formula || "")
+    ]
+  });
+  return cards;
 }
 
 function ratioCard(title, actual, same, unit, direction, formula) {
@@ -1017,6 +1031,22 @@ function monthStats() {
 }
 
 function kpiCardHtml(card, className) {
+  if (card.type === "cost-combo") {
+    return `
+      <article class="${className} kpi-card cost-combo-card">
+        <span>${escapeHtml(card.title)}</span>
+        <div class="cost-combo-items">
+          ${card.items.map((item) => `
+            <div class="cost-combo-item ${item.className}">
+              <b>${escapeHtml(item.title)}</b>
+              <strong>${formatPercent(item.value)}</strong>
+              <small>${escapeHtml(item.note)}</small>
+            </div>
+          `).join("")}
+        </div>
+      </article>
+    `;
+  }
   return `
     <article class="${className} kpi-card ${card.className}">
       <span>${escapeHtml(card.title)}</span>

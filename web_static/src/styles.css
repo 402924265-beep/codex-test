@@ -327,6 +327,44 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   font-size: 11px;
 }
 
+.cost-combo-card {
+  gap: 6px;
+}
+
+.cost-combo-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cost-combo-item {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.cost-combo-item b {
+  color: #cde0ec;
+  font-size: 11px;
+}
+
+.cost-combo-item strong {
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.cost-combo-item small {
+  overflow: hidden;
+  color: #00a37b;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cost-combo-item.positive strong { color: #31e6b1; }
+.cost-combo-item.negative strong { color: #ff665f; }
+.cost-combo-item.negative small { color: #ff8a84; }
+
 .smart-summary {
   margin: 0;
   padding: 12px 16px;
