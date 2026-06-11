@@ -207,5 +207,9 @@ test("dashboard exposes DW 2026 4+8 headcount as direct, indirect and white coll
   assert.equal(white.values[3], 24.67);
   assert.equal(white.values[4], 26.5);
   assert.equal(white.values[11], 27.5);
+  assert.equal(rows.find((row) => row.label === "直接员工" && row.scenario === "同期").values[0], 218);
+  assert.equal(rows.find((row) => row.label === "直接员工" && row.scenario === "预算").values[0], 244);
+  assert.equal(rows.find((row) => row.label === "间接员工" && row.scenario === "同期").values[3], 93);
+  assert.equal(rows.find((row) => row.label === "白领" && row.scenario === "预算").values[7], 27.5);
   assert.equal(rows.some((row) => row.label === "用人"), false);
 });

@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260611-kpi-headcount-v16";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260611-kpi-headcount-v16";
-import { buildReconciliation } from "./reconcile.js?v=20260611-kpi-headcount-v16";
-import { exportAnalysisWorkbook } from "./export.js?v=20260611-kpi-headcount-v16";
-import { loadXlsx } from "./xlsx-loader.js?v=20260611-kpi-headcount-v16";
-import { createStore } from "./store.js?v=20260611-kpi-headcount-v16";
+} from "./baseline-data.js?v=20260611-kpi-headcount-full-v17";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260611-kpi-headcount-full-v17";
+import { buildReconciliation } from "./reconcile.js?v=20260611-kpi-headcount-full-v17";
+import { exportAnalysisWorkbook } from "./export.js?v=20260611-kpi-headcount-full-v17";
+import { loadXlsx } from "./xlsx-loader.js?v=20260611-kpi-headcount-full-v17";
+import { createStore } from "./store.js?v=20260611-kpi-headcount-full-v17";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,26 +16,26 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260611-kpi-headcount-v16";
+} from "./forecast-parser.js?v=20260611-kpi-headcount-full-v17";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260611-kpi-headcount-v16";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260611-kpi-headcount-v16";
+} from "./workbench.js?v=20260611-kpi-headcount-full-v17";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260611-kpi-headcount-full-v17";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260611-kpi-headcount-v16";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260611-kpi-headcount-v16";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260611-kpi-headcount-v16";
-import { categoryAlias } from "./category-alias.js?v=20260611-kpi-headcount-v16";
+} from "./metrics.js?v=20260611-kpi-headcount-full-v17";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260611-kpi-headcount-full-v17";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260611-kpi-headcount-full-v17";
+import { categoryAlias } from "./category-alias.js?v=20260611-kpi-headcount-full-v17";
 
-const VERSION = "20260611-kpi-headcount-v16";
+const VERSION = "20260611-kpi-headcount-full-v17";
 
 const i18n = {
   zh: {
