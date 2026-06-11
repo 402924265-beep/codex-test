@@ -1449,10 +1449,15 @@ function metricTooltip(row, index) {
   const completion = targetCompletionRate(actual, budget);
   return [
     `${annual ? t("fullYear") : localizeMonthLabel(index, state.language)} · ${localizeDashboardText("labels", row.label, state.language)}`,
-    Number.isFinite(yoy) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}</span>` : "",
+    Number.isFinite(yoy) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}${formatYoyPercent(yoy, same)}</span>` : "",
     Number.isFinite(budgetDiff) ? `<span class="${tooltipDiffClass(budgetDiff, row.direction)}">${t("budgetVariance")}: ${formatDashboardValue(budgetDiff, row.unit)}</span>` : "",
     Number.isFinite(completion) ? `<span class="${completion >= 1 ? "tooltip-good" : "tooltip-bad"}">${t("targetCompletion")}: ${formatPercent(completion)}</span>` : ""
   ].filter(Boolean).join("\n");
+}
+
+function formatYoyPercent(diff, base) {
+  if (!Number.isFinite(diff) || !Number.isFinite(base) || base === 0) return "";
+  return `（${formatPercent(Math.abs(diff / base))}）`;
 }
 
 function tooltipDiffClass(value, direction) {
@@ -1721,7 +1726,7 @@ function categoryTooltip(item) {
   const optimized = Number.isFinite(item.unitDiff) ? item.unitDiff <= 0 : null;
   return [
     `${localizeCategory(item.category, state.language)} · ${state.result?.month || ""}月`,
-    Number.isFinite(item.unitDiff) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.unitDiff))} €/台</span>` : "",
+    Number.isFinite(item.unitDiff) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.unitDiff))} €/台${formatYoyPercent(item.unitDiff, item.unit25)}</span>` : "",
     Number.isFinite(item.unitBudgetDiff) ? `<span class="${tooltipDiffClass(item.unitBudgetDiff, "lower")}">${t("budgetVariance")}: ${formatUnit(item.unitBudgetDiff)} €/台</span>` : "",
     Number.isFinite(item.targetCompletion) ? `<span class="${item.targetCompletion >= 1 ? "tooltip-good" : "tooltip-bad"}">${t("targetCompletion")}: ${formatPercent(item.targetCompletion)}</span>` : ""
   ].filter(Boolean).join("\n");
