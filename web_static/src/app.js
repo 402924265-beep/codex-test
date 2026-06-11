@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260611-kpi-headcount-order-v18";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260611-kpi-headcount-order-v18";
-import { buildReconciliation } from "./reconcile.js?v=20260611-kpi-headcount-order-v18";
-import { exportAnalysisWorkbook } from "./export.js?v=20260611-kpi-headcount-order-v18";
-import { loadXlsx } from "./xlsx-loader.js?v=20260611-kpi-headcount-order-v18";
-import { createStore } from "./store.js?v=20260611-kpi-headcount-order-v18";
+} from "./baseline-data.js?v=20260611-account-plan-v19";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260611-account-plan-v19";
+import { buildReconciliation } from "./reconcile.js?v=20260611-account-plan-v19";
+import { exportAnalysisWorkbook } from "./export.js?v=20260611-account-plan-v19";
+import { loadXlsx } from "./xlsx-loader.js?v=20260611-account-plan-v19";
+import { createStore } from "./store.js?v=20260611-account-plan-v19";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,26 +16,27 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260611-kpi-headcount-order-v18";
+} from "./forecast-parser.js?v=20260611-account-plan-v19";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260611-kpi-headcount-order-v18";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260611-kpi-headcount-order-v18";
+} from "./workbench.js?v=20260611-account-plan-v19";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260611-account-plan-v19";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260611-kpi-headcount-order-v18";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260611-kpi-headcount-order-v18";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260611-kpi-headcount-order-v18";
-import { categoryAlias } from "./category-alias.js?v=20260611-kpi-headcount-order-v18";
+} from "./metrics.js?v=20260611-account-plan-v19";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260611-account-plan-v19";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260611-account-plan-v19";
+import { categoryAlias } from "./category-alias.js?v=20260611-account-plan-v19";
+import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260611-account-plan-v19";
 
-const VERSION = "20260611-kpi-headcount-order-v18";
+const VERSION = "20260611-account-plan-v19";
 
 const i18n = {
   zh: {
@@ -751,10 +752,12 @@ async function handleSapFileChange(event) {
 
     for (const item of MONTHS) {
       try {
-        const actual26 = extractActualFromWorkbook(workbook, item.month, XLSX);
+        const parsedActual26 = extractActualFromWorkbook(workbook, item.month, XLSX);
+        const actual26 = accountForecastActualForMonth(item.month) || parsedActual26;
+        const budget26 = accountBudgetForMonth(item.month) || BUDGET_26_BY_MONTH[item.month];
         const result = buildReconciliation({
           baseline25: BASELINE_25_BY_MONTH[item.month],
-          budget26: BUDGET_26_BY_MONTH[item.month],
+          budget26,
           actual26,
           month: item.month,
           categoryOrder: CATEGORY_ORDER
@@ -796,6 +799,46 @@ function renderAll() {
   renderChart();
   renderTable();
   renderFactors();
+}
+
+function accountBudgetForMonth(month) {
+  if (month < 5) return null;
+  const source = ACCOUNT_BUDGET_DW_BY_MONTH[month];
+  if (!source) return null;
+  const accounts = (source.accounts || []).map((row) => ({
+    code: row.code,
+    descEn: row.descEn,
+    category: row.category,
+    summaryKey: row.summaryKey,
+    amountBudget: row.amount,
+    unitBudget: row.unit
+  }));
+  return {
+    month,
+    volume: source.volume,
+    accounts,
+    categories: groupedCategoryAmounts(accounts, "amountBudget", "amountBudget")
+  };
+}
+
+function accountForecastActualForMonth(month) {
+  if (month < 5) return null;
+  const source = ACCOUNT_FORECAST_DW_BY_MONTH[month];
+  if (!source) return null;
+  return {
+    month,
+    volume: source.volume,
+    accounts: source.accounts || []
+  };
+}
+
+function groupedCategoryAmounts(accounts, sourceKey, targetKey) {
+  const map = new Map();
+  for (const row of accounts || []) {
+    const category = row.category || t("other");
+    map.set(category, (map.get(category) || 0) + (Number(row[sourceKey]) || 0));
+  }
+  return [...map.entries()].map(([label, value]) => ({ label, [targetKey]: value }));
 }
 
 function buildDashboardRows() {
