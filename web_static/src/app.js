@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260610-shared-submit-v14";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260610-shared-submit-v14";
-import { buildReconciliation } from "./reconcile.js?v=20260610-shared-submit-v14";
-import { exportAnalysisWorkbook } from "./export.js?v=20260610-shared-submit-v14";
-import { loadXlsx } from "./xlsx-loader.js?v=20260610-shared-submit-v14";
-import { createStore } from "./store.js?v=20260610-shared-submit-v14";
+} from "./baseline-data.js?v=20260610-summary-clean-v15";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260610-summary-clean-v15";
+import { buildReconciliation } from "./reconcile.js?v=20260610-summary-clean-v15";
+import { exportAnalysisWorkbook } from "./export.js?v=20260610-summary-clean-v15";
+import { loadXlsx } from "./xlsx-loader.js?v=20260610-summary-clean-v15";
+import { createStore } from "./store.js?v=20260610-summary-clean-v15";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,26 +16,26 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260610-shared-submit-v14";
+} from "./forecast-parser.js?v=20260610-summary-clean-v15";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260610-shared-submit-v14";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260610-shared-submit-v14";
+} from "./workbench.js?v=20260610-summary-clean-v15";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260610-summary-clean-v15";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260610-shared-submit-v14";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260610-shared-submit-v14";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260610-shared-submit-v14";
-import { categoryAlias } from "./category-alias.js?v=20260610-shared-submit-v14";
+} from "./metrics.js?v=20260610-summary-clean-v15";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260610-summary-clean-v15";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260610-summary-clean-v15";
+import { categoryAlias } from "./category-alias.js?v=20260610-summary-clean-v15";
 
-const VERSION = "20260610-shared-submit-v14";
+const VERSION = "20260610-summary-clean-v15";
 
 const i18n = {
   zh: {

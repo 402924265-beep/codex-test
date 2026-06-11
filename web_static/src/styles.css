@@ -1008,10 +1008,10 @@ td:nth-child(2) { text-align: left; }
 .compact-summary {
   margin: 0 14px 12px;
   min-height: 48px;
-  display: flex;
-  align-items: center;
+  display: block;
   color: #162231;
   font: 14px/1.55 "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+  white-space: pre-line;
   background: linear-gradient(90deg, #f7fbff, #eef8f5);
   border: 1px solid var(--line);
   border-left: 4px solid var(--teal);
