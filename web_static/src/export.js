@@ -78,7 +78,7 @@ function buildMonthlyMetricSheet(result) {
     metricRow("单台制造费", summary.totalUnit25, summary.totalUnitBudget, summary.totalUnit26, summary.totalUnitDiff, "€/台"),
     metricRow("制造费差额", "", "", summary.manufacturingDiff, summary.manufacturingDiff, "K€"),
     metricRow("待确认公式：UPPH", "", "", "", "", "台/时"),
-    metricRow("待确认公式：用人", "", "", "", "", "人")
+    metricRow("直接员工 / 间接员工 / 白领见洗碗机成本数据", "", "", "", "", "人")
   ];
 }
 

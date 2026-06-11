@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260610-summary-clean-v15";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260610-summary-clean-v15";
-import { buildReconciliation } from "./reconcile.js?v=20260610-summary-clean-v15";
-import { exportAnalysisWorkbook } from "./export.js?v=20260610-summary-clean-v15";
-import { loadXlsx } from "./xlsx-loader.js?v=20260610-summary-clean-v15";
-import { createStore } from "./store.js?v=20260610-summary-clean-v15";
+} from "./baseline-data.js?v=20260611-kpi-headcount-v16";
+import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260611-kpi-headcount-v16";
+import { buildReconciliation } from "./reconcile.js?v=20260611-kpi-headcount-v16";
+import { exportAnalysisWorkbook } from "./export.js?v=20260611-kpi-headcount-v16";
+import { loadXlsx } from "./xlsx-loader.js?v=20260611-kpi-headcount-v16";
+import { createStore } from "./store.js?v=20260611-kpi-headcount-v16";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,26 +16,26 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260610-summary-clean-v15";
+} from "./forecast-parser.js?v=20260611-kpi-headcount-v16";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260610-summary-clean-v15";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260610-summary-clean-v15";
+} from "./workbench.js?v=20260611-kpi-headcount-v16";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260611-kpi-headcount-v16";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260610-summary-clean-v15";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260610-summary-clean-v15";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260610-summary-clean-v15";
-import { categoryAlias } from "./category-alias.js?v=20260610-summary-clean-v15";
+} from "./metrics.js?v=20260611-kpi-headcount-v16";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260611-kpi-headcount-v16";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260611-kpi-headcount-v16";
+import { categoryAlias } from "./category-alias.js?v=20260611-kpi-headcount-v16";
 
-const VERSION = "20260610-summary-clean-v15";
+const VERSION = "20260611-kpi-headcount-v16";
 
 const i18n = {
   zh: {
@@ -872,10 +872,10 @@ function renderDashboard() {
 
 function dashboardMetricsForGroup() {
   const map = {
-    all: ["产量", "工作日", "用人", "UPPH", "制造费率", "单台制造费"],
+    all: ["产量", "工作日", "直接员工", "间接员工", "白领", "UPPH", "制造费率", "单台制造费"],
     unit: ["产量", "产量累计"],
     time: ["工作日"],
-    people: ["用人", "直接用人", "间接用人", "固定用人"],
+    people: ["直接员工", "间接员工", "白领"],
     efficiency: ["UPPH", "产值", "产值累计"],
     cost: ["制造费率", "制造费率累计", "单台制造费", "单台制造费累计", "制造费用金额", "制造费用金额累计"]
   };
@@ -931,7 +931,7 @@ function visibleDashboardRows() {
 function metricFamily(labelText) {
   if (/产量/.test(labelText)) return "unit";
   if (/工作日|工时|出勤|标准工时/.test(labelText)) return "time";
-  if (/用人|人数/.test(labelText)) return "people";
+  if (/用人|人数|员工|白领/.test(labelText)) return "people";
   if (/UPPH|效率|标准台|产值/.test(labelText)) return "efficiency";
   if (/单台|制造费率|制造费用/.test(labelText)) return "cost";
   return "cost";
@@ -976,9 +976,10 @@ function annualMetricValue(row) {
   }
   if (row.label === "UPPH") {
     const stats = annualStats();
-    return row.scenario === "同期" ? stats.upph25 : row.scenario === "26年" ? stats.upph26 : averageFinite(row.values);
+    const value = row.scenario === "同期" ? stats.upph25 : row.scenario === "26年" ? stats.upph26 : averageFinite(row.values);
+    return Number.isFinite(value) ? value : averageFinite(row.values);
   }
-  if (row.label === "用人") return averageFinite(row.values);
+  if (["用人", "直接员工", "间接员工", "白领"].includes(row.label)) return averageFinite(row.values);
   if (row.label?.includes("累计") || ["€/台", "%"].includes(row.unit)) return lastFinite(row.values);
   return sum(row.values);
 }
@@ -1028,6 +1029,20 @@ function formatKpiRaw(value, unit) {
   return `${formatPlain(value)}${unit}`;
 }
 
+function combinedPeopleRow(scenario) {
+  const direct = state.dashboardRows.find((row) => row.label === "直接员工" && row.scenario === scenario);
+  const indirect = state.dashboardRows.find((row) => row.label === "间接员工" && row.scenario === scenario);
+  if (!direct && !indirect) return null;
+  return {
+    values: Array.from({ length: 12 }, (_, index) => {
+      const left = direct?.values?.[index];
+      const right = indirect?.values?.[index];
+      if (!Number.isFinite(left) && !Number.isFinite(right)) return null;
+      return (Number.isFinite(left) ? left : 0) + (Number.isFinite(right) ? right : 0);
+    })
+  };
+}
+
 function annualStats() {
   const rowBy = (labelText, scenario) => state.dashboardRows.find((row) => row.label === labelText && row.scenario === scenario);
   const amount26 = rowBy("制造费用金额", "26年");
@@ -1036,8 +1051,10 @@ function annualStats() {
   const volume25 = rowBy("产量", "同期");
   const days26 = rowBy("工作日", "26年");
   const days25 = rowBy("工作日", "同期");
-  const people26 = rowBy("用人", "26年");
-  const people25 = rowBy("用人", "同期");
+  const people26 = combinedPeopleRow("26年");
+  const people25 = combinedPeopleRow("同期");
+  const upph26Row = rowBy("UPPH", "26年");
+  const upph25Row = rowBy("UPPH", "同期");
   const output26 = rowBy("产值", "26年");
   const output25 = rowBy("产值", "同期");
   return {
@@ -1049,8 +1066,8 @@ function annualStats() {
     days25: sum(days25?.values || []),
     people26: averageFinite(people26?.values || []),
     people25: averageFinite(people25?.values || []),
-    upph26: annualUpph(volume26?.values || [], people26?.values || [], [], days26?.values || []),
-    upph25: annualUpph(volume25?.values || [], people25?.values || [], [], days25?.values || []),
+    upph26: annualUpph(volume26?.values || [], people26?.values || [], [], days26?.values || []) || averageFinite(upph26Row?.values || []),
+    upph25: annualUpph(volume25?.values || [], people25?.values || [], [], days25?.values || []) || averageFinite(upph25Row?.values || []),
     rate26: annualManufacturingRate(amount26?.values || [], output26?.values || []),
     rate25: annualManufacturingRate(amount25?.values || [], output25?.values || [])
   };
@@ -1067,8 +1084,8 @@ function monthStats() {
     unit25: summary.totalUnit25,
     days26: rowValue("工作日", "26年"),
     days25: rowValue("工作日", "同期"),
-    people26: rowValue("用人", "26年"),
-    people25: rowValue("用人", "同期"),
+    people26: sumFinite(rowValue("直接员工", "26年"), rowValue("间接员工", "26年")),
+    people25: sumFinite(rowValue("直接员工", "同期"), rowValue("间接员工", "同期")),
     upph26: rowValue("UPPH", "26年"),
     upph25: rowValue("UPPH", "同期"),
     rate26: rowValue("制造费率", "26年"),
@@ -2080,6 +2097,11 @@ function formatEditable(value) {
 function valueClass(value) {
   if (!value) return "";
   return value > 0 ? "negative" : "positive";
+}
+
+function sumFinite(...values) {
+  const finite = values.filter(Number.isFinite);
+  return finite.length ? finite.reduce((total, value) => total + value, 0) : null;
 }
 
 function sum(values) {

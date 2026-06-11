@@ -7,6 +7,7 @@ import {
   outputValue
 } from "./metrics.js?v=20260608-metric-groups-v9";
 import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-metric-groups-v9";
+import { getKpiHeadcount } from "./kpi-headcount-data.js?v=20260611-kpi-headcount-v16";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
@@ -69,7 +70,10 @@ const DASHBOARD_TEXT = {
     "累计人均产量": { en: "YTD output per HC", tr: "YTD kişi başı çıktı" },
     "直接用人": { en: "Direct HC", tr: "Direkt kişi" },
     "间接用人": { en: "Indirect HC", tr: "Endirekt kişi" },
-    "固定用人": { en: "White-collar HC", tr: "Beyaz yaka kişi" }
+    "固定用人": { en: "White-collar HC", tr: "Beyaz yaka kişi" },
+    "直接员工": { en: "Direct employees", tr: "Direkt çalışan" },
+    "间接员工": { en: "Indirect employees", tr: "Endirekt çalışan" },
+    "白领": { en: "White collar", tr: "Beyaz yaka" }
     ,"工作日": { en: "Workdays", tr: "İş günü" }
     ,"UPPH": { en: "UPPH", tr: "UPPH" }
     ,"产值": { en: "Output value", tr: "Üretim değeri" }
@@ -237,14 +241,13 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const workdaysSame = preferSeries(jiang?.workdays?.same, OPERATIONAL_BASELINE.workdays.same);
   const workdaysBudget = preferSeries(jiang?.workdays?.budget, OPERATIONAL_BASELINE.workdays.budget);
   const workdaysActual = preferSeries(jiang?.workdays?.actual, OPERATIONAL_BASELINE.workdays.actual);
+  const kpiHeadcount = getKpiHeadcount("DW");
+  const directEmployees26 = normalizeMonths(kpiHeadcount.direct);
+  const indirectEmployees26 = normalizeMonths(kpiHeadcount.indirect);
+  const whiteCollar26 = normalizeMonths(kpiHeadcount.white);
   const hcSame = preferSeries(jiang?.headcount?.same, OPERATIONAL_BASELINE.headcount.same);
   const hcBudget = preferSeries(jiang?.headcount?.budget, forecast.hc?.budgetTotal);
-  const forecastHeadcount = preferSeries(forecast.hc?.actualTotal, OPERATIONAL_BASELINE.headcount.actual);
-  const hcActual = mergeRealizedAndForecast(
-    preferSeries(jiang?.headcount?.actual, OPERATIONAL_BASELINE.headcount.actual),
-    forecastHeadcount,
-    actualMonthCount
-  );
+  const hcActual = combineHeadcount(directEmployees26, indirectEmployees26);
   const upphSame = sameVolume.map((value, index) => monthlyUpph(value, hcSame[index], 0, workdaysSame[index]));
   const upphBudget = budgetVolume.map((value, index) => monthlyUpph(value, hcBudget[index], 0, workdaysBudget[index]));
   const upphActual = actualVolume.map((value, index) => monthlyUpph(value, hcActual[index], 0, workdaysActual[index]));
@@ -268,9 +271,9 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
     metric("时", "工作日", "同期", "天", workdaysSame, "higher"),
     metric("时", "工作日", "预算", "天", workdaysBudget, "higher"),
     metric("时", "工作日", "26年", "天", workdaysActual, "higher", workdaysBudget),
-    metric("人", "用人", "同期", "人", hcSame, "lower"),
-    metric("人", "用人", "预算", "人", hcBudget, "lower"),
-    metric("人", "用人", "26年", "人", hcActual, "lower", hcBudget),
+    metric("人", "直接员工", "26年", "人", directEmployees26, "lower"),
+    metric("人", "间接员工", "26年", "人", indirectEmployees26, "lower"),
+    metric("人", "白领", "26年", "人", whiteCollar26, "lower"),
     metric("单", "产量", "同期", "台", sameVolume, "higher"),
     metric("单", "产量", "预算", "台", budgetVolume, "higher"),
     metric("单", "产量", "26年", "台", actualVolume, "higher", budgetVolume),

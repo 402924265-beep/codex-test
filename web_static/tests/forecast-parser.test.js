@@ -168,6 +168,44 @@ test("UPPH uses realized direct plus indirect headcount for actual months", () =
   const actualUpph = rows.find((row) => row.label === "UPPH" && row.scenario === "26年");
 
   assert.ok(actualUpph);
-  assert.equal(actualUpph.values[3], 40893 / 301 / 21 / 7.5);
+  assert.equal(actualUpph.values[3], 40893 / (164 + 75) / 21 / 7.5);
   assert.ok(actualUpph.values[3] < 2);
+});
+
+test("dashboard exposes DW 2026 4+8 headcount as direct, indirect and white collar", () => {
+  const forecast = {
+    volume: {
+      actual: Array(12).fill(1000),
+      budget: Array(12).fill(1000),
+      std: Array(12).fill(1000)
+    },
+    hc: {},
+    categories: [],
+    totalAll: {
+      amountMonths: Array(12).fill(100),
+      budgetMonths: Array(12).fill(100),
+      unitMonths: Array(12).fill(100)
+    }
+  };
+
+  const rows = buildAnnualDashboardRows(forecast);
+  const direct = rows.find((row) => row.label === "直接员工" && row.scenario === "26年");
+  const indirect = rows.find((row) => row.label === "间接员工" && row.scenario === "26年");
+  const white = rows.find((row) => row.label === "白领" && row.scenario === "26年");
+
+  assert.ok(direct);
+  assert.ok(indirect);
+  assert.ok(white);
+  assert.equal(direct.values[0], 235);
+  assert.equal(direct.values[3], 164);
+  assert.equal(direct.values[4], 247);
+  assert.equal(direct.values[11], 252);
+  assert.equal(indirect.values[0], 85);
+  assert.equal(indirect.values[3], 75);
+  assert.equal(indirect.values[11], 85);
+  assert.equal(white.values[0], 26);
+  assert.equal(white.values[3], 24.67);
+  assert.equal(white.values[4], 26.5);
+  assert.equal(white.values[11], 27.5);
+  assert.equal(rows.some((row) => row.label === "用人"), false);
 });
