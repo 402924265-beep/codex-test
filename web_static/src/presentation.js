@@ -41,6 +41,8 @@ export function buildKpiDefinitions(language = "zh") {
   }));
 }
 
-export function categoryComparisonHeaders(language = "zh") {
-  return [...(CATEGORY_HEADERS[language] || CATEGORY_HEADERS.zh)];
+export function categoryComparisonHeaders(language = "zh", costLabels = null) {
+  const headers = [...(CATEGORY_HEADERS[language] || CATEGORY_HEADERS.zh)];
+  if (costLabels) headers.splice(1, 3, costLabels.same, costLabels.previous, costLabels.current);
+  return headers;
 }

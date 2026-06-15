@@ -1,5 +1,5 @@
 import { loadXlsx } from "./xlsx-loader.js?v=20260608-metric-groups-v9";
-import { analysisReason } from "./workbench.js?v=20260615-mom-variance-v26";
+import { analysisReason } from "./workbench.js?v=20260615-dynamic-month-v28";
 import {
   annualManufacturingRate,
   annualUnitCost,
@@ -168,6 +168,7 @@ function buildVarianceDetailSheet(result, analyses) {
     "环比单台差€/台": round(row.momUnitDiff),
     "同比%": percent(row.unitDiff, row.unit25),
     "环比%": percent(row.momUnitDiff, row.previousUnit26),
+    科目描述: analysisReason(analyses, result.month, row.code, "description"),
     同比差异原因: analysisReason(analyses, result.month, row.code, "yoy"),
     环比差异原因: analysisReason(analyses, result.month, row.code, "mom")
   }));
