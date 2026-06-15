@@ -3,7 +3,7 @@ import {
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
-import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-may-actual-v24";
+import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-total-reconcile-v25";
 import { buildReconciliation } from "./reconcile.js?v=20260612-duplicate-accounts-v23";
 import { exportAnalysisWorkbook } from "./export.js?v=20260612-duplicate-accounts-v23";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
@@ -907,7 +907,7 @@ function renderDashboard() {
       <th colspan="${12 - actualMonthCount}" class="phase-forecast">${escapeHtml(`${actualMonthCount + 1}-12 ${t("forecastMonths")}`)}</th>
       <th class="phase-year">${escapeHtml(t("fullYear"))}</th>
     </tr>
-    <tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < 3 ? `sticky-col sticky-col-${index + 5} ` : ""}${index < actualMonthCount ? "actual-month-head" : "forecast-month-head"}">${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
+    <tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < actualMonthCount ? "actual-month-head" : "forecast-month-head"}">${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
   els.dashboardTableWrap.classList.toggle("collapsed", !state.dashboardTableOpen);
   els.toggleDashboardTable.textContent = t(state.dashboardTableOpen ? "hideDetail" : "showDetail");
   renderMetricFilters();
@@ -945,9 +945,8 @@ function renderDashboard() {
         <td class="sticky-col sticky-col-4">${escapeHtml(localized.unit)}</td>
         ${row.values.map((value, index) => {
           const tooltip = metricTooltip(row, index);
-          const stickyClass = index < 3 ? ` sticky-col sticky-col-${index + 5}` : "";
           const phaseClass = index < actualMonthCount ? " actual-month-cell" : " forecast-month-cell";
-          return `<td class="month-cell ${heatClass(row, index)}${stickyClass}${phaseClass}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
+          return `<td class="month-cell ${heatClass(row, index)}${phaseClass}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
         }).join("")}
         <td class="month-cell full-year-cell" tabindex="0" data-metric-tooltip="${escapeHtml(metricTooltip(row, null))}">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
       </tr>
