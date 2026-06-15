@@ -19,12 +19,10 @@ test("dynamic KPI definitions are fully localized", () => {
 test("monthly category comparison headers are localized", () => {
   assert.deepEqual(categoryComparisonHeaders("en"), [
     "Category",
-    "2025 unit €/pc",
-    "2026 target unit €/pc",
-    "2026 actual unit €/pc",
-    "YoY unit gap €/pc",
-    "YoY %",
-    "Target variance",
-    "YoY variance"
+    "2025 cost K€",
+    "Previous month K€",
+    "Current month K€",
+    "YoY reason",
+    "MoM reason"
   ]);
 });

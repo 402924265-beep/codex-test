@@ -4,8 +4,8 @@ import {
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
 import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-total-reconcile-v25";
-import { buildReconciliation } from "./reconcile.js?v=20260615-mom-variance-v26";
-import { exportAnalysisWorkbook } from "./export.js?v=20260615-mom-variance-v26";
+import { buildReconciliation } from "./reconcile.js?v=20260615-compact-cost-v27";
+import { exportAnalysisWorkbook } from "./export.js?v=20260615-compact-cost-v27";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
 import { createStore } from "./store.js?v=20260612-duplicate-accounts-v23";
 import {
@@ -25,7 +25,7 @@ import {
   buildFactorSummary,
   parseEditableNumber,
   serializeAnalysisReasons
-} from "./workbench.js?v=20260615-mom-variance-v26";
+} from "./workbench.js?v=20260615-compact-cost-v27";
 import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260612-duplicate-accounts-v23";
 import {
   annualManufacturingRate,
@@ -34,12 +34,12 @@ import {
   averageFinite,
   targetCompletionRate
 } from "./metrics.js?v=20260612-duplicate-accounts-v23";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-mom-variance-v26";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-compact-cost-v27";
 import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260612-duplicate-accounts-v23";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 
-const VERSION = "20260615-mom-variance-v26";
+const VERSION = "20260615-compact-cost-v27";
 
 const i18n = {
   zh: {
@@ -63,6 +63,9 @@ const i18n = {
     unitCost26: "26单台制造费",
     actual26: "26实际",
     same25: "25同期",
+    sameCost: "25同期费用 K€",
+    previousCost: "上月费用 K€",
+    currentCost: "本月费用 K€",
     budget26: "26预算",
     previousActual: "上月实际",
     actualVsSame: "实际-同期",
@@ -225,6 +228,9 @@ const i18n = {
     unitCost26: "2026 unit cost",
     actual26: "2026 actual",
     same25: "2025 same period",
+    sameCost: "2025 cost K€",
+    previousCost: "Previous cost K€",
+    currentCost: "Current cost K€",
     budget26: "2026 budget",
     previousActual: "Previous month",
     actualVsSame: "Actual vs same",
@@ -387,6 +393,9 @@ const i18n = {
     unitCost26: "2026 birim maliyet",
     actual26: "2026 gerçekleşen",
     same25: "2025 aynı dönem",
+    sameCost: "2025 gider K€",
+    previousCost: "Önceki ay gider K€",
+    currentCost: "Bu ay gider K€",
     budget26: "2026 bütçe",
     previousActual: "Önceki ay",
     actualVsSame: "Gerçekleşen - dönem",
@@ -1340,6 +1349,11 @@ function totalCategoryDiagnostic(volume) {
   const momUnitDiff = summary.totalMomUnitDiff;
   return {
     category: "总单台",
+    amount25: summary.totalAmount25,
+    previousAmount26: summary.previousTotalAmount26,
+    amount26: summary.totalAmount26,
+    amountDiff: summary.totalAmountDiff,
+    momAmountDiff: summary.totalMomAmountDiff,
     unit25,
     previousUnit26,
     unit26,
@@ -1741,13 +1755,13 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 function renderTable() {
   if (!state.result) {
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
-    els.detailBody.innerHTML = `<tr><td colspan="17" class="empty-cell">${t("emptySap")}</td></tr>`;
+    els.detailBody.innerHTML = `<tr><td colspan="7" class="empty-cell">${t("emptySap")}</td></tr>`;
     return;
   }
   const rows = visibleRows();
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}`;
   els.detailBody.innerHTML =
-    rows.map(rowToHtml).join("") || `<tr><td colspan="17" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
+    rows.map(rowToHtml).join("") || `<tr><td colspan="7" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
     textarea.addEventListener("change", (event) => {
       const key = event.target.dataset.key;
@@ -1873,25 +1887,14 @@ function rowToHtml(row) {
   const majorYoy = Math.abs(row.unitDiff || 0) >= 0.5;
   const majorMom = Math.abs(row.momUnitDiff || 0) >= 0.5;
   const major = majorYoy || majorMom;
-  const yoyRate = Number.isFinite(row.unit25) && row.unit25 !== 0 ? row.unitDiff / row.unit25 : null;
-  const momRate = Number.isFinite(row.previousUnit26) && row.previousUnit26 !== 0 ? row.momUnitDiff / row.previousUnit26 : null;
+  const tooltip = accountCostTooltip(row);
   return `
-    <tr class="${major ? "high" : ""}">
+    <tr class="${major ? "high" : ""} ${row.amountDiff > 0 ? "cost-worse" : row.amountDiff < 0 ? "cost-better" : ""}">
       <td><div class="account-code">${escapeHtml(row.code)}</div><div class="desc">${escapeHtml(row.descEn)}</div></td>
       <td>${escapeHtml(localizeCategory(row.category, state.language))}</td>
-      <td>${formatMoney(row.amount25)}</td>
-      <td>${formatMoney(row.previousAmount26)}</td>
-      <td>${formatMoney(row.amount26)}</td>
-      <td class="${valueClass(row.amountDiff)}">${formatMoney(row.amountDiff)}</td>
-      <td class="${valueClass(row.momAmountDiff)}">${formatMoney(row.momAmountDiff)}</td>
-      <td class="${valueClass(row.manufacturingDiff)}">${formatMoney(row.manufacturingDiff)}</td>
-      <td>${formatUnit(row.unit25)}</td>
-      <td>${formatUnit(row.previousUnit26)}</td>
-      <td>${formatUnit(row.unit26)}</td>
-      <td class="${valueClass(row.unitDiff)}">${formatUnit(row.unitDiff)}</td>
-      <td class="${valueClass(row.momUnitDiff)}">${formatUnit(row.momUnitDiff)}</td>
-      <td class="${valueClass(yoyRate)}">${formatPercent(yoyRate)}</td>
-      <td class="${valueClass(momRate)}">${formatPercent(momRate)}</td>
+      <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount25)}</td>
+      <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.previousAmount26)}</td>
+      <td tabindex="0" class="${valueClass(row.amountDiff)}" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount26)}</td>
       <td><textarea class="${majorYoy ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="yoy" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorYoy ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(yoyAnalysis)}</textarea></td>
       <td><textarea class="${majorMom ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="mom" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorMom ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(momAnalysis)}</textarea></td>
     </tr>
@@ -1915,15 +1918,11 @@ function renderChart() {
         ${headers.map((header) => `<span>${escapeHtml(header)}</span>`).join("")}
       </div>
       ${rows.map((item) => `
-        <button class="category-diagnostic category-comparison-row ${item.unitDiff > 0 ? "bad" : "good"} ${item.isTotal ? "total-row" : ""}" type="button" data-category="${escapeHtml(item.category)}" data-metric-tooltip="${escapeHtml(categoryTooltip(item))}">
+        <button class="category-diagnostic category-comparison-row ${item.amountDiff > 0 ? "bad" : "good"} ${item.isTotal ? "total-row" : ""}" type="button" data-category="${escapeHtml(item.category)}" data-metric-tooltip="${escapeHtml(categoryTooltip(item))}">
           <span>${escapeHtml(localizeCategory(item.category, state.language))}</span>
-          <em>${formatUnit(item.unit25)}</em>
-          <em>${formatUnit(item.previousUnit26)}</em>
-          <strong class="${valueClass(item.unit26 - item.unit25)}">${formatUnit(item.unit26)}</strong>
-          <strong class="${valueClass(item.unitDiff)}">${formatUnit(item.unitDiff)}</strong>
-          <strong class="${valueClass(item.momUnitDiff)}">${formatUnit(item.momUnitDiff)}</strong>
-          <em class="${valueClass(item.yoyRate)}">${formatPercent(item.yoyRate)}</em>
-          <em class="${valueClass(item.momRate)}">${formatPercent(item.momRate)}</em>
+          <em>${formatMoney(item.amount25)}</em>
+          <em>${formatMoney(item.previousAmount26)}</em>
+          <strong class="${valueClass(item.amountDiff)}">${formatMoney(item.amount26)}</strong>
           <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "yoy"))}</em>
           <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "mom"))}</em>
         </button>
@@ -1938,13 +1937,48 @@ function renderChart() {
 }
 
 function categoryTooltip(item) {
-  const optimized = Number.isFinite(item.unitDiff) ? item.unitDiff <= 0 : null;
-  const momOptimized = Number.isFinite(item.momUnitDiff) ? item.momUnitDiff <= 0 : null;
-  return [
+  return costVarianceTooltip(
     `${localizeCategory(item.category, state.language)} · ${state.result?.month || ""}月`,
-    Number.isFinite(item.unitDiff) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.unitDiff))} €/台${formatYoyPercent(item.unitDiff, item.unit25)}</span>` : "",
-    Number.isFinite(item.momUnitDiff) ? `<span class="${momOptimized ? "tooltip-good" : "tooltip-bad"}">${t("momVarianceAnalysis")} · ${t(momOptimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.momUnitDiff))} €/台${formatYoyPercent(item.momUnitDiff, item.previousUnit26)}</span>` : ""
+    item
+  );
+}
+
+function accountCostTooltip(row) {
+  return costVarianceTooltip(`${row.code} ${row.descEn}`, row);
+}
+
+function costVarianceTooltip(title, item) {
+  const amountYoyRate = ratioNullable(item.amountDiff, item.amount25);
+  const amountMomRate = ratioNullable(item.momAmountDiff, item.previousAmount26);
+  const unitYoyRate = ratioNullable(item.unitDiff, item.unit25);
+  const unitMomRate = ratioNullable(item.momUnitDiff, item.previousUnit26);
+  return [
+    title,
+    `费用：同期 ${formatMoney(item.amount25)} K€ · 上月 ${formatMoney(item.previousAmount26)} K€ · 本月 ${formatMoney(item.amount26)} K€`,
+    varianceTooltipLine("费用同比", item.amountDiff, "K€", amountYoyRate),
+    varianceTooltipLine("费用环比", item.momAmountDiff, "K€", amountMomRate),
+    `单台：同期 ${formatUnit(item.unit25)} €/台 · 上月 ${formatUnit(item.previousUnit26)} €/台 · 本月 ${formatUnit(item.unit26)} €/台`,
+    varianceTooltipLine("单台同比", item.unitDiff, "€/台", unitYoyRate),
+    varianceTooltipLine("单台环比", item.momUnitDiff, "€/台", unitMomRate),
+    Number.isFinite(item.manufacturingDiff)
+      ? `<span class="${item.manufacturingDiff <= 0 ? "tooltip-good" : "tooltip-bad"}">制造费差额：${formatMoney(item.manufacturingDiff)} K€</span>`
+      : ""
   ].filter(Boolean).join("\n");
+}
+
+function varianceTooltipLine(label, value, unit, rate) {
+  if (!Number.isFinite(value)) return "";
+  const good = value <= 0;
+  return `<span class="${good ? "tooltip-good" : "tooltip-bad"}">${label}：${formatSigned(value, unit)}${Number.isFinite(rate) ? `（${formatPercent(Math.abs(rate))}）` : ""} · ${t(good ? "better" : "worse")}</span>`;
+}
+
+function formatSigned(value, unit) {
+  const formatted = unit === "K€" ? formatMoney(Math.abs(value)) : formatUnit(Math.abs(value));
+  return `${value > 0 ? "+" : value < 0 ? "-" : ""}${formatted} ${unit}`;
+}
+
+function ratioNullable(value, base) {
+  return Number.isFinite(value) && Number.isFinite(base) && base !== 0 ? value / base : null;
 }
 
 function handleChartClick(event) {

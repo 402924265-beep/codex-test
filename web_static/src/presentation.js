@@ -26,9 +26,9 @@ const KPI_COPY = {
 };
 
 const CATEGORY_HEADERS = {
-  zh: ["大科目", "25同期单台 €/台", "上月单台 €/台", "26实际单台 €/台", "同比单台差 €/台", "环比单台差 €/台", "同比%", "环比%", "同比差异原因", "环比差异原因"],
-  en: ["Category", "2025 unit €/pc", "Previous month €/pc", "2026 actual €/pc", "YoY unit gap €/pc", "MoM unit gap €/pc", "YoY %", "MoM %", "YoY reason", "MoM reason"],
-  tr: ["Kategori", "2025 birim €/adet", "Önceki ay €/adet", "2026 gerçekleşen €/adet", "Yıllık birim farkı €/adet", "Aylık birim farkı €/adet", "Yıllık %", "Aylık %", "Yıllık neden", "Aylık neden"]
+  zh: ["大科目", "25同期费用 K€", "上月费用 K€", "本月费用 K€", "同比差异原因", "环比差异原因"],
+  en: ["Category", "2025 cost K€", "Previous month K€", "Current month K€", "YoY reason", "MoM reason"],
+  tr: ["Kategori", "2025 gider K€", "Önceki ay K€", "Bu ay K€", "Yıllık neden", "Aylık neden"]
 };
 
 export function buildKpiDefinitions(language = "zh") {
