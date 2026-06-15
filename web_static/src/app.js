@@ -4,7 +4,7 @@ import {
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
 import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-total-reconcile-v25";
-import { buildReconciliation } from "./reconcile.js?v=20260615-dynamic-month-v28";
+import { buildReconciliation } from "./reconcile.js?v=20260615-category-collapse-v29";
 import { exportAnalysisWorkbook } from "./export.js?v=20260615-dynamic-month-v28";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
 import { createStore } from "./store.js?v=20260612-duplicate-accounts-v23";
@@ -39,7 +39,7 @@ import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=2026061
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 
-const VERSION = "20260615-dynamic-month-v28";
+const VERSION = "20260615-category-collapse-v29";
 
 const i18n = {
   zh: {
@@ -969,6 +969,7 @@ function accountForecastActualForMonth(month) {
   return {
     month,
     volume: source.volume,
+    isForecast: true,
     accounts: source.accounts || []
   };
 }
@@ -1821,7 +1822,8 @@ function renderTable() {
     return;
   }
   const rows = visibleRows();
-  els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}`;
+  const collapsedCount = state.result.unsplitCategories?.length || 0;
+  els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedCount ? ` · ${collapsedCount}个大科目按汇总比较` : ""}`;
   els.detailBody.innerHTML =
     rows.map(rowToHtml).join("") || `<tr><td colspan="8" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
@@ -1954,7 +1956,7 @@ function rowToHtml(row) {
   const tooltip = accountCostTooltip(row);
   return `
     <tr class="${major ? "high" : ""} ${row.amountDiff > 0 ? "cost-worse" : row.amountDiff < 0 ? "cost-better" : ""}">
-      <td><div class="account-code">${escapeHtml(row.code)}</div><div class="desc">${escapeHtml(row.descEn)}</div></td>
+      <td><div class="account-code">${escapeHtml(row.isCategorySummary ? `${localizeCategory(row.category, state.language)}（大科目汇总）` : row.code)}</div><div class="desc">${escapeHtml(row.isCategorySummary ? "4+8预测未拆分到小科目" : row.descEn)}</div></td>
       <td>${escapeHtml(localizeCategory(row.category, state.language))}</td>
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount25)}</td>
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.previousAmount26)}</td>

@@ -684,6 +684,10 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .dashboard-table-wrap { max-height: 70vh; }
 .table-wrap { max-height: calc(100vh - 430px); min-height: 360px; }
+#varianceView .table-wrap {
+  max-height: none;
+  min-height: 68vh;
+}
 #varianceView .table-wrap table { min-width: 1340px; }
 #varianceView .table-wrap th:nth-child(1) { width: 250px; }
 #varianceView .table-wrap th:nth-child(2) { width: 150px; }
@@ -969,7 +973,7 @@ td:nth-child(2) { text-align: left; }
 .category-diagnostics {
   display: grid;
   gap: 8px;
-  max-height: 72vh;
+  max-height: 360px;
   padding: 12px;
   overflow: auto;
 }

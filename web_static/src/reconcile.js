@@ -39,6 +39,10 @@ export function buildReconciliation({
   const previousByCode = groupActualAccounts(previousActual26?.accounts || [], previousActual26?.volume);
   const hasPreviousActual = Boolean(previousActual26 && ((previousActual26.accounts || []).length || previousActual26.volume));
   const budgetByCode = groupBudgetAccounts(budgetAccounts.map(normalizeBudgetAccount));
+  const unsplitCategories = actual26.isForecast
+    ? detectUnsplitAccountCategories(actual26.accounts || [])
+    : [];
+  const unsplitCategorySet = new Set(unsplitCategories);
   const codes = [...new Set([...baselineByCode.keys(), ...actualByCode.keys(), ...previousByCode.keys(), ...budgetByCode.keys()])].sort((a, b) =>
     a.localeCompare(b, "zh-Hans-CN", { numeric: true })
   );
@@ -64,6 +68,7 @@ export function buildReconciliation({
     const momUnitDiff = hasPreviousActual ? diffWithMissingZero(unit26, previousUnit26) : null;
     const momManufacturingDiff = momUnitDiff === null || !actual26.volume ? null : (momUnitDiff * actual26.volume) / 1000;
     const status = rowStatus(base, actual);
+    const accountComparisonAvailable = !unsplitCategorySet.has(category);
     return {
       code,
       descEn: actual?.descEn || base?.descEn || previous?.descEn || budget?.descEn || "",
@@ -87,10 +92,11 @@ export function buildReconciliation({
       status,
       statusLabel: statusLabel(status),
       sourceRows26: actual?.sourceRows || [],
-      isHighImpact: Math.abs(manufacturingDiff || 0) >= HIGH_AMOUNT_DIFF
+      accountComparisonAvailable,
+      isHighImpact: accountComparisonAvailable && (Math.abs(manufacturingDiff || 0) >= HIGH_AMOUNT_DIFF
         || Math.abs(unitDiff || 0) >= HIGH_UNIT_DIFF
         || Math.abs(momManufacturingDiff || 0) >= HIGH_AMOUNT_DIFF
-        || Math.abs(momUnitDiff || 0) >= HIGH_UNIT_DIFF,
+        || Math.abs(momUnitDiff || 0) >= HIGH_UNIT_DIFF),
       analysis: ""
     };
   });
@@ -98,18 +104,71 @@ export function buildReconciliation({
   const categories = summarizeCategories(rows, actual26.summaryCategories || [], budget26, forecast4plus8, categoryOrder, hasPreviousActual);
   const summary = buildSummary(rows, actual26.volume, baseline25?.volume, budget26?.volume, previousActual26?.volume, forecast4plus8);
   const referenceChecks = summarizeForHiddenReference(actual26.summaryCategories || [], forecast4plus8, month, summary.totalAmount26);
+  const comparisonRows = collapseUnsplitForecastRows(rows, categories, unsplitCategorySet, actual26.volume);
 
   return {
     month,
     volume25: baseline25?.volume ?? null,
     volume26: actual26.volume,
     previousVolume26: previousActual26?.volume ?? null,
-    rows,
+    rows: comparisonRows,
+    sourceRows: rows,
     categories,
+    unsplitCategories,
     summary,
     referenceChecks,
     narrative
   };
+}
+
+export function detectUnsplitAccountCategories(accounts) {
+  const grouped = new Map();
+  for (const row of accounts || []) {
+    const category = categoryForAccount(row);
+    const current = grouped.get(category) || { count: 0, nonzero: 0 };
+    current.count += 1;
+    if (Math.abs(Number(row.amount) || 0) > 0.0001) current.nonzero += 1;
+    grouped.set(category, current);
+  }
+  return [...grouped.entries()]
+    .filter(([, stats]) => stats.count > 1 && stats.nonzero <= 1)
+    .map(([category]) => category);
+}
+
+function collapseUnsplitForecastRows(rows, categories, unsplitCategorySet, volume26) {
+  if (!unsplitCategorySet.size) return rows;
+  const detailRows = rows.filter((row) => !unsplitCategorySet.has(row.category));
+  const categoryRows = categories
+    .filter((item) => unsplitCategorySet.has(item.category))
+    .map((item) => ({
+      code: `CATEGORY::${item.category}`,
+      descEn: "4+8 forecast is available at category level only",
+      category: item.category,
+      amount25: item.amount25,
+      previousAmount26: item.previousAmount26,
+      amount26: item.amount26,
+      amountDiff: item.amountDiff,
+      momAmountDiff: item.momAmountDiff,
+      manufacturingDiff: item.manufacturingDiff,
+      momManufacturingDiff: Number.isFinite(item.momUnitDiff) && volume26 ? item.momUnitDiff * volume26 / 1000 : null,
+      unit25: item.unit25,
+      previousUnit26: item.previousUnit26,
+      unit26: item.unit26,
+      unitDiff: item.unitDiff,
+      momUnitDiff: item.momUnitDiff,
+      status: "category_only",
+      statusLabel: "4+8未拆分到小科目",
+      sourceRows26: [],
+      accountComparisonAvailable: false,
+      isCategorySummary: true,
+      isHighImpact: Math.abs(item.manufacturingDiff || 0) >= HIGH_AMOUNT_DIFF
+        || Math.abs(item.unitDiff || 0) >= HIGH_UNIT_DIFF
+        || Math.abs(item.momUnitDiff || 0) >= HIGH_UNIT_DIFF,
+      analysis: ""
+    }));
+  return [...detailRows, ...categoryRows].sort((a, b) =>
+    a.code.localeCompare(b.code, "zh-Hans-CN", { numeric: true })
+  );
 }
 
 export function categoryForAccount(account) {
@@ -163,6 +222,7 @@ function summarizeCategories(rows, summaryCategories, budget26, forecast4plus8, 
     current.previousAmount26 += row.previousAmount26 || 0;
     current.amountBudget += row.amountBudget || 0;
     current.manufacturingDiff += row.manufacturingDiff || 0;
+    current.momManufacturingDiff += row.momManufacturingDiff || 0;
     current.unit25 += row.unit25 || 0;
     current.unit26 += row.unit26 || 0;
     current.previousUnit26 += row.previousUnit26 || 0;
@@ -256,6 +316,7 @@ function emptyCategory(category) {
     momAmountDiff: 0,
     budgetDiff: 0,
     manufacturingDiff: 0,
+    momManufacturingDiff: 0,
     unit25: 0,
     unit26: 0,
     previousUnit26: 0,
