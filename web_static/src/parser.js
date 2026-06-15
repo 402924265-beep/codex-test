@@ -163,7 +163,7 @@ export function extractActualFromWorkbook(workbook, month, xlsx) {
   const sapSheetName = findSheetName(workbook, ["SAP_ACT_EUR", "SAP Actual extraction"]);
   if (sapSheetName) return extractSapActualFromWorkbook(workbook, month, xlsx);
 
-  const rentaSheetName = findSheetName(workbook, ["Renta DW _2026", "Renta DW_2026", "Renta DW"]);
+  const rentaSheetName = findSheetName(workbook, ["4+8 DW 2026", "Renta DW _2026", "Renta DW_2026", "Renta DW"]);
   if (rentaSheetName) {
     const rows = xlsx.utils.sheet_to_json(workbook.Sheets[rentaSheetName], { header: 1, raw: true, defval: null });
     return {
@@ -223,6 +223,7 @@ export function detectRentaMonthColumns(rows, month) {
 export function extractRentaActualFromRows(rows, { month }) {
   const { headerRow, valueCol, cpuCol } = detectRentaMonthColumns(rows, month);
   const volume = detectRentaVolume(rows, valueCol);
+  const reportedTotal = findRentaReportedTotal(rows, headerRow, valueCol);
   const accountMap = new Map();
   const summaryMap = new Map();
 
@@ -266,11 +267,32 @@ export function extractRentaActualFromRows(rows, { month }) {
     }
   }
 
+  const detailTotal = [...accountMap.values()].reduce((total, item) => total + (item.amount || 0), 0);
+  const totalAdjustment = reportedTotal.amount === null ? 0 : reportedTotal.amount - detailTotal;
+  if (reportedTotal.amount !== null && Math.abs(totalAdjustment) > 0.000001) {
+    const code = "REPORT_TOTAL_ADJUSTMENT";
+    accountMap.set(code, {
+      code,
+      descEn: "Report TOTAL reconciliation adjustment",
+      category: "报表TOTAL校准",
+      summaryKey: "REPORT_TOTAL_ADJUSTMENT",
+      amount: totalAdjustment,
+      unit: volume ? (totalAdjustment / volume) * 1000 : null,
+      volume,
+      duplicateCount: 1,
+      sourceRows: [reportedTotal.rowNumber]
+    });
+  }
+
   return {
     month,
     volume,
     valueCol,
     cpuCol,
+    reportedTotal: reportedTotal.amount,
+    reportedTotalRow: reportedTotal.rowNumber,
+    detailTotal,
+    totalAdjustment,
     accounts: [...accountMap.values()].sort((a, b) => a.code.localeCompare(b.code, "zh-Hans-CN", { numeric: true })),
     summaryCategories: [...summaryMap.values()],
     sourceRows: [...accountMap.values()].flatMap((item) => item.sourceRows)
@@ -313,6 +335,17 @@ function detectRentaVolume(rows, valueCol) {
     }
   }
   return null;
+}
+
+function findRentaReportedTotal(rows, headerRow, valueCol) {
+  for (let rowIndex = rows.length - 1; rowIndex > headerRow; rowIndex -= 1) {
+    const row = rows[rowIndex] || [];
+    const isTotal = row.some((cell) => cellText(cell).trim().toUpperCase() === "TOTAL");
+    if (!isTotal) continue;
+    const amount = normalizeNumber(row[valueCol]);
+    if (amount !== null) return { amount, rowNumber: rowIndex + 1 };
+  }
+  return { amount: null, rowNumber: null };
 }
 
 function findRentaCpuColumn(row, valueCol, tokens) {

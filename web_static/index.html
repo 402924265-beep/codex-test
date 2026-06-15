@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260615-may-actual-v24" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260615-total-reconcile-v25" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,7 +20,7 @@
         language: "zh"
       };
     </script>
-    <script type="module" src="./src/app.js?v=20260615-may-actual-v24"></script>
+    <script type="module" src="./src/app.js?v=20260615-total-reconcile-v25"></script>
   </head>
   <body>
     <header class="app-header">
@@ -112,9 +112,16 @@
               <div id="metricFilterBar" class="metric-filter-bar"></div>
               <div class="dashboard-table-wrap" id="dashboardTableWrap">
                 <table class="dashboard-table">
+                  <colgroup>
+                    <col class="dashboard-col-group" />
+                    <col class="dashboard-col-indicator" />
+                    <col class="dashboard-col-scenario" />
+                    <col class="dashboard-col-unit" />
+                    <col class="dashboard-col-month" span="13" />
+                  </colgroup>
                   <thead id="dashboardHead"></thead>
                   <tbody id="dashboardBody">
-                    <tr><td colspan="16" class="empty-cell">导入4+8预测文件后显示1-12月全年驾驶舱</td></tr>
+                    <tr><td colspan="17" class="empty-cell">导入预测表文件后显示1-12月全年驾驶舱</td></tr>
                   </tbody>
                 </table>
               </div>
