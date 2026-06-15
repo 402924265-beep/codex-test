@@ -2,6 +2,37 @@ export function analysisKey(month, code) {
   return `${month}:${code}`;
 }
 
+export function analysisReasons(value) {
+  if (value && typeof value === "object") {
+    return {
+      yoy: String(value.yoy || ""),
+      mom: String(value.mom || "")
+    };
+  }
+  const text = String(value || "");
+  if (!text.trim()) return { yoy: "", mom: "" };
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === "object") {
+      return {
+        yoy: String(parsed.yoy || ""),
+        mom: String(parsed.mom || "")
+      };
+    }
+  } catch {
+    // Legacy records stored a single text value; keep it as the YoY reason.
+  }
+  return { yoy: text, mom: "" };
+}
+
+export function analysisReason(analyses, month, code, mode = "yoy") {
+  return analysisReasons(analyses?.[analysisKey(month, code)] ?? analyses?.[code])[mode] || "";
+}
+
+export function serializeAnalysisReasons(value) {
+  return JSON.stringify(analysisReasons(value));
+}
+
 export function parseEditableNumber(value) {
   const parsed = Number(String(value ?? "").replace(/,/g, "").trim());
   return Number.isFinite(parsed) ? parsed : 0;
@@ -45,25 +76,34 @@ export function buildFactorSummary(items, month = 4) {
 export function buildAutoSummary(result, analyses, _factorSummary, forecastSnapshot = null) {
   if (!result) return "导入 SAP 报表后生成本月总结。";
   const totalUnit = result.summary.totalUnitDiff;
+  const totalMomUnit = result.summary.totalMomUnitDiff;
   const manufacturingDiff = result.summary.manufacturingDiff;
   const direction = totalUnit <= 0 ? "下降" : "上升";
   const quality = totalUnit <= 0 ? "优化" : "恶化";
-  const reasonLines = result.rows
+  const momDirection = totalMomUnit <= 0 ? "下降" : "上升";
+  const momQuality = totalMomUnit <= 0 ? "优化" : "恶化";
+  const reasonLines = (mode) => result.rows
     .map((row) => ({
       row,
-      reason: (analyses?.[analysisKey(result.month, row.code)] || analyses?.[row.code] || "").trim()
+      reason: analysisReason(analyses, result.month, row.code, mode).trim()
     }))
     .filter((item) => item.reason)
-    .sort((a, b) => Math.abs(b.row.manufacturingDiff || b.row.unitDiff || 0) - Math.abs(a.row.manufacturingDiff || a.row.unitDiff || 0))
+    .sort((a, b) => {
+      const key = mode === "mom" ? "momUnitDiff" : "unitDiff";
+      return Math.abs(b.row[key] || 0) - Math.abs(a.row[key] || 0);
+    })
     .slice(0, 8)
     .map(({ row, reason }, index) => `${index + 1}. ${row.code} ${row.descEn}: ${reason}`);
+  const yoyReasons = reasonLines("yoy");
+  const momReasons = reasonLines("mom");
   const forecastLine = forecastSnapshot?.unitCost
     ? `4+8预测口径：本月单台 ${formatNumber(forecastSnapshot.unitCost)} 欧/台，金额 ${formatKeur(forecastSnapshot.amount)}。`
     : "";
   return [
-    `总结：${result.month}月洗碗机单台制造费同比${direction}${Math.abs(totalUnit || 0).toFixed(2)}欧，表现为${quality}；制造费差额 ${formatKeur(manufacturingDiff)}。`,
+    `总结：${result.month}月洗碗机单台制造费同比${direction}${Math.abs(totalUnit || 0).toFixed(2)}欧，表现为${quality}；环比${momDirection}${Math.abs(totalMomUnit || 0).toFixed(2)}欧，表现为${momQuality}；同比制造费差额 ${formatKeur(manufacturingDiff)}。`,
     forecastLine,
-    reasonLines.length ? `重点科目原因：\n${reasonLines.join("\n")}` : "重点科目原因：暂无需要解释的科目。"
+    yoyReasons.length ? `同比重点原因：\n${yoyReasons.join("\n")}` : "同比重点原因：暂无。",
+    momReasons.length ? `环比重点原因：\n${momReasons.join("\n")}` : "环比重点原因：暂无。"
   ].filter(Boolean).join("\n");
 }
 

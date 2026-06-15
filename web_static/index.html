@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260615-total-reconcile-v25" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260615-mom-variance-v26" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,7 +20,7 @@
         language: "zh"
       };
     </script>
-    <script type="module" src="./src/app.js?v=20260615-total-reconcile-v25"></script>
+    <script type="module" src="./src/app.js?v=20260615-mom-variance-v26"></script>
   </head>
   <body>
     <header class="app-header">
@@ -205,8 +205,10 @@
             <div class="field">
               <label for="sortBy" data-i18n="sort">排序</label>
               <select id="sortBy">
-                <option value="unit" data-i18n-option="sortUnit">按单台差异</option>
-                <option value="amount" data-i18n-option="sortAmount">按额差异</option>
+                <option value="unit" data-i18n-option="sortUnit">按同比单台差异</option>
+                <option value="momUnit" data-i18n-option="sortMomUnit">按环比单台差异</option>
+                <option value="amount" data-i18n-option="sortAmount">按同比额差异</option>
+                <option value="momAmount" data-i18n-option="sortMomAmount">按环比额差异</option>
                 <option value="code" data-i18n-option="sortCode">按账户编码</option>
               </select>
             </div>
@@ -218,20 +220,24 @@
                   <th data-i18n="account">账户</th>
                   <th data-i18n="category">大科目</th>
                   <th data-i18n="same25">25同期</th>
-                  <th data-i18n="budget26">26预算</th>
+                  <th data-i18n="previousActual">上月实际</th>
                   <th data-i18n="actual26">26实际</th>
                   <th data-i18n="actualVsSame">实际-同期</th>
+                  <th data-i18n="actualVsPrevious">实际-上月</th>
                   <th data-i18n="manufacturingDiff">制造费差额</th>
                   <th data-i18n="unit25">25单台</th>
+                  <th data-i18n="previousUnit">上月单台</th>
                   <th data-i18n="unit26">26单台</th>
-                  <th data-i18n="unitDiff">单台差异</th>
+                  <th data-i18n="unitDiff">同比单台差</th>
+                  <th data-i18n="momUnitDiff">环比单台差</th>
                   <th data-i18n="yoyPercent">同比%</th>
-                  <th data-i18n="targetVarianceAnalysis">目标差异分析</th>
+                  <th data-i18n="momPercent">环比%</th>
                   <th data-i18n="yoyVarianceAnalysis">同比差异分析</th>
+                  <th data-i18n="momVarianceAnalysis">环比差异分析</th>
                 </tr>
               </thead>
               <tbody id="detailBody">
-                <tr><td colspan="13" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
+                <tr><td colspan="17" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
               </tbody>
             </table>
           </div>
