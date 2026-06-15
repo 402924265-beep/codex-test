@@ -1,5 +1,5 @@
 import { loadXlsx } from "./xlsx-loader.js?v=20260608-metric-groups-v9";
-import { analysisKey } from "./workbench.js?v=20260608-metric-groups-v9";
+import { analysisReason } from "./workbench.js?v=20260615-mom-variance-v26";
 import {
   annualManufacturingRate,
   annualUnitCost,
@@ -76,27 +76,28 @@ function buildCostDataSheet(rows, forecast) {
 }
 
 function buildMonthlyMetricSheet(result) {
-  if (!result) return [{ 指标: "说明", 同期: "待导入SAP实际报表", 目标预算: "", 实际: "", 差异: "", 幅度: "" }];
+  if (!result) return [{ 指标: "说明", 同期: "待导入SAP实际报表", 上月实际: "", 本月实际: "", 同比差异: "", 环比差异: "" }];
   const summary = result.summary || {};
   return [
-    metricRow("定单量（累计）", result.volume25, result.volumeBudget, result.volume26, result.volume26 - result.volume25, "台"),
-    metricRow("费用金额", summary.totalAmount25, summary.totalAmountBudget, summary.totalAmount26, summary.totalAmountDiff, "K€"),
-    metricRow("单台制造费", summary.totalUnit25, summary.totalUnitBudget, summary.totalUnit26, summary.totalUnitDiff, "€/台"),
-    metricRow("制造费差额", "", "", summary.manufacturingDiff, summary.manufacturingDiff, "K€"),
-    metricRow("待确认公式：UPPH", "", "", "", "", "台/时"),
-    metricRow("直接员工 / 间接员工 / 白领见洗碗机成本数据", "", "", "", "", "人")
+    metricRow("定单量（累计）", result.volume25, result.previousVolume26, result.volume26, diff(result.volume26, result.volume25), diff(result.volume26, result.previousVolume26), "台"),
+    metricRow("费用金额", summary.totalAmount25, summary.previousTotalAmount26, summary.totalAmount26, summary.totalAmountDiff, summary.totalMomAmountDiff, "K€"),
+    metricRow("单台制造费", summary.totalUnit25, summary.previousTotalUnit26, summary.totalUnit26, summary.totalUnitDiff, summary.totalMomUnitDiff, "€/台"),
+    metricRow("制造费差额", "", "", summary.manufacturingDiff, summary.manufacturingDiff, summary.momManufacturingDiff, "K€"),
+    metricRow("待确认公式：UPPH", "", "", "", "", "", "台/时"),
+    metricRow("直接员工 / 间接员工 / 白领见洗碗机成本数据", "", "", "", "", "", "人")
   ];
 }
 
-function metricRow(name, same, budget, actual, diff, unit) {
-  const width = Number.isFinite(same) && Number.isFinite(actual) && same !== 0 ? diff / same : null;
+function metricRow(name, same, previous, actual, yoyDiff, momDiff, unit) {
   return {
     指标: name,
     同期: round(same),
-    目标预算: round(budget),
-    实际: round(actual),
-    差异: round(diff),
-    幅度: width === null ? "" : `${round(width * 100)}%`,
+    上月实际: round(previous),
+    本月实际: round(actual),
+    同比差异: round(yoyDiff),
+    环比差异: round(momDiff),
+    同比幅度: percent(yoyDiff, same),
+    环比幅度: percent(momDiff, previous),
     单位: unit
   };
 }
@@ -106,7 +107,7 @@ function buildVarianceDetailSheet(result, analyses) {
   const summary = result.summary || {};
   const reasonSummary = (result.rows || [])
     .map((row) => {
-      const reason = analyses[analysisKey(result.month, row.code)] || analyses[row.code] || "";
+      const reason = analysisReason(analyses, result.month, row.code, "yoy");
       return reason.trim() ? `${row.code} ${reason.trim()}` : "";
     })
     .filter(Boolean)
@@ -118,24 +119,36 @@ function buildVarianceDetailSheet(result, analyses) {
       英文描述: `${result.month}月洗碗机单台制造费同比${formatTrend(summary.totalUnitDiff)}${absText(summary.totalUnitDiff)}欧；制造费差额${round(summary.manufacturingDiff)} K€`,
       大科目: "",
       "25同期K€": round(summary.totalAmount25),
-      "26预算K€": round(summary.totalAmountBudget),
+      "上月实际K€": round(summary.previousTotalAmount26),
       "26实际K€": round(summary.totalAmount26),
       "实际-同期K€": round(summary.totalAmountDiff),
-      "单台差异€/台": round(summary.totalUnitDiff),
-      差异分析: reasonSummary || "待在下方小科目填写差异原因"
+      "实际-上月K€": round(summary.totalMomAmountDiff),
+      "同比单台差€/台": round(summary.totalUnitDiff),
+      "环比单台差€/台": round(summary.totalMomUnitDiff),
+      同比差异原因: reasonSummary || "待在下方小科目填写同比原因",
+      环比差异原因: (result.rows || [])
+        .map((row) => {
+          const reason = analysisReason(analyses, result.month, row.code, "mom").trim();
+          return reason ? `${row.code} ${reason}` : "";
+        })
+        .filter(Boolean)
+        .join("；") || "待在下方小科目填写环比原因"
     }
   ];
-  const categoryRows = (result.summaryCategories || []).map((item) => ({
+  const categoryRows = (result.categories || result.summaryCategories || []).map((item) => ({
     类型: "大科目汇总",
     账户编码: "",
     英文描述: "",
-    大科目: item.label,
+    大科目: item.category || item.label,
     "25同期K€": round(item.amount25),
-    "26预算K€": round(item.amountBudget),
+    "上月实际K€": round(item.previousAmount26),
     "26实际K€": round(item.amount26),
     "实际-同期K€": round(item.amountDiff),
-    "单台差异€/台": "",
-    差异分析: ""
+    "实际-上月K€": round(item.momAmountDiff),
+    "同比单台差€/台": round(item.unitDiff),
+    "环比单台差€/台": round(item.momUnitDiff),
+    同比差异原因: "",
+    环比差异原因: ""
   }));
   const accountRows = (result.rows || []).map((row) => ({
     类型: Math.abs(row.unitDiff || 0) >= 0.5 ? "重点科目" : "普通科目",
@@ -143,16 +156,20 @@ function buildVarianceDetailSheet(result, analyses) {
     英文描述: row.descEn,
     大科目: row.category,
     "25同期K€": round(row.amount25),
-    "26预算K€": round(row.amountBudget),
+    "上月实际K€": round(row.previousAmount26),
     "26实际K€": round(row.amount26),
     "实际-同期K€": round(row.amountDiff),
-    "实际-预算K€": round(row.budgetDiff),
+    "实际-上月K€": round(row.momAmountDiff),
     "制造费差额K€": round(row.manufacturingDiff),
     "25单台€/台": round(row.unit25),
-    "26预算单台€/台": round(row.unitBudget),
+    "上月单台€/台": round(row.previousUnit26),
     "26单台€/台": round(row.unit26),
-    "单台差异€/台": round(row.unitDiff),
-    差异分析: analyses[analysisKey(result.month, row.code)] || analyses[row.code] || ""
+    "同比单台差€/台": round(row.unitDiff),
+    "环比单台差€/台": round(row.momUnitDiff),
+    "同比%": percent(row.unitDiff, row.unit25),
+    "环比%": percent(row.momUnitDiff, row.previousUnit26),
+    同比差异原因: analysisReason(analyses, result.month, row.code, "yoy"),
+    环比差异原因: analysisReason(analyses, result.month, row.code, "mom")
   }));
   return [...summaryRows, ...categoryRows, ...accountRows];
 }
@@ -216,8 +233,8 @@ function buildFormulaSheet(forecast, result) {
   return [
     { 项目: "26年滚动预测", 说明: forecast?.source || "由用户导入4+8/5+7预测表，已发生月份为实际，后续月份为预测。" },
     { 项目: "25同期", 说明: "取自2025 monthly Renta DW _ DEC_ACT.xlsx，覆盖1-12月同期。" },
-    { 项目: "预算/目标", 说明: "取预算表或预测表内预算口径，作为目标展示，不计算预算差异。" },
     { 项目: "同比差异", 说明: "26年滚动预测或SAP实际 - 25同期。" },
+    { 项目: "环比差异", 说明: "本月SAP实际或滚动预测 - 上月实际或滚动预测。" },
     { 项目: "制造费差额", 说明: "单台差 × 26年产量 / 1000，单位K€。" },
     { 项目: "折旧", 说明: "折旧包含建筑折旧、模具折旧、FC等；FC不单列，不重复加。" },
     { 项目: "月度SAP", 说明: result ? `${result.month}月SAP实际已导入。` : "尚未导入SAP实际。" }
@@ -226,6 +243,14 @@ function buildFormulaSheet(forecast, result) {
 
 function round(value) {
   return value === null || value === undefined || Number.isNaN(Number(value)) || value === "" ? "" : Math.round(Number(value) * 100000) / 100000;
+}
+
+function diff(left, right) {
+  return Number.isFinite(left) && Number.isFinite(right) ? left - right : null;
+}
+
+function percent(value, base) {
+  return Number.isFinite(value) && Number.isFinite(base) && base !== 0 ? `${round(value / base * 100)}%` : "";
 }
 
 function annualValue(row, rows) {

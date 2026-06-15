@@ -4,8 +4,8 @@ import {
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
 import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-total-reconcile-v25";
-import { buildReconciliation } from "./reconcile.js?v=20260612-duplicate-accounts-v23";
-import { exportAnalysisWorkbook } from "./export.js?v=20260612-duplicate-accounts-v23";
+import { buildReconciliation } from "./reconcile.js?v=20260615-mom-variance-v26";
+import { exportAnalysisWorkbook } from "./export.js?v=20260615-mom-variance-v26";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
 import { createStore } from "./store.js?v=20260612-duplicate-accounts-v23";
 import {
@@ -19,10 +19,13 @@ import {
 } from "./forecast-parser.js?v=20260612-duplicate-accounts-v23";
 import {
   analysisKey,
+  analysisReason,
+  analysisReasons,
   buildAutoSummary,
   buildFactorSummary,
-  parseEditableNumber
-} from "./workbench.js?v=20260612-duplicate-accounts-v23";
+  parseEditableNumber,
+  serializeAnalysisReasons
+} from "./workbench.js?v=20260615-mom-variance-v26";
 import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260612-duplicate-accounts-v23";
 import {
   annualManufacturingRate,
@@ -31,12 +34,12 @@ import {
   averageFinite,
   targetCompletionRate
 } from "./metrics.js?v=20260612-duplicate-accounts-v23";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260612-duplicate-accounts-v23";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-mom-variance-v26";
 import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260612-duplicate-accounts-v23";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 
-const VERSION = "20260612-duplicate-accounts-v23";
+const VERSION = "20260615-mom-variance-v26";
 
 const i18n = {
   zh: {
@@ -61,8 +64,11 @@ const i18n = {
     actual26: "26实际",
     same25: "25同期",
     budget26: "26预算",
+    previousActual: "上月实际",
     actualVsSame: "实际-同期",
-    unitDiff: "单台差异",
+    actualVsPrevious: "实际-上月",
+    unitDiff: "同比单台差",
+    momUnitDiff: "环比单台差",
     manufacturingDiff: "制造费差额",
     factorNet: "因素净影响",
     dashboardTitle: "全年数据驾驶舱",
@@ -75,13 +81,15 @@ const i18n = {
     heroAmountDiff: "制造费差额",
     heroOpen: "待解释重点",
     categoryCompare: "大科目对比",
-    redBadGreenGood: "红色为同比恶化，绿色为同比优化",
+    redBadGreenGood: "红色为差异恶化，绿色为差异优化",
     accountDetail: "科目明细",
     account: "账户",
     analysis: "同比差异分析",
     targetVarianceAnalysis: "目标差异分析",
     yoyVarianceAnalysis: "同比差异分析",
+    momVarianceAnalysis: "环比差异分析",
     yoyPercent: "同比%",
+    momPercent: "环比%",
     submitAnalyses: "提交原因",
     submitProjects: "提交项目",
     analysisSubmitted: "原因已提交到后台共享",
@@ -107,10 +115,12 @@ const i18n = {
     progress: "进展",
     action: "操作",
     all: "全部",
-    unitOver: "单台差≥0.5",
+    unitOver: "同比/环比单台差≥0.5",
     blankReason: "待填写原因",
-    sortUnit: "按单台差异",
-    sortAmount: "按额差异",
+    sortUnit: "按同比单台差异",
+    sortMomUnit: "按环比单台差异",
+    sortAmount: "按同比额差异",
+    sortMomAmount: "按环比额差异",
     sortCode: "按账户编码",
     increase: "上涨因素",
     decrease: "下降因素",
@@ -189,6 +199,7 @@ const i18n = {
     ,mfgDiffFormula: "单台差 × 26产量",
     keurYtd: "K€累计",
     unit25: "25单台",
+    previousUnit: "上月单台",
     unit26: "26单台"
     ,unitEuroPc: "€/台",
     emptyCategoryChart: "导入SAP报表后显示大科目对比"
@@ -215,8 +226,11 @@ const i18n = {
     actual26: "2026 actual",
     same25: "2025 same period",
     budget26: "2026 budget",
+    previousActual: "Previous month",
     actualVsSame: "Actual vs same",
-    unitDiff: "Unit variance",
+    actualVsPrevious: "Actual vs previous",
+    unitDiff: "YoY unit variance",
+    momUnitDiff: "MoM unit variance",
     manufacturingDiff: "MFG variance",
     factorNet: "Net factor impact",
     dashboardTitle: "Year Dashboard",
@@ -229,13 +243,15 @@ const i18n = {
     heroAmountDiff: "MFG variance",
     heroOpen: "Open items",
     categoryCompare: "Category Comparison",
-    redBadGreenGood: "Red means worse, green means better",
+    redBadGreenGood: "Red means worse variance, green means better variance",
     accountDetail: "Account Detail",
     account: "Account",
     analysis: "YoY variance",
     targetVarianceAnalysis: "Target variance",
     yoyVarianceAnalysis: "YoY variance",
+    momVarianceAnalysis: "MoM variance",
     yoyPercent: "YoY %",
+    momPercent: "MoM %",
     submitAnalyses: "Submit reasons",
     submitProjects: "Submit projects",
     analysisSubmitted: "Reasons submitted to shared backend",
@@ -261,10 +277,12 @@ const i18n = {
     progress: "Progress",
     action: "Action",
     all: "All",
-    unitOver: "Unit gap ≥0.5",
+    unitOver: "YoY/MoM unit gap ≥0.5",
     blankReason: "Missing reason",
-    sortUnit: "By unit variance",
-    sortAmount: "By amount variance",
+    sortUnit: "By YoY unit variance",
+    sortMomUnit: "By MoM unit variance",
+    sortAmount: "By YoY amount variance",
+    sortMomAmount: "By MoM amount variance",
     sortCode: "By account code",
     increase: "Increase",
     decrease: "Decrease",
@@ -343,6 +361,7 @@ const i18n = {
     ,mfgDiffFormula: "Unit gap × 2026 volume",
     keurYtd: "K€ YTD",
     unit25: "2025 unit",
+    previousUnit: "Previous month unit",
     unit26: "2026 unit"
     ,unitEuroPc: "€/pc",
     emptyCategoryChart: "Import April actual table to show category comparison"
@@ -369,8 +388,11 @@ const i18n = {
     actual26: "2026 gerçekleşen",
     same25: "2025 aynı dönem",
     budget26: "2026 bütçe",
+    previousActual: "Önceki ay",
     actualVsSame: "Gerçekleşen - dönem",
-    unitDiff: "Birim fark",
+    actualVsPrevious: "Gerçekleşen - önceki ay",
+    unitDiff: "Yıllık birim fark",
+    momUnitDiff: "Aylık birim fark",
     manufacturingDiff: "Üretim farkı",
     factorNet: "Net faktör etkisi",
     dashboardTitle: "Yıllık Veri Panosu",
@@ -383,13 +405,15 @@ const i18n = {
     heroAmountDiff: "Üretim farkı",
     heroOpen: "Açık konu",
     categoryCompare: "Kategori Karşılaştırma",
-    redBadGreenGood: "Kırmızı kötüleşme, yeşil iyileşme",
+    redBadGreenGood: "Kırmızı fark kötüleşmesi, yeşil fark iyileşmesi",
     accountDetail: "Hesap Detayı",
     account: "Hesap",
     analysis: "Yıllık fark",
     targetVarianceAnalysis: "Hedef fark",
     yoyVarianceAnalysis: "Yıllık fark",
+    momVarianceAnalysis: "Aylık fark",
     yoyPercent: "YoY %",
+    momPercent: "Aylık %",
     submitAnalyses: "Nedenleri gönder",
     submitProjects: "Projeleri gönder",
     analysisSubmitted: "Nedenler paylaşılan arka uca gönderildi",
@@ -415,10 +439,12 @@ const i18n = {
     progress: "İlerleme",
     action: "İşlem",
     all: "Tümü",
-    unitOver: "Birim fark ≥0.5",
+    unitOver: "Yıllık/Aylık birim fark ≥0.5",
     blankReason: "Neden eksik",
-    sortUnit: "Birim farka göre",
-    sortAmount: "Tutar farkına göre",
+    sortUnit: "Yıllık birim farka göre",
+    sortMomUnit: "Aylık birim farka göre",
+    sortAmount: "Yıllık tutar farkına göre",
+    sortMomAmount: "Aylık tutar farkına göre",
     sortCode: "Hesap koduna göre",
     increase: "Artış",
     decrease: "Azalış",
@@ -497,6 +523,7 @@ const i18n = {
     ,mfgDiffFormula: "Birim fark × 2026 hacim",
     keurYtd: "K€ YTD",
     unit25: "2025 birim",
+    previousUnit: "Önceki ay birim",
     unit26: "2026 birim"
     ,unitEuroPc: "€/adet",
     emptyCategoryChart: "Kategori karşılaştırması için SAP gerçekleşen yükleyin"
@@ -778,6 +805,7 @@ async function handleSapFileChange(event) {
     state.sapFileName = file.name;
     state.actualMonthCount = inferActualMonthCountFromFileName(file.name, 4);
     state.resultByMonth.clear();
+    const actualByMonth = new Map();
 
     for (const item of MONTHS) {
       try {
@@ -785,11 +813,22 @@ async function handleSapFileChange(event) {
         const actual26 = item.month <= state.actualMonthCount
           ? parsedActual26
           : accountForecastActualForMonth(item.month) || parsedActual26;
+        actualByMonth.set(item.month, actual26);
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+
+    for (const item of MONTHS) {
+      try {
+        const actual26 = actualByMonth.get(item.month);
+        if (!actual26) continue;
         const budget26 = accountBudgetForMonth(item.month) || BUDGET_26_BY_MONTH[item.month];
         const result = buildReconciliation({
           baseline25: BASELINE_25_BY_MONTH[item.month],
           budget26,
           actual26,
+          previousActual26: actualByMonth.get(item.month - 1) || null,
           month: item.month,
           categoryOrder: CATEGORY_ORDER
         });
@@ -1230,44 +1269,47 @@ function monthlyCategoryDiagnostics() {
   if (!state.result) return [];
   const monthIndex = Math.max(0, Number(state.result.month || 1) - 1);
   const volume = dashboardMonthValue("产量", "26年", monthIndex) || state.result.volume26 || 0;
-  const volumeBudget = dashboardMonthValue("产量", "预算", monthIndex);
   const rows = (state.result.categories || [])
-    .map((item) => enrichCategoryDiagnostic(item, monthIndex, volume, volumeBudget))
+    .map((item) => enrichCategoryDiagnostic(item, monthIndex, volume))
     .sort((a, b) => {
-      const absA = Math.abs(a.unitDiff || 0);
-      const absB = Math.abs(b.unitDiff || 0);
+      const absA = Math.max(Math.abs(a.unitDiff || 0), Math.abs(a.momUnitDiff || 0));
+      const absB = Math.max(Math.abs(b.unitDiff || 0), Math.abs(b.momUnitDiff || 0));
       if (absB !== absA) return absB - absA;
       return (b.unitDiff || 0) - (a.unitDiff || 0);
     });
-  const total = totalCategoryDiagnostic(monthIndex, volume, volumeBudget);
+  const total = totalCategoryDiagnostic(volume);
   return total ? [total, ...rows] : rows;
 }
 
-function enrichCategoryDiagnostic(item, monthIndex, volume, volumeBudget) {
+function enrichCategoryDiagnostic(item, monthIndex, volume) {
   const forecast = forecastCategoryForMonth(item.category, monthIndex);
-  const amountBudget = chooseCategoryValue(item.amountBudget, forecast?.budgetAmount);
   const amount26 = chooseCategoryValue(item.amount26, forecast?.actualAmount);
   const unit25 = item.unit25;
-  const unitBudget = unitFromAmount(amountBudget, volumeBudget) ?? item.unitBudget;
+  const previousAmount26 = item.previousAmount26;
+  const previousUnit26 = item.previousUnit26;
   const unit26 = unitFromAmount(amount26, volume) ?? item.unit26;
   const amount25 = item.amount25;
   const amountDiff = diffNullableLocal(amount26, amount25) ?? item.amountDiff;
   const unitDiff = diffNullableLocal(unit26, unit25) ?? item.unitDiff ?? (volume ? (amountDiff / volume) * 1000 : null);
-  const unitBudgetDiff = diffNullableLocal(unit26, unitBudget) ?? item.unitBudgetDiff;
+  const momAmountDiff = state.result.previousVolume26
+    ? diffNullableLocal(amount26, previousAmount26) ?? item.momAmountDiff
+    : null;
+  const momUnitDiff = state.result.previousVolume26
+    ? diffNullableLocal(unit26, previousUnit26) ?? item.momUnitDiff
+    : null;
   return {
     ...item,
     amount26,
-    amountBudget,
+    previousAmount26,
     amountDiff,
-    budgetDiff: diffNullableLocal(amount26, amountBudget) ?? item.budgetDiff,
+    momAmountDiff,
     unit26,
-    unitBudget,
+    previousUnit26,
     unitDiff,
-    unitBudgetDiff,
+    momUnitDiff,
     manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : item.manufacturingDiff,
-    targetImpact: Number.isFinite(unitBudgetDiff) && volume ? unitBudgetDiff * volume / 1000 : null,
     yoyRate: unit25 ? unitDiff / unit25 : null,
-    targetCompletion: targetCompletionRate(unit26, unitBudget)
+    momRate: previousUnit26 ? momUnitDiff / previousUnit26 : null
   };
 }
 
@@ -1275,36 +1317,37 @@ function buildCategoryReasonText(item, mode) {
   if (!state.result) return "";
   const category = item.category;
   const reasons = state.result.rows
-    .filter((row) => row.category === category && state.analyses[analysisKey(state.result.month, row.code)]?.trim())
-    .map((row) => state.analyses[analysisKey(state.result.month, row.code)].trim());
+    .map((row) => ({ row, reason: analysisReason(state.analyses, state.result.month, row.code, mode).trim() }))
+    .filter(({ row, reason }) => row.category === category && reason)
+    .map(({ reason }) => reason);
   if (!reasons.length && !item.isTotal) return "";
   if (item.isTotal) {
     const allReasons = state.result.rows
-      .filter((row) => state.analyses[analysisKey(state.result.month, row.code)]?.trim())
-      .map((row) => state.analyses[analysisKey(state.result.month, row.code)].trim());
+      .map((row) => analysisReason(state.analyses, state.result.month, row.code, mode).trim())
+      .filter(Boolean);
     return allReasons.join("；");
   }
   return reasons.join("；");
 }
 
-function totalCategoryDiagnostic(monthIndex, volume, volumeBudget) {
-  const unit25 = dashboardMonthValue("单台制造费", "同期", monthIndex);
-  const unitBudget = dashboardMonthValue("单台制造费", "预算", monthIndex);
-  const unit26 = dashboardMonthValue("单台制造费", "26年", monthIndex);
-  if (![unit25, unitBudget, unit26].some(Number.isFinite)) return null;
-  const unitDiff = diffNullableLocal(unit26, unit25);
-  const unitBudgetDiff = diffNullableLocal(unit26, unitBudget);
+function totalCategoryDiagnostic(volume) {
+  const summary = state.result?.summary || {};
+  const unit25 = summary.totalUnit25;
+  const previousUnit26 = summary.previousTotalUnit26;
+  const unit26 = summary.totalUnit26;
+  if (![unit25, previousUnit26, unit26].some(Number.isFinite)) return null;
+  const unitDiff = summary.totalUnitDiff;
+  const momUnitDiff = summary.totalMomUnitDiff;
   return {
     category: "总单台",
     unit25,
-    unitBudget,
+    previousUnit26,
     unit26,
     unitDiff,
-    unitBudgetDiff,
+    momUnitDiff,
     manufacturingDiff: Number.isFinite(unitDiff) && volume ? unitDiff * volume / 1000 : null,
-    targetImpact: Number.isFinite(unitBudgetDiff) && volume ? unitBudgetDiff * volume / 1000 : null,
     yoyRate: unit25 ? unitDiff / unit25 : null,
-    targetCompletion: targetCompletionRate(unit26, unitBudget),
+    momRate: previousUnit26 ? momUnitDiff / previousUnit26 : null,
     isTotal: true
   };
 }
@@ -1664,20 +1707,33 @@ function renderNarrative() {
 
 function buildCompactSummary(result, analyses, _factorSummary, forecast) {
   if (!result) return t("summaryEmpty");
-  const highRows = result.rows.filter((row) => row.isHighImpact || Math.abs(row.unitDiff || 0) >= 0.5);
-  const filled = highRows.filter((row) => (analyses[analysisKey(result.month, row.code)] || "").trim()).length;
+  const highRows = result.rows.filter((row) => row.isHighImpact
+    || Math.abs(row.unitDiff || 0) >= 0.5
+    || Math.abs(row.momUnitDiff || 0) >= 0.5);
+  const filled = highRows.filter((row) => {
+    const yoyNeeded = Math.abs(row.unitDiff || 0) >= 0.5;
+    const momNeeded = Math.abs(row.momUnitDiff || 0) >= 0.5;
+    return (!yoyNeeded || analysisReason(analyses, result.month, row.code, "yoy").trim())
+      && (!momNeeded || analysisReason(analyses, result.month, row.code, "mom").trim());
+  }).length;
   const direction = (result.summary.totalUnitDiff || 0) <= 0 ? t("better") : t("worse");
+  const momDirection = (result.summary.totalMomUnitDiff || 0) <= 0 ? t("better") : t("worse");
   const forecastText = forecast?.unitCost ? t("forecastUnitLine").replace("{unit}", formatUnit(forecast.unitCost)) : "";
-  const reasonText = highRows
-    .map((row) => analyses[analysisKey(result.month, row.code)]?.trim())
+  const yoyReasonText = highRows
+    .map((row) => analysisReason(analyses, result.month, row.code, "yoy").trim())
     .filter(Boolean)
-    .slice(0, 5)
+    .slice(0, 3)
+    .join("; ");
+  const momReasonText = highRows
+    .map((row) => analysisReason(analyses, result.month, row.code, "mom").trim())
+    .filter(Boolean)
+    .slice(0, 3)
     .join("; ");
   if (state.language === "en") {
-    return `${localizeMonthLabel(result.month - 1, state.language)} unit cost ${direction} by ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/pc; MFG impact ${formatMoney(result.summary.manufacturingDiff)} K€. Reasons completed ${filled}/${highRows.length}${reasonText ? `: ${reasonText}` : "."} ${forecastText}`;
+    return `${localizeMonthLabel(result.month - 1, state.language)} unit cost YoY ${direction} by ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/pc and MoM ${momDirection} by ${formatUnit(Math.abs(result.summary.totalMomUnitDiff || 0))} €/pc; YoY MFG impact ${formatMoney(result.summary.manufacturingDiff)} K€. Reasons completed ${filled}/${highRows.length}. YoY: ${yoyReasonText || "--"}; MoM: ${momReasonText || "--"}. ${forecastText}`;
   }
   if (state.language === "tr") {
-    return `${localizeMonthLabel(result.month - 1, state.language)} birim maliyet ${direction}: ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/adet; üretim gider etkisi ${formatMoney(result.summary.manufacturingDiff)} K€. Nedenler ${filled}/${highRows.length}${reasonText ? `: ${reasonText}` : "."} ${forecastText}`;
+    return `${localizeMonthLabel(result.month - 1, state.language)} birim maliyet yıllık ${direction}: ${formatUnit(Math.abs(result.summary.totalUnitDiff || 0))} €/adet; aylık ${momDirection}: ${formatUnit(Math.abs(result.summary.totalMomUnitDiff || 0))} €/adet. Nedenler ${filled}/${highRows.length}. Yıllık: ${yoyReasonText || "--"}; aylık: ${momReasonText || "--"}. ${forecastText}`;
   }
   return "";
 }
@@ -1685,21 +1741,27 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 function renderTable() {
   if (!state.result) {
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
-    els.detailBody.innerHTML = `<tr><td colspan="13" class="empty-cell">${t("emptySap")}</td></tr>`;
+    els.detailBody.innerHTML = `<tr><td colspan="17" class="empty-cell">${t("emptySap")}</td></tr>`;
     return;
   }
   const rows = visibleRows();
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}`;
   els.detailBody.innerHTML =
-    rows.map(rowToHtml).join("") || `<tr><td colspan="13" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
+    rows.map(rowToHtml).join("") || `<tr><td colspan="17" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
     textarea.addEventListener("change", (event) => {
       const key = event.target.dataset.key;
-      state.analyses[key] = event.target.value;
+      state.analyses[key] = {
+        ...analysisReasons(state.analyses[key]),
+        [event.target.dataset.mode]: event.target.value
+      };
       if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("unsavedChanges");
     });
     textarea.addEventListener("input", (event) => {
-      state.analyses[event.target.dataset.key] = event.target.value;
+      state.analyses[event.target.dataset.key] = {
+        ...analysisReasons(state.analyses[event.target.dataset.key]),
+        [event.target.dataset.mode]: event.target.value
+      };
       renderNarrative();
       renderChart();
     });
@@ -1726,7 +1788,7 @@ async function submitCurrentMonthAnalyses() {
           key,
           month: state.result.month,
           code: row.code,
-          text: state.analyses[key] || "",
+          text: serializeAnalysisReasons(state.analyses[key]),
           author
         });
       });
@@ -1781,17 +1843,24 @@ function visibleRows() {
   const category = els.categoryFilter.value;
   const sortBy = els.sortBy.value;
   const rows = state.result.rows.filter((row) => {
-    const key = analysisKey(state.result.month, row.code);
-    const analysis = state.analyses[key] || "";
+    const yoyAnalysis = analysisReason(state.analyses, state.result.month, row.code, "yoy");
+    const momAnalysis = analysisReason(state.analyses, state.result.month, row.code, "mom");
+    const highYoy = Math.abs(row.unitDiff || 0) >= 0.5;
+    const highMom = Math.abs(row.momUnitDiff || 0) >= 0.5;
     if (category !== "all" && row.category !== category) return false;
-    if (filter === "high" && Math.abs(row.unitDiff || 0) < 0.5) return false;
-    if (filter === "blank" && (Math.abs(row.unitDiff || 0) < 0.5 || analysis.trim())) return false;
+    if (filter === "high" && !highYoy && !highMom) return false;
+    if (filter === "blank" && !((highYoy && !yoyAnalysis.trim()) || (highMom && !momAnalysis.trim()))) return false;
     if (!search) return true;
-    return `${row.code} ${row.descEn} ${row.category} ${analysis}`.toLowerCase().includes(search);
+    return `${row.code} ${row.descEn} ${row.category} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
   });
   rows.sort((a, b) => {
     if (sortBy === "code") return a.code.localeCompare(b.code, "zh-Hans-CN", { numeric: true });
-    const key = sortBy === "unit" ? "unitDiff" : "amountDiff";
+    const key = {
+      unit: "unitDiff",
+      momUnit: "momUnitDiff",
+      amount: "amountDiff",
+      momAmount: "momAmountDiff"
+    }[sortBy] || "unitDiff";
     return Math.abs(b[key] || 0) - Math.abs(a[key] || 0);
   });
   return rows;
@@ -1799,26 +1868,32 @@ function visibleRows() {
 
 function rowToHtml(row) {
   const key = analysisKey(state.result.month, row.code);
-  const analysis = state.analyses[key] || "";
-  const major = Math.abs(row.unitDiff || 0) >= 0.5;
+  const yoyAnalysis = analysisReason(state.analyses, state.result.month, row.code, "yoy");
+  const momAnalysis = analysisReason(state.analyses, state.result.month, row.code, "mom");
+  const majorYoy = Math.abs(row.unitDiff || 0) >= 0.5;
+  const majorMom = Math.abs(row.momUnitDiff || 0) >= 0.5;
+  const major = majorYoy || majorMom;
   const yoyRate = Number.isFinite(row.unit25) && row.unit25 !== 0 ? row.unitDiff / row.unit25 : null;
-  const targetDiff = Number.isFinite(row.unitBudget) && Number.isFinite(row.unit26) ? row.unit26 - row.unitBudget : null;
-  const targetText = Number.isFinite(targetDiff) ? `目标差 ${formatUnit(targetDiff)} €/台` : "";
+  const momRate = Number.isFinite(row.previousUnit26) && row.previousUnit26 !== 0 ? row.momUnitDiff / row.previousUnit26 : null;
   return `
     <tr class="${major ? "high" : ""}">
       <td><div class="account-code">${escapeHtml(row.code)}</div><div class="desc">${escapeHtml(row.descEn)}</div></td>
       <td>${escapeHtml(localizeCategory(row.category, state.language))}</td>
       <td>${formatMoney(row.amount25)}</td>
-      <td>${formatMoney(row.amountBudget)}</td>
+      <td>${formatMoney(row.previousAmount26)}</td>
       <td>${formatMoney(row.amount26)}</td>
       <td class="${valueClass(row.amountDiff)}">${formatMoney(row.amountDiff)}</td>
+      <td class="${valueClass(row.momAmountDiff)}">${formatMoney(row.momAmountDiff)}</td>
       <td class="${valueClass(row.manufacturingDiff)}">${formatMoney(row.manufacturingDiff)}</td>
       <td>${formatUnit(row.unit25)}</td>
+      <td>${formatUnit(row.previousUnit26)}</td>
       <td>${formatUnit(row.unit26)}</td>
       <td class="${valueClass(row.unitDiff)}">${formatUnit(row.unitDiff)}</td>
+      <td class="${valueClass(row.momUnitDiff)}">${formatUnit(row.momUnitDiff)}</td>
       <td class="${valueClass(yoyRate)}">${formatPercent(yoyRate)}</td>
-      <td class="analysis-cell">${escapeHtml(targetText)}</td>
-      <td><textarea class="${major ? "major" : ""}" data-key="${escapeHtml(key)}" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${major ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(analysis)}</textarea></td>
+      <td class="${valueClass(momRate)}">${formatPercent(momRate)}</td>
+      <td><textarea class="${majorYoy ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="yoy" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorYoy ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(yoyAnalysis)}</textarea></td>
+      <td><textarea class="${majorMom ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="mom" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorMom ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(momAnalysis)}</textarea></td>
     </tr>
   `;
 }
@@ -1843,12 +1918,14 @@ function renderChart() {
         <button class="category-diagnostic category-comparison-row ${item.unitDiff > 0 ? "bad" : "good"} ${item.isTotal ? "total-row" : ""}" type="button" data-category="${escapeHtml(item.category)}" data-metric-tooltip="${escapeHtml(categoryTooltip(item))}">
           <span>${escapeHtml(localizeCategory(item.category, state.language))}</span>
           <em>${formatUnit(item.unit25)}</em>
-          <em>${formatUnit(item.unitBudget)}</em>
+          <em>${formatUnit(item.previousUnit26)}</em>
           <strong class="${valueClass(item.unit26 - item.unit25)}">${formatUnit(item.unit26)}</strong>
           <strong class="${valueClass(item.unitDiff)}">${formatUnit(item.unitDiff)}</strong>
+          <strong class="${valueClass(item.momUnitDiff)}">${formatUnit(item.momUnitDiff)}</strong>
           <em class="${valueClass(item.yoyRate)}">${formatPercent(item.yoyRate)}</em>
-          <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "target"))}</em>
+          <em class="${valueClass(item.momRate)}">${formatPercent(item.momRate)}</em>
           <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "yoy"))}</em>
+          <em class="analysis-cell">${escapeHtml(buildCategoryReasonText(item, "mom"))}</em>
         </button>
       `).join("")}`;
     for (const button of els.categoryDiagnostics.querySelectorAll("[data-category]")) {
@@ -1862,11 +1939,11 @@ function renderChart() {
 
 function categoryTooltip(item) {
   const optimized = Number.isFinite(item.unitDiff) ? item.unitDiff <= 0 : null;
+  const momOptimized = Number.isFinite(item.momUnitDiff) ? item.momUnitDiff <= 0 : null;
   return [
     `${localizeCategory(item.category, state.language)} · ${state.result?.month || ""}月`,
     Number.isFinite(item.unitDiff) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.unitDiff))} €/台${formatYoyPercent(item.unitDiff, item.unit25)}</span>` : "",
-    Number.isFinite(item.unitBudgetDiff) ? `<span class="${tooltipDiffClass(item.unitBudgetDiff, "lower")}">${t("budgetVariance")}: ${formatUnit(item.unitBudgetDiff)} €/台</span>` : "",
-    Number.isFinite(item.targetCompletion) ? `<span class="${item.targetCompletion >= 1 ? "tooltip-good" : "tooltip-bad"}">${t("targetCompletion")}: ${formatPercent(item.targetCompletion)}</span>` : ""
+    Number.isFinite(item.momUnitDiff) ? `<span class="${momOptimized ? "tooltip-good" : "tooltip-bad"}">${t("momVarianceAnalysis")} · ${t(momOptimized ? "better" : "worse")}: ${formatUnit(Math.abs(item.momUnitDiff))} €/台${formatYoyPercent(item.momUnitDiff, item.previousUnit26)}</span>` : ""
   ].filter(Boolean).join("\n");
 }
 
@@ -2155,8 +2232,11 @@ function applyLanguage(language) {
 
 function countOpenHighRows() {
   return state.result.rows.filter((row) => {
-    const key = analysisKey(state.result.month, row.code);
-    return Math.abs(row.unitDiff || 0) >= 0.5 && !(state.analyses[key] || "").trim();
+    const yoyMissing = Math.abs(row.unitDiff || 0) >= 0.5
+      && !analysisReason(state.analyses, state.result.month, row.code, "yoy").trim();
+    const momMissing = Math.abs(row.momUnitDiff || 0) >= 0.5
+      && !analysisReason(state.analyses, state.result.month, row.code, "mom").trim();
+    return yoyMissing || momMissing;
   }).length;
 }
 

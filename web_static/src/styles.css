@@ -684,6 +684,7 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .dashboard-table-wrap { max-height: 70vh; }
 .table-wrap { max-height: calc(100vh - 430px); min-height: 360px; }
+#varianceView .table-wrap table { min-width: 2240px; }
 .project-wrap { max-height: 72vh; overflow: auto; }
 
 table {
@@ -951,9 +952,9 @@ td:nth-child(2) { text-align: left; }
 .category-comparison-head,
 .category-comparison-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr));
+  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr)) repeat(2, minmax(180px, 1.5fr));
   align-items: center;
-  min-width: 1080px;
+  min-width: 1520px;
 }
 
 .category-comparison-head {
@@ -999,9 +1000,9 @@ td:nth-child(2) { text-align: left; }
 }
 
 .category-comparison-row.category-diagnostic {
-  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr));
+  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr)) repeat(2, minmax(180px, 1.5fr));
   gap: 0;
-  min-width: 1080px;
+  min-width: 1520px;
   border-width: 0 0 1px 5px;
 }
 
