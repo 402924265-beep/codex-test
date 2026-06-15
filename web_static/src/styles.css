@@ -684,7 +684,19 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .dashboard-table-wrap { max-height: 70vh; }
 .table-wrap { max-height: calc(100vh - 430px); min-height: 360px; }
-#varianceView .table-wrap table { min-width: 2240px; }
+#varianceView .table-wrap table { min-width: 1180px; }
+#varianceView .table-wrap th:nth-child(1) { width: 250px; }
+#varianceView .table-wrap th:nth-child(2) { width: 150px; }
+#varianceView .table-wrap th:nth-child(3),
+#varianceView .table-wrap th:nth-child(4),
+#varianceView .table-wrap th:nth-child(5) { width: 120px; }
+#varianceView .table-wrap th:nth-child(6),
+#varianceView .table-wrap th:nth-child(7) { width: 260px; }
+#varianceView .table-wrap td[data-metric-tooltip] {
+  cursor: help;
+  font-weight: 700;
+}
+#varianceView .table-wrap textarea.major { min-height: 72px; }
 .project-wrap { max-height: 72vh; overflow: auto; }
 
 table {
@@ -952,9 +964,9 @@ td:nth-child(2) { text-align: left; }
 .category-comparison-head,
 .category-comparison-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr)) repeat(2, minmax(180px, 1.5fr));
+  grid-template-columns: minmax(190px, 1.4fr) repeat(3, minmax(115px, 0.75fr)) repeat(2, minmax(220px, 1.5fr));
   align-items: center;
-  min-width: 1520px;
+  min-width: 1120px;
 }
 
 .category-comparison-head {
@@ -1000,9 +1012,9 @@ td:nth-child(2) { text-align: left; }
 }
 
 .category-comparison-row.category-diagnostic {
-  grid-template-columns: minmax(180px, 1.6fr) repeat(7, minmax(92px, 1fr)) repeat(2, minmax(180px, 1.5fr));
+  grid-template-columns: minmax(190px, 1.4fr) repeat(3, minmax(115px, 0.75fr)) repeat(2, minmax(220px, 1.5fr));
   gap: 0;
-  min-width: 1520px;
+  min-width: 1120px;
   border-width: 0 0 1px 5px;
 }
 
@@ -1101,6 +1113,11 @@ tr.high { background: #fffbf2; }
 tr.high td:first-child {
   border-left: 4px solid var(--amber);
 }
+
+.table-wrap tr.cost-worse td:first-child { border-left: 4px solid var(--red); }
+.table-wrap tr.cost-better td:first-child { border-left: 4px solid var(--green); }
+.table-wrap tr.cost-worse { background: #fff8f6; }
+.table-wrap tr.cost-better { background: #f4fbf8; }
 
 .negative { color: var(--red); }
 .positive { color: var(--green); }

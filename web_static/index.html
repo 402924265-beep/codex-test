@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260615-mom-variance-v26" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260615-compact-cost-v27" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,7 +20,7 @@
         language: "zh"
       };
     </script>
-    <script type="module" src="./src/app.js?v=20260615-mom-variance-v26"></script>
+    <script type="module" src="./src/app.js?v=20260615-compact-cost-v27"></script>
   </head>
   <body>
     <header class="app-header">
@@ -219,25 +219,15 @@
                 <tr>
                   <th data-i18n="account">账户</th>
                   <th data-i18n="category">大科目</th>
-                  <th data-i18n="same25">25同期</th>
-                  <th data-i18n="previousActual">上月实际</th>
-                  <th data-i18n="actual26">26实际</th>
-                  <th data-i18n="actualVsSame">实际-同期</th>
-                  <th data-i18n="actualVsPrevious">实际-上月</th>
-                  <th data-i18n="manufacturingDiff">制造费差额</th>
-                  <th data-i18n="unit25">25单台</th>
-                  <th data-i18n="previousUnit">上月单台</th>
-                  <th data-i18n="unit26">26单台</th>
-                  <th data-i18n="unitDiff">同比单台差</th>
-                  <th data-i18n="momUnitDiff">环比单台差</th>
-                  <th data-i18n="yoyPercent">同比%</th>
-                  <th data-i18n="momPercent">环比%</th>
+                  <th data-i18n="sameCost">25同期费用 K€</th>
+                  <th data-i18n="previousCost">上月费用 K€</th>
+                  <th data-i18n="currentCost">本月费用 K€</th>
                   <th data-i18n="yoyVarianceAnalysis">同比差异分析</th>
                   <th data-i18n="momVarianceAnalysis">环比差异分析</th>
                 </tr>
               </thead>
               <tbody id="detailBody">
-                <tr><td colspan="17" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
+                <tr><td colspan="7" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
               </tbody>
             </table>
           </div>

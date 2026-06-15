@@ -28,6 +28,9 @@ test("trend charts render visible value labels and detail cells expose rich hove
 
   assert.match(app, /chart-value-label/);
   assert.match(app, /data-metric-tooltip/);
+  assert.match(app, /costVarianceTooltip/);
+  assert.match(app, /费用同比/);
+  assert.match(app, /单台环比/);
   assert.match(app, /metric-hover-tooltip/);
   assert.match(css, /\.chart-value-label/);
   assert.match(css, /\.metric-hover-tooltip/);
