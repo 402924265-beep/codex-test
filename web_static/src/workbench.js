@@ -5,16 +5,18 @@ export function analysisKey(month, code) {
 export function analysisReasons(value) {
   if (value && typeof value === "object") {
     return {
+      description: String(value.description || ""),
       yoy: String(value.yoy || ""),
       mom: String(value.mom || "")
     };
   }
   const text = String(value || "");
-  if (!text.trim()) return { yoy: "", mom: "" };
+  if (!text.trim()) return { description: "", yoy: "", mom: "" };
   try {
     const parsed = JSON.parse(text);
     if (parsed && typeof parsed === "object") {
       return {
+        description: String(parsed.description || ""),
         yoy: String(parsed.yoy || ""),
         mom: String(parsed.mom || "")
       };
@@ -22,7 +24,7 @@ export function analysisReasons(value) {
   } catch {
     // Legacy records stored a single text value; keep it as the YoY reason.
   }
-  return { yoy: text, mom: "" };
+  return { description: "", yoy: text, mom: "" };
 }
 
 export function analysisReason(analyses, month, code, mode = "yoy") {

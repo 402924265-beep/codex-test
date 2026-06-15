@@ -25,4 +25,13 @@ test("monthly category comparison headers are localized", () => {
     "YoY reason",
     "MoM reason"
   ]);
+  assert.deepEqual(categoryComparisonHeaders("zh", {
+    same: "2月25同期费用 K€",
+    previous: "1月实际费用 K€",
+    current: "2月实际费用 K€"
+  }).slice(1, 4), [
+    "2月25同期费用 K€",
+    "1月实际费用 K€",
+    "2月实际费用 K€"
+  ]);
 });

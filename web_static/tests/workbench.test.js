@@ -1,7 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { buildFactorSummary, buildAutoSummary, analysisKey } from "../src/workbench.js";
+import {
+  analysisKey,
+  analysisReason,
+  analysisReasons,
+  buildAutoSummary,
+  buildFactorSummary,
+  serializeAnalysisReasons
+} from "../src/workbench.js";
 import { createStore, supabaseSchemaSql } from "../src/store.js";
 import { PROJECT_SEEDS, projectImpactSummary } from "../src/project-data.js";
 
@@ -22,7 +29,7 @@ test("summarizes increase and decrease factors as positive impacts", () => {
 test("auto summary uses saved account reasons and excludes project factors", () => {
   const result = {
     month: 4,
-    summary: { totalUnitDiff: -10.19, manufacturingDiff: -416.6 },
+    summary: { totalUnitDiff: -10.19, totalMomUnitDiff: 2.5, manufacturingDiff: -416.6 },
     rows: [
       { code: "6666010188", descEn: "Salary", unitDiff: -1, isHighImpact: true }
     ]
@@ -37,6 +44,15 @@ test("auto summary uses saved account reasons and excludes project factors", () 
   assert.match(text, /4月洗碗机/);
   assert.match(text, /4\+8预测口径/);
   assert.doesNotMatch(text, /上涨因素累计/);
+  assert.match(text, /环比上升2.50欧/);
+});
+
+test("analysis reasons preserve legacy YoY text and serialize YoY plus MoM", () => {
+  assert.deepEqual(analysisReasons("旧同比原因"), { description: "", yoy: "旧同比原因", mom: "" });
+  const serialized = serializeAnalysisReasons({ description: "单价上涨 * 数量", yoy: "同比原因", mom: "环比原因" });
+  assert.equal(analysisReason({ "5:1": serialized }, 5, "1", "description"), "单价上涨 * 数量");
+  assert.equal(analysisReason({ "5:1": serialized }, 5, "1", "yoy"), "同比原因");
+  assert.equal(analysisReason({ "5:1": serialized }, 5, "1", "mom"), "环比原因");
 });
 
 test("local store saves analyses and exposes Supabase schema", async () => {

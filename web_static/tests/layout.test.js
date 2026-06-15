@@ -12,6 +12,9 @@ test("monthly variance keeps one reason summary above account-level inputs", asy
   assert.equal((varianceView.match(/class="variance-hero"/g) || []).length, 0);
   assert.ok(varianceView.indexOf('id="summaryText"') < varianceView.indexOf('id="detailBody"'));
   assert.doesNotMatch(css, /\.narrative-panel\s*\{\s*display:\s*none/);
+  assert.match(varianceView, /id="previousCostHeader"/);
+  assert.match(varianceView, /科目描述/);
+  assert.match(css, /editable-cell/);
 });
 
 test("project page points monthly reasons back to the second table", async () => {

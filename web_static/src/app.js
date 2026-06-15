@@ -4,8 +4,8 @@ import {
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
 import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-total-reconcile-v25";
-import { buildReconciliation } from "./reconcile.js?v=20260615-compact-cost-v27";
-import { exportAnalysisWorkbook } from "./export.js?v=20260615-compact-cost-v27";
+import { buildReconciliation } from "./reconcile.js?v=20260615-dynamic-month-v28";
+import { exportAnalysisWorkbook } from "./export.js?v=20260615-dynamic-month-v28";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
 import { createStore } from "./store.js?v=20260612-duplicate-accounts-v23";
 import {
@@ -25,7 +25,7 @@ import {
   buildFactorSummary,
   parseEditableNumber,
   serializeAnalysisReasons
-} from "./workbench.js?v=20260615-compact-cost-v27";
+} from "./workbench.js?v=20260615-dynamic-month-v28";
 import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260612-duplicate-accounts-v23";
 import {
   annualManufacturingRate,
@@ -34,12 +34,12 @@ import {
   averageFinite,
   targetCompletionRate
 } from "./metrics.js?v=20260612-duplicate-accounts-v23";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-compact-cost-v27";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-dynamic-month-v28";
 import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260612-duplicate-accounts-v23";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 
-const VERSION = "20260615-compact-cost-v27";
+const VERSION = "20260615-dynamic-month-v28";
 
 const i18n = {
   zh: {
@@ -66,6 +66,8 @@ const i18n = {
     sameCost: "25同期费用 K€",
     previousCost: "上月费用 K€",
     currentCost: "本月费用 K€",
+    accountDescription: "科目描述",
+    descriptionPlaceholder: "单价 * 数量",
     budget26: "26预算",
     previousActual: "上月实际",
     actualVsSame: "实际-同期",
@@ -231,6 +233,8 @@ const i18n = {
     sameCost: "2025 cost K€",
     previousCost: "Previous cost K€",
     currentCost: "Current cost K€",
+    accountDescription: "Account description",
+    descriptionPlaceholder: "Unit price × quantity",
     budget26: "2026 budget",
     previousActual: "Previous month",
     actualVsSame: "Actual vs same",
@@ -396,6 +400,8 @@ const i18n = {
     sameCost: "2025 gider K€",
     previousCost: "Önceki ay gider K€",
     currentCost: "Bu ay gider K€",
+    accountDescription: "Hesap açıklaması",
+    descriptionPlaceholder: "Birim fiyat × miktar",
     budget26: "2026 bütçe",
     previousActual: "Önceki ay",
     actualVsSame: "Gerçekleşen - dönem",
@@ -608,6 +614,9 @@ const els = {
   categoryDiagnostics: document.getElementById("categoryDiagnostics"),
   emptyChart: document.getElementById("emptyChart"),
   detailBody: document.getElementById("detailBody"),
+  sameCostHeader: document.getElementById("sameCostHeader"),
+  previousCostHeader: document.getElementById("previousCostHeader"),
+  currentCostHeader: document.getElementById("currentCostHeader"),
   rowCount: document.getElementById("rowCount"),
   factorBody: document.getElementById("factorBody"),
   projectImpactCards: document.getElementById("projectImpactCards"),
@@ -815,6 +824,7 @@ async function handleSapFileChange(event) {
     state.actualMonthCount = inferActualMonthCountFromFileName(file.name, 4);
     state.resultByMonth.clear();
     const actualByMonth = new Map();
+    actualByMonth.set(0, baselineAsActual(BASELINE_25_BY_MONTH[12]));
 
     for (const item of MONTHS) {
       try {
@@ -871,6 +881,7 @@ function selectCurrentMonth() {
 
 function renderAll() {
   renderMonthButtons();
+  renderVarianceCostHeaders();
   renderSummaryCards();
   renderDashboard();
   renderCategoryFilter();
@@ -878,6 +889,57 @@ function renderAll() {
   renderChart();
   renderTable();
   renderFactors();
+}
+
+function baselineAsActual(source) {
+  if (!source) return null;
+  return {
+    month: 12,
+    volume: source.volume,
+    accounts: (source.accounts || []).map((row) => Array.isArray(row)
+      ? { code: row[0], amount: row.length === 3 ? row[1] : row[4], unit: row.length === 3 ? row[2] : row[5] }
+      : {
+          code: row.code,
+          descEn: row.descEn,
+          category: row.category,
+          summaryKey: row.summaryKey,
+          amount: row.amount25,
+          unit: row.unit25
+        })
+  };
+}
+
+function varianceCostLabels() {
+  const month = Number(state.result?.month || els.monthSelect.value || 1);
+  const previousMonth = month === 1 ? 12 : month - 1;
+  const currentBasis = month <= state.actualMonthCount ? "actual" : "forecast";
+  const previousBasis = month === 1 || previousMonth <= state.actualMonthCount ? "actual" : "forecast";
+  if (state.language === "en") {
+    return {
+      same: `${month}M 2025 cost K€`,
+      previous: `${previousMonth}M ${previousBasis} cost K€`,
+      current: `${month}M ${currentBasis} cost K€`
+    };
+  }
+  if (state.language === "tr") {
+    return {
+      same: `${month}. ay 2025 gider K€`,
+      previous: `${previousMonth}. ay ${previousBasis === "actual" ? "gerçekleşen" : "tahmin"} gider K€`,
+      current: `${month}. ay ${currentBasis === "actual" ? "gerçekleşen" : "tahmin"} gider K€`
+    };
+  }
+  return {
+    same: `${month}月25同期费用 K€`,
+    previous: `${previousMonth}月${previousBasis === "actual" ? "实际" : "预测"}费用 K€`,
+    current: `${month}月${currentBasis === "actual" ? "实际" : "预测"}费用 K€`
+  };
+}
+
+function renderVarianceCostHeaders() {
+  const labels = varianceCostLabels();
+  if (els.sameCostHeader) els.sameCostHeader.textContent = labels.same;
+  if (els.previousCostHeader) els.previousCostHeader.textContent = labels.previous;
+  if (els.currentCostHeader) els.currentCostHeader.textContent = labels.current;
 }
 
 function accountBudgetForMonth(month) {
@@ -1755,13 +1817,13 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 function renderTable() {
   if (!state.result) {
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
-    els.detailBody.innerHTML = `<tr><td colspan="7" class="empty-cell">${t("emptySap")}</td></tr>`;
+    els.detailBody.innerHTML = `<tr><td colspan="8" class="empty-cell">${t("emptySap")}</td></tr>`;
     return;
   }
   const rows = visibleRows();
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}`;
   els.detailBody.innerHTML =
-    rows.map(rowToHtml).join("") || `<tr><td colspan="7" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
+    rows.map(rowToHtml).join("") || `<tr><td colspan="8" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
     textarea.addEventListener("change", (event) => {
       const key = event.target.dataset.key;
@@ -1859,13 +1921,14 @@ function visibleRows() {
   const rows = state.result.rows.filter((row) => {
     const yoyAnalysis = analysisReason(state.analyses, state.result.month, row.code, "yoy");
     const momAnalysis = analysisReason(state.analyses, state.result.month, row.code, "mom");
+    const description = analysisReason(state.analyses, state.result.month, row.code, "description");
     const highYoy = Math.abs(row.unitDiff || 0) >= 0.5;
     const highMom = Math.abs(row.momUnitDiff || 0) >= 0.5;
     if (category !== "all" && row.category !== category) return false;
     if (filter === "high" && !highYoy && !highMom) return false;
     if (filter === "blank" && !((highYoy && !yoyAnalysis.trim()) || (highMom && !momAnalysis.trim()))) return false;
     if (!search) return true;
-    return `${row.code} ${row.descEn} ${row.category} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
+    return `${row.code} ${row.descEn} ${row.category} ${description} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
   });
   rows.sort((a, b) => {
     if (sortBy === "code") return a.code.localeCompare(b.code, "zh-Hans-CN", { numeric: true });
@@ -1884,6 +1947,7 @@ function rowToHtml(row) {
   const key = analysisKey(state.result.month, row.code);
   const yoyAnalysis = analysisReason(state.analyses, state.result.month, row.code, "yoy");
   const momAnalysis = analysisReason(state.analyses, state.result.month, row.code, "mom");
+  const description = analysisReason(state.analyses, state.result.month, row.code, "description");
   const majorYoy = Math.abs(row.unitDiff || 0) >= 0.5;
   const majorMom = Math.abs(row.momUnitDiff || 0) >= 0.5;
   const major = majorYoy || majorMom;
@@ -1895,8 +1959,9 @@ function rowToHtml(row) {
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount25)}</td>
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.previousAmount26)}</td>
       <td tabindex="0" class="${valueClass(row.amountDiff)}" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount26)}</td>
-      <td><textarea class="${majorYoy ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="yoy" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorYoy ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(yoyAnalysis)}</textarea></td>
-      <td><textarea class="${majorMom ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="mom" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorMom ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(momAnalysis)}</textarea></td>
+      <td class="editable-cell"><textarea data-key="${escapeHtml(key)}" data-mode="description" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${escapeHtml(t("descriptionPlaceholder"))}">${escapeHtml(description)}</textarea></td>
+      <td class="editable-cell"><textarea class="${majorYoy ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="yoy" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorYoy ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(yoyAnalysis)}</textarea></td>
+      <td class="editable-cell"><textarea class="${majorMom ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="mom" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorMom ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(momAnalysis)}</textarea></td>
     </tr>
   `;
 }
@@ -1912,7 +1977,7 @@ function renderChart() {
   if (els.categoryChart) els.categoryChart.style.display = "none";
   const rows = monthlyCategoryDiagnostics();
   if (els.categoryDiagnostics) {
-    const headers = categoryComparisonHeaders(state.language);
+    const headers = categoryComparisonHeaders(state.language, varianceCostLabels());
     els.categoryDiagnostics.innerHTML = `
       <div class="category-comparison-head">
         ${headers.map((header) => `<span>${escapeHtml(header)}</span>`).join("")}
