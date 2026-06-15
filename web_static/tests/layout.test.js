@@ -18,6 +18,8 @@ test("monthly variance keeps one reason summary above account-level inputs", asy
   assert.match(css, /#varianceView \.table-wrap\s*\{[\s\S]*height:\s*clamp\(560px,\s*68vh,\s*760px\)/);
   assert.match(css, /#varianceView \.table-wrap thead th\s*\{[\s\S]*position:\s*sticky[\s\S]*z-index:\s*10/);
   assert.match(varianceView, /id="sameCostHeader"[^>]*>同期费用 K€/);
+  assert.match(css, /#varianceView \.table-wrap th:nth-child\(6\),[\s\S]*text-align:\s*center/);
+  assert.match(css, /#varianceView \.table-wrap td:nth-child\(6\) textarea\s*\{[\s\S]*text-align:\s*center/);
   assert.match(css, /\.category-diagnostics\s*\{[\s\S]*max-height:\s*360px/);
 });
 

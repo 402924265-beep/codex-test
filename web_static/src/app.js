@@ -38,8 +38,9 @@ import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.j
 import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260612-duplicate-accounts-v23";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
+import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 
-const VERSION = "20260615-fixed-detail-table-v30";
+const VERSION = "20260615-account-labels-v31";
 
 const i18n = {
   zh: {
@@ -1930,7 +1931,8 @@ function visibleRows() {
     if (filter === "high" && !highYoy && !highMom) return false;
     if (filter === "blank" && !((highYoy && !yoyAnalysis.trim()) || (highMom && !momAnalysis.trim()))) return false;
     if (!search) return true;
-    return `${row.code} ${row.descEn} ${row.category} ${description} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
+    const localizedAccount = localizeAccountLabel(row.code, row.descEn, state.language);
+    return `${row.code} ${row.descEn} ${localizedAccount} ${row.category} ${description} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
   });
   rows.sort((a, b) => {
     if (sortBy === "code") return a.code.localeCompare(b.code, "zh-Hans-CN", { numeric: true });
@@ -1954,9 +1956,16 @@ function rowToHtml(row) {
   const majorMom = Math.abs(row.momUnitDiff || 0) >= 0.5;
   const major = majorYoy || majorMom;
   const tooltip = accountCostTooltip(row);
+  const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
+  const summarySuffix = state.language === "tr" ? "kategori toplamı" : state.language === "en" ? "category total" : "大科目汇总";
+  const unsplitLabel = state.language === "tr"
+    ? "4+8 tahmini alt hesaplara dağıtılmamıştır"
+    : state.language === "en"
+      ? "4+8 forecast is not split by account"
+      : "4+8预测未拆分到小科目";
   return `
     <tr class="${major ? "high" : ""} ${row.amountDiff > 0 ? "cost-worse" : row.amountDiff < 0 ? "cost-better" : ""}">
-      <td><div class="account-code">${escapeHtml(row.isCategorySummary ? `${localizeCategory(row.category, state.language)}（大科目汇总）` : row.code)}</div><div class="desc">${escapeHtml(row.isCategorySummary ? "4+8预测未拆分到小科目" : row.descEn)}</div></td>
+      <td><div class="account-code">${escapeHtml(row.isCategorySummary ? `${localizeCategory(row.category, state.language)} (${summarySuffix})` : row.code)}</div><div class="desc">${escapeHtml(row.isCategorySummary ? unsplitLabel : accountLabel)}</div></td>
       <td>${escapeHtml(localizeCategory(row.category, state.language))}</td>
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount25)}</td>
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.previousAmount26)}</td>

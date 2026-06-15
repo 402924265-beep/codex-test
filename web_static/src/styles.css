@@ -723,6 +723,13 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   background: #fff9df;
   border-color: #d9bd62;
 }
+#varianceView .table-wrap th:nth-child(6),
+#varianceView .table-wrap td:nth-child(6) {
+  text-align: center;
+}
+#varianceView .table-wrap td:nth-child(6) textarea {
+  text-align: center;
+}
 .project-wrap { max-height: 72vh; overflow: auto; }
 
 table {
