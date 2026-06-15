@@ -39,7 +39,7 @@ import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=2026061
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 
-const VERSION = "20260615-category-collapse-v29";
+const VERSION = "20260615-fixed-detail-table-v30";
 
 const i18n = {
   zh: {
@@ -63,7 +63,7 @@ const i18n = {
     unitCost26: "26单台制造费",
     actual26: "26实际",
     same25: "25同期",
-    sameCost: "25同期费用 K€",
+    sameCost: "同期费用 K€",
     previousCost: "上月费用 K€",
     currentCost: "本月费用 K€",
     accountDescription: "科目描述",
@@ -916,20 +916,20 @@ function varianceCostLabels() {
   const previousBasis = month === 1 || previousMonth <= state.actualMonthCount ? "actual" : "forecast";
   if (state.language === "en") {
     return {
-      same: `${month}M 2025 cost K€`,
+      same: "Prior-year cost K€",
       previous: `${previousMonth}M ${previousBasis} cost K€`,
       current: `${month}M ${currentBasis} cost K€`
     };
   }
   if (state.language === "tr") {
     return {
-      same: `${month}. ay 2025 gider K€`,
+      same: "Geçen yıl gider K€",
       previous: `${previousMonth}. ay ${previousBasis === "actual" ? "gerçekleşen" : "tahmin"} gider K€`,
       current: `${month}. ay ${currentBasis === "actual" ? "gerçekleşen" : "tahmin"} gider K€`
     };
   }
   return {
-    same: `${month}月25同期费用 K€`,
+    same: "同期费用 K€",
     previous: `${previousMonth}月${previousBasis === "actual" ? "实际" : "预测"}费用 K€`,
     current: `${month}月${currentBasis === "actual" ? "实际" : "预测"}费用 K€`
   };

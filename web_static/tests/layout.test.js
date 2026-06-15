@@ -15,7 +15,9 @@ test("monthly variance keeps one reason summary above account-level inputs", asy
   assert.match(varianceView, /id="previousCostHeader"/);
   assert.match(varianceView, /科目描述/);
   assert.match(css, /editable-cell/);
-  assert.match(css, /#varianceView \.table-wrap\s*\{[\s\S]*max-height:\s*none/);
+  assert.match(css, /#varianceView \.table-wrap\s*\{[\s\S]*height:\s*clamp\(560px,\s*68vh,\s*760px\)/);
+  assert.match(css, /#varianceView \.table-wrap thead th\s*\{[\s\S]*position:\s*sticky[\s\S]*z-index:\s*10/);
+  assert.match(varianceView, /id="sameCostHeader"[^>]*>同期费用 K€/);
   assert.match(css, /\.category-diagnostics\s*\{[\s\S]*max-height:\s*360px/);
 });
 

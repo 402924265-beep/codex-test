@@ -685,8 +685,17 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 .dashboard-table-wrap { max-height: 70vh; }
 .table-wrap { max-height: calc(100vh - 430px); min-height: 360px; }
 #varianceView .table-wrap {
-  max-height: none;
-  min-height: 68vh;
+  height: clamp(560px, 68vh, 760px);
+  min-height: 560px;
+  max-height: 760px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+#varianceView .table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 0 #cfdce6;
 }
 #varianceView .table-wrap table { min-width: 1340px; }
 #varianceView .table-wrap th:nth-child(1) { width: 250px; }
@@ -1252,4 +1261,9 @@ tr.high td:first-child {
   .heatmap-grid { grid-template-columns: 120px repeat(13, minmax(24px, 1fr)); overflow-x: auto; }
   .factor-summary { grid-template-columns: 1fr; }
   .table-wrap { max-height: none; }
+  #varianceView .table-wrap {
+    height: 68vh;
+    min-height: 420px;
+    max-height: none;
+  }
 }
