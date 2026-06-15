@@ -48,15 +48,15 @@ export function buildAutoSummary(result, analyses, _factorSummary, forecastSnaps
   const manufacturingDiff = result.summary.manufacturingDiff;
   const direction = totalUnit <= 0 ? "下降" : "上升";
   const quality = totalUnit <= 0 ? "优化" : "恶化";
-  const importantRows = result.rows
-    .filter((row) => row.isHighImpact || Math.abs(row.unitDiff || 0) >= 0.5)
-    .slice()
-    .sort((a, b) => Math.abs(b.unitDiff || 0) - Math.abs(a.unitDiff || 0))
-    .slice(0, 8);
-  const reasonLines = importantRows.map((row, index) => {
-    const reason = analyses?.[analysisKey(result.month, row.code)] || analyses?.[row.code] || "待填写原因";
-    return `${index + 1}. ${row.code} ${row.descEn}: ${reason}`;
-  });
+  const reasonLines = result.rows
+    .map((row) => ({
+      row,
+      reason: (analyses?.[analysisKey(result.month, row.code)] || analyses?.[row.code] || "").trim()
+    }))
+    .filter((item) => item.reason)
+    .sort((a, b) => Math.abs(b.row.manufacturingDiff || b.row.unitDiff || 0) - Math.abs(a.row.manufacturingDiff || a.row.unitDiff || 0))
+    .slice(0, 8)
+    .map(({ row, reason }, index) => `${index + 1}. ${row.code} ${row.descEn}: ${reason}`);
   const forecastLine = forecastSnapshot?.unitCost
     ? `4+8预测口径：本月单台 ${formatNumber(forecastSnapshot.unitCost)} 欧/台，金额 ${formatKeur(forecastSnapshot.amount)}。`
     : "";

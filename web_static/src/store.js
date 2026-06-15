@@ -5,14 +5,17 @@ const STORAGE_KEYS = {
 };
 
 export function createStore(config = globalThis.window?.DW_SUPABASE_CONFIG) {
-  const supabase = config?.url && config?.anonKey ? new SupabaseStore(config) : null;
+  const localApiConfig = globalThis.window?.DW_LOCAL_API_CONFIG;
+  const localApi = localApiConfig ? new LocalApiStore(localApiConfig) : null;
+  const supabase = !localApi && config?.url && config?.anonKey ? new SupabaseStore(config) : null;
   return {
-    mode: supabase ? "shared" : "local",
-    label: supabase ? "后台共享" : "本机保存",
+    mode: localApi ? "lan" : supabase ? "shared" : "local",
+    label: localApi ? "局域网共享" : supabase ? "后台共享" : "本机保存",
     async loadAnalyses() {
-      return supabase ? supabase.loadAnalyses() : readJson(STORAGE_KEYS.analyses, {});
+      return localApi ? localApi.loadAnalyses() : supabase ? supabase.loadAnalyses() : readJson(STORAGE_KEYS.analyses, {});
     },
     async saveAnalysis(record) {
+      if (localApi) return localApi.saveAnalysis(record);
       if (supabase) return supabase.saveAnalysis(record);
       const all = readJson(STORAGE_KEYS.analyses, {});
       all[record.key] = record.text;
@@ -20,6 +23,10 @@ export function createStore(config = globalThis.window?.DW_SUPABASE_CONFIG) {
       return record;
     },
     async loadFactors(defaults = []) {
+      if (localApi) {
+        const remote = await localApi.loadFactors();
+        return remote.length ? remote : defaults;
+      }
       if (supabase) {
         const remote = await supabase.loadFactors();
         return remote.length ? remote : defaults;
@@ -27,6 +34,7 @@ export function createStore(config = globalThis.window?.DW_SUPABASE_CONFIG) {
       return readJson(STORAGE_KEYS.factors, defaults);
     },
     async saveFactors(items) {
+      if (localApi) return localApi.saveFactors(items);
       if (supabase) return supabase.saveFactors(items);
       writeJson(STORAGE_KEYS.factors, items);
       return items;
@@ -38,6 +46,48 @@ export function createStore(config = globalThis.window?.DW_SUPABASE_CONFIG) {
       localStorage.setItem(STORAGE_KEYS.user, name || "");
     }
   };
+}
+
+export class LocalApiStore {
+  constructor({ baseUrl = "" } = {}) {
+    this.baseUrl = baseUrl.replace(/\/$/, "");
+  }
+
+  async loadAnalyses() {
+    return this.request("/api/analyses");
+  }
+
+  async saveAnalysis(record) {
+    await this.request("/api/analyses", {
+      method: "POST",
+      body: JSON.stringify(record)
+    });
+    return record;
+  }
+
+  async loadFactors() {
+    return this.request("/api/factors");
+  }
+
+  async saveFactors(items) {
+    await this.request("/api/factors", {
+      method: "PUT",
+      body: JSON.stringify(items)
+    });
+    return items;
+  }
+
+  async request(path, options = {}) {
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+    if (!response.ok) throw new Error(`局域网保存失败：${response.status}`);
+    return response.json();
+  }
 }
 
 export class SupabaseStore {

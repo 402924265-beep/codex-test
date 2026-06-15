@@ -4,14 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260608-jiang-fallback-sticky-v4" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260615-may-actual-v24" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
         anonKey: "sb_publishable_kji34L4Yh1vCIPudrIKROA_hdwTjzuu"
       };
+      window.DW_BUNDLED_FILES = {
+        forecast: "./input/01_Forecast_4plus8.xlsx",
+        forecastName: "2026 MFG Variance Reporting DW 4+8.xlsx",
+        jiang: "./input/02_Domestic_Finance_4plus8.xlsx",
+        jiangName: "4+8 Domestic Finance.xlsx",
+        sap: "./input/03_Dishwasher_May_Actual.xlsx",
+        sapName: "Dishwasher May Actual Manufacturing Cost.xlsx",
+        language: "zh"
+      };
     </script>
-    <script type="module" src="./src/app.js?v=20260608-jiang-fallback-sticky-v4"></script>
+    <script type="module" src="./src/app.js?v=20260615-may-actual-v24"></script>
   </head>
   <body>
     <header class="app-header">
@@ -34,15 +43,15 @@
         </label>
         <label class="file-button secondary">
           <input id="forecastFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importForecast">导入4+8预测</span>
+          <span data-i18n="importForecast">导入预测表</span>
         </label>
         <label class="file-button secondary">
           <input id="jiangFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importJiang">导入姜月表</span>
+          <span data-i18n="importJiang">导入国内财务表</span>
         </label>
         <label class="file-button">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importSap">导入SAP实际</span>
+          <span data-i18n="importSap">导入实际表</span>
         </label>
         <button id="exportBtn" type="button" disabled data-i18n="exportAnalysis">导出三张表</button>
       </div>
@@ -51,9 +60,9 @@
     <main class="workspace">
       <section class="top-strip" aria-label="当前状态">
         <div class="status-pill" id="saveMode">本机保存</div>
-        <div class="status-pill muted" id="sapStatus">待导入 SAP 实际</div>
-        <div class="status-pill muted" id="forecastStatus">待导入 4+8 预测</div>
-        <div class="status-pill muted" id="jiangStatus">待导入姜月表</div>
+        <div class="status-pill muted" id="sapStatus">待导入实际表</div>
+        <div class="status-pill muted" id="forecastStatus">待导入预测表</div>
+        <div class="status-pill muted" id="jiangStatus">待导入国内财务表</div>
       </section>
 
       <nav class="tabbar" aria-label="页面">
@@ -145,8 +154,18 @@
 
         <section class="panel table-panel" aria-label="科目明细">
           <div class="panel-title">
-            <h2 data-i18n="accountDetail">科目明细</h2>
-            <span id="rowCount">0 项</span>
+            <div>
+              <h2 data-i18n="accountDetail">科目明细</h2>
+              <span id="rowCount">0 项</span>
+            </div>
+            <div class="factor-actions">
+              <label class="field compact inline-field">
+                <span data-i18n="author">提报人</span>
+                <input id="analysisAuthor" type="text" placeholder="姓名" />
+              </label>
+              <button id="submitAnalysesBtn" type="button" data-i18n="submitAnalyses">提交原因</button>
+              <span id="analysisSaveStatus" class="status-pill muted">未提交</span>
+            </div>
           </div>
           <section class="toolbar variance-toolbar" aria-label="筛选">
             <div class="field">
@@ -199,11 +218,13 @@
                   <th data-i18n="unit25">25单台</th>
                   <th data-i18n="unit26">26单台</th>
                   <th data-i18n="unitDiff">单台差异</th>
-                  <th data-i18n="analysis">差异分析</th>
+                  <th data-i18n="yoyPercent">同比%</th>
+                  <th data-i18n="targetVarianceAnalysis">目标差异分析</th>
+                  <th data-i18n="yoyVarianceAnalysis">同比差异分析</th>
                 </tr>
               </thead>
               <tbody id="detailBody">
-                <tr><td colspan="11" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
+                <tr><td colspan="13" class="empty-cell">导入SAP报表后显示科目明细</td></tr>
               </tbody>
             </table>
           </div>
@@ -228,7 +249,8 @@
                 </select>
               </label>
               <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加项目</button>
-              <button id="saveFactorsBtn" type="button" data-i18n="saveProjects">保存项目</button>
+              <button id="saveFactorsBtn" type="button" data-i18n="submitProjects">提交项目</button>
+              <span id="factorSaveStatus" class="status-pill muted">未提交</span>
             </div>
           </div>
           <div id="projectSummary" class="smart-summary smart-summary-project">???????????/?????????</div>

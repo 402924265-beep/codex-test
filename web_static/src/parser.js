@@ -175,6 +175,32 @@ export function extractActualFromWorkbook(workbook, month, xlsx) {
   throw new Error("找不到SAP_ACT_EUR或Renta DW _2026 sheet，请确认导入的是洗碗机26年实际报表");
 }
 
+export function inferActualMonthCountFromFileName(fileName, fallback = 4) {
+  const text = cellText(fileName).toLowerCase();
+  const chineseMonth = text.match(/(?:^|[^\d])(1[0-2]|[1-9])\s*月/);
+  if (chineseMonth) return Number(chineseMonth[1]);
+
+  const numericMonth = text.match(/(?:^|[_\s-])(0?[1-9]|1[0-2])\.(?:20)?\d{2}(?:\D|$)/);
+  if (numericMonth) return Number(numericMonth[1]);
+
+  const englishMonths = [
+    ["january", "jan"],
+    ["february", "feb"],
+    ["march", "mar"],
+    ["april", "apr"],
+    ["may"],
+    ["june", "jun"],
+    ["july", "jul"],
+    ["august", "aug"],
+    ["september", "sept", "sep"],
+    ["october", "oct"],
+    ["november", "nov"],
+    ["december", "dec"]
+  ];
+  const englishIndex = englishMonths.findIndex((tokens) => tokens.some((token) => new RegExp(`(?:^|[^a-z])${token}(?:[^a-z]|$)`).test(text)));
+  return englishIndex >= 0 ? englishIndex + 1 : fallback;
+}
+
 export function detectRentaMonthColumns(rows, month) {
   const tokens = MONTH_TOKENS[month] || [];
   const maxRows = Math.min(rows.length, 20);
@@ -273,10 +299,17 @@ export function detectFcstVolume(workbook, month, xlsx) {
 
 function detectRentaVolume(rows, valueCol) {
   for (let rowIndex = 0; rowIndex < Math.min(rows.length, 5); rowIndex += 1) {
+    const value = normalizeNumber(rows[rowIndex]?.[valueCol]);
+    if (value !== null && value > 100) return value;
+  }
+  for (let rowIndex = 0; rowIndex < Math.min(rows.length, 5); rowIndex += 1) {
     const row = rows[rowIndex] || [];
-    for (let colIndex = Math.max(0, valueCol - 2); colIndex <= Math.min(row.length - 1, valueCol + 2); colIndex += 1) {
-      const value = normalizeNumber(row[colIndex]);
-      if (value !== null && value > 100) return value;
+    for (let distance = 1; distance <= 2; distance += 1) {
+      for (const colIndex of [valueCol - distance, valueCol + distance]) {
+        if (colIndex < 0 || colIndex >= row.length) continue;
+        const value = normalizeNumber(row[colIndex]);
+        if (value !== null && value > 100) return value;
+      }
     }
   }
   return null;

@@ -1,4 +1,4 @@
-import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-jiang-fallback-sticky-v4";
+import { ACCOUNT_INFO } from "./baseline-data.js?v=20260608-metric-groups-v9";
 
 const SUMMARY_LABELS = {
   CS_DEPRECIATION: "折旧（含FC）",
@@ -34,7 +34,7 @@ export function buildReconciliation({
   const baselineAccounts = Array.isArray(baseline25) ? baseline25 : baseline25?.accounts || [];
   const budgetAccounts = Array.isArray(budget26) ? budget26 : budget26?.accounts || [];
   const baselineByCode = groupBaselineAccounts(baselineAccounts.map(normalizeBaselineAccount));
-  const actualByCode = new Map(actual26.accounts.map((row) => [row.code, row]));
+  const actualByCode = groupActualAccounts(actual26.accounts || [], actual26.volume);
   const budgetByCode = groupBudgetAccounts(budgetAccounts.map(normalizeBudgetAccount));
   const codes = [...new Set([...baselineByCode.keys(), ...actualByCode.keys(), ...budgetByCode.keys()])].sort((a, b) =>
     a.localeCompare(b, "zh-Hans-CN", { numeric: true })
@@ -283,6 +283,31 @@ function groupBudgetAccounts(accounts) {
   return grouped;
 }
 
+function groupActualAccounts(accounts, volume) {
+  const grouped = new Map();
+  for (const row of accounts) {
+    const current = grouped.get(row.code) || {
+      ...row,
+      amount: null,
+      unit: null,
+      duplicateCount: 0,
+      sourceRows: []
+    };
+    current.descEn = current.descEn || row.descEn;
+    current.category = current.category || row.category;
+    current.summaryKey = current.summaryKey || row.summaryKey;
+    current.amount = sumNullable(current.amount, row.amount);
+    current.unit = sumNullable(current.unit, row.unit);
+    current.duplicateCount += Number(row.duplicateCount) || 1;
+    current.sourceRows.push(...(row.sourceRows || []));
+    grouped.set(row.code, current);
+  }
+  for (const row of grouped.values()) {
+    if (row.amount !== null && volume) row.unit = row.amount * 1000 / volume;
+  }
+  return grouped;
+}
+
 function normalizeBudgetAccount(row) {
   if (!Array.isArray(row)) return row;
   const info = ACCOUNT_INFO?.[row[0]] || [];
@@ -318,6 +343,11 @@ function diffNullable(left, right) {
 function diffWithMissingZero(left, right) {
   if ((left === null || left === undefined) && (right === null || right === undefined)) return null;
   return (left || 0) - (right || 0);
+}
+
+function sumNullable(left, right) {
+  if (left === null && right === null) return null;
+  return (left || 0) + (right || 0);
 }
 
 function sum(rows, key) {

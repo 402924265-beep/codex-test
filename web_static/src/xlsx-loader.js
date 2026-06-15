@@ -9,6 +9,7 @@ export function loadXlsx() {
 
 async function loadXlsxFromAvailableSource() {
   const moduleUrls = [
+    "../vendor/xlsx.mjs",
     "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/xlsx.mjs",
     "https://unpkg.com/xlsx@0.18.5/xlsx.mjs"
   ];
@@ -28,7 +29,7 @@ async function loadXlsxFromAvailableSource() {
     console.warn("XLSX script fallback failed", error);
   }
 
-  throw new Error("Excel解析库加载失败，请换个浏览器或网络后重试");
+  throw new Error("Excel解析库加载失败，请确认 vendor/xlsx.mjs 已随网站文件一起打包。");
 }
 
 function loadScript(src) {

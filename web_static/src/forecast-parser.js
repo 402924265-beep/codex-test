@@ -1,12 +1,13 @@
-import { cellText, normalizeNumber } from "./parser.js?v=20260608-jiang-fallback-sticky-v4";
+import { cellText, normalizeNumber } from "./parser.js?v=20260608-metric-groups-v9";
 import {
   annualManufacturingRate,
   combineHeadcount,
   manufacturingRate,
   monthlyUpph,
   outputValue
-} from "./metrics.js?v=20260608-jiang-fallback-sticky-v4";
-import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-jiang-fallback-sticky-v4";
+} from "./metrics.js?v=20260608-metric-groups-v9";
+import { OPERATIONAL_BASELINE } from "./operational-data.js?v=20260608-metric-groups-v9";
+import { getKpiHeadcount } from "./kpi-headcount-data.js?v=20260611-kpi-headcount-full-v17";
 
 export const DASHBOARD_MONTHS = [
   "1月", "2月", "3月", "4月", "5月", "6月",
@@ -69,7 +70,10 @@ const DASHBOARD_TEXT = {
     "累计人均产量": { en: "YTD output per HC", tr: "YTD kişi başı çıktı" },
     "直接用人": { en: "Direct HC", tr: "Direkt kişi" },
     "间接用人": { en: "Indirect HC", tr: "Endirekt kişi" },
-    "固定用人": { en: "White-collar HC", tr: "Beyaz yaka kişi" }
+    "固定用人": { en: "White-collar HC", tr: "Beyaz yaka kişi" },
+    "直接员工": { en: "Direct employees", tr: "Direkt çalışan" },
+    "间接员工": { en: "Indirect employees", tr: "Endirekt çalışan" },
+    "白领": { en: "White collar", tr: "Beyaz yaka" }
     ,"工作日": { en: "Workdays", tr: "İş günü" }
     ,"UPPH": { en: "UPPH", tr: "UPPH" }
     ,"产值": { en: "Output value", tr: "Üretim değeri" }
@@ -211,15 +215,31 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const sameVolume = preferSeries(jiang?.volume?.same, baselineSameVolume);
   const baselineBudgetAmount = monthsFromObject(options.budget26ByMonth, (item) => sumAccounts(item?.accounts, 1));
   const baselineBudgetVolume = monthsFromObject(options.budget26ByMonth, (item) => item?.volume ?? null);
-  const budgetAmount = preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount));
-  const budgetVolume = preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume));
+  const accountBudgetAmount = futureMonthsFromObject(options.accountBudgetByMonth, (item) => item?.totalAmount ?? null);
+  const accountBudgetVolume = futureMonthsFromObject(options.accountBudgetByMonth, (item) => item?.volume ?? null);
+  const budgetAmount = preferSeries(
+    accountBudgetAmount,
+    preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount))
+  );
+  const budgetVolume = preferSeries(
+    accountBudgetVolume,
+    preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume))
+  );
   const stdVolume = normalizeMonths(forecast.volume.std);
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
   const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
   const actualMonthCount = inferActualMonthCount(options, jiang);
-  const forecastAmount = preferNonZeroSeries(jiang?.amount?.actual, preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount)));
-  const forecastVolume = preferNonZeroSeries(jiang?.volume?.actual, preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume)));
-  const forecastUnit = preferNonZeroSeries(jiang?.unit?.actual, preferNonZeroSeries(actualSource?.unitMonths, budgetUnit));
+  const accountForecastAmount = futureMonthsFromObject(options.accountForecastByMonth, (item) => item?.totalAmount ?? null);
+  const accountForecastVolume = futureMonthsFromObject(options.accountForecastByMonth, (item) => item?.volume ?? null);
+  const forecastAmount = preferSeries(
+    accountForecastAmount,
+    preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount))
+  );
+  const forecastVolume = preferSeries(
+    accountForecastVolume,
+    preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume))
+  );
+  const forecastUnit = preferNonZeroSeries(actualSource?.unitMonths, budgetUnit);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
     if (hasRealizedActual(result)) return result.summary.totalAmount26;
@@ -237,14 +257,19 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const workdaysSame = preferSeries(jiang?.workdays?.same, OPERATIONAL_BASELINE.workdays.same);
   const workdaysBudget = preferSeries(jiang?.workdays?.budget, OPERATIONAL_BASELINE.workdays.budget);
   const workdaysActual = preferSeries(jiang?.workdays?.actual, OPERATIONAL_BASELINE.workdays.actual);
-  const hcSame = preferSeries(jiang?.headcount?.same, OPERATIONAL_BASELINE.headcount.same);
-  const hcBudget = preferSeries(jiang?.headcount?.budget, forecast.hc?.budgetTotal);
-  const forecastHeadcount = preferSeries(forecast.hc?.actualTotal, OPERATIONAL_BASELINE.headcount.actual);
-  const hcActual = mergeRealizedAndForecast(
-    preferSeries(jiang?.headcount?.actual, OPERATIONAL_BASELINE.headcount.actual),
-    forecastHeadcount,
-    actualMonthCount
-  );
+  const kpiHeadcount = getKpiHeadcount("DW");
+  const directEmployeesSame = normalizeMonths(kpiHeadcount.direct.same);
+  const directEmployeesBudget = normalizeMonths(kpiHeadcount.direct.budget);
+  const directEmployees26 = normalizeMonths(kpiHeadcount.direct.actual);
+  const indirectEmployeesSame = normalizeMonths(kpiHeadcount.indirect.same);
+  const indirectEmployeesBudget = normalizeMonths(kpiHeadcount.indirect.budget);
+  const indirectEmployees26 = normalizeMonths(kpiHeadcount.indirect.actual);
+  const whiteCollarSame = normalizeMonths(kpiHeadcount.white.same);
+  const whiteCollarBudget = normalizeMonths(kpiHeadcount.white.budget);
+  const whiteCollar26 = normalizeMonths(kpiHeadcount.white.actual);
+  const hcSame = combineHeadcount(directEmployeesSame, indirectEmployeesSame);
+  const hcBudget = combineHeadcount(directEmployeesBudget, indirectEmployeesBudget);
+  const hcActual = combineHeadcount(directEmployees26, indirectEmployees26);
   const upphSame = sameVolume.map((value, index) => monthlyUpph(value, hcSame[index], 0, workdaysSame[index]));
   const upphBudget = budgetVolume.map((value, index) => monthlyUpph(value, hcBudget[index], 0, workdaysBudget[index]));
   const upphActual = actualVolume.map((value, index) => monthlyUpph(value, hcActual[index], 0, workdaysActual[index]));
@@ -259,24 +284,30 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const rateActual = actualAmount.map((value, index) => manufacturingRate(value, priceActual[index], actualVolume[index]));
 
   const rows = [
-    metric("单", "单台制造费", "同期", "€/台", sameUnit, "lower"),
-    metric("单", "单台制造费", "预算", "€/台", budgetUnit, "lower"),
-    metric("单", "单台制造费", "26年", "€/台", actualUnit, "lower", budgetUnit),
-    metric("单", "单台制造费累计", "同期", "€/台", cumulativeUnit(sameAmount, sameVolume), "lower"),
-    metric("单", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
-    metric("单", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
+    metric("费", "单台制造费", "同期", "€/台", sameUnit, "lower"),
+    metric("费", "单台制造费", "预算", "€/台", budgetUnit, "lower"),
+    metric("费", "单台制造费", "26年", "€/台", actualUnit, "lower", budgetUnit),
+    metric("费", "单台制造费累计", "同期", "€/台", cumulativeUnit(sameAmount, sameVolume), "lower"),
+    metric("费", "单台制造费累计", "预算", "€/台", cumulativeUnit(budgetAmount, budgetVolume), "lower"),
+    metric("费", "单台制造费累计", "26年", "€/台", cumulativeUnit(actualAmount, actualVolume), "lower", cumulativeUnit(budgetAmount, budgetVolume)),
     metric("时", "工作日", "同期", "天", workdaysSame, "higher"),
     metric("时", "工作日", "预算", "天", workdaysBudget, "higher"),
     metric("时", "工作日", "26年", "天", workdaysActual, "higher", workdaysBudget),
-    metric("人", "用人", "同期", "人", hcSame, "lower"),
-    metric("人", "用人", "预算", "人", hcBudget, "lower"),
-    metric("人", "用人", "26年", "人", hcActual, "lower", hcBudget),
-    metric("效", "产量", "同期", "台", sameVolume, "higher"),
-    metric("效", "产量", "预算", "台", budgetVolume, "higher"),
-    metric("效", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
-    metric("效", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
-    metric("效", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
-    metric("效", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
+    metric("人", "直接员工", "同期", "人", directEmployeesSame, "lower"),
+    metric("人", "直接员工", "预算", "人", directEmployeesBudget, "lower"),
+    metric("人", "直接员工", "26年", "人", directEmployees26, "lower", directEmployeesBudget),
+    metric("人", "间接员工", "同期", "人", indirectEmployeesSame, "lower"),
+    metric("人", "间接员工", "预算", "人", indirectEmployeesBudget, "lower"),
+    metric("人", "间接员工", "26年", "人", indirectEmployees26, "lower", indirectEmployeesBudget),
+    metric("人", "白领", "同期", "人", whiteCollarSame, "lower"),
+    metric("人", "白领", "预算", "人", whiteCollarBudget, "lower"),
+    metric("人", "白领", "26年", "人", whiteCollar26, "lower", whiteCollarBudget),
+    metric("单", "产量", "同期", "台", sameVolume, "higher"),
+    metric("单", "产量", "预算", "台", budgetVolume, "higher"),
+    metric("单", "产量", "26年", "台", actualVolume, "higher", budgetVolume),
+    metric("单", "产量累计", "同期", "台", cumulative(sameVolume), "higher"),
+    metric("单", "产量累计", "预算", "台", cumulative(budgetVolume), "higher"),
+    metric("单", "产量累计", "26年", "台", cumulative(actualVolume), "higher", cumulative(budgetVolume)),
     metric("效", "UPPH", "同期", "UPPH", upphSame, "higher"),
     metric("效", "UPPH", "预算", "UPPH", upphBudget, "higher"),
     metric("效", "UPPH", "26年", "UPPH", upphActual, "higher", upphBudget),
@@ -331,6 +362,9 @@ function prioritizeDashboardRows(rows) {
     "YTD unit manufacturing cost",
     "Workdays",
     "Headcount",
+    "Direct employees",
+    "Indirect employees",
+    "White collar",
     "Volume",
     "YTD volume",
     "UPPH",
@@ -503,6 +537,14 @@ function rowMonths(row, startCol) {
 
 function monthsFromObject(source, getter) {
   return Array.from({ length: 12 }, (_, index) => {
+    const value = getter(source?.[index + 1]);
+    return Number.isFinite(value) ? value : null;
+  });
+}
+
+function futureMonthsFromObject(source, getter, startMonth = 5) {
+  return Array.from({ length: 12 }, (_, index) => {
+    if (index + 1 < startMonth) return null;
     const value = getter(source?.[index + 1]);
     return Number.isFinite(value) ? value : null;
   });
