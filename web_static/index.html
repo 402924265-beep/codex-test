@@ -4,14 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260611-account-plan-v19" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260615-may-actual-v24" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
         anonKey: "sb_publishable_kji34L4Yh1vCIPudrIKROA_hdwTjzuu"
       };
+      window.DW_BUNDLED_FILES = {
+        forecast: "./input/01_Forecast_4plus8.xlsx",
+        forecastName: "2026 MFG Variance Reporting DW 4+8.xlsx",
+        jiang: "./input/02_Domestic_Finance_4plus8.xlsx",
+        jiangName: "4+8 Domestic Finance.xlsx",
+        sap: "./input/03_Dishwasher_May_Actual.xlsx",
+        sapName: "Dishwasher May Actual Manufacturing Cost.xlsx",
+        language: "zh"
+      };
     </script>
-    <script type="module" src="./src/app.js?v=20260611-account-plan-v19"></script>
+    <script type="module" src="./src/app.js?v=20260615-may-actual-v24"></script>
   </head>
   <body>
     <header class="app-header">
@@ -42,7 +51,7 @@
         </label>
         <label class="file-button">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
-          <span data-i18n="importSap">导入4月实际表</span>
+          <span data-i18n="importSap">导入实际表</span>
         </label>
         <button id="exportBtn" type="button" disabled data-i18n="exportAnalysis">导出三张表</button>
       </div>
@@ -51,7 +60,7 @@
     <main class="workspace">
       <section class="top-strip" aria-label="当前状态">
         <div class="status-pill" id="saveMode">本机保存</div>
-        <div class="status-pill muted" id="sapStatus">待导入 4月实际表</div>
+        <div class="status-pill muted" id="sapStatus">待导入实际表</div>
         <div class="status-pill muted" id="forecastStatus">待导入预测表</div>
         <div class="status-pill muted" id="jiangStatus">待导入国内财务表</div>
       </section>

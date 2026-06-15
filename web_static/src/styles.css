@@ -529,6 +529,26 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
   animation: drawLine 1.15s ease-out forwards;
 }
 
+.animated-line.forecast-segment {
+  stroke-dasharray: 9 7;
+  stroke-dashoffset: 0;
+  animation: none;
+  opacity: 0.82;
+}
+
+.actual-zone { fill: rgba(66, 224, 205, 0.035); }
+.forecast-zone { fill: rgba(246, 200, 95, 0.07); }
+.phase-divider {
+  stroke: rgba(246, 200, 95, 0.9);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+.phase-label {
+  text-anchor: middle;
+  font-weight: 700;
+}
+.forecast-dot { opacity: 0.65; }
+
 .chart-dot {
   transform-origin: center;
   animation: chartPulse 2.4s ease-in-out infinite;
@@ -564,7 +584,6 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 }
 .trend-diff-good { fill: #49d9a4; }
 .trend-diff-bad { fill: #ff7a70; }
-.forecast-zone { fill: rgba(255,255,255,0.05); }
 .dot { stroke: #0f2234; stroke-width: 1.5; }
 .dot.forecast { opacity: 0.65; }
 .wf-bad { fill: rgba(180, 35, 24, 0.84); }
@@ -774,6 +793,47 @@ td:nth-child(2) { text-align: left; }
 .dashboard-table th,
 .dashboard-table td {
   padding: 8px 9px;
+}
+
+.dashboard-table .phase-header-row th {
+  position: static;
+  padding: 7px 8px;
+  border-bottom: 1px solid #cbd8e0;
+  font-size: 11px;
+  text-align: center;
+}
+
+.dashboard-table .phase-corner,
+.dashboard-table .phase-year {
+  color: #5f7180;
+  background: #edf2f6;
+}
+
+.dashboard-table .phase-actual {
+  color: #08775d;
+  background: #def4ed;
+}
+
+.dashboard-table .phase-forecast {
+  color: #9a5700;
+  background: #fff1d8;
+}
+
+.dashboard-table .actual-month-head {
+  box-shadow: inset 0 3px 0 #0f7b69;
+}
+
+.dashboard-table .forecast-month-head {
+  background: #fff9ee;
+  box-shadow: inset 0 3px 0 #d58a20;
+}
+
+.dashboard-table td.actual-month-cell {
+  background-image: linear-gradient(rgba(8, 119, 93, 0.025), rgba(8, 119, 93, 0.025));
+}
+
+.dashboard-table td.forecast-month-cell {
+  background-image: linear-gradient(rgba(213, 138, 32, 0.055), rgba(213, 138, 32, 0.055));
 }
 
 .full-year-cell {

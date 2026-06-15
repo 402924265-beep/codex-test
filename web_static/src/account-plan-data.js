@@ -139,6 +139,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 27.44554877667209,
+        "unit": 0.543874695849872
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -157,6 +189,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -515,6 +571,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 9.029961184653938,
+        "unit": 0.17894221874747712
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -55.20601685854295,
+        "unit": -1.0939899898647119
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -755,12 +843,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.013259633892759444
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005546541927662602
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.10385333745877409
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.058192413876531346
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.014964719622814546
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.051081759137591144
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.01838763759426534
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.010160931684588047
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.006745787369026004
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.0004154133498350963
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.015075565033278223
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.3810965790116852
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.01827906915297677
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.02093351487939368
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.05647435171705547
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.010720468360293592
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.07285580671195378
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.06955845700738957
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.07957277160650345
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.010785863377471729
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.525469184078447,
         "unit": 0.12931195497846834
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.7973014386778434
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.012799832450856944
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.027001867739281264
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.7345150572366553
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.009308087024632764
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.511904562044,
+        "unit": 0.02996065557029903
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.0781512084976357,
+        "unit": 0.04118168179651697
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.007883590629069607
       },
       {
         "code": "6666110101",
@@ -834,7 +1394,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1838.2556258926322,
+    "totalUnit": 36.427791171603594
   },
   "2": {
     "volume": 50446,
@@ -976,6 +1538,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 27.44554877667209,
+        "unit": 0.5440579783664135
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -994,6 +1588,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -1352,6 +1970,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.861590956480807,
+        "unit": 0.17566488832575047
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -55.378439464397175,
+        "unit": -1.0977766218212976
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -1592,12 +2242,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.013016783424927566
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005548411079087299
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.10388833541176935
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.05821202437163306
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.01496976264373965
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.05109897338461447
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.018393834118055185
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.010164355857736326
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.006748060658985039
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.00041555334164707737
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.015080645408443068
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.3812250062773395
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.018285229089851855
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.020940569348587464
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.05649338323549479
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.01072408109395186
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.07288035868265716
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.06958189779098242
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.07959958715416451
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.010789498148859291
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.874662176464975,
         "unit": 0.13627764691878394
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.7979071185029538
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.01280414591776541
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.027010967207060033
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.7347625844136966
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.009311223794236276
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.5228025657678355,
+        "unit": 0.030186785191448986
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.1817208180078316,
+        "unit": 0.04324863850469475
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.007886247351915702
       },
       {
         "code": "6666110101",
@@ -1671,7 +2793,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1852.3923559755106,
+    "totalUnit": 36.72030202544326
   },
   "3": {
     "volume": 50447,
@@ -1813,6 +2937,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 27.44554877667209,
+        "unit": 0.544047193622457
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -1831,6 +2987,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -2189,6 +3369,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.696360114308936,
+        "unit": 0.1723860708131095
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -55.50394840911213,
+        "unit": -1.1002427975719493
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -2429,12 +3641,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.01277382276353027
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005548301094131224
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.10388627605570434
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.05821087044722979
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.014969465901363617
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.051097960460686695
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.01839346950104886
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.010164154371902526
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.006747926893634096
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.00041554510422281725
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.015080346468061907
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.38121744933626717
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.01828486662569958
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.020940154248197975
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.05649226337934407
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.01072386851280543
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.0728789139910267
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.06958051848403075
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.07959800926871734
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.010789284270964693
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.864992351044391,
         "unit": 0.13608326265277204
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.7978714789779373
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.012803892103942631
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.02701043177448313
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.7347480193734679
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.009311039219855356
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.5228025657678355,
+        "unit": 0.030186186805317174
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.1817208180078316,
+        "unit": 0.043247781196262054
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.007886091024535444
       },
       {
         "code": "6666110101",
@@ -2508,7 +4192,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1893.0365109563659,
+    "totalUnit": 37.52525444439443
   },
   "4": {
     "volume": 48050,
@@ -2650,6 +4336,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 19.321771337838488,
+        "unit": 0.4021180299237979
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -2668,6 +4386,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -3026,6 +4768,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.567842477151663,
+        "unit": 0.17831097767225104
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -47.847787047901605,
+        "unit": -0.9957916139001375
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -3266,12 +5040,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.013212858874464953
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005825081067547094
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.1090686986094093
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.06111475091470137
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.015716225729991474
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.05364700960167038
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.019311037584170902
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.010671198659716268
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.007084550842937757
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.0004362747944376371
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.015832637633180418
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.4002346860908776
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.019197016996184528
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.021984765064700172
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.05931041021223247
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.011258834440488981
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.07651451767128666
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.07305157993681372
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.08356879861766875
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.011327513498800328
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.707070565259024,
         "unit": 0.13958523548926172
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.8875592611862644
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.01344262112315492
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.028357861638446415
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.7714013180714534
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.009775525401124729
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.5228025657678355,
+        "unit": 0.03169204091088107
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.1817208180078316,
+        "unit": 0.045405219937728024
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.008279492901451394
       },
       {
         "code": "6666110101",
@@ -3345,7 +5591,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1849.6673108310094,
+    "totalUnit": 38.494637062039736
   },
   "5": {
     "volume": 36788,
@@ -3487,6 +5735,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 14.55288414367046,
+        "unit": 0.3955878042750478
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -3505,6 +5785,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -3863,6 +6167,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.441224115420358,
+        "unit": 0.229455912673164
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -36.20766602876269,
+        "unit": -0.9842249110786857
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -4103,12 +6439,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.01700270298351843
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.007608327315854025
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.14245816484131013
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.07982395839543878
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.020527472173700403
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.07007009925411171
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.02522277253233152
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.01393799868433638
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.009253361639750985
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.0005698326593652404
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.02067952153621613
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.5227595049110217
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.02507384654416295
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.028715014715636707
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.07746725048107454
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.014705528837270183
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.09993809323978807
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.09541503794617535
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.10915191838585905
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.014795232782900831
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 7.363331620611959,
         "unit": 0.20015580136490047
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 2.465402373056432
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.01755784345350641
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.037039122858740635
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 1.0075522815410825
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.01276813079058506
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.5846425792152354,
+        "unit": 0.04307498584362389
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.2006634781795302,
+        "unit": 0.05982014456288818
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.010814114219711306
       },
       {
         "code": "6666110101",
@@ -4182,7 +6990,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1928.8688418517522,
+    "totalUnit": 52.432011575833215
   },
   "6": {
     "volume": 53265,
@@ -4324,6 +7134,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 21.22932621550569,
+        "unit": 0.398560522209813
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -4342,6 +7184,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -4700,6 +7566,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.316476961005279,
+        "unit": 0.1561339896931433
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -53.05745428035405,
+        "unit": -0.9961035253985553
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -4940,12 +7838,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.011569542146275334
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005254766644055907
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.0983901430241644
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.055131207762159046
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.014177502043106924
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.04839460830489555
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.017420357756864954
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.00962641688912732
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.006390925898867159
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.00039356057209665753
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.014282516441834583
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.3610490315717013
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.017317500547576584
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.019832309421925154
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.05350352409082456
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.010156519193945283
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.06902323428340043
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.06589934133040269
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.07538685391117964
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.010218474112782424
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 7.021171270053816,
         "unit": 0.1318158503717979
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.7027545761757252
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.012126498544402401
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.02558143718628274
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.695875966081542
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.008818436037248535
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.4997490334266446,
+        "unit": 0.028156369725460335
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.8975809154323544,
+        "unit": 0.03562528706340663
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.007468875132164452
       },
       {
         "code": "6666110101",
@@ -5019,7 +8389,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1870.432553541251,
+    "totalUnit": 35.11560224427393
   },
   "7": {
     "volume": 42049,
@@ -5161,6 +8533,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 17.41421646017127,
+        "unit": 0.41414103688961146
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -5179,6 +8583,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -5537,6 +8965,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.250473175600474,
+        "unit": 0.19621092476873347
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -43.80810294571059,
+        "unit": -1.0418345964401194
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -5777,12 +9237,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.01453924650316684
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.006656404321045396
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.1246343781821712
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.06983670911202172
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.017959158275490272
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.061303213188429254
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.022067001734153293
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.01219413293061349
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.008095618635476688
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.0004985375127286848
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.018092183839670834
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.45735396006246687
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.02193670876041444
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.025122308767362916
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.06777486291464174
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.012865632829924504
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.08743424514507654
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.08347709614887154
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.09549527393229289
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.012944113382419459
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.870827878462845,
         "unit": 0.16340050603968811
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 2.1569412471164595
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.0153610774326998
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.032404938327364505
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.8814914345961459
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.011170634153583752
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.6609153780994899,
+        "unit": 0.03949952146542105
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.4836813095939605,
+        "unit": 0.059066358524434835
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.009461096195265988
       },
       {
         "code": "6666110101",
@@ -5856,7 +9788,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1859.235099225676,
+    "totalUnit": 44.215917125869254
   },
   "8": {
     "volume": 39150,
@@ -5998,6 +9932,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 15.985545652211314,
+        "unit": 0.4083153423297909
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -6016,6 +9982,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -6374,6 +10364,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.184993229762377,
+        "unit": 0.20906751544731486
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -40.42505124749562,
+        "unit": -1.0325683588121486
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -6614,12 +10636,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.015491920984909034
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.007149301284690622
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.13386337083479224
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.07500801485188764
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.01928900756899337
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.06584262608838472
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.023701030802539255
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.013097090564479354
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.008695087305316967
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.000535453483339169
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.019431883480825515
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.49122034908471696
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.023561089825457644
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.026982578834197784
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.07279349197184598
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.01381831404509567
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.09390862258251147
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.08965845251504212
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.10256655871210685
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.013902605967237696
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.798222163447668,
         "unit": 0.1736455214162878
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 2.3166595785440616
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.016498542655621812
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.03480447641704598
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.9467645806726267
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.011997803206233542
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.6553353574633676,
+        "unit": 0.042281873753853574
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.4618199240537906,
+        "unit": 0.06288173496944548
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.010161676472917996
       },
       {
         "code": "6666110101",
@@ -6693,7 +11187,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1842.1673410321491,
+    "totalUnit": 47.05408278498465
   },
   "9": {
     "volume": 53732,
@@ -6835,6 +11331,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 21.89976391309584,
+        "unit": 0.407573958034241
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -6853,6 +11381,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -7211,6 +11763,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.120032966034103,
+        "unit": 0.15112098872243918
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -55.86863450087387,
+        "unit": -1.0397646560871336
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -7451,12 +12035,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.011198078340579554
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005209095981829038
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.09753500647997687
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.054652046851995116
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.014054281365407772
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.047973997084796056
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.01726895250352512
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.009542750978920694
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.0063353805554075635
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.00039014002591990736
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.014158383054312494
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.3579110523834339
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.017166989255316508
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.019659941214896955
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.053038509839532684
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.010068246014767652
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.06842333384399099
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.06532659152765391
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.07473164545483107
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.010129662465892872
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 7.45534999124164,
         "unit": 0.13875065121792673
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.6879554548499964
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.012021103717851447
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.025359101684793984
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.6898279113625649
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.008741792517011153
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.6609153780994899,
+        "unit": 0.03091110284559461
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.4836813095939605,
+        "unit": 0.04622350386350704
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.007403961027222875
       },
       {
         "code": "6666110101",
@@ -7530,7 +12586,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1948.686789556268,
+    "totalUnit": 36.26678310050376
   },
   "10": {
     "volume": 48548,
@@ -7672,6 +12730,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 18.942654782653577,
+        "unit": 0.3901840401798957
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -7690,6 +12780,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -8048,6 +13162,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 7.980376379394696,
+        "unit": 0.16438115636884518
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -48.22478472556797,
+        "unit": -0.9933423565454389
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -8288,12 +13434,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.012180657910558404
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005765328031960902
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.10794988399485286
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.06048784257747799
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.01555501042939133
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.053096704526659426
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.019112947102237206
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.010561734687306722
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.007011878306071501
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.00043179953597941137
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.015670228192187503
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.39612912306720505
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.01900009612479745
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.02175924778278906
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.058702010601832624
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.011143342565409399
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.07572964023451684
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.07230222493128242
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.0827115591492746
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.011211317121557136
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 7.034408361020259,
         "unit": 0.14489594547705897
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.86819688761638
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.0133047282064677
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.028066969838661745
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.7634883688995084
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.009675249145671153
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.649755336827245,
+        "unit": 0.033981942342161266
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.43995853851362,
+        "unit": 0.050258682922337074
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.00819456278146864
       },
       {
         "code": "6666110101",
@@ -8367,7 +13985,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1894.9246326072878,
+    "totalUnit": 39.031981391762535
   },
   "11": {
     "volume": 51408,
@@ -8509,6 +14129,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 20.914060869615092,
+        "unit": 0.40682502469683884
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -8527,6 +14179,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -8885,6 +14561,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 7.843121748790854,
+        "unit": 0.1525661715840113
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -53.30756640541448,
+        "unit": -1.0369507937561173
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -9125,12 +14833,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.011305166515671308
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.005444583436345274
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.1019442687554878
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.057122700386153934
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.014689632865042218
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.050142756212267776
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.01804962955025311
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.009974149852150768
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.006621783924742437
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.0004077770750219511
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.014798440676048843
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.3740911271916174
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.017943056852370576
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.020548707620581294
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.055436220251668424
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.010523400927199958
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.07151654555916051
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.06827980890063608
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.07811003683432508
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.010587593830091734
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.859964677862486,
         "unit": 0.13344157870102877
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 1.764262809290383
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.012564541413157368
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.026505509876426827
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.7210129422139226
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.00913698248373878
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.7001441470640999,
+        "unit": 0.03307158704995526
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.4618199240537906,
+        "unit": 0.04788787589584871
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.007738671683682297
       },
       {
         "code": "6666110101",
@@ -9204,7 +15384,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1861.9627651516764,
+    "totalUnit": 36.21931927232486
   },
   "12": {
     "volume": 40676,
@@ -9346,6 +15528,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 16.019466607148917,
+        "unit": 0.3938309225870026
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "5102010151",
         "descEn": "Other Rev.-Interco-Epidemic problem comp",
         "category": "运营费",
@@ -9364,6 +15578,30 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
       {
         "code": "5001010201",
         "descEn": "Cost of Manufacture - Raw Material-Freig",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000011",
+        "descEn": "Gain of tangible asset disposal",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000012",
+        "descEn": "Loss of tangible asset sold",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5207000022",
+        "descEn": "Loss of intangible asset disposal",
         "category": "运营费",
         "summaryKey": "运营费",
         "amount": 0,
@@ -9722,6 +15960,38 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 7.708227762939414,
+        "unit": 0.18950309182169864
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -40.818689266358476,
+        "unit": -1.0035079473487676
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -9962,12 +16232,484 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "unit": 0.014042195501373967
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27989514529563786,
+        "unit": 0.006881088241116084
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 5.240750968182117,
+        "unit": 0.1288413552999832
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.9365637814514014,
+        "unit": 0.07219401567143774
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7551646463260904,
+        "unit": 0.018565361547991207
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.5777388113602617,
+        "unit": 0.06337247544891979
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9278953559194119,
+        "unit": 0.02281186340641685
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5127510955993667,
+        "unit": 0.012605740377602682
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3404126680031592,
+        "unit": 0.008368882584402578
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.020963003872728463,
+        "unit": 0.0005153654211999327
+      },
+      {
+        "code": "6666020601",
+        "descEn": "Training costs within the Group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.760758238274319,
+        "unit": 0.018702877329981292
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127666666667,
+        "unit": 0.47279173632281124
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9224166666666667,
+        "unit": 0.02267717245222408
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.0563679613588433,
+        "unit": 0.025970300947950713
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.84986521069777,
+        "unit": 0.07006257278733824
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5409869948654955,
+        "unit": 0.013299906452588639
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.6765225741053236,
+        "unit": 0.09038554858160398
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.5101284159638992,
+        "unit": 0.0862948278091233
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 4.015480773578983,
+        "unit": 0.09871867375304808
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.5442870236173558,
+        "unit": 0.013381036080670563
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 7.3203600591985065,
         "unit": 0.1799675498868745
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722250000001,
+        "unit": 2.22974782426984
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021400",
+        "descEn": "Recruitment expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6459179449675939,
+        "unit": 0.015879583660330265
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.3625952517273503,
+        "unit": 0.03349875237799563
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 37.06583333333334,
+        "unit": 0.911245779657128
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4697139955240432,
+        "unit": 0.011547693861836052
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.6943903541590326,
+        "unit": 0.04165577623559427
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.43995853851362,
+        "unit": 0.059985213357105424
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3978296339147395,
+        "unit": 0.009780451222213087
       },
       {
         "code": "6666110101",
@@ -10041,7 +16783,9 @@ export const ACCOUNT_BUDGET_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1947.1504903735117,
+    "totalUnit": 47.86976326023974
   }
 };
 
@@ -10176,6 +16920,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "summaryKey": "直接人工",
         "amount": -4.2657,
         "unit": -0.09007538484278987
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 6.063500000000001,
+        "unit": 0.12803809362924176
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 11.57396,
+        "unit": 0.24439808264881646
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0.5881900000000001,
+        "unit": 0.012420339126211545
       },
       {
         "code": "5102010151",
@@ -10602,6 +17378,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": -0.000004223240492429842
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": -2.7322800000000003,
+        "unit": -0.05769537766328104
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": -26.068060000000003,
+        "unit": -0.5504584327554533
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -56.35548,
+        "unit": -1.1900137255316006
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -10882,12 +17690,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.016424182275059655
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0070999999999999995,
+        "unit": 0.00014992503748125936
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00395,
+        "unit": 0.00008340899972548938
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00013000000000000002,
+        "unit": 0.0000027451063200793973
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0072699999999999996,
+        "unit": 0.0001535147918998247
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.07826999999999999,
+        "unit": 0.0016527651667124184
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 71.70073,
+        "unit": 1.5140471313638955
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.26835000000000003,
+        "unit": 0.005666532930717741
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01877,
+        "unit": 0.0003963511202145406
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.29908999999999997,
+        "unit": -0.006315644994404205
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00452,
+        "unit": 0.00009544523512891442
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.82921,
+        "unit": 0.017509766243638744
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01091,
+        "unit": 0.00023037776886204782
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.12303,
+        "unit": 0.002597926388918217
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.015050000000000001,
+        "unit": 0.0003177988470553456
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01704,
+        "unit": 0.00035982008995502244
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.02234,
+        "unit": -0.00047173596300441323
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.231279999999998,
+        "unit": 0.40609160208628076
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.02777,
+        "unit": 0.0005863969423738835
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6408400000000001,
+        "unit": 0.013532107185843698
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.42118,
+        "unit": 0.03000992461515721
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.16222,
+        "unit": 0.0034254703634098442
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.00155,
+        "unit": -0.000032730113816331265
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6909500000000001,
+        "unit": 0.014590240091221996
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.07784999999999999,
+        "unit": 0.0016438963616783155
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.07116,
+        "unit": 0.0015026289672065375
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 4.66974,
         "unit": 0.09860717528559663
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0044800000000000005,
+        "unit": 0.00009460058703042845
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 88.89034,
+        "unit": 1.87702641636928
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.13338999999999998,
+        "unit": 0.0028166902464260824
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.05709,
+        "unit": -0.0012055239985640982
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.046,
+        "unit": -0.0009713453132588635
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00133,
+        "unit": 0.000028084549274658445
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05037,
+        "unit": 0.0010636231180184553
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.81961,
+        "unit": 0.059539455624300526
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 15.732700000000001,
+        "unit": 0.33221487847625486
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.96245,
+        "unit": 0.08367189644614313
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.25683,
+        "unit": 0.005423274278353781
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.25233,
+        "unit": 0.0053282513672741096
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.63149,
+        "unit": 0.013334670692822603
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.03233,
+        "unit": 0.0006826868256012838
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.1876,
+        "unit": 0.00396139958189919
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.13535,
+        "unit": -0.002858078003251895
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0017800000000000001,
+        "unit": 0.00003758684038262559
       },
       {
         "code": "6666110101",
@@ -10953,7 +18273,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1778.339979999999,
+    "totalUnit": 37.55178706421435
   },
   "2": {
     "volume": 42593,
@@ -11085,6 +18407,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "summaryKey": "直接人工",
         "amount": 0.68853,
         "unit": 0.016165332331603784
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 6.05671,
+        "unit": 0.14219965722067004
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 7.723510000000002,
+        "unit": 0.18133284812058323
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0.5574699999999999,
+        "unit": 0.013088300894513181
       },
       {
         "code": "5102010151",
@@ -11511,6 +18865,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": -0.00001878242903763529
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": -0.22594999999999998,
+        "unit": -0.0053048623013171176
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0.07193000000000001,
+        "unit": 0.0016887751508463833
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 5.09381,
+        "unit": 0.1195926560702463
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -55.94882,
+        "unit": -1.3135684267367875
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -11791,12 +19177,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.01862583053553401
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.09326999999999999,
+        "unit": 0.0021897964454253046
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.052770000000000004,
+        "unit": 0.001238935975395018
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00181,
+        "unit": 0.000042495245697649846
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.09207,
+        "unit": 0.0021616228018688515
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": -2.1466,
+        "unit": -0.050397952715234895
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.06378,
+        "unit": -0.0014974291550254738
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 14.3189,
+        "unit": 0.336179653933745
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.34917000000000004,
+        "unit": 0.008197825933838894
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.06620000000000001,
+        "unit": 0.0015542460028643206
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27619,
+        "unit": 0.006484398844880614
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": -2.51615,
+        "unit": -0.059074261028807556
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.33135000000000003,
+        "unit": 0.007779447327025567
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.08370999999999999,
+        "unit": 0.0019653464184255626
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.5799100000000001,
+        "unit": 0.03709318432606297
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05871,
+        "unit": 0.00137839551099946
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05978,
+        "unit": 0.0014035170098372972
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 18.68756,
+        "unit": 0.4387472119831898
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.4152,
+        "unit": 0.009748080670532717
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.33071,
+        "unit": 0.007764421383795459
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.6975399999999999,
+        "unit": 0.01637686943864015
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 3.27313,
+        "unit": 0.07684666494494401
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.12025,
+        "unit": 0.0028232338647195547
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.29917,
+        "unit": 0.05397999671307492
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.1032,
+        "unit": 0.0024229333458549527
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.07784999999999999,
+        "unit": -0.0018277651257248841
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.07116,
+        "unit": -0.0016706970628976594
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 2.2962399999999996,
         "unit": 0.05391120606672457
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01672,
+        "unit": 0.0003925527668865776
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.60498,
+        "unit": 0.06115981499307398
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05372,
+        "unit": 0.0012612401098772098
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 89.41512,
+        "unit": 2.099291432864555
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.07572,
+        "unit": 0.0017777569084121802
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": -2.08704,
+        "unit": -0.04899960087338295
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0047,
+        "unit": 0.00011034677059610734
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.92021,
+        "unit": 0.04508276007794708
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.3966,
+        "unit": 0.009311389195407695
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.00023,
+        "unit": -0.0000053999483483201465
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.04275,
+        "unit": 0.001003686051698636
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.05664,
+        "unit": 0.04828586856995281
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 43.36412,
+        "unit": 1.0181043833493766
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": -26.06165,
+        "unit": -0.6118763646608598
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.00019,
+        "unit": -0.000004460826896438383
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.19285,
+        "unit": 0.004527739299884957
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.20578,
+        "unit": 0.004831310309205738
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.92914,
+        "unit": 0.045292418942079686
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.64312,
+        "unit": 0.015099194703355011
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.18181,
+        "unit": 0.00426854177916559
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.7174299999999999,
+        "unit": 0.016843847580588357
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.02802,
+        "unit": 0.0006578545770431761
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00093,
+        "unit": 0.000021834573756251028
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.038149999999999996,
+        "unit": 0.0008956870847322329
       },
       {
         "code": "6666110101",
@@ -11862,7 +19760,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1751.2070899999994,
+    "totalUnit": 41.11490362266099
   },
   "3": {
     "volume": 23002,
@@ -11994,6 +19894,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "summaryKey": "直接人工",
         "amount": 0.6322300000000001,
         "unit": 0.027485870793844017
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 5.524310000000001,
+        "unit": 0.24016650726023828
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 2.51955,
+        "unit": 0.10953612729327886
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 1.5109399999999997,
+        "unit": 0.06568733153638813
       },
       {
         "code": "5102010151",
@@ -12420,6 +20352,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": -0.5556700000000001,
+        "unit": -0.024157464568298415
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 200.17382999999998,
+        "unit": 8.702453264933483
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -30.366419999999998,
+        "unit": -1.3201643335362143
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -12700,12 +20664,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.02782366750717329
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.10325,
+        "unit": 0.004488740109555691
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.056280000000000004,
+        "unit": 0.002446743761412051
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.002,
+        "unit": 0.00008694896095991653
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.10195,
+        "unit": 0.004432223284931746
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": -3.21366,
+        "unit": -0.13971219893922268
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01292,
+        "unit": 0.0005616902878010608
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 18.89773,
+        "unit": 0.8215689940005217
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.1343,
+        "unit": 0.005838622728458395
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05951,
+        "unit": 0.002587166333362316
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.09381,
+        "unit": -0.004078341013824885
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.16444999999999999,
+        "unit": 0.007149378314929136
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.59792,
+        "unit": 0.025994261368576646
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.43258,
+        "unit": 0.06228067124597861
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00505,
+        "unit": 0.00021954612642378923
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.91314,
+        "unit": -0.03969828710546909
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.1333,
+        "unit": 0.005795148247978436
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.01001,
+        "unit": -0.0004351795496043822
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 18.959419999999998,
+        "unit": 0.8242509347013303
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.11728,
+        "unit": -0.005098687070689505
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.26491000000000003,
+        "unit": 0.011516824623945744
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 7.72778,
+        "unit": 0.33596122076341184
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": -2.08135,
+        "unit": -0.09048560994696114
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 6.43413,
+        "unit": 0.2797204590905139
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.24158000000000002,
+        "unit": 0.010502564994348318
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.2991599999999996,
+        "unit": 0.09995478654030082
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.11222,
+        "unit": 0.004878706199460916
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 6.75632,
         "unit": 0.2937275019563516
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.09270999999999999,
+        "unit": 0.00403051908529693
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": -1.338,
+        "unit": -0.058168854882184165
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.054740000000000004,
+        "unit": 0.0023797930614729156
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 89.41512,
+        "unit": 3.8872758890531256
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.9946,
+        "unit": 0.04323971828536649
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.15418,
+        "unit": -0.006702895400399965
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00965,
+        "unit": 0.00041952873663159726
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.62521,
+        "unit": 0.07065516042083297
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.25142,
+        "unit": 0.010930353882271105
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.00335,
+        "unit": -0.0001456395096078602
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00801,
+        "unit": 0.00034823058864446574
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.8885300000000003,
+        "unit": 0.12557734110077384
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 16.51439,
+        "unit": 0.7179545256934179
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.86165,
+        "unit": 0.12440874706547256
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.26811,
+        "unit": 0.01165594296148161
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.22557,
+        "unit": 0.009806538561864185
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.05608,
+        "unit": -0.002438048865316059
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01712,
+        "unit": 0.0007442831058168855
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.08768000000000001,
+        "unit": 0.0038118424484827407
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.91204,
+        "unit": -0.03965046517694113
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01482,
+        "unit": 0.0006442918007129814
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.2507,
+        "unit": 0.010899052256325537
       },
       {
         "code": "6666110101",
@@ -12771,7 +21247,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1712.8791300000005,
+    "totalUnit": 74.46653030171292
   },
   "4": {
     "volume": 44096,
@@ -12903,6 +21381,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "summaryKey": "直接人工",
         "amount": 0.63007,
         "unit": 0.014288597605224964
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 4.28283,
+        "unit": 0.09712513606676343
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 44.860479999999995,
+        "unit": 1.0173367198838896
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 1.3141,
+        "unit": 0.029800888969521044
       },
       {
         "code": "5102010151",
@@ -13329,6 +21839,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 65.57718,
+        "unit": 1.4871457728592161
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": -177.1679,
+        "unit": -4.017777122641509
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -53.893480000000004,
+        "unit": -1.2221852322206097
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -13609,12 +22151,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": -0.0045620917997097245
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.09993,
+        "unit": 0.0022661919448476054
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05065,
+        "unit": 0.0011486302612481857
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0019399999999999999,
+        "unit": 0.00004399492017416546
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.09864,
+        "unit": 0.0022369375907111758
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": -5.47451,
+        "unit": -0.12414980950653122
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00415,
+        "unit": 0.00009411284470246734
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": -19.546730000000004,
+        "unit": -0.44327671444121924
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.061459999999999994,
+        "unit": -0.001393777213352685
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0606,
+        "unit": 0.0013742743105950653
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.00556,
+        "unit": -0.00012608853410740203
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.82877,
+        "unit": 0.04147246915820029
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.51529,
+        "unit": 0.011685640420899856
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05971,
+        "unit": 0.0013540910740203194
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.04268,
+        "unit": 0.0009678882438316402
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.12232,
+        "unit": 0.002773947750362845
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.08897999999999999,
+        "unit": 0.0020178701015965165
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 18.959419999999998,
+        "unit": 0.42995781930333815
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.33199,
+        "unit": 0.007528800798258345
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.88629,
+        "unit": 0.06545468976777938
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.77559,
+        "unit": 0.040266464078374455
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.010890000000000014,
+        "unit": -0.0002469611756168363
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.1700100000000004,
+        "unit": 0.04921103955007258
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.30616999999999994,
+        "unit": 0.0069432601596516675
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": -0.000029999999999999997,
+        "unit": -6.8033381712627e-7
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 10.38653,
         "unit": 0.2355435867198839
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.18492,
+        "unit": 0.0041935776487663275
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.054009999999999996,
+        "unit": 0.001224827648766328
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 89.41512,
+        "unit": 2.0277376632801163
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.0572,
+        "unit": 0.0012971698113207549
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00637,
+        "unit": 0.00014445754716981132
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.03617,
+        "unit": 0.0008202558055152396
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 1.59456,
+        "unit": 0.0361611030478955
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.13257,
+        "unit": 0.003006395137880987
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.04778,
+        "unit": 0.0010835449927431061
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 2.8718000000000004,
+        "unit": 0.06512608853410741
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 33.744600000000005,
+        "unit": 0.7652530841799711
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 24.229059999999997,
+        "unit": 0.549461629172714
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.27032999999999996,
+        "unit": 0.0061304880261248175
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.236,
+        "unit": 0.005351959361393323
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.01239,
+        "unit": 0.0002809778664731495
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.11531,
+        "unit": 0.0026149764150943397
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.56559,
+        "unit": 0.01282633345428157
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.07128,
+        "unit": 0.0016164731494920173
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.05484000000000001,
+        "unit": 0.0012436502177068218
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0.00547,
+        "unit": 0.00012404753265602322
       },
       {
         "code": "6666110101",
@@ -13680,7 +22734,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 901.32007,
+    "totalUnit": 20.439950789187225
   },
   "5": {
     "volume": 36000,
@@ -13810,6 +22866,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 14.74,
+        "unit": 0.40944444444444444
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -14238,6 +23326,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.441224115420358,
+        "unit": 0.2344784476505655
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -31.28553668625938,
+        "unit": -0.8690426857294272
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -14518,12 +23638,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.017374873259935444
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 79.96899030643021,
+        "unit": 2.221360841845284
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.5342021201821447
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 3.8756343539174343,
         "unit": 0.10765650983103985
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 2.5193672880001365
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -14589,7 +24221,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1694.3563132446168,
+    "totalUnit": 47.065453145683804
   },
   "6": {
     "volume": 54500.001,
@@ -14719,6 +24353,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 23.30592,
+        "unit": 0.4276315517865771
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -15147,6 +24813,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.316476961005279,
+        "unit": 0.15259590474145643
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -51.571118382193724,
+        "unit": -0.9462590355217374
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -15427,12 +25125,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.01130736974521075
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 78.80565706979455,
+        "unit": 1.4459753325471416
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.35286744905852774
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 3.6243974617360832,
         "unit": 0.06650270449969503
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 1.6641691872263435
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -15498,7 +25708,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1693.123582292432,
+    "totalUnit": 31.066487178457706
   },
   "7": {
     "volume": 41500,
@@ -15628,6 +25840,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 17.86224,
+        "unit": 0.430415421686747
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -16056,6 +26300,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.250473175600474,
+        "unit": 0.19880658254458974
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -39.48854081384819,
+        "unit": -0.9515311039481492
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -16336,12 +26612,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.014731584968955722
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 76.02325864268242,
+        "unit": 1.8318857504260826
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.46340424883270387
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 3.524904571983588,
         "unit": 0.0849374595658696
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 2.185475237783251
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -16407,7 +27195,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1663.8605590911152,
+    "totalUnit": 40.09302552026784
   },
   "8": {
     "volume": 39000.001,
@@ -16537,6 +27327,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 17.5076,
+        "unit": 0.4489128090022357
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -16965,6 +27787,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.184993229762377,
+        "unit": 0.2098716158946349
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -38.65851014447247,
+        "unit": -0.9912438244417603
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -17245,12 +28099,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.01555150489763292
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 75.37469730062351,
+        "unit": 1.932684496613821
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.493109636755066
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 3.395715855568434,
         "unit": 0.0870696350897128
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 2.325569744677825
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -17316,7 +28682,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1652.5460734680303,
+    "totalUnit": 42.372975156283466
   },
   "9": {
     "volume": 54085,
@@ -17446,6 +28814,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 24.159080000000003,
+        "unit": 0.44668725154848854
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -17874,6 +29274,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 8.120032966034103,
+        "unit": 0.1501346577800518
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -53.347192542572024,
+        "unit": -0.9863583718696871
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -18154,12 +29586,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.01112499113240308
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 81.98319099322006,
+        "unit": 1.5158212257228447
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.35557504532785816
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 3.8320278203383196,
         "unit": 0.07085195193377683
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 1.676938566478782
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -18225,7 +30169,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1816.0821789374882,
+    "totalUnit": 33.57829673546248
   },
   "10": {
     "volume": 49968,
@@ -18355,6 +30301,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 21.98592,
+        "unit": 0.44
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -18783,6 +30761,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 7.980376379394696,
+        "unit": 0.1597097418226604
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -48.63513710337335,
+        "unit": -0.9733256704965848
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -19063,12 +31073,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.011834505688476412
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 75.85909771124179,
+        "unit": 1.518153572511243
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.38487184451163164
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 4.186313733216748,
         "unit": 0.08377989379636464
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 1.8151061152738734
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -19134,7 +31656,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1764.06749849449,
+    "totalUnit": 35.30394449436619
   },
   "11": {
     "volume": 51936,
@@ -19264,6 +31788,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 22.85184,
+        "unit": 0.43999999999999995
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -19692,6 +32248,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 7.843121748790854,
+        "unit": 0.15101512917419238
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -50.750043862884446,
+        "unit": -0.9771650466513487
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -19972,12 +32560,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.011190234138894613
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 75.53957259650409,
+        "unit": 1.4544742104995396
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.37028797609668074
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 4.06143992125138,
         "unit": 0.07820086108386053
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 1.7463266783734772
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -20043,7 +33143,9 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1739.756205463259,
+    "totalUnit": 33.49807850938191
   },
   "12": {
     "volume": 42190,
@@ -20173,6 +33275,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "descEn": "Salary-Blue collar direct employees-Accr",
         "category": "直接人工",
         "summaryKey": "直接人工",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "8701530201",
+        "descEn": "Scrap-Raw Material - Managerial",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050309",
+        "descEn": "SFG scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 18.563599999999997,
+        "unit": 0.43999999999999995
+      },
+      {
+        "code": "6666050308",
+        "descEn": "Raw material scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050306",
+        "descEn": "Finished goods scrap",
+        "category": "可回收废料",
+        "summaryKey": "可回收废料",
         "amount": 0,
         "unit": 0
       },
@@ -20601,6 +33735,38 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0
       },
       {
+        "code": "6666050307",
+        "descEn": "Inventory count different-raw material",
+        "category": "生产耗用品",
+        "summaryKey": "生产耗用品",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050312",
+        "descEn": "Inventory count different- Semifinished",
+        "category": "运营费",
+        "summaryKey": "运营费",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666100203",
+        "descEn": "Provision for inventory devaluation - RM",
+        "category": "存货跌价准备",
+        "summaryKey": "存货跌价准备",
+        "amount": 7.708227762939414,
+        "unit": 0.18270272014551822
+      },
+      {
+        "code": "5301070000",
+        "descEn": "Non-operation revenue-sales of scrapped",
+        "category": "Scrap selling",
+        "summaryKey": "Scrap selling",
+        "amount": -41.11843231749201,
+        "unit": -0.9746013822586397
+      },
+      {
         "code": "6666021602",
         "descEn": "Electricity",
         "category": "固定能源费",
@@ -20881,12 +34047,524 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "unit": 0.013538287371744194
       },
       {
+        "code": "6666110110",
+        "descEn": "Depreciation-Plant & Machinery",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110112",
+        "descEn": "Depreciation of Furniture & Fixture",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110207",
+        "descEn": "Amortization of Software",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666110506",
+        "descEn": "Amortization-Leasehold Improvement",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010380",
+        "descEn": "Incentive",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040406",
+        "descEn": "Other revenue-Servic",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029996",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029700",
+        "descEn": "Service fee recharge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 63.65660116998903,
+        "unit": 1.5088078020855424
+      },
+      {
+        "code": "6666010322",
+        "descEn": "fuel allowance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020495",
+        "descEn": "Non-deductible expense-travel.",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301999999",
+        "descEn": "Non-operation revenue-Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5301060000",
+        "descEn": "Other Income-Subsidy income",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050000",
+        "descEn": "Non-Operating Expense - Penalty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601050100",
+        "descEn": "Non-operation Expense-Others",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5601080000",
+        "descEn": "Non-operating expens",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020101",
+        "descEn": "Entertainment",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020201",
+        "descEn": "Domestic business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020202",
+        "descEn": "Overseas business travel",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020204",
+        "descEn": "Travel expense pay to agency",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020301",
+        "descEn": "Staff communication expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020403",
+        "descEn": "Company car expense",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020504",
+        "descEn": "Newspaper and Periodicals expenditure",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020508",
+        "descEn": "Postage",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020602",
+        "descEn": "Training costs Outside the group",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020701",
+        "descEn": "Enterprise Property Insurance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 19.23127632655721,
+        "unit": 0.4558254640094148
+      },
+      {
+        "code": "6666020801",
+        "descEn": "Housing rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020803",
+        "descEn": "Car rental cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021100",
+        "descEn": "Consulting fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021102",
+        "descEn": "Consulting expense-tax",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021103",
+        "descEn": "Consulting expense-finance",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021104",
+        "descEn": "Consulting expense-Technical",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021200",
+        "descEn": "Audit fee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021300",
+        "descEn": "Legal fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021902",
+        "descEn": "Cleaning fees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666022100",
+        "descEn": "Security",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
         "code": "6666022300",
         "descEn": "Association dues",
         "category": "",
         "summaryKey": "",
         "amount": 4.469919835280953,
         "unit": 0.10594737699172678
+      },
+      {
+        "code": "6666029900",
+        "descEn": "Sundry Expenses",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666029997",
+        "descEn": "restructure cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666031100",
+        "descEn": "Technical Documentation",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666050107",
+        "descEn": "Special distribution costs",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666070400",
+        "descEn": "IT maint. & repairs hardware",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666079999",
+        "descEn": "IT Expense-Internal Charge Out",
+        "category": "",
+        "summaryKey": "",
+        "amount": 90.69722236800492,
+        "unit": 2.1497326941930535
+      },
+      {
+        "code": "6666090100",
+        "descEn": "Stamp Duty",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666093800",
+        "descEn": "Other Taxes-CIT Deductible",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5401050201",
+        "descEn": "COGS-Freight out-Special and sporadic fr",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "5102040000",
+        "descEn": "Other Revenue - Other",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021602",
+        "descEn": "Electricity",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021600",
+        "descEn": "Energy and power cost",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021604",
+        "descEn": "Oil & Gas",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010012",
+        "descEn": "Payroll Taxes- Blue Collar Indirect",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010102",
+        "descEn": "Salary-Blue collar i",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010196",
+        "descEn": "Payroll Taxes-White Collar Employee",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010101",
+        "descEn": "Salary - White collar employees",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010199",
+        "descEn": "Salary-White collar employees -Accrued",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010185",
+        "descEn": "Salary&Additional Incentive-White Collar",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010207",
+        "descEn": "Unemployment insurance companies to pay",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010227",
+        "descEn": "Staff Leaving Indemn",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010314",
+        "descEn": "Work uniforms",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666010315",
+        "descEn": "Other labor supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020401",
+        "descEn": "local transportation - bus and taxi",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020502",
+        "descEn": "Working meals",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666020503",
+        "descEn": "Office supplies",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021502",
+        "descEn": "Repair & Maintain - Building&office",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666021505",
+        "descEn": "Repairs & Maintenance - Vehicles",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
+      },
+      {
+        "code": "6666091600",
+        "descEn": "Garbage disposal charge",
+        "category": "",
+        "summaryKey": "",
+        "amount": 0,
+        "unit": 0
       },
       {
         "code": "6666110101",
@@ -20952,6 +34630,8 @@ export const ACCOUNT_FORECAST_DW_BY_MONTH = {
         "amount": 0,
         "unit": 0
       }
-    ]
+    ],
+    "totalAmount": 1797.7701583611138,
+    "totalUnit": 42.61128604790505
   }
 };

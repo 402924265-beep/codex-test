@@ -2,12 +2,12 @@ import {
   BASELINE_25_BY_MONTH,
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
-} from "./baseline-data.js?v=20260611-account-plan-v19";
-import { MONTHS, extractActualFromWorkbook } from "./parser.js?v=20260611-account-plan-v19";
-import { buildReconciliation } from "./reconcile.js?v=20260611-account-plan-v19";
-import { exportAnalysisWorkbook } from "./export.js?v=20260611-account-plan-v19";
-import { loadXlsx } from "./xlsx-loader.js?v=20260611-account-plan-v19";
-import { createStore } from "./store.js?v=20260611-account-plan-v19";
+} from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
+import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-may-actual-v24";
+import { buildReconciliation } from "./reconcile.js?v=20260612-duplicate-accounts-v23";
+import { exportAnalysisWorkbook } from "./export.js?v=20260612-duplicate-accounts-v23";
+import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
+import { createStore } from "./store.js?v=20260612-duplicate-accounts-v23";
 import {
   extractForecastWorkbook,
   buildAnnualDashboardRows,
@@ -16,27 +16,27 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260611-account-plan-v19";
+} from "./forecast-parser.js?v=20260612-duplicate-accounts-v23";
 import {
   analysisKey,
   buildAutoSummary,
   buildFactorSummary,
   parseEditableNumber
-} from "./workbench.js?v=20260611-account-plan-v19";
-import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260611-account-plan-v19";
+} from "./workbench.js?v=20260612-duplicate-accounts-v23";
+import { extractJiangYueWorkbook } from "./jiangyue-parser.js?v=20260612-duplicate-accounts-v23";
 import {
   annualManufacturingRate,
   annualUnitCost,
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260611-account-plan-v19";
-import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260611-account-plan-v19";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260611-account-plan-v19";
-import { categoryAlias } from "./category-alias.js?v=20260611-account-plan-v19";
-import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260611-account-plan-v19";
+} from "./metrics.js?v=20260612-duplicate-accounts-v23";
+import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260612-duplicate-accounts-v23";
+import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260612-duplicate-accounts-v23";
+import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
+import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 
-const VERSION = "20260611-account-plan-v19";
+const VERSION = "20260612-duplicate-accounts-v23";
 
 const i18n = {
   zh: {
@@ -46,7 +46,7 @@ const i18n = {
     author: "填写人",
     importForecast: "导入预测表",
     importJiang: "导入国内财务表",
-    importSap: "导入4月实际表",
+    importSap: "导入实际表",
     exportAnalysis: "导出三张表",
     tabDashboard: "全年驾驶舱",
     tabVariance: "月度差异",
@@ -118,7 +118,7 @@ const i18n = {
     emptyForecast: "导入预测表文件后显示1-12月全年驾驶舱",
     emptySap: "导入SAP报表后显示科目明细",
     waitingForecast: "等待预测表文件",
-    waitingSap: "待导入4月实际表",
+    waitingSap: "待导入实际表",
     waitingForecastPill: "待导入预测表",
     placeholderMajor: "重点差异：填写原因、责任、行动和预计影响",
     placeholderSmall: "简要原因",
@@ -136,7 +136,7 @@ const i18n = {
     other: "其他",
     fullYear: "全年",
     annualSummaryEmpty: "导入预测表后生成全年总结。",
-    monthlySummaryEmpty: "导入4月实际表后生成月度总结。",
+    monthlySummaryEmpty: "导入实际表后生成月度总结。",
     allIndicators: "全部指标",
     allScenarios: "全部口径",
     allStatus: "全部状态",
@@ -160,12 +160,12 @@ const i18n = {
     importedForecast: "已导入预测表",
     importedSap: "已导入SAP",
     loadedForecast: "已读取预测表",
-    loadedSap: "已读取4月实际表",
+    loadedSap: "已读取实际表",
     noTimeData: "工时/工作日数据待接入",
     actualLine: "26年",
     budgetLine: "预算",
     sameLine: "同期",
-    actualMonths: "已发生",
+      actualMonths: "实际",
     forecastMonths: "预测",
     annualValue: "全年值",
     varianceValue: "差异",
@@ -200,7 +200,7 @@ const i18n = {
     author: "Author",
     importForecast: "Import forecast table",
     importJiang: "Import domestic finance table",
-    importSap: "Import April actual table",
+    importSap: "Import actual table",
     exportAnalysis: "Export workbook",
     tabDashboard: "Year dashboard",
     tabVariance: "Monthly variance",
@@ -270,7 +270,7 @@ const i18n = {
     decrease: "Decrease",
     delete: "Del",
     emptyForecast: "Import a 4+8 forecast file to show the 12-month dashboard",
-    emptySap: "Import April actual table to show account details",
+    emptySap: "Import the actual table to show account details",
     waitingForecast: "Waiting for 4+8 forecast",
     waitingSap: "SAP actuals not imported",
     waitingForecastPill: "4+8 forecast not imported",
@@ -290,7 +290,7 @@ const i18n = {
     other: "Other",
     fullYear: "Full year",
     annualSummaryEmpty: "Import the 4+8 forecast to generate the annual summary.",
-    monthlySummaryEmpty: "Import April actual table to generate the monthly summary.",
+    monthlySummaryEmpty: "Import the actual table to generate the monthly summary.",
     allIndicators: "All metrics",
     allScenarios: "All bases",
     allStatus: "All status",
@@ -524,6 +524,7 @@ const state = {
   metricIndicator: "all",
   dashboardTableOpen: true,
   factorMonth: 4,
+  actualMonthCount: 4,
   sapFileName: "",
   forecastFileName: "",
   jiangFileName: ""
@@ -607,6 +608,33 @@ async function bootstrap() {
   applyLanguage(els.languageSelect.value);
   recalcFactors();
   renderAll();
+  await loadBundledFiles();
+}
+
+async function loadBundledFiles() {
+  const config = globalThis.window?.DW_BUNDLED_FILES;
+  if (!config) return;
+  try {
+    const load = async (url, name, handler) => {
+      if (!url) return;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Unable to load bundled file: ${name}`);
+      const file = new File([await response.blob()], name, {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+      await handler({ target: { files: [file] } });
+    };
+    await load(config.forecast, config.forecastName || "01_Forecast_4plus8.xlsx", handleForecastFileChange);
+    await load(config.jiang, config.jiangName || "02_Domestic_Finance_4plus8.xlsx", handleJiangFileChange);
+    await load(config.sap, config.sapName || "03_April_Actual.xlsx", handleSapFileChange);
+    if (config.language && i18n[config.language]) {
+      els.languageSelect.value = config.language;
+      applyLanguage(config.language);
+      renderAll();
+    }
+  } catch (error) {
+    toast(error.message || String(error), true);
+  }
 }
 
 function bindEvents() {
@@ -748,12 +776,15 @@ async function handleSapFileChange(event) {
     const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: false });
     state.workbook = workbook;
     state.sapFileName = file.name;
+    state.actualMonthCount = inferActualMonthCountFromFileName(file.name, 4);
     state.resultByMonth.clear();
 
     for (const item of MONTHS) {
       try {
         const parsedActual26 = extractActualFromWorkbook(workbook, item.month, XLSX);
-        const actual26 = accountForecastActualForMonth(item.month) || parsedActual26;
+        const actual26 = item.month <= state.actualMonthCount
+          ? parsedActual26
+          : accountForecastActualForMonth(item.month) || parsedActual26;
         const budget26 = accountBudgetForMonth(item.month) || BUDGET_26_BY_MONTH[item.month];
         const result = buildReconciliation({
           baseline25: BASELINE_25_BY_MONTH[item.month],
@@ -768,7 +799,7 @@ async function handleSapFileChange(event) {
       }
     }
 
-    if (!state.resultByMonth.size) throw new Error("没有解析到可用4月实际表数");
+    if (!state.resultByMonth.size) throw new Error("没有解析到可用实际表数据");
     const importedMonths = [...state.resultByMonth.keys()].sort((a, b) => a - b);
     els.monthSelect.innerHTML = importedMonths.map((month) => `<option value="${month}">${month}月</option>`).join("");
     els.monthSelect.value = String(importedMonths.at(-1));
@@ -846,7 +877,9 @@ function buildDashboardRows() {
     baseline25ByMonth: BASELINE_25_BY_MONTH,
     budget26ByMonth: BUDGET_26_BY_MONTH,
     resultByMonth: state.resultByMonth,
-    jiangyue: state.jiangyue
+    jiangyue: state.jiangyue,
+    accountBudgetByMonth: ACCOUNT_BUDGET_DW_BY_MONTH,
+    accountForecastByMonth: ACCOUNT_FORECAST_DW_BY_MONTH
   });
 }
 
@@ -866,7 +899,15 @@ function renderSummaryCards() {
 
 function renderDashboard() {
   const months = Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language));
-  els.dashboardHead.innerHTML = `<tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < 3 ? `sticky-col sticky-col-${index + 5}` : ""}">${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
+  const actualMonthCount = countActualMonths();
+  els.dashboardHead.innerHTML = `
+    <tr class="phase-header-row">
+      <th colspan="4" class="phase-corner">${escapeHtml(t("scenario"))}</th>
+      <th colspan="${actualMonthCount}" class="phase-actual">${escapeHtml(`1-${actualMonthCount} ${t("actualMonths")}`)}</th>
+      <th colspan="${12 - actualMonthCount}" class="phase-forecast">${escapeHtml(`${actualMonthCount + 1}-12 ${t("forecastMonths")}`)}</th>
+      <th class="phase-year">${escapeHtml(t("fullYear"))}</th>
+    </tr>
+    <tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < 3 ? `sticky-col sticky-col-${index + 5} ` : ""}${index < actualMonthCount ? "actual-month-head" : "forecast-month-head"}">${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
   els.dashboardTableWrap.classList.toggle("collapsed", !state.dashboardTableOpen);
   els.toggleDashboardTable.textContent = t(state.dashboardTableOpen ? "hideDetail" : "showDetail");
   renderMetricFilters();
@@ -905,7 +946,8 @@ function renderDashboard() {
         ${row.values.map((value, index) => {
           const tooltip = metricTooltip(row, index);
           const stickyClass = index < 3 ? ` sticky-col sticky-col-${index + 5}` : "";
-          return `<td class="month-cell ${heatClass(row, index)}${stickyClass}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
+          const phaseClass = index < actualMonthCount ? " actual-month-cell" : " forecast-month-cell";
+          return `<td class="month-cell ${heatClass(row, index)}${stickyClass}${phaseClass}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatDashboardValue(value, row.unit)}</td>`;
         }).join("")}
         <td class="month-cell full-year-cell" tabindex="0" data-metric-tooltip="${escapeHtml(metricTooltip(row, null))}">${formatDashboardValue(annualMetricValue(row), row.unit)}</td>
       </tr>
@@ -1333,7 +1375,7 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   const height = 310;
   const left = 54;
   const right = 24;
-  const top = 44;
+  const top = 58;
   const bottom = 46;
   const actualValues = withFullYearValue(actual, unitLabel);
   const budgetValues = withFullYearValue(budget, unitLabel);
@@ -1346,6 +1388,10 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   const span = Math.max(max - min, 1e-9);
   const x = (index) => left + index * ((width - left - right) / 12);
   const y = (value) => top + (max - value) / span * (height - top - bottom);
+  const actualMonthCount = countActualMonths();
+  const forecastStart = Math.max(1, Math.min(12, actualMonthCount));
+  const forecastBoundary = (x(forecastStart - 1) + x(forecastStart)) / 2;
+  const forecastEnd = (x(11) + x(12)) / 2;
   const series = [
     { row: actual, values: actualValues, color: "#42e0cd", name: t("actual26") },
     { row: budget, values: budgetValues, color: "#f6c85f", name: t("budget26") },
@@ -1353,6 +1399,34 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   ];
   const labelItems = [];
   const paths = series.map((item, seriesIndex) => {
+    if (item.row === actual) {
+      const actualPoints = item.values
+        .map((value, index) => index < actualMonthCount && Number.isFinite(value) ? `${x(index)},${y(value)}` : null)
+        .filter(Boolean)
+        .join(" ");
+      const forecastPoints = item.values
+        .map((value, index) => index >= actualMonthCount - 1 && Number.isFinite(value) ? `${x(index)},${y(value)}` : null)
+        .filter(Boolean)
+        .join(" ");
+      const dots = item.values.map((value, index) => {
+        if (!Number.isFinite(value)) return "";
+        labelItems.push({
+          x: x(index),
+          y: y(value),
+          seriesIndex,
+          color: item.color,
+          text: formatDashboardValue(value, unitLabel)
+        });
+        return `
+        <circle cx="${x(index)}" cy="${y(value)}" r="5" fill="${item.color}" class="chart-dot ${index < actualMonthCount ? "actual-dot" : "forecast-dot"}">
+          <title>${labels[index]} ${item.name}: ${formatDashboardValue(value, unitLabel)}</title>
+        </circle>`;
+      }).join("");
+      return `
+        <polyline points="${actualPoints}" fill="none" stroke="${item.color}" stroke-width="4" class="animated-line actual-segment" />
+        <polyline points="${forecastPoints}" fill="none" stroke="${item.color}" stroke-width="4" class="animated-line forecast-segment" />
+        ${dots}`;
+    }
     const points = item.values.map((value, index) => Number.isFinite(value) ? `${x(index)},${y(value)}` : null).filter(Boolean).join(" ");
     const dots = item.values.map((value, index) => {
       if (!Number.isFinite(value)) return "";
@@ -1373,6 +1447,11 @@ function renderTripleSeriesChart(svg, rowBy, labelText, unitLabel) {
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.innerHTML = `
     <rect width="${width}" height="${height}" class="chart-bg" />
+    <rect x="${left}" y="${top}" width="${forecastBoundary - left}" height="${height - top - bottom}" class="actual-zone" />
+    <rect x="${forecastBoundary}" y="${top}" width="${forecastEnd - forecastBoundary}" height="${height - top - bottom}" class="forecast-zone" />
+    <line x1="${forecastBoundary}" y1="${top}" x2="${forecastBoundary}" y2="${height - bottom}" class="phase-divider" />
+    <text x="${(left + forecastBoundary) / 2}" y="47" class="phase-label">${escapeSvg(`1-${actualMonthCount} ${t("actualMonths")}`)}</text>
+    <text x="${(forecastBoundary + forecastEnd) / 2}" y="47" class="phase-label">${escapeSvg(`${actualMonthCount + 1}-12 ${t("forecastMonths")}`)}</text>
     ${labels.map((label, index) => `<line x1="${x(index)}" y1="${top}" x2="${x(index)}" y2="${height - bottom}" class="grid-line" /><text x="${x(index)}" y="${height - 16}" class="axis-label">${escapeSvg(label)}</text>`).join("")}
     ${paths}
     ${placeChartLabels(labelItems, top, height - bottom)}
@@ -1457,7 +1536,7 @@ function renderHeatmap(metrics, rowBy) {
 }
 
 function countActualMonths() {
-  return state.resultByMonth.size || 4;
+  return Math.max(1, Math.min(11, Number(state.actualMonthCount) || 4));
 }
 
 function emptySvgMessage(message) {

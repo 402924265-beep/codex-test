@@ -215,14 +215,30 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const sameVolume = preferSeries(jiang?.volume?.same, baselineSameVolume);
   const baselineBudgetAmount = monthsFromObject(options.budget26ByMonth, (item) => sumAccounts(item?.accounts, 1));
   const baselineBudgetVolume = monthsFromObject(options.budget26ByMonth, (item) => item?.volume ?? null);
-  const budgetAmount = preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount));
-  const budgetVolume = preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume));
+  const accountBudgetAmount = futureMonthsFromObject(options.accountBudgetByMonth, (item) => item?.totalAmount ?? null);
+  const accountBudgetVolume = futureMonthsFromObject(options.accountBudgetByMonth, (item) => item?.volume ?? null);
+  const budgetAmount = preferSeries(
+    accountBudgetAmount,
+    preferSeries(jiang?.amount?.budget, preferSeries(actualSource?.budgetMonths, baselineBudgetAmount))
+  );
+  const budgetVolume = preferSeries(
+    accountBudgetVolume,
+    preferSeries(jiang?.volume?.budget, preferSeries(forecast.volume.budget, baselineBudgetVolume))
+  );
   const stdVolume = normalizeMonths(forecast.volume.std);
   const sameUnit = sameAmount.map((value, index) => unit(value, sameVolume[index]));
   const budgetUnit = budgetAmount.map((value, index) => unit(value, budgetVolume[index]));
   const actualMonthCount = inferActualMonthCount(options, jiang);
-  const forecastAmount = preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount));
-  const forecastVolume = preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume));
+  const accountForecastAmount = futureMonthsFromObject(options.accountForecastByMonth, (item) => item?.totalAmount ?? null);
+  const accountForecastVolume = futureMonthsFromObject(options.accountForecastByMonth, (item) => item?.volume ?? null);
+  const forecastAmount = preferSeries(
+    accountForecastAmount,
+    preferNonZeroSeries(actualSource?.amountMonths, preferNonZeroSeries(actualSource?.budgetMonths, budgetAmount))
+  );
+  const forecastVolume = preferSeries(
+    accountForecastVolume,
+    preferNonZeroSeries(forecast.volume.actual, preferNonZeroSeries(forecast.volume.std, budgetVolume))
+  );
   const forecastUnit = preferNonZeroSeries(actualSource?.unitMonths, budgetUnit);
   const actualAmount = Array.from({ length: 12 }, (_, index) => {
     const result = options.resultByMonth?.get?.(index + 1);
@@ -521,6 +537,14 @@ function rowMonths(row, startCol) {
 
 function monthsFromObject(source, getter) {
   return Array.from({ length: 12 }, (_, index) => {
+    const value = getter(source?.[index + 1]);
+    return Number.isFinite(value) ? value : null;
+  });
+}
+
+function futureMonthsFromObject(source, getter, startMonth = 5) {
+  return Array.from({ length: 12 }, (_, index) => {
+    if (index + 1 < startMonth) return null;
     const value = getter(source?.[index + 1]);
     return Number.isFinite(value) ? value : null;
   });

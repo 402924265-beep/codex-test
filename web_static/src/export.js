@@ -1,5 +1,11 @@
 import { loadXlsx } from "./xlsx-loader.js?v=20260608-metric-groups-v9";
 import { analysisKey } from "./workbench.js?v=20260608-metric-groups-v9";
+import {
+  annualManufacturingRate,
+  annualUnitCost,
+  annualUpph,
+  averageFinite
+} from "./metrics.js?v=20260612-metric-formulas-v22";
 
 const MONTHS = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 const SCENARIO_ORDER = ["同期", "预算", "26年", "差额", "累计差额"];
@@ -56,7 +62,7 @@ function buildCostDataSheet(rows, forecast) {
     for (let index = 0; index < 12; index += 1) {
       record[MONTHS[index]] = round(row.values[index]);
     }
-    record["年度"] = round(annualValue(row));
+    record["年度"] = round(annualValue(row, rows));
     output.push(record);
   }
 
@@ -222,11 +228,38 @@ function round(value) {
   return value === null || value === undefined || Number.isNaN(Number(value)) || value === "" ? "" : Math.round(Number(value) * 100000) / 100000;
 }
 
-function annualValue(row) {
+function annualValue(row, rows) {
   if (!row) return null;
+  if (row.label === "单台制造费" || row.label === "单台制造费累计") {
+    return annualUnitCost(
+      findMetricValues(rows, "制造费用金额", row.scenario),
+      findMetricValues(rows, "产量", row.scenario)
+    ) ?? lastNumber(row.values);
+  }
+  if (row.label === "制造费率" || row.label === "制造费率累计") {
+    return annualManufacturingRate(
+      findMetricValues(rows, "制造费用金额", row.scenario),
+      findMetricValues(rows, "产值", row.scenario)
+    ) ?? lastNumber(row.values);
+  }
+  if (row.label === "UPPH") {
+    return annualUpph(
+      findMetricValues(rows, "产量", row.scenario),
+      findMetricValues(rows, "直接员工", row.scenario),
+      findMetricValues(rows, "间接员工", row.scenario),
+      findMetricValues(rows, "工作日", row.scenario)
+    ) ?? averageFinite(row.values);
+  }
+  if (["直接员工", "间接员工", "白领", "用人"].includes(row.label)) {
+    return averageFinite(row.values);
+  }
   const values = row.values || [];
-  if (row.label?.includes("累计") || ["€/台", "台/人"].includes(row.unit)) return lastNumber(values);
+  if (row.label?.includes("累计") || ["€/台", "台/人", "%"].includes(row.unit)) return lastNumber(values);
   return values.reduce((total, value) => total + (Number.isFinite(value) ? value : 0), 0);
+}
+
+function findMetricValues(rows, label, scenario) {
+  return rows.find((item) => item.label === label && item.scenario === scenario)?.values || [];
 }
 
 function lastNumber(values) {
