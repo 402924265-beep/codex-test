@@ -40,7 +40,7 @@ import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 
-const VERSION = "20260615-account-labels-v31";
+const VERSION = "20260616-description-templates-v32";
 
 const i18n = {
   zh: {
@@ -69,6 +69,9 @@ const i18n = {
     currentCost: "本月费用 K€",
     accountDescription: "科目描述",
     descriptionPlaceholder: "单价 * 数量",
+    attachmentButton: "附件",
+    attachmentHint: "本地选择，不上传",
+    noPersonalAttachment: "不传个人明细",
     budget26: "26预算",
     previousActual: "上月实际",
     actualVsSame: "实际-同期",
@@ -236,6 +239,9 @@ const i18n = {
     currentCost: "Current cost K€",
     accountDescription: "Account description",
     descriptionPlaceholder: "Unit price × quantity",
+    attachmentButton: "Attachment",
+    attachmentHint: "Local only, not uploaded",
+    noPersonalAttachment: "No personal details",
     budget26: "2026 budget",
     previousActual: "Previous month",
     actualVsSame: "Actual vs same",
@@ -403,6 +409,9 @@ const i18n = {
     currentCost: "Bu ay gider K€",
     accountDescription: "Hesap açıklaması",
     descriptionPlaceholder: "Birim fiyat × miktar",
+    attachmentButton: "Ek",
+    attachmentHint: "Yerel seçim, yüklenmez",
+    noPersonalAttachment: "Kişisel detay yok",
     budget26: "2026 bütçe",
     previousActual: "Önceki ay",
     actualVsSame: "Gerçekleşen - dönem",
@@ -555,6 +564,7 @@ const state = {
   resultByMonth: new Map(),
   result: null,
   analyses: {},
+  descriptionAttachments: {},
   factors: [],
   factorSummary: null,
   chartHitZones: [],
@@ -1827,6 +1837,14 @@ function renderTable() {
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedCount ? ` · ${collapsedCount}个大科目按汇总比较` : ""}`;
   els.detailBody.innerHTML =
     rows.map(rowToHtml).join("") || `<tr><td colspan="8" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
+  for (const input of els.detailBody.querySelectorAll(".description-attachment-input")) {
+    input.addEventListener("change", (event) => {
+      const fileName = event.target.files?.[0]?.name || "";
+      state.descriptionAttachments[event.target.dataset.key] = fileName;
+      const nameNode = event.target.closest(".attachment-row")?.querySelector(".attachment-name");
+      if (nameNode) nameNode.textContent = fileName || t("attachmentHint");
+    });
+  }
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
     textarea.addEventListener("change", (event) => {
       const key = event.target.dataset.key;
@@ -1957,6 +1975,8 @@ function rowToHtml(row) {
   const major = majorYoy || majorMom;
   const tooltip = accountCostTooltip(row);
   const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
+  const descriptionTemplate = descriptionTemplateForRow(row);
+  const attachmentName = state.descriptionAttachments[key] || t("attachmentHint");
   const summarySuffix = state.language === "tr" ? "kategori toplamı" : state.language === "en" ? "category total" : "大科目汇总";
   const unsplitLabel = state.language === "tr"
     ? "4+8 tahmini alt hesaplara dağıtılmamıştır"
@@ -1970,11 +1990,88 @@ function rowToHtml(row) {
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount25)}</td>
       <td tabindex="0" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.previousAmount26)}</td>
       <td tabindex="0" class="${valueClass(row.amountDiff)}" data-metric-tooltip="${escapeHtml(tooltip)}">${formatMoney(row.amount26)}</td>
-      <td class="editable-cell"><textarea data-key="${escapeHtml(key)}" data-mode="description" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${escapeHtml(t("descriptionPlaceholder"))}">${escapeHtml(description)}</textarea></td>
+      <td class="editable-cell description-edit-cell">
+        <textarea data-key="${escapeHtml(key)}" data-mode="description" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${escapeHtml(descriptionTemplate.placeholder)}">${escapeHtml(description)}</textarea>
+        <div class="attachment-row ${descriptionTemplate.allowAttachment ? "" : "no-attachment"}">
+          <label class="attachment-button">
+            <input class="description-attachment-input" type="file" data-key="${escapeHtml(key)}" ${descriptionTemplate.allowAttachment ? "" : "disabled"} />
+            <span>${escapeHtml(descriptionTemplate.allowAttachment ? t("attachmentButton") : t("noPersonalAttachment"))}</span>
+          </label>
+          <span class="attachment-name">${escapeHtml(descriptionTemplate.allowAttachment ? attachmentName : descriptionTemplate.hint)}</span>
+        </div>
+      </td>
       <td class="editable-cell"><textarea class="${majorYoy ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="yoy" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorYoy ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(yoyAnalysis)}</textarea></td>
       <td class="editable-cell"><textarea class="${majorMom ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="mom" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorMom ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(momAnalysis)}</textarea></td>
     </tr>
   `;
+}
+
+function descriptionTemplateForRow(row) {
+  const code = String(row.code || "");
+  const category = String(row.category || "");
+  const desc = String(row.descEn || "").toLowerCase();
+  const language = state.language;
+  const templates = {
+    zh: {
+      unit: "单价 × 数量",
+      list: "清单编号 / 供应商 / 金额 / 用途",
+      labor: "人数 / 工时 × 产量",
+      asset: "资产名称 / 原值 / 折旧年限 / 本月折旧",
+      energy: "单价 × 用量",
+      scrap: "回收重量 × 单价",
+      category: "大科目总额说明 / 主要驱动项",
+      laborHint: "仅填汇总数和量，不上传个人明细"
+    },
+    en: {
+      unit: "Unit price × quantity",
+      list: "List no. / supplier / amount / purpose",
+      labor: "Headcount / hours × volume",
+      asset: "Asset / original value / useful life / monthly depreciation",
+      energy: "Unit price × usage",
+      scrap: "Recovered weight × unit price",
+      category: "Category total note / main driver",
+      laborHint: "Use totals only; do not upload personal details"
+    },
+    tr: {
+      unit: "Birim fiyat × miktar",
+      list: "Liste no. / tedarikçi / tutar / amaç",
+      labor: "Kişi sayısı / saat × hacim",
+      asset: "Varlık / ilk değer / faydalı ömür / aylık amortisman",
+      energy: "Birim fiyat × kullanım",
+      scrap: "Geri kazanılan ağırlık × birim fiyat",
+      category: "Kategori toplam notu / ana etken",
+      laborHint: "Sadece toplam sayı ve miktar; kişisel detay yüklemeyin"
+    }
+  }[language] || {};
+  const unitQuantityCodes = new Set(["6666010314", "6666010315", "6666010322", "6666020401", "6666020402", "6666020502", "6666020503"]);
+  const listCodes = new Set(["6666021500", "6666021502", "6666021503", "6666021505", "6666021506", "6666070400", "6666079999"]);
+  if (row.isCategorySummary) {
+    return category.includes("人工")
+      ? { placeholder: templates.labor, allowAttachment: false, hint: templates.laborHint }
+      : { placeholder: templates.category, allowAttachment: true, hint: t("attachmentHint") };
+  }
+  if (unitQuantityCodes.has(code)) return { placeholder: templates.unit, allowAttachment: true, hint: t("attachmentHint") };
+  if (listCodes.has(code)) return { placeholder: templates.list, allowAttachment: true, hint: t("attachmentHint") };
+  const isLabor = category.includes("人工") || code.startsWith("666601") || code === "5001010205" || code === "5001010206";
+  if (isLabor) return { placeholder: templates.labor, allowAttachment: false, hint: templates.laborHint };
+  if (category.includes("折旧") || desc.includes("depreciation") || desc.includes("amortization")) {
+    return { placeholder: templates.asset, allowAttachment: true, hint: t("attachmentHint") };
+  }
+  if (category.includes("能源") || desc.includes("energy") || desc.includes("electricity") || desc.includes("water") || desc.includes("oil") || desc.includes("gas")) {
+    return { placeholder: templates.energy, allowAttachment: true, hint: t("attachmentHint") };
+  }
+  if (category.includes("废料") || desc.includes("scrap") || desc.includes("scrapped")) {
+    return { placeholder: templates.scrap, allowAttachment: true, hint: t("attachmentHint") };
+  }
+  const unitQuantityWords = ["work uniforms", "working meals", "office supplies", "local transportation", "fuel allowance"];
+  if (unitQuantityWords.some((word) => desc.includes(word))) {
+    return { placeholder: templates.unit, allowAttachment: true, hint: t("attachmentHint") };
+  }
+  const listWords = ["repair", "maintenance", "it ", "software", "consulting", "service", "travel", "rental", "cleaning", "security", "training", "custom", "stamp", "tax", "audit", "legal", "distribution", "material", "consumable"];
+  if (category.includes("运营") || category.includes("制造费") || listWords.some((word) => desc.includes(word))) {
+    return { placeholder: templates.list, allowAttachment: true, hint: t("attachmentHint") };
+  }
+  return { placeholder: templates.unit, allowAttachment: true, hint: t("attachmentHint") };
 }
 
 function renderChart() {

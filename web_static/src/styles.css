@@ -730,6 +730,49 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 #varianceView .table-wrap td:nth-child(6) textarea {
   text-align: center;
 }
+#varianceView .description-edit-cell textarea {
+  min-height: 54px;
+}
+.attachment-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.attachment-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px dashed #d2b45e;
+  border-radius: 999px;
+  background: #fff9df;
+  color: #80620b;
+  cursor: pointer;
+}
+.attachment-button input {
+  display: none;
+}
+.attachment-name {
+  max-width: 104px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-row.no-attachment .attachment-button {
+  border-color: #d9e0e6;
+  background: #f4f7fa;
+  color: var(--muted);
+  cursor: default;
+}
+.attachment-row.no-attachment .attachment-name {
+  max-width: 160px;
+}
 .project-wrap { max-height: 72vh; overflow: auto; }
 
 table {
