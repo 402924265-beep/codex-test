@@ -10,7 +10,7 @@ import {
   serializeAnalysisReasons
 } from "../src/workbench.js";
 import { createStore, supabaseSchemaSql } from "../src/store.js";
-import { PROJECT_SEEDS, projectImpactSummary } from "../src/project-data.js";
+import { PROJECT_SEEDS, localizeProjectField, localizeProjectText, projectImpactSummary } from "../src/project-data.js";
 
 test("summarizes increase and decrease factors as positive impacts", () => {
   const summary = buildFactorSummary(
@@ -76,4 +76,11 @@ test("seed project library carries all three-sheet projects and key impact bucke
   assert.ok(summary.inflation.actual < 0);
   assert.ok(summary.wage.actual < 0);
   assert.ok(summary.scale.actual < 0);
+});
+
+test("project library text follows selected language", () => {
+  assert.equal(localizeProjectField(PROJECT_SEEDS[0], "category", "en"), "Cost increase factor");
+  assert.match(localizeProjectField(PROJECT_SEEDS[8], "project", "en"), /Increase UPH/);
+  assert.match(localizeProjectText("新增降费项目：备件费用", "en"), /Spare parts cost/);
+  assert.match(localizeProjectText("新增降费项目：备件费用", "tr"), /Yedek parça maliyeti/);
 });

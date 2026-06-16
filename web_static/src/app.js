@@ -35,12 +35,12 @@ import {
   targetCompletionRate
 } from "./metrics.js?v=20260612-duplicate-accounts-v23";
 import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-dynamic-month-v28";
-import { PROJECT_SEEDS, projectImpactSummary } from "./project-data.js?v=20260612-duplicate-accounts-v23";
+import { PROJECT_SEEDS, localizeProjectField, localizeProjectText, projectImpactSummary, projectTextFields } from "./project-data.js?v=20260616-project-i18n-v33";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 
-const VERSION = "20260616-description-templates-v32";
+const VERSION = "20260616-project-i18n-v33";
 
 const i18n = {
   zh: {
@@ -1905,19 +1905,29 @@ async function submitProjects() {
   state.factors = rows.map((row, index) => {
     const existing = state.factors[Number(row.dataset.index)] || {};
     const get = (field) => row.querySelector(`[data-field="${field}"]`)?.value || "";
+    const translations = { ...(existing.translations || {}) };
+    const readProjectField = (field) => {
+      const value = get(field);
+      if (state.language === "zh") return value;
+      const displayed = localizeProjectField(existing, field, state.language);
+      if (value === displayed) return existing[field] || "";
+      translations[state.language] = {
+        ...(translations[state.language] || {}),
+        [field]: value
+      };
+      return existing[field] || value;
+    };
+    const textFields = Object.fromEntries(projectTextFields().map((field) => [field, readProjectField(field)]));
     return {
       ...existing,
       id: existing.id || String(index + 1),
       type: "decrease",
       lead: existing.lead || "",
-      category: get("category"),
-      strategy: get("strategy"),
-      project: get("project"),
-      owner: get("owner"),
-      timing: get("timing"),
+      ...textFields,
       plannedImpact: parseEditableNumber(get("plannedImpact")),
       actualCumulative: parseEditableNumber(get("actualCumulative")),
-      progress: get("progress")
+      progress: textFields.progress,
+      translations
     };
   });
   if (els.factorSaveStatus) els.factorSaveStatus.textContent = t("saving");
@@ -2167,24 +2177,25 @@ function handleChartClick(event) {
 
 function renderFactors() {
   recalcFactors();
-  if (els.projectSummary) els.projectSummary.innerHTML = buildProjectSummaryText();
-  renderProjectImpactCards();
+  if (els.projectSummary) els.projectSummary.innerHTML = buildLocalizedProjectSummaryText();
+  renderLocalizedProjectImpactCards();
   els.factorBody.innerHTML = state.factors.length
     ? state.factors.map((item, index) => factorRowHtml(item, index)).join("")
     : `<tr><td colspan="9" class="empty-cell">${t("emptyFactors")}</td></tr>`;
 }
 
 function factorRowHtml(item, index) {
+  const display = (field) => localizeProjectField(item, field, state.language);
   return `
     <tr data-index="${index}">
-      <td><input data-field="category" value="${escapeHtml(item.category || "")}" /></td>
-      <td><textarea data-field="strategy">${escapeHtml(item.strategy || "")}</textarea></td>
-      <td><textarea data-field="project">${escapeHtml(item.project || "")}</textarea></td>
-      <td><input data-field="owner" value="${escapeHtml(item.owner || "")}" /></td>
-      <td><input data-field="timing" value="${escapeHtml(item.timing || "")}" /></td>
+      <td><input data-field="category" value="${escapeHtml(display("category"))}" /></td>
+      <td><textarea data-field="strategy">${escapeHtml(display("strategy"))}</textarea></td>
+      <td><textarea data-field="project">${escapeHtml(display("project"))}</textarea></td>
+      <td><input data-field="owner" value="${escapeHtml(display("owner"))}" /></td>
+      <td><input data-field="timing" value="${escapeHtml(display("timing"))}" /></td>
       <td><input data-field="plannedImpact" value="${formatEditable(item.plannedImpact)}" /></td>
       <td><input data-field="actualCumulative" value="${formatEditable(item.actualCumulative)}" /></td>
-      <td><textarea data-field="progress">${escapeHtml(item.progress || "")}</textarea></td>
+      <td><textarea data-field="progress">${escapeHtml(display("progress"))}</textarea></td>
       <td><button class="delete-btn" type="button" data-delete-index="${index}" title="${t("delete")}">×</button></td>
     </tr>
   `;
@@ -2287,6 +2298,95 @@ function renderProjectImpactCards() {
     <div><span>${escapeHtml(monthLabel)} · ${escapeHtml(t("decreaseTotal"))}</span><strong>${formatMoney(actual)} K€</strong></div>
     <div><span>${escapeHtml(monthLabel)} · ${escapeHtml(t("netImpact"))}</span><strong class="${valueClass(actual - planned)}">${formatMoney(actual - planned)} K€</strong></div>
   `;
+}
+
+function renderLocalizedProjectImpactCards() {
+  if (!els.projectImpactCards) return;
+  if (state.factorMonth === 4) {
+    const card = (title, value, note, klass = "") => `
+      <div class="impact-card ${klass || (value < 0 ? "bad" : "good")}">
+        <span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(localizeProjectText(title, state.language))}</span>
+        <strong>${formatMoney(value)} K€</strong>
+        <small>${escapeHtml(localizeProjectText(note, state.language))}</small>
+      </div>`;
+    els.projectImpactCards.innerHTML = `
+      ${card("订单量 规模负影响", -1000, "三张表口径：订单量下降负影响100万欧", "bad")}
+      ${card("通胀负影响", -400, "三张表口径：通胀负影响40万欧", "bad")}
+      ${card("降费项目", 700, "新增63万欧 + 持续收益7万欧", "good")}
+      ${card("园区分摊", 10, "园区分摊下降1万欧", "good")}
+      <div><span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(t("increaseTotal"))}</span><strong class="bad">-1,400 K€</strong></div>
+      <div><span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(t("decreaseTotal"))}</span><strong class="good">710 K€</strong></div>
+    `;
+    return;
+  }
+  const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
+  const monthValue = (item, field, fallbackField) => {
+    const series = Array.isArray(item[field]) ? item[field] : null;
+    const value = Number(series?.[monthIndex]);
+    if (Number.isFinite(value) && value !== 0) return value;
+    return Number(item[fallbackField]) || 0;
+  };
+  const projectRows = state.factors.filter((item) => item.impactType === "project");
+  const planned = sum(projectRows.map((item) => monthValue(item, "budgetMonths", "plannedImpact")));
+  const actual = sum(projectRows.map((item) => monthValue(item, "actualMonths", "actualCumulative")));
+  const impactBucket = (impactType) => {
+    const rows = state.factors.filter((item) => item.impactType === impactType);
+    return {
+      planned: sum(rows.map((item) => monthValue(item, "budgetMonths", "plannedImpact"))),
+      actual: sum(rows.map((item) => monthValue(item, "actualMonths", "actualCumulative")))
+    };
+  };
+  const impacts = {
+    scale: impactBucket("scale"),
+    wage: impactBucket("wage"),
+    inflation: impactBucket("inflation")
+  };
+  const impactCard = (title, data) => `
+    <div class="impact-card ${data.actual <= 0 ? "bad" : "good"}">
+      <span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(title)}</span>
+      <strong>${formatMoney(data.actual)} K€</strong>
+      <small>${escapeHtml(t("plannedShort"))}: ${formatMoney(data.planned)} K€ / ${escapeHtml(t("actualShort"))}: ${formatMoney(data.actual)} K€</small>
+    </div>`;
+  els.projectImpactCards.innerHTML = `
+    ${impactCard(t("scaleImpact"), impacts.scale)}
+    ${impactCard(t("wageImpact"), impacts.wage)}
+    ${impactCard(t("inflationImpact"), impacts.inflation)}
+    <div><span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(t("increaseTotal"))}</span><strong>${formatMoney(planned)} K€</strong></div>
+    <div><span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(t("decreaseTotal"))}</span><strong>${formatMoney(actual)} K€</strong></div>
+    <div><span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(t("netImpact"))}</span><strong class="${valueClass(actual - planned)}">${formatMoney(actual - planned)} K€</strong></div>
+  `;
+}
+
+function buildLocalizedProjectSummaryText() {
+  const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
+  const monthValue = (item, field, fallbackField) => {
+    const series = Array.isArray(item[field]) ? item[field] : null;
+    const value = Number(series?.[monthIndex]);
+    if (Number.isFinite(value) && value !== 0) return value;
+    return Number(item[fallbackField]) || 0;
+  };
+  const projectRows = state.factors.filter((item) => item.impactType === "project");
+  const planned = sum(projectRows.map((item) => monthValue(item, "budgetMonths", "plannedImpact")));
+  const actual = sum(projectRows.map((item) => monthValue(item, "actualMonths", "actualCumulative")));
+  const impactActual = (type) => sum(state.factors.filter((item) => item.impactType === type).map((item) => monthValue(item, "actualMonths", "actualCumulative")));
+  const top = projectRows
+    .slice()
+    .sort((a, b) => Math.abs(monthValue(b, "actualMonths", "actualCumulative")) - Math.abs(monthValue(a, "actualMonths", "actualCumulative")))
+    .slice(0, 3)
+    .map((item) => localizeProjectField(item, "project", state.language) || localizeProjectField(item, "strategy", state.language) || localizeProjectField(item, "category", state.language))
+    .join(state.language === "zh" ? "、" : "; ");
+  const achieved = formatPercent(planned ? actual / planned : null);
+  if (state.language === "en") {
+    return `${projectMonthLabel()} model includes ${state.factors.length} factors and cost reduction projects. Monthly planned benefit is ${formatMoney(planned)} K€, actual benefit is ${formatMoney(actual)} K€, achievement rate is ${achieved}. Scale, wage and inflation impacts are ${formatMoney(impactActual("scale"))} K€, ${formatMoney(impactActual("wage"))} K€ and ${formatMoney(impactActual("inflation"))} K€. Key projects: ${top || "to be filled"}.`;
+  }
+  if (state.language === "tr") {
+    return `${projectMonthLabel()} modeli ${state.factors.length} faktör ve maliyet azaltma projesi içerir. Aylık planlanan fayda ${formatMoney(planned)} K€, gerçekleşen fayda ${formatMoney(actual)} K€, gerçekleşme oranı ${achieved}. Ölçek, ücret ve enflasyon etkileri ${formatMoney(impactActual("scale"))} K€, ${formatMoney(impactActual("wage"))} K€ ve ${formatMoney(impactActual("inflation"))} K€. Ana projeler: ${top || "doldurulacak"}.`;
+  }
+  return `${projectMonthLabel()}模型包含 ${state.factors.length} 项因素与降费项目；当月降费项目预计收益 ${formatMoney(planned)} K€，实际收益 ${formatMoney(actual)} K€，达成率 ${achieved}。规模变化、工资上涨、通胀影响分别为 ${formatMoney(impactActual("scale"))} K€、${formatMoney(impactActual("wage"))} K€、${formatMoney(impactActual("inflation"))} K€；重点项目为 ${top || "待补充"}。`;
+}
+
+function projectMonthLabel() {
+  return localizeMonthLabel(state.factorMonth - 1, state.language);
 }
 
 function buildProjectSummaryText() {
