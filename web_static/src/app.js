@@ -40,7 +40,7 @@ import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 
-const VERSION = "20260616-project-i18n-v33";
+const VERSION = "20260616-full-i18n-v35";
 
 const i18n = {
   zh: {
@@ -120,6 +120,7 @@ const i18n = {
     project: "关键项目",
     owner: "责任人",
     timing: "到位时间",
+    plannedImpact: "预计影响 K€",
     impact: "实际月累差额 K€",
     progress: "进展",
     action: "操作",
@@ -180,6 +181,7 @@ const i18n = {
     importedSap: "已导入SAP",
     loadedForecast: "已读取预测表",
     loadedSap: "已读取实际表",
+    loadedJiang: "已读取国内财务表",
     noTimeData: "工时/工作日数据待接入",
     actualLine: "26年",
     budgetLine: "预算",
@@ -195,7 +197,20 @@ const i18n = {
     searchPlaceholder: "账户编码 / 英文描述 / 原因",
     namePlaceholder: "姓名",
     rowCountSuffix: "项"
-    ,summaryEmpty: "导入 SAP 报表后，本月摘要会根据下方科目原因自动汇总。",
+    ,collapsedCategoryCompare: "{count}个大科目按汇总比较",
+    fillAuthorName: "请填写提报人姓名",
+    annualTopCategoryFallback: "重点大科目",
+    tooltipCost: "费用",
+    tooltipUnit: "单台",
+    tooltipSame: "同期",
+    tooltipPrevious: "上月",
+    tooltipCurrent: "本月",
+    tooltipAmountYoy: "费用同比",
+    tooltipAmountMom: "费用环比",
+    tooltipUnitYoy: "单台同比",
+    tooltipUnitMom: "单台环比",
+    tooltipMfgVariance: "制造费差额",
+    summaryEmpty: "导入 SAP 报表后，本月摘要会根据下方科目原因自动汇总。",
     better: "优化",
     worse: "恶化",
     forecastUnitLine: "；4+8本月单台 {unit} €/台",
@@ -290,6 +305,7 @@ const i18n = {
     project: "Project",
     owner: "Owner",
     timing: "Timing",
+    plannedImpact: "Forecast impact K€",
     impact: "Actual YTD impact K€",
     progress: "Progress",
     action: "Action",
@@ -350,6 +366,7 @@ const i18n = {
     importedSap: "Imported SAP",
     loadedForecast: "Loaded 4+8 forecast",
     loadedSap: "Loaded SAP actuals",
+    loadedJiang: "Loaded domestic finance table",
     noTimeData: "Work-hour / workday data pending",
     actualLine: "2026",
     budgetLine: "Budget",
@@ -365,7 +382,20 @@ const i18n = {
     searchPlaceholder: "Account code / English description / reason",
     namePlaceholder: "Name",
     rowCountSuffix: "items"
-    ,summaryEmpty: "After importing SAP actuals, this month summary will be generated from account-level reasons below.",
+    ,collapsedCategoryCompare: "{count} categories compared by total",
+    fillAuthorName: "Please enter the submitter name",
+    annualTopCategoryFallback: "key categories",
+    tooltipCost: "Cost",
+    tooltipUnit: "Unit cost",
+    tooltipSame: "Same period",
+    tooltipPrevious: "Previous month",
+    tooltipCurrent: "Current month",
+    tooltipAmountYoy: "Cost YoY",
+    tooltipAmountMom: "Cost MoM",
+    tooltipUnitYoy: "Unit YoY",
+    tooltipUnitMom: "Unit MoM",
+    tooltipMfgVariance: "MFG variance",
+    summaryEmpty: "After importing SAP actuals, this month summary will be generated from account-level reasons below.",
     better: "better",
     worse: "worse",
     forecastUnitLine: "; 4+8 unit cost {unit} €/pc",
@@ -460,6 +490,7 @@ const i18n = {
     project: "Proje",
     owner: "Sorumlu",
     timing: "Zaman",
+    plannedImpact: "Tahmini etki K€",
     impact: "Gerçekleşen YTD etki K€",
     progress: "İlerleme",
     action: "İşlem",
@@ -520,6 +551,7 @@ const i18n = {
     importedSap: "SAP içe aktarıldı",
     loadedForecast: "4+8 tahmin yüklendi",
     loadedSap: "SAP gerçekleşen yüklendi",
+    loadedJiang: "Yurtiçi finans tablosu yüklendi",
     noTimeData: "İş saati / iş günü verisi bekleniyor",
     actualLine: "2026",
     budgetLine: "Bütçe",
@@ -535,7 +567,20 @@ const i18n = {
     searchPlaceholder: "Hesap kodu / İngilizce açıklama / neden",
     namePlaceholder: "Ad",
     rowCountSuffix: "satır"
-    ,summaryEmpty: "SAP gerçekleşen yüklendikten sonra aylık özet aşağıdaki hesap nedenlerinden üretilecek.",
+    ,collapsedCategoryCompare: "{count} kategori toplam bazında karşılaştırıldı",
+    fillAuthorName: "Lütfen gönderen adını girin",
+    annualTopCategoryFallback: "ana kategoriler",
+    tooltipCost: "Gider",
+    tooltipUnit: "Birim maliyet",
+    tooltipSame: "Aynı dönem",
+    tooltipPrevious: "Önceki ay",
+    tooltipCurrent: "Bu ay",
+    tooltipAmountYoy: "Gider yıllık",
+    tooltipAmountMom: "Gider aylık",
+    tooltipUnitYoy: "Birim yıllık",
+    tooltipUnitMom: "Birim aylık",
+    tooltipMfgVariance: "Üretim gideri farkı",
+    summaryEmpty: "SAP gerçekleşen yüklendikten sonra aylık özet aşağıdaki hesap nedenlerinden üretilecek.",
     better: "iyileşti",
     worse: "kötüleşti",
     forecastUnitLine: "; 4+8 birim maliyet {unit} €/adet",
@@ -817,7 +862,7 @@ async function handleJiangFileChange(event) {
     els.jiangStatus.textContent = `${t("importJiang")}: ${file.name}`;
     els.jiangStatus.classList.remove("muted", "warning");
     renderAll();
-    toast(`国内财务表已读取: ${file.name}`);
+    toast(`${t("loadedJiang")}: ${file.name}`);
   } catch (error) {
     toast(error.message || String(error), true);
   }
@@ -870,7 +915,7 @@ async function handleSapFileChange(event) {
 
     if (!state.resultByMonth.size) throw new Error("没有解析到可用实际表数据");
     const importedMonths = [...state.resultByMonth.keys()].sort((a, b) => a - b);
-    els.monthSelect.innerHTML = importedMonths.map((month) => `<option value="${month}">${month}月</option>`).join("");
+    els.monthSelect.innerHTML = importedMonths.map((month) => `<option value="${month}">${localizeMonthLabel(month - 1, state.language)}</option>`).join("");
     els.monthSelect.value = String(importedMonths.at(-1));
     selectCurrentMonth();
     state.dashboardRows = buildDashboardRows();
@@ -1009,7 +1054,7 @@ function renderMonthButtons() {
   if (!els.monthButtons) return;
   const months = [...state.resultByMonth.keys()].sort((a, b) => a - b);
   els.monthButtons.innerHTML = months.length
-    ? months.map((month) => `<button type="button" data-month="${month}" class="${Number(els.monthSelect.value) === month ? "active" : ""}">${month}月</button>`).join("")
+    ? months.map((month) => `<button type="button" data-month="${month}" class="${Number(els.monthSelect.value) === month ? "active" : ""}">${escapeHtml(localizeMonthLabel(month - 1, state.language))}</button>`).join("")
     : `<span class="muted">${t("waitingSap")}</span>`;
 }
 
@@ -1333,8 +1378,20 @@ function buildAnnualSummaryText() {
   const ratio = stats.unit25 ? unitDiff / stats.unit25 : null;
   const volume26 = annualMetricValue(state.dashboardRows.find((row) => row.label === "产量" && row.scenario === "26年"));
   const impact = Number.isFinite(unitDiff) && Number.isFinite(volume26) ? unitDiff * volume26 / 1000 : null;
-  const topCats = annualCategoryDiffs().slice(0, 3).map((item) => localizeCategory(item.label, state.language)).join("、");
-  return `2026年洗碗机全年滚动预测单台制造费为 ${formatUnit(stats.unit26)} €/台，较同期${unitDiff <= 0 ? "优化" : "恶化"} ${formatPercent(Math.abs(ratio))}，对应制造费影响 ${formatMoney(impact)} K€。主要差异集中在 ${topCats || "重点大科目"}，请结合下方到月差异和大科目中轴图跟踪。`;
+  const topCats = annualCategoryDiffs()
+    .slice(0, 3)
+    .map((item) => localizeCategory(item.label, state.language))
+    .join(state.language === "zh" ? "、" : "; ");
+  const direction = unitDiff <= 0 ? t("better") : t("worse");
+  const unit = t("unitEuroPc");
+  const categories = topCats || t("annualTopCategoryFallback");
+  if (state.language === "en") {
+    return `2026 dishwasher full-year rolling forecast unit manufacturing cost is ${formatUnit(stats.unit26)} ${unit}, ${direction} vs same period by ${formatPercent(Math.abs(ratio))}; MFG impact is ${formatMoney(impact)} K€. Main variance categories: ${categories}.`;
+  }
+  if (state.language === "tr") {
+    return `2026 bulaşık makinesi tam yıl hareketli tahmin birim üretim gideri ${formatUnit(stats.unit26)} ${unit}; aynı döneme göre ${direction}: ${formatPercent(Math.abs(ratio))}. Üretim gideri etkisi ${formatMoney(impact)} K€. Ana fark kategorileri: ${categories}.`;
+  }
+  return `2026年洗碗机全年滚动预测单台制造费为 ${formatUnit(stats.unit26)} ${unit}，较同期${direction} ${formatPercent(Math.abs(ratio))}，对应制造费影响 ${formatMoney(impact)} K€。主要差异集中在 ${categories}。`;
 }
 
 function annualCategoryDiffs() {
@@ -1834,7 +1891,8 @@ function renderTable() {
   }
   const rows = visibleRows();
   const collapsedCount = state.result.unsplitCategories?.length || 0;
-  els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedCount ? ` · ${collapsedCount}个大科目按汇总比较` : ""}`;
+  const collapsedText = collapsedCount ? ` · ${t("collapsedCategoryCompare").replace("{count}", collapsedCount)}` : "";
+  els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedText}`;
   els.detailBody.innerHTML =
     rows.map(rowToHtml).join("") || `<tr><td colspan="8" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
   for (const input of els.detailBody.querySelectorAll(".description-attachment-input")) {
@@ -1842,7 +1900,7 @@ function renderTable() {
       const fileName = event.target.files?.[0]?.name || "";
       state.descriptionAttachments[event.target.dataset.key] = fileName;
       const nameNode = event.target.closest(".attachment-row")?.querySelector(".attachment-name");
-      if (nameNode) nameNode.textContent = fileName || t("attachmentHint");
+      if (nameNode) nameNode.textContent = fileName || "";
     });
   }
   for (const textarea of els.detailBody.querySelectorAll("textarea")) {
@@ -1869,7 +1927,7 @@ async function submitCurrentMonthAnalyses() {
   if (!state.result) return;
   const author = els.analysisAuthor?.value.trim() || els.userName.value.trim();
   if (!author) {
-    toast("请填写提报人姓名", true);
+    toast(t("fillAuthorName"), true);
     return;
   }
   if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("saving");
@@ -1986,7 +2044,7 @@ function rowToHtml(row) {
   const tooltip = accountCostTooltip(row);
   const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
   const descriptionTemplate = descriptionTemplateForRow(row);
-  const attachmentName = state.descriptionAttachments[key] || t("attachmentHint");
+  const attachmentName = state.descriptionAttachments[key] || "";
   const summarySuffix = state.language === "tr" ? "kategori toplamı" : state.language === "en" ? "category total" : "大科目汇总";
   const unsplitLabel = state.language === "tr"
     ? "4+8 tahmini alt hesaplara dağıtılmamıştır"
@@ -2007,7 +2065,7 @@ function rowToHtml(row) {
             <input class="description-attachment-input" type="file" data-key="${escapeHtml(key)}" ${descriptionTemplate.allowAttachment ? "" : "disabled"} />
             <span>${escapeHtml(descriptionTemplate.allowAttachment ? t("attachmentButton") : t("noPersonalAttachment"))}</span>
           </label>
-          <span class="attachment-name">${escapeHtml(descriptionTemplate.allowAttachment ? attachmentName : descriptionTemplate.hint)}</span>
+          <span class="attachment-name">${escapeHtml(descriptionTemplate.allowAttachment ? attachmentName : "")}</span>
         </div>
       </td>
       <td class="editable-cell"><textarea class="${majorYoy ? "major" : ""}" data-key="${escapeHtml(key)}" data-mode="yoy" data-month="${state.result.month}" data-code="${escapeHtml(row.code)}" placeholder="${majorYoy ? t("placeholderMajor") : t("placeholderSmall")}">${escapeHtml(yoyAnalysis)}</textarea></td>
@@ -2121,7 +2179,7 @@ function renderChart() {
 
 function categoryTooltip(item) {
   return costVarianceTooltip(
-    `${localizeCategory(item.category, state.language)} · ${state.result?.month || ""}月`,
+    `${localizeCategory(item.category, state.language)} · ${localizeMonthLabel((state.result?.month || 1) - 1, state.language)}`,
     item
   );
 }
@@ -2135,16 +2193,17 @@ function costVarianceTooltip(title, item) {
   const amountMomRate = ratioNullable(item.momAmountDiff, item.previousAmount26);
   const unitYoyRate = ratioNullable(item.unitDiff, item.unit25);
   const unitMomRate = ratioNullable(item.momUnitDiff, item.previousUnit26);
+  const unitLabel = t("unitEuroPc");
   return [
     title,
-    `费用：同期 ${formatMoney(item.amount25)} K€ · 上月 ${formatMoney(item.previousAmount26)} K€ · 本月 ${formatMoney(item.amount26)} K€`,
-    varianceTooltipLine("费用同比", item.amountDiff, "K€", amountYoyRate),
-    varianceTooltipLine("费用环比", item.momAmountDiff, "K€", amountMomRate),
-    `单台：同期 ${formatUnit(item.unit25)} €/台 · 上月 ${formatUnit(item.previousUnit26)} €/台 · 本月 ${formatUnit(item.unit26)} €/台`,
-    varianceTooltipLine("单台同比", item.unitDiff, "€/台", unitYoyRate),
-    varianceTooltipLine("单台环比", item.momUnitDiff, "€/台", unitMomRate),
+    `${t("tooltipCost")}: ${t("tooltipSame")} ${formatMoney(item.amount25)} K€ · ${t("tooltipPrevious")} ${formatMoney(item.previousAmount26)} K€ · ${t("tooltipCurrent")} ${formatMoney(item.amount26)} K€`,
+    varianceTooltipLine(t("tooltipAmountYoy"), item.amountDiff, "K€", amountYoyRate),
+    varianceTooltipLine(t("tooltipAmountMom"), item.momAmountDiff, "K€", amountMomRate),
+    `${t("tooltipUnit")}: ${t("tooltipSame")} ${formatUnit(item.unit25)} ${unitLabel} · ${t("tooltipPrevious")} ${formatUnit(item.previousUnit26)} ${unitLabel} · ${t("tooltipCurrent")} ${formatUnit(item.unit26)} ${unitLabel}`,
+    varianceTooltipLine(t("tooltipUnitYoy"), item.unitDiff, unitLabel, unitYoyRate),
+    varianceTooltipLine(t("tooltipUnitMom"), item.momUnitDiff, unitLabel, unitMomRate),
     Number.isFinite(item.manufacturingDiff)
-      ? `<span class="${item.manufacturingDiff <= 0 ? "tooltip-good" : "tooltip-bad"}">制造费差额：${formatMoney(item.manufacturingDiff)} K€</span>`
+      ? `<span class="${item.manufacturingDiff <= 0 ? "tooltip-good" : "tooltip-bad"}">${t("tooltipMfgVariance")}: ${formatMoney(item.manufacturingDiff)} K€</span>`
       : ""
   ].filter(Boolean).join("\n");
 }
@@ -2152,7 +2211,13 @@ function costVarianceTooltip(title, item) {
 function varianceTooltipLine(label, value, unit, rate) {
   if (!Number.isFinite(value)) return "";
   const good = value <= 0;
-  return `<span class="${good ? "tooltip-good" : "tooltip-bad"}">${label}：${formatSigned(value, unit)}${Number.isFinite(rate) ? `（${formatPercent(Math.abs(rate))}）` : ""} · ${t(good ? "better" : "worse")}</span>`;
+  const colon = state.language === "zh" ? "：" : ": ";
+  const rateText = Number.isFinite(rate)
+    ? state.language === "zh"
+      ? `（${formatPercent(Math.abs(rate))}）`
+      : ` (${formatPercent(Math.abs(rate))})`
+    : "";
+  return `<span class="${good ? "tooltip-good" : "tooltip-bad"}">${label}${colon}${formatSigned(value, unit)}${rateText} · ${t(good ? "better" : "worse")}</span>`;
 }
 
 function formatSigned(value, unit) {
@@ -2520,6 +2585,7 @@ function switchTab(name) {
 function applyLanguage(language) {
   state.language = language;
   document.documentElement.lang = language === "zh" ? "zh-CN" : language;
+  document.title = t("appTitle");
   for (const node of document.querySelectorAll("[data-i18n]")) {
     const key = node.dataset.i18n;
     node.textContent = t(key);
