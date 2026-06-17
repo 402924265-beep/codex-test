@@ -41,6 +41,11 @@ createServer(async (req, res) => {
 });
 
 async function serveStatic(res, url) {
+  if (url.pathname === "/favicon.ico") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
   const cleanPath = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
   const filePath = normalize(join(root, cleanPath));
   if (!filePath.startsWith(normalize(root))) {

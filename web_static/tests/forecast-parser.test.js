@@ -138,6 +138,52 @@ test("zero SAP future months do not overwrite forecast actuals", () => {
   assert.equal(volume.values[4], 50);
 });
 
+test("account plan overrides are applied before cumulative unit cost and manufacturing rate", () => {
+  const forecast = {
+    volume: {
+      actual: Array(12).fill(1000),
+      budget: Array(12).fill(1000),
+      std: Array(12).fill(1000)
+    },
+    categories: [],
+    totalAll: {
+      amountMonths: Array(12).fill(100),
+      budgetMonths: Array(12).fill(100),
+      unitMonths: Array(12).fill(100)
+    }
+  };
+  const jiangyue = {
+    price: {
+      same: Array(12).fill(10),
+      budget: Array(12).fill(10),
+      actual: Array(12).fill(10)
+    }
+  };
+  const accountForecastByMonth = {
+    1: { totalAmount: 999, volume: 999 },
+    5: { totalAmount: 300, volume: 2000 }
+  };
+
+  const rows = buildAnnualDashboardRows(forecast, { jiangyue, accountForecastByMonth });
+  const amount = rows.find((row) => row.label === "制造费用金额" && row.scenario === "26年");
+  const volume = rows.find((row) => row.label === "产量" && row.scenario === "26年");
+  const unit = rows.find((row) => row.label === "单台制造费" && row.scenario === "26年");
+  const cumulativeUnit = rows.find((row) => row.label === "单台制造费累计" && row.scenario === "26年");
+  const output = rows.find((row) => row.label === "产值" && row.scenario === "26年");
+  const rate = rows.find((row) => row.label === "制造费率" && row.scenario === "26年");
+  const cumulativeRate = rows.find((row) => row.label === "制造费率累计" && row.scenario === "26年");
+
+  assert.equal(amount.values[0], 100);
+  assert.equal(volume.values[0], 1000);
+  assert.equal(amount.values[4], 300);
+  assert.equal(volume.values[4], 2000);
+  assert.equal(unit.values[4], 150);
+  assert.equal(cumulativeUnit.values[4], 700 * 1000 / 6000);
+  assert.equal(output.values[4], 20);
+  assert.equal(rate.values[4], 15);
+  assert.equal(cumulativeRate.values[4], 700 / 60);
+});
+
 test("UPPH uses realized direct plus indirect headcount for actual months", () => {
   const months = Array(12).fill(1000);
   const forecast = {

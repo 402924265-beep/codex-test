@@ -1,5 +1,0 @@
-
-> dw-public-reconcile-web@0.1.0 serve:web
-> node web_static/dev-server.mjs
-
-DW static web: http://127.0.0.1:8780

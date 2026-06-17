@@ -40,7 +40,7 @@ import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 
-const VERSION = "20260616-full-i18n-v35";
+const VERSION = "20260617-public-rolling-v37";
 
 const i18n = {
   zh: {
@@ -623,6 +623,11 @@ const state = {
   dashboardTableOpen: true,
   factorMonth: 4,
   actualMonthCount: 4,
+  rollingForecastDrafts: loadRollingForecastDrafts(),
+  rollingForecastSubmitted: loadRollingForecastSubmitted(),
+  rollingSelectedCode: null,
+  rollingTaskFilter: "all",
+  rollingViewMode: "fill",
   sapFileName: "",
   forecastFileName: "",
   jiangFileName: ""
@@ -669,6 +674,7 @@ const els = {
   categoryChart: document.getElementById("categoryChart"),
   categoryDiagnostics: document.getElementById("categoryDiagnostics"),
   emptyChart: document.getElementById("emptyChart"),
+  forecastWorkspace: document.getElementById("forecastWorkspace"),
   detailBody: document.getElementById("detailBody"),
   sameCostHeader: document.getElementById("sameCostHeader"),
   previousCostHeader: document.getElementById("previousCostHeader"),
@@ -757,6 +763,9 @@ function bindEvents() {
   els.analysisFilter.addEventListener("change", renderTable);
   els.categoryFilter.addEventListener("change", renderTable);
   els.sortBy.addEventListener("change", renderTable);
+  els.forecastWorkspace?.addEventListener("click", handleRollingForecastClick);
+  els.forecastWorkspace?.addEventListener("input", handleRollingForecastInput);
+  els.forecastWorkspace?.addEventListener("change", handleRollingForecastInput);
   els.dashboardGroupSelect?.addEventListener("change", () => {
     state.dashboardGroup = els.dashboardGroupSelect.value;
     renderDashboard();
@@ -1884,17 +1893,54 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 }
 
 function renderTable() {
+  const varianceView = document.getElementById("varianceView");
   if (!state.result) {
+    varianceView?.classList.remove("show-legacy-variance");
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
-    els.detailBody.innerHTML = `<tr><td colspan="8" class="empty-cell">${t("emptySap")}</td></tr>`;
+    if (els.forecastWorkspace) els.forecastWorkspace.innerHTML = `<div class="empty-cell">${t("emptySap")}</div>`;
+    if (els.detailBody) els.detailBody.innerHTML = `<tr><td colspan="8" class="empty-cell">${t("emptySap")}</td></tr>`;
     return;
   }
   const rows = visibleRows();
   const collapsedCount = state.result.unsplitCategories?.length || 0;
   const collapsedText = collapsedCount ? ` · ${t("collapsedCategoryCompare").replace("{count}", collapsedCount)}` : "";
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedText}`;
-  els.detailBody.innerHTML =
-    rows.map(rowToHtml).join("") || `<tr><td colspan="8" class="empty-cell">${t("noMatchingAccounts")}</td></tr>`;
+  varianceView?.classList.toggle("show-legacy-variance", state.rollingViewMode === "variance");
+  if (state.rollingViewMode === "variance") {
+    renderVarianceAnalysisWorkspace();
+    if (!els.detailBody) return;
+    els.detailBody.innerHTML = rows.map((row) => rowToHtml(row)).join("");
+    bindVarianceAnalysisRows();
+    return;
+  }
+  renderRollingForecastWorkspace(rows);
+  if (!els.detailBody) return;
+  els.detailBody.innerHTML = "";
+}
+
+function renderVarianceAnalysisWorkspace() {
+  if (!els.forecastWorkspace) return;
+  els.forecastWorkspace.innerHTML = `
+    <div class="rf-switch-panel">
+      <div>
+        <h3>${escapeHtml(rfT("varianceMode"))}</h3>
+        <p>${escapeHtml(state.language === "en"
+          ? "Use the original variance table format after forecast input: cost, unit variance, YoY/MoM result and hover details."
+          : state.language === "tr"
+            ? "Tahmin girişinden sonra eski fark tablosu formatı kullanılır: gider, birim fark, yıllık/aylık sonuç ve hover detayı."
+            : "填完预测后，用原来的差异表格式查看：费用、单台、同比/环比结论和悬停明细。")}</p>
+      </div>
+      <div class="rf-actions">
+        <div class="rf-mode-toggle">
+          <button type="button" class="${state.rollingViewMode === "fill" ? "active" : ""}" data-rf-view-mode="fill">${escapeHtml(rfT("fillMode"))}</button>
+          <button type="button" class="${state.rollingViewMode === "variance" ? "active" : ""}" data-rf-view-mode="variance">${escapeHtml(rfT("varianceMode"))}</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function bindVarianceAnalysisRows() {
   for (const input of els.detailBody.querySelectorAll(".description-attachment-input")) {
     input.addEventListener("change", (event) => {
       const fileName = event.target.files?.[0]?.name || "";
@@ -1921,6 +1967,789 @@ function renderTable() {
       renderChart();
     });
   }
+}
+
+const ROLLING_FORECAST_MONTHS = [6, 7, 8, 9, 10, 11, 12];
+const ROLLING_FORECAST_DRAFT_KEY = "dwRollingForecastDrafts.v1";
+const ROLLING_FORECAST_SUBMIT_KEY = "dwRollingForecastSubmitted.v1";
+const ROLLING_FORECAST_TEXT = {
+  zh: {
+    title: "滚动预测协作区",
+    subtitle: "6-12月预测在这里直接维护；单价和数量为空时，总额沿用4+8预测。",
+    myTasks: "我的任务",
+    allTasks: "全部任务",
+    ownerMissing: "责任人缺失",
+    warnings: "预警",
+    drafts: "草稿",
+    submitted: "已提交",
+    saveAll: "保存全部草稿",
+    submitAll: "提交全部预测",
+    saveCurrent: "保存当前科目",
+    submitCurrent: "提交当前科目",
+    fillMode: "填报版",
+    varianceMode: "差异版",
+    account: "科目",
+    task: "任务",
+    action: "操作",
+    fill: "填写",
+    continueFill: "继续填",
+    view: "查看",
+    ownerNeeded: "待填责任人",
+    usesForecast: "沿用4+8",
+    byFormula: "单价×数量",
+    byTotal: "手填总价",
+    draft: "草稿",
+    noTask: "没有符合条件的科目",
+    selectedAccount: "当前科目",
+    forecastLogic: "预测逻辑",
+    ownerSection: "责任人与计算",
+    priceOwner: "单价责任人",
+    qtyOwner: "数量责任人",
+    totalOwner: "总价责任人",
+    reviewer: "审核责任人",
+    month: "月份",
+    forecast48: "4+8预测",
+    unitPrice: "单价",
+    quantity: "数量",
+    totalAmount: "总价",
+    detailFile: "明细附件",
+    uploadDetail: "上传明细",
+    replaceDetail: "更换明细",
+    detailRequired: "待上传明细",
+    rollingTotal: "滚动预测总额",
+    yoyDiff: "同比差额",
+    momDiff: "环比差额",
+    varianceReasonTitle: "同比/环比原因",
+    yoyReason: "同比差异分析",
+    momReason: "环比差异分析",
+    samePeriod: "25同期",
+    previousMonth: "上月",
+    currentRolling: "当前滚动",
+    reasonPlaceholder: "填写原因、责任、行动和预计影响",
+    warning: "预警",
+    noWarning: "正常",
+    formulaHint: "单价和数量为空时，滚动预测总额保持4+8；两者都填写后，总额=单价×数量。",
+    totalModeHint: "该科目单价不统一，请上传明细并填写总价；总价为空时，滚动预测总额保持4+8。",
+    completion: "填写完整度",
+    saved: "滚动预测草稿已保存",
+    submittedToast: "滚动预测已提交",
+    currentSaved: "当前科目草稿已保存",
+    currentSubmitted: "当前科目已提交",
+    missingOwnerHint: "请补责任人",
+    warningHint: "超过上月20%",
+    status: "状态"
+  },
+  en: {
+    title: "Rolling Forecast Hub",
+    subtitle: "Maintain Jun-Dec forecast here. When unit price and quantity are blank, total keeps the 4+8 forecast.",
+    myTasks: "My Tasks",
+    allTasks: "All Tasks",
+    ownerMissing: "Owner Missing",
+    warnings: "Warnings",
+    drafts: "Drafts",
+    submitted: "Submitted",
+    saveAll: "Save All Drafts",
+    submitAll: "Submit All Forecasts",
+    saveCurrent: "Save Current Account",
+    submitCurrent: "Submit Current Account",
+    fillMode: "Input View",
+    varianceMode: "Variance View",
+    account: "Account",
+    task: "Task",
+    action: "Action",
+    fill: "Fill",
+    continueFill: "Continue",
+    view: "View",
+    ownerNeeded: "Owner Needed",
+    usesForecast: "Use 4+8",
+    byFormula: "Unit x Qty",
+    byTotal: "Manual Total",
+    draft: "Draft",
+    noTask: "No matching accounts",
+    selectedAccount: "Current Account",
+    forecastLogic: "Forecast Logic",
+    ownerSection: "Owners & Calculation",
+    priceOwner: "Price Owner",
+    qtyOwner: "Quantity Owner",
+    totalOwner: "Total Owner",
+    reviewer: "Reviewer",
+    month: "Month",
+    forecast48: "4+8 Forecast",
+    unitPrice: "Unit Price",
+    quantity: "Quantity",
+    totalAmount: "Total Amount",
+    detailFile: "Detail File",
+    uploadDetail: "Upload Detail",
+    replaceDetail: "Replace Detail",
+    detailRequired: "Detail Needed",
+    rollingTotal: "Rolling Total",
+    yoyDiff: "YoY Diff",
+    momDiff: "MoM Diff",
+    varianceReasonTitle: "YoY / MoM Reasons",
+    yoyReason: "YoY Variance",
+    momReason: "MoM Variance",
+    samePeriod: "2025 Same",
+    previousMonth: "Previous Month",
+    currentRolling: "Current Rolling",
+    reasonPlaceholder: "Enter reason, owner, action and estimated impact",
+    warning: "Warning",
+    noWarning: "OK",
+    formulaHint: "Blank unit price and quantity keep the 4+8 total. When both are filled, total = unit price x quantity.",
+    totalModeHint: "This account has no unified unit price. Upload the detail file and fill the total amount. Blank total keeps the 4+8 forecast.",
+    completion: "Completion",
+    saved: "Rolling forecast drafts saved",
+    submittedToast: "Rolling forecast submitted",
+    currentSaved: "Current account draft saved",
+    currentSubmitted: "Current account submitted",
+    missingOwnerHint: "Add owner",
+    warningHint: "Over 20% vs previous month",
+    status: "Status"
+  },
+  tr: {
+    title: "Dönen Tahmin Merkezi",
+    subtitle: "Haziran-Aralık tahmini burada tutulur. Birim fiyat ve miktar boşsa toplam 4+8 tahmini olarak kalır.",
+    myTasks: "Görevlerim",
+    allTasks: "Tüm Görevler",
+    ownerMissing: "Sorumlu Eksik",
+    warnings: "Uyarılar",
+    drafts: "Taslaklar",
+    submitted: "Gönderildi",
+    saveAll: "Tüm Taslakları Kaydet",
+    submitAll: "Tüm Tahminleri Gönder",
+    saveCurrent: "Seçili Hesabı Kaydet",
+    submitCurrent: "Seçili Hesabı Gönder",
+    fillMode: "Giriş Görünümü",
+    varianceMode: "Fark Görünümü",
+    account: "Hesap",
+    task: "Görev",
+    action: "İşlem",
+    fill: "Doldur",
+    continueFill: "Devam",
+    view: "Görüntüle",
+    ownerNeeded: "Sorumlu Gerekli",
+    usesForecast: "4+8 kullan",
+    byFormula: "Birim x Miktar",
+    byTotal: "Manuel Toplam",
+    draft: "Taslak",
+    noTask: "Eşleşen hesap yok",
+    selectedAccount: "Seçili Hesap",
+    forecastLogic: "Tahmin Mantığı",
+    ownerSection: "Sorumlular ve Hesaplama",
+    priceOwner: "Fiyat Sorumlusu",
+    qtyOwner: "Miktar Sorumlusu",
+    totalOwner: "Toplam Sorumlusu",
+    reviewer: "Kontrol Eden",
+    month: "Ay",
+    forecast48: "4+8 Tahmin",
+    unitPrice: "Birim Fiyat",
+    quantity: "Miktar",
+    totalAmount: "Toplam Tutar",
+    detailFile: "Detay Dosyası",
+    uploadDetail: "Detay Yükle",
+    replaceDetail: "Detayı Değiştir",
+    detailRequired: "Detay Gerekli",
+    rollingTotal: "Dönen Toplam",
+    yoyDiff: "Yıllık Fark",
+    momDiff: "Aylık Fark",
+    varianceReasonTitle: "Yıllık / Aylık Nedenler",
+    yoyReason: "Yıllık Fark",
+    momReason: "Aylık Fark",
+    samePeriod: "2025 Aynı",
+    previousMonth: "Önceki Ay",
+    currentRolling: "Mevcut Dönen",
+    reasonPlaceholder: "Neden, sorumlu, aksiyon ve tahmini etki girin",
+    warning: "Uyarı",
+    noWarning: "Normal",
+    formulaHint: "Birim fiyat ve miktar boşsa toplam 4+8 olarak kalır. İkisi de doluysa toplam = birim fiyat x miktar.",
+    totalModeHint: "Bu hesabın tek bir birim fiyatı yok. Detay dosyasını yükleyin ve toplam tutarı girin. Toplam boşsa 4+8 tahmini kullanılır.",
+    completion: "Tamamlanma",
+    saved: "Dönen tahmin taslakları kaydedildi",
+    submittedToast: "Dönen tahmin gönderildi",
+    currentSaved: "Seçili hesap taslağı kaydedildi",
+    currentSubmitted: "Seçili hesap gönderildi",
+    missingOwnerHint: "Sorumlu ekle",
+    warningHint: "Önceki aya göre %20 üzeri",
+    status: "Durum"
+  }
+};
+
+function renderRollingForecastWorkspace(rows) {
+  if (!els.forecastWorkspace) return;
+  const accountRows = rows.filter((row) => row.code);
+  if (!accountRows.length) {
+    els.forecastWorkspace.innerHTML = `<div class="empty-cell">${rfT("noTask")}</div>`;
+    return;
+  }
+  if (!state.rollingSelectedCode || !accountRows.some((row) => row.code === state.rollingSelectedCode)) {
+    state.rollingSelectedCode = accountRows[0].code;
+  }
+  const allMeta = accountRows.map((row) => rollingRowMeta(row));
+  const filteredMeta = allMeta.filter((item) => rollingFilterMatches(item));
+  const selectedMeta = allMeta.find((item) => item.row.code === state.rollingSelectedCode) || allMeta[0];
+  const stats = rollingStats(allMeta);
+  els.forecastWorkspace.innerHTML = `
+    <div class="rf-shell">
+      <div class="rf-header">
+        <div>
+          <h3>${escapeHtml(rfT("title"))}</h3>
+          <p>${escapeHtml(rfT("subtitle"))}</p>
+        </div>
+        <div class="rf-actions">
+          <div class="rf-mode-toggle">
+            <button type="button" class="${state.rollingViewMode === "fill" ? "active" : ""}" data-rf-view-mode="fill">${escapeHtml(rfT("fillMode"))}</button>
+            <button type="button" class="${state.rollingViewMode === "variance" ? "active" : ""}" data-rf-view-mode="variance">${escapeHtml(rfT("varianceMode"))}</button>
+          </div>
+          <button type="button" class="ghost-button" data-rf-action="save-all">${escapeHtml(rfT("saveAll"))}</button>
+          <button type="button" data-rf-action="submit-all">${escapeHtml(rfT("submitAll"))}</button>
+        </div>
+      </div>
+      <div class="rf-stats">
+        ${rfStat(rfT("myTasks"), stats.myTasks)}
+        ${rfStat(rfT("ownerMissing"), stats.ownerMissing)}
+        ${rfStat(rfT("warnings"), stats.warnings, stats.warnings ? "warn" : "")}
+        ${rfStat(rfT("drafts"), stats.drafts)}
+        ${rfStat(rfT("submitted"), stats.submitted, "ok")}
+      </div>
+      <div class="rf-layout">
+        <aside class="rf-task-panel">
+          <div class="rf-filter-tabs">
+            ${rfFilterButton("all", rfT("allTasks"))}
+            ${rfFilterButton("my", rfT("myTasks"))}
+            ${rfFilterButton("missing", rfT("ownerMissing"))}
+            ${rfFilterButton("warning", rfT("warnings"))}
+          </div>
+          <div class="rf-task-list">
+            ${filteredMeta.map((item) => rfTaskRow(item)).join("") || `<div class="rf-empty">${escapeHtml(rfT("noTask"))}</div>`}
+          </div>
+        </aside>
+        <section class="rf-editor">
+          ${rfEditor(selectedMeta)}
+        </section>
+      </div>
+    </div>
+  `;
+}
+
+function rfStat(labelText, value, className = "") {
+  return `<div class="rf-stat ${className}"><span>${escapeHtml(labelText)}</span><strong>${escapeHtml(value)}</strong></div>`;
+}
+
+function rfFilterButton(value, labelText) {
+  return `<button type="button" class="${state.rollingTaskFilter === value ? "active" : ""}" data-rf-filter="${escapeHtml(value)}">${escapeHtml(labelText)}</button>`;
+}
+
+function rfTaskRow(item) {
+  const row = item.row;
+  const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
+  const selected = row.code === state.rollingSelectedCode;
+  const taskLabel = item.warningCount
+    ? rfT("warningHint")
+    : item.ownerMissing
+      ? rfT("missingOwnerHint")
+      : item.hasFormula
+        ? item.totalOnly ? rfT("byTotal") : rfT("byFormula")
+        : rfT("usesForecast");
+  const action = item.submitted ? rfT("view") : item.hasDraft ? rfT("continueFill") : rfT("fill");
+  return `
+    <button type="button" class="rf-task-row ${selected ? "selected" : ""} ${item.warningCount ? "has-warning" : ""}" data-rf-select="${escapeHtml(row.code)}">
+      <span class="rf-task-main">
+        <b>${escapeHtml(row.code)}</b>
+        <em>${escapeHtml(shortText(accountLabel, 42))}</em>
+      </span>
+      <span class="rf-task-meta">
+        <small>${escapeHtml(localizeCategory(row.category, state.language))}</small>
+        <strong class="${valueClass(row.amountDiff)}">${formatMoney(row.amountDiff)}</strong>
+      </span>
+      <span class="rf-task-status">
+        <i>${escapeHtml(taskLabel)}</i>
+        <u>${escapeHtml(action)}</u>
+      </span>
+    </button>
+  `;
+}
+
+function rfEditor(item) {
+  const row = item.row;
+  const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
+  const totalOnly = item.totalOnly;
+  const showVariance = state.rollingViewMode === "variance";
+  const ownerSummary = item.ownerMissing ? rfT("ownerNeeded") : totalOnly ? rfT("byTotal") : rfT("byFormula");
+  return `
+    <div class="rf-editor-head">
+      <div>
+        <span>${escapeHtml(rfT("selectedAccount"))}</span>
+        <h3>${escapeHtml(row.code)} · ${escapeHtml(accountLabel)}</h3>
+        <p>${escapeHtml(localizeCategory(row.category, state.language))} · ${escapeHtml(rfT("forecastLogic"))}: ${escapeHtml(forecastLogicForRow(row))}</p>
+      </div>
+      <div class="rf-status-stack">
+        <span class="rf-chip ${item.submitted ? "ok" : item.hasDraft ? "draft" : ""}">${escapeHtml(item.submitted ? rfT("submitted") : item.hasDraft ? rfT("draft") : rfT("usesForecast"))}</span>
+        <span class="rf-chip ${item.ownerMissing ? "muted" : "ok"}">${escapeHtml(ownerSummary)}</span>
+      </div>
+    </div>
+    <div class="rf-formula-note">${escapeHtml(totalOnly ? rfT("totalModeHint") : rfT("formulaHint"))}</div>
+    <div class="rf-matrix-wrap">
+      <table class="rf-matrix ${totalOnly ? "rf-total-mode" : ""} ${showVariance ? "rf-variance-mode" : ""}">
+        <thead>
+          ${totalOnly ? rfTotalModeHeader(showVariance) : rfUnitQtyHeader(showVariance)}
+        </thead>
+        <tbody>
+          ${ROLLING_FORECAST_MONTHS.map((month) => rfMonthRow(row.code, month, totalOnly, showVariance)).join("")}
+        </tbody>
+      </table>
+    </div>
+    ${showVariance ? rfVarianceReasonPanel(row) : ""}
+    <div class="rf-submit-bar">
+      <div>
+        <span>${escapeHtml(rfT("completion"))}</span>
+        <strong>${Math.round(item.completion * 100)}%</strong>
+        <small>${escapeHtml(rfT("ownerMissing"))}: ${item.ownerMissingCount} · ${escapeHtml(rfT("warnings"))}: ${item.warningCount}</small>
+      </div>
+      <div class="rf-actions">
+        <button type="button" class="ghost-button" data-rf-action="save-current">${escapeHtml(rfT("saveCurrent"))}</button>
+        <button type="button" data-rf-action="submit-current">${escapeHtml(rfT("submitCurrent"))}</button>
+      </div>
+    </div>
+  `;
+}
+
+function rfUnitQtyHeader(showVariance = state.rollingViewMode === "variance") {
+  return `
+    <tr>
+      <th>${escapeHtml(rfT("month"))}</th>
+      <th>${escapeHtml(rfT("forecast48"))}</th>
+      <th>${escapeHtml(rfT("unitPrice"))}</th>
+      <th>${escapeHtml(rfT("priceOwner"))}</th>
+      <th>${escapeHtml(rfT("quantity"))}</th>
+      <th>${escapeHtml(rfT("qtyOwner"))}</th>
+      <th>${escapeHtml(rfT("rollingTotal"))}</th>
+      ${showVariance ? `<th>${escapeHtml(rfT("yoyDiff"))}</th><th>${escapeHtml(rfT("momDiff"))}</th>` : ""}
+      <th>${escapeHtml(rfT("warning"))}</th>
+    </tr>
+  `;
+}
+
+function rfTotalModeHeader(showVariance = state.rollingViewMode === "variance") {
+  return `
+    <tr>
+      <th>${escapeHtml(rfT("month"))}</th>
+      <th>${escapeHtml(rfT("forecast48"))}</th>
+      <th>${escapeHtml(rfT("detailFile"))}</th>
+      <th>${escapeHtml(rfT("totalAmount"))}</th>
+      <th>${escapeHtml(rfT("totalOwner"))}</th>
+      <th>${escapeHtml(rfT("rollingTotal"))}</th>
+      ${showVariance ? `<th>${escapeHtml(rfT("yoyDiff"))}</th><th>${escapeHtml(rfT("momDiff"))}</th>` : ""}
+      <th>${escapeHtml(rfT("warning"))}</th>
+    </tr>
+  `;
+}
+
+function rfMonthRow(code, month, totalOnly = isRollingTotalOnlyCode(code), showVariance = state.rollingViewMode === "variance") {
+  const draft = rollingMonthDraft(code, month);
+  const base = forecastAmountForAccount(code, month);
+  const totalInfo = rollingTotalInfo(code, month);
+  const warning = rollingWarningInfo(code, month);
+  const variance = showVariance ? rollingVarianceInfo(code, month) : null;
+  const totalClass = warning.level === "severe" ? "severe" : warning.level === "warn" ? "warn" : "";
+  if (totalOnly) {
+    const detailLabel = draft.detailName ? rfT("replaceDetail") : rfT("uploadDetail");
+    return `
+      <tr>
+        <td>${escapeHtml(localizeMonthLabel(month - 1, state.language))}</td>
+        <td>${formatMoney(base)}</td>
+        <td class="rf-detail-cell">
+          <label class="rf-detail-upload">
+            <input type="file" data-rf-field="detailName" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" />
+            <span>${escapeHtml(detailLabel)}</span>
+          </label>
+          <small>${escapeHtml(draft.detailName || rfT("detailRequired"))}</small>
+        </td>
+        <td><input inputmode="decimal" data-rf-field="totalAmount" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.totalAmount)}" placeholder="--" /></td>
+        <td><input data-rf-field="totalOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.totalOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" /></td>
+        <td class="rf-total ${totalClass}" data-rf-total-cell><strong>${formatMoney(totalInfo.total)}</strong><small>${escapeHtml(totalInfo.source)}</small></td>
+        ${showVariance ? `<td data-rf-yoy-cell class="${valueClass(variance.yoy)}">${formatVarianceWithRate(variance.yoy, variance.same)}</td><td data-rf-mom-cell class="${valueClass(variance.mom)}">${formatVarianceWithRate(variance.mom, variance.previous)}</td>` : ""}
+        <td data-rf-warning-cell>${warning.level ? `<span class="rf-warning ${warning.level}">${escapeHtml(warning.label)}</span>` : `<span class="rf-ok">${escapeHtml(rfT("noWarning"))}</span>`}</td>
+      </tr>
+    `;
+  }
+  return `
+    <tr>
+      <td>${escapeHtml(localizeMonthLabel(month - 1, state.language))}</td>
+      <td>${formatMoney(base)}</td>
+      <td><input inputmode="decimal" data-rf-field="unitPrice" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.unitPrice)}" placeholder="--" /></td>
+      <td><input data-rf-field="priceOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.priceOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" /></td>
+      <td><input inputmode="decimal" data-rf-field="quantity" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.quantity)}" placeholder="--" /></td>
+      <td><input data-rf-field="quantityOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.quantityOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" /></td>
+      <td class="rf-total ${totalClass}" data-rf-total-cell><strong>${formatMoney(totalInfo.total)}</strong><small>${escapeHtml(totalInfo.source)}</small></td>
+      ${showVariance ? `<td data-rf-yoy-cell class="${valueClass(variance.yoy)}">${formatVarianceWithRate(variance.yoy, variance.same)}</td><td data-rf-mom-cell class="${valueClass(variance.mom)}">${formatVarianceWithRate(variance.mom, variance.previous)}</td>` : ""}
+      <td data-rf-warning-cell>${warning.level ? `<span class="rf-warning ${warning.level}">${escapeHtml(warning.label)}</span>` : `<span class="rf-ok">${escapeHtml(rfT("noWarning"))}</span>`}</td>
+    </tr>
+  `;
+}
+
+function rfVarianceReasonPanel(row) {
+  const key = analysisKey(state.result.month, row.code);
+  const yoyAnalysis = analysisReason(state.analyses, state.result.month, row.code, "yoy");
+  const momAnalysis = analysisReason(state.analyses, state.result.month, row.code, "mom");
+  const currentMonth = Number(els.monthSelect?.value || state.result.month || 12);
+  const currentVariance = rollingVarianceInfo(row.code, currentMonth);
+  return `
+    <div class="rf-variance-panel">
+      <div class="rf-variance-head">
+        <div>
+          <h4>${escapeHtml(rfT("varianceReasonTitle"))}</h4>
+          <p>${escapeHtml(localizeMonthLabel(currentMonth - 1, state.language))}: ${escapeHtml(rfT("currentRolling"))} ${formatMoney(currentVariance.current)} K€ · ${escapeHtml(rfT("samePeriod"))} ${formatMoney(currentVariance.same)} K€ · ${escapeHtml(rfT("previousMonth"))} ${formatMoney(currentVariance.previous)} K€</p>
+        </div>
+        <div class="rf-variance-kpis">
+          <span class="${valueClass(currentVariance.yoy)}">${escapeHtml(rfT("yoyDiff"))}: ${formatVarianceWithRate(currentVariance.yoy, currentVariance.same)}</span>
+          <span class="${valueClass(currentVariance.mom)}">${escapeHtml(rfT("momDiff"))}: ${formatVarianceWithRate(currentVariance.mom, currentVariance.previous)}</span>
+        </div>
+      </div>
+      <div class="rf-reason-grid">
+        <label>
+          <span>${escapeHtml(rfT("yoyReason"))}</span>
+          <textarea data-rf-analysis-key="${escapeHtml(key)}" data-rf-analysis-mode="yoy" placeholder="${escapeHtml(rfT("reasonPlaceholder"))}">${escapeHtml(yoyAnalysis)}</textarea>
+        </label>
+        <label>
+          <span>${escapeHtml(rfT("momReason"))}</span>
+          <textarea data-rf-analysis-key="${escapeHtml(key)}" data-rf-analysis-mode="mom" placeholder="${escapeHtml(rfT("reasonPlaceholder"))}">${escapeHtml(momAnalysis)}</textarea>
+        </label>
+      </div>
+    </div>
+  `;
+}
+
+function rollingVarianceInfo(code, month) {
+  const row = state.resultByMonth.get(Number(month))?.rows?.find((item) => String(item.code) === String(code));
+  const current = rollingTotalInfo(code, Number(month)).total;
+  const same = Number.isFinite(row?.amount25) ? row.amount25 : referenceAmountForAccount(code, month, "same");
+  const previous = month > 1
+    ? (Number.isFinite(rollingTotalInfo(code, Number(month) - 1).total)
+      ? rollingTotalInfo(code, Number(month) - 1).total
+      : referenceAmountForAccount(code, Number(month) - 1, "current"))
+    : null;
+  return {
+    current,
+    same,
+    previous,
+    yoy: Number.isFinite(current) && Number.isFinite(same) ? current - same : null,
+    mom: Number.isFinite(current) && Number.isFinite(previous) ? current - previous : null
+  };
+}
+
+function referenceAmountForAccount(code, month, mode = "current") {
+  const resultRow = state.resultByMonth.get(Number(month))?.rows?.find((row) => String(row.code) === String(code));
+  if (mode === "same" && Number.isFinite(resultRow?.amount25)) return resultRow.amount25;
+  if (mode === "previous" && Number.isFinite(resultRow?.previousAmount26)) return resultRow.previousAmount26;
+  if (mode === "current" && Number.isFinite(resultRow?.amount26)) return resultRow.amount26;
+  const baseline = BASELINE_25_BY_MONTH[month]?.accounts?.find((row) => String(row.code) === String(code));
+  if (mode === "same" && Number.isFinite(baseline?.amount25)) return baseline.amount25;
+  return forecastAmountForAccount(code, month);
+}
+
+function formatVarianceWithRate(value, base) {
+  if (!Number.isFinite(value)) return "--";
+  const rate = Number.isFinite(base) && base !== 0 ? ` (${formatPercent(value / Math.abs(base))})` : "";
+  return `${formatMoney(value)}${rate}`;
+}
+
+function rollingRowMeta(row) {
+  const totalOnly = isRollingTotalOnlyRow(row);
+  const months = ROLLING_FORECAST_MONTHS.map((month) => {
+    const draft = rollingMonthDraft(row.code, month);
+    const hasUnit = String(draft.unitPrice || "").trim() !== "";
+    const hasQty = String(draft.quantity || "").trim() !== "";
+    const hasTotal = String(draft.totalAmount || "").trim() !== "";
+    const hasOwner = totalOnly
+      ? String(draft.totalOwner || "").trim()
+      : String(draft.priceOwner || "").trim() || String(draft.quantityOwner || "").trim();
+    const hasDetail = String(draft.detailName || "").trim() !== "";
+    return {
+      month,
+      draft,
+      hasDraft: totalOnly ? hasTotal || hasOwner || hasDetail : hasUnit || hasQty || hasOwner,
+      hasFormula: totalOnly ? hasTotal : hasUnit && hasQty,
+      ownerMissing: totalOnly
+        ? !String(draft.totalOwner || "").trim()
+        : !String(draft.priceOwner || "").trim() || !String(draft.quantityOwner || "").trim(),
+      warning: rollingWarningInfo(row.code, month)
+    };
+  });
+  const warningCount = months.filter((item) => item.warning.level).length;
+  const ownerMissingCount = months.filter((item) => item.ownerMissing).length;
+  const formulaCount = months.filter((item) => item.hasFormula).length;
+  const hasDraft = months.some((item) => item.hasDraft);
+  return {
+    row,
+    totalOnly,
+    months,
+    hasDraft,
+    hasFormula: formulaCount > 0,
+    ownerMissing: ownerMissingCount > 0,
+    ownerMissingCount,
+    warningCount,
+    completion: ROLLING_FORECAST_MONTHS.length ? formulaCount / ROLLING_FORECAST_MONTHS.length : 0,
+    submitted: Boolean(state.rollingForecastSubmitted[row.code])
+  };
+}
+
+function rollingStats(items) {
+  return {
+    myTasks: items.filter((item) => rollingFilterMatches(item, "my")).length,
+    ownerMissing: items.filter((item) => item.ownerMissing).length,
+    warnings: items.filter((item) => item.warningCount).length,
+    drafts: items.filter((item) => item.hasDraft && !item.submitted).length,
+    submitted: items.filter((item) => item.submitted).length
+  };
+}
+
+function rollingFilterMatches(item, override = null) {
+  const filter = override || state.rollingTaskFilter;
+  if (filter === "missing") return item.ownerMissing;
+  if (filter === "warning") return item.warningCount > 0;
+  if (filter === "my") return rollingOwnedByCurrentUser(item);
+  return true;
+}
+
+function rollingOwnedByCurrentUser(item) {
+  const user = (els.analysisAuthor?.value || els.userName?.value || "").trim().toLowerCase();
+  if (!user) return false;
+  return item.months.some(({ draft }) => [draft.priceOwner, draft.quantityOwner, draft.totalOwner].some((owner) => String(owner || "").trim().toLowerCase() === user));
+}
+
+function rollingMonthDraft(code, month) {
+  const account = state.rollingForecastDrafts[code] || {};
+  const monthDraft = account[String(month)] || {};
+  return {
+    unitPrice: String(monthDraft.unitPrice || ""),
+    quantity: String(monthDraft.quantity || ""),
+    priceOwner: String(monthDraft.priceOwner || ""),
+    quantityOwner: String(monthDraft.quantityOwner || ""),
+    totalAmount: String(monthDraft.totalAmount || ""),
+    totalOwner: String(monthDraft.totalOwner || ""),
+    detailName: String(monthDraft.detailName || "")
+  };
+}
+
+function setRollingMonthDraft(code, month, field, value) {
+  state.rollingForecastDrafts[code] = {
+    ...(state.rollingForecastDrafts[code] || {}),
+    [String(month)]: {
+      ...rollingMonthDraft(code, month),
+      [field]: value
+    }
+  };
+  delete state.rollingForecastSubmitted[code];
+}
+
+function forecastAmountForAccount(code, month) {
+  const source = ACCOUNT_FORECAST_DW_BY_MONTH[month];
+  const item = source?.accounts?.find((row) => String(row.code) === String(code));
+  return Number.isFinite(item?.amount) ? item.amount : null;
+}
+
+function rollingTotalInfo(code, month) {
+  const draft = rollingMonthDraft(code, month);
+  if (isRollingTotalOnlyCode(code)) {
+    const total = parseOptionalNumber(draft.totalAmount);
+    if (Number.isFinite(total)) return { total, source: rfT("byTotal") };
+    return { total: forecastAmountForAccount(code, month), source: rfT("usesForecast") };
+  }
+  const unit = parseOptionalNumber(draft.unitPrice);
+  const qty = parseOptionalNumber(draft.quantity);
+  if (Number.isFinite(unit) && Number.isFinite(qty)) {
+    return { total: unit * qty, source: rfT("byFormula") };
+  }
+  return { total: forecastAmountForAccount(code, month), source: rfT("usesForecast") };
+}
+
+function rollingWarningInfo(code, month) {
+  const current = rollingTotalInfo(code, month).total;
+  const previous = month > 1 ? rollingTotalInfo(code, month - 1).total : null;
+  if (!Number.isFinite(current) || !Number.isFinite(previous) || previous === 0) return { level: "", label: "" };
+  const ratio = (current - previous) / Math.abs(previous);
+  if (Math.abs(ratio) < 0.2) return { level: "", label: "" };
+  const pct = `${ratio >= 0 ? "+" : ""}${Math.round(ratio * 100)}%`;
+  return { level: Math.abs(ratio) >= 0.5 ? "severe" : "warn", label: pct };
+}
+
+function parseOptionalNumber(value) {
+  const text = String(value ?? "").replace(/,/g, "").trim();
+  if (!text) return null;
+  const number = Number(text);
+  return Number.isFinite(number) ? number : null;
+}
+
+function rollingRowForCode(code) {
+  return state.result?.rows?.find((row) => String(row.code) === String(code)) || null;
+}
+
+function isRollingTotalOnlyCode(code) {
+  const row = rollingRowForCode(code);
+  return row ? isRollingTotalOnlyRow(row) : false;
+}
+
+function isRollingTotalOnlyRow(row) {
+  const text = `${row.code || ""} ${row.descEn || ""} ${row.category || ""}`.toLowerCase();
+  return text.includes("repair") || text.includes("maint");
+}
+
+function forecastLogicForRow(row) {
+  const text = `${row.code} ${row.descEn || ""} ${row.category || ""}`.toLowerCase();
+  if (text.includes("uniform") || text.includes("transport")) {
+    return state.language === "en" ? "unit price from operations, quantity from HR" : state.language === "tr" ? "birim fiyat operasyon, miktar HR" : "单价由运营提供，数量由HR提供";
+  }
+  if (text.includes("repair") || text.includes("maint")) {
+    return state.language === "en" ? "Upload maintenance detail and fill one total amount" : state.language === "tr" ? "Bakım detayını yükleyin ve tek toplam tutar girin" : "上传维修明细，直接填写总价";
+  }
+  if (text.includes("inventory") || text.includes("devaluation") || text.includes("obsolete")) {
+    return state.language === "en" ? "SAP aging report plus planning risk judgement" : state.language === "tr" ? "SAP yaşlandırma raporu ve planlama risk kararı" : "SAP aging report + 计划部门风险判断";
+  }
+  if (text.includes("labour") || text.includes("labor") || text.includes("salary") || text.includes("overtime")) {
+    return state.language === "en" ? "HR labor plan, overtime, festival payment and salary mix" : state.language === "tr" ? "HR iş gücü planı, mesai, bayram ödemesi ve maaş karması" : "HR labor plan + 加班 + 节日付款 + salary mix";
+  }
+  return state.language === "en" ? "fill unit price, quantity and responsible owners" : state.language === "tr" ? "birim fiyat, miktar ve sorumluları doldurun" : "填写单价、数量和责任人";
+}
+
+function handleRollingForecastClick(event) {
+  const modeButton = event.target.closest("[data-rf-view-mode]");
+  if (modeButton) {
+    state.rollingViewMode = modeButton.dataset.rfViewMode === "variance" ? "variance" : "fill";
+    renderTable();
+    return;
+  }
+  const filterButton = event.target.closest("[data-rf-filter]");
+  if (filterButton) {
+    state.rollingTaskFilter = filterButton.dataset.rfFilter;
+    renderTable();
+    return;
+  }
+  const selectButton = event.target.closest("[data-rf-select]");
+  if (selectButton) {
+    state.rollingSelectedCode = selectButton.dataset.rfSelect;
+    renderTable();
+    return;
+  }
+  const action = event.target.closest("[data-rf-action]")?.dataset.rfAction;
+  if (!action) return;
+  if (action === "save-all") {
+    saveRollingForecastDrafts();
+    toast(rfT("saved"));
+    return;
+  }
+  if (action === "save-current") {
+    saveRollingForecastDrafts();
+    toast(rfT("currentSaved"));
+    return;
+  }
+  if (action === "submit-current") {
+    if (state.rollingSelectedCode) state.rollingForecastSubmitted[state.rollingSelectedCode] = new Date().toISOString();
+    state.rollingViewMode = "variance";
+    saveRollingForecastDrafts();
+    toast(rfT("currentSubmitted"));
+    renderTable();
+    return;
+  }
+  if (action === "submit-all") {
+    for (const row of visibleRows()) {
+      if (row.code) state.rollingForecastSubmitted[row.code] = new Date().toISOString();
+    }
+    state.rollingViewMode = "variance";
+    saveRollingForecastDrafts();
+    toast(rfT("submittedToast"));
+    renderTable();
+  }
+}
+
+function handleRollingForecastInput(event) {
+  const analysisTarget = event.target.closest("[data-rf-analysis-key]");
+  if (analysisTarget) {
+    const key = analysisTarget.dataset.rfAnalysisKey;
+    state.analyses[key] = {
+      ...analysisReasons(state.analyses[key]),
+      [analysisTarget.dataset.rfAnalysisMode]: analysisTarget.value
+    };
+    if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("unsavedChanges");
+    if (event.type === "input") {
+      renderNarrative();
+      renderChart();
+    }
+    return;
+  }
+  const target = event.target.closest("[data-rf-field]");
+  if (!target) return;
+  const value = target.type === "file" ? target.files?.[0]?.name || "" : target.value;
+  setRollingMonthDraft(target.dataset.rfCode, target.dataset.rfMonth, target.dataset.rfField, value);
+  if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("unsavedChanges");
+  if (target.dataset.rfField === "unitPrice" || target.dataset.rfField === "quantity" || target.dataset.rfField === "totalAmount") {
+    refreshRollingMatrixRows(target.dataset.rfCode);
+  }
+  if (event.type === "change") renderTable();
+}
+
+function refreshRollingMatrixRows(code) {
+  if (!els.forecastWorkspace || !code) return;
+  const rows = els.forecastWorkspace.querySelectorAll(`.rf-matrix tbody tr`);
+  for (const row of rows) {
+    const month = row.querySelector("[data-rf-month]")?.dataset.rfMonth;
+    if (!month) continue;
+    const totalInfo = rollingTotalInfo(code, Number(month));
+    const warning = rollingWarningInfo(code, Number(month));
+    const variance = rollingVarianceInfo(code, Number(month));
+    const totalClass = warning.level === "severe" ? "severe" : warning.level === "warn" ? "warn" : "";
+    const totalCell = row.querySelector("[data-rf-total-cell]");
+    const yoyCell = row.querySelector("[data-rf-yoy-cell]");
+    const momCell = row.querySelector("[data-rf-mom-cell]");
+    const warningCell = row.querySelector("[data-rf-warning-cell]");
+    if (totalCell) {
+      totalCell.className = `rf-total ${totalClass}`.trim();
+      totalCell.innerHTML = `<strong>${formatMoney(totalInfo.total)}</strong><small>${escapeHtml(totalInfo.source)}</small>`;
+    }
+    if (yoyCell) {
+      yoyCell.className = valueClass(variance.yoy);
+      yoyCell.textContent = formatVarianceWithRate(variance.yoy, variance.same);
+    }
+    if (momCell) {
+      momCell.className = valueClass(variance.mom);
+      momCell.textContent = formatVarianceWithRate(variance.mom, variance.previous);
+    }
+    if (warningCell) {
+      warningCell.innerHTML = warning.level
+        ? `<span class="rf-warning ${warning.level}">${escapeHtml(warning.label)}</span>`
+        : `<span class="rf-ok">${escapeHtml(rfT("noWarning"))}</span>`;
+    }
+  }
+}
+
+function saveRollingForecastDrafts() {
+  try {
+    localStorage.setItem(ROLLING_FORECAST_DRAFT_KEY, JSON.stringify(state.rollingForecastDrafts));
+    localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
+    if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = rfT("saved");
+  } catch (error) {
+    toast(error.message || String(error), true);
+  }
+}
+
+function loadRollingForecastDrafts() {
+  try {
+    if (typeof localStorage === "undefined") return {};
+    return JSON.parse(localStorage.getItem("dwRollingForecastDrafts.v1") || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+
+function loadRollingForecastSubmitted() {
+  try {
+    if (typeof localStorage === "undefined") return {};
+    return JSON.parse(localStorage.getItem("dwRollingForecastSubmitted.v1") || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+
+function rfT(key) {
+  return ROLLING_FORECAST_TEXT[state.language]?.[key] || ROLLING_FORECAST_TEXT.zh[key] || key;
 }
 
 async function submitCurrentMonthAnalyses() {
