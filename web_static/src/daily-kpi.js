@@ -597,7 +597,17 @@ document.addEventListener("click", (event) => {
     showDailyPage(pageButton.dataset.dailyPage);
     return;
   }
-  if (event.target.closest(".tab") || event.target.closest("[data-unit]")) {
+  const unitButton = event.target.closest("[data-unit]");
+  if (unitButton) {
+    leaveDailyMode();
+    if (unitButton.classList.contains("active")) {
+      document.getElementById("dashboardView")?.classList.add("active");
+      document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+      document.querySelector('[data-tab="dashboard"]')?.classList.add("active");
+    }
+    return;
+  }
+  if (event.target.closest(".tab")) {
     leaveDailyMode();
   }
   if (event.target.closest("[data-daily-submit]")) {

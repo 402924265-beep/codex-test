@@ -4,9 +4,9 @@ body.daily-kpi-mode .tabbar {
 
 .daily-subnav {
   display: grid;
-  gap: 8px;
-  margin-top: 8px;
-  padding-left: 12px;
+  gap: 6px;
+  margin-top: 6px;
+  padding-left: 0;
 }
 
 .daily-subnav button {
