@@ -580,6 +580,7 @@ function showDailyPage(page) {
 function leaveDailyMode() {
   document.body.classList.remove("daily-kpi-mode");
   document.querySelectorAll(".daily-subnav [data-daily-page]").forEach((button) => button.classList.remove("active"));
+  document.querySelectorAll(".daily-kpi-view").forEach((view) => view.classList.remove("active"));
 }
 
 function setDailySubmitStatus(text) {
