@@ -76,7 +76,7 @@ export function buildFactorSummary(items, month = 4) {
 }
 
 export function buildAutoSummary(result, analyses, _factorSummary, forecastSnapshot = null) {
-  if (!result) return "导入 SAP 报表后生成本月总结。";
+  if (!result || !result.summary) return "导入 SAP 报表后生成本月总结。";
   const totalUnit = result.summary.totalUnitDiff;
   const totalMomUnit = result.summary.totalMomUnitDiff;
   const manufacturingDiff = result.summary.manufacturingDiff;
