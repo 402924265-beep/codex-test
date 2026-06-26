@@ -1,0 +1,9 @@
+node_modules/
+__pycache__/
+*.pyc
+.claude/settings.local.json
+web_static/dev-server.log
+web_static/dev-server.err.log
+web_static/preview-*.png
+web_static/data/
+data/

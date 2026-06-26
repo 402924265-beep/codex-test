@@ -1,0 +1,299 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import XLSX from "xlsx";
+
+import { BASELINE_25_BY_MONTH } from "../src/baseline-data.js";
+import { COOKING_UNIT } from "../src/cooking-data.js";
+import { extractForecastWorkbook, buildAnnualDashboardRows, monthSnapshot, localizeDashboardRow } from "../src/forecast-parser.js";
+
+test("extracts 4+8 forecast volume, amount, unit, and budget variance", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Total"],
+    ["Budget Volume", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 780],
+    [],
+    ["STD Volume", 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 121, 792],
+    [],
+    ["Actual Volume", 12, 22, 32, 42, 52, 62, 72, 82, 92, 102, 112, 122, 804]
+  ]), "VOLUME");
+  const cpuRows = Array.from({ length: 36 }, () => []);
+  cpuRows[34] = ["TOTAL ALL", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 78, "", 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2];
+  cpuRows[6] = ["Direct Labor", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, "", 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(cpuRows), "FCST CPU");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    [],
+    [],
+    ["K€", "Jan", "Feb", "Mar", "Apr"],
+    ["TOTAL ALL", -1, -2, -3, -4]
+  ]), "FCST 26");
+
+  const forecast = extractForecastWorkbook(wb, XLSX);
+  const snapshot = monthSnapshot(forecast, 4);
+  const rows = buildAnnualDashboardRows(forecast);
+
+  assert.equal(forecast.volume.actual[3], 42);
+  assert.equal(snapshot.amount, 4);
+  assert.equal(snapshot.unitCost, 0.4);
+  assert.equal(snapshot.budgetDelta, -4);
+  assert.ok(rows.some((row) => row.label === "单台制造费"));
+  assert.deepEqual(rows.find((row) => row.label === "产量" && row.scenario === "预算").values.slice(0, 4), [10, 20, 30, 40]);
+  assert.deepEqual(rows.find((row) => row.label === "制造费用金额" && row.scenario === "预算").values.slice(0, 4), [2, 4, 6, 8]);
+  assert.ok(rows.some((row) => row.label === "工作日"));
+});
+
+test("extracts 5+7 Renta forecast from month columns and ignores YTD", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    [null, "Renta DW Cost Evolution", null, "Volume", 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 8700],
+    [],
+    [],
+    [],
+    ["HQD PERIMETER", null, null, null, "Jan K€", "Feb K€", "Mar K€", "Apr K€", "May K€", "June K€", "July K€", "Aug K€", "Sep K€", "Oct K€", "Nov K€", "DEC K€", "YTD K€"],
+    ["YES", 6666010188, "Salary - Blue collar direct employees", "* CS_DIRECT LABOUR", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 780],
+    ["YES", 6666021500, "Repairs cost", "* CS_FIX COST", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 78],
+    [null, null, "TOTAL", null, 11, 22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 132, 858]
+  ]), "4+8 DW 2026");
+
+  const forecast = extractForecastWorkbook(wb, XLSX);
+  const snapshot = monthSnapshot(forecast, 12);
+
+  assert.equal(forecast.source, "5+7 forecast");
+  assert.equal(forecast.volume.actual[11], 1200);
+  assert.equal(snapshot.amount, 132);
+  assert.equal(snapshot.unitCost, 110);
+  assert.equal(forecast.totalAll.total, 858);
+  assert.equal(forecast.categories.find((row) => row.label === "Direct Labor").amountMonths[0], 10);
+  assert.equal(forecast.categories.find((row) => row.label === "Fixed Cost").amountMonths[11], 12);
+});
+
+test("annual dashboard puts order volume before other metric cards", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["Budget Volume", 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+    [],
+    ["STD Volume", 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+    [],
+    ["Actual Volume", 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+  ]), "VOLUME");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["TOTAL ALL", 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 240, "", 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+  ]), "FCST CPU");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["TOTAL ALL", 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+  ]), "FCST 26");
+
+  const rows = buildAnnualDashboardRows(extractForecastWorkbook(wb, XLSX));
+  assert.equal(localizeDashboardRow(rows[0], "en").label, "Volume");
+});
+
+test("annual indicator detail excludes category costs and keeps business KPI groups", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["Budget Volume", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120],
+    [],
+    ["STD Volume", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120],
+    [],
+    ["Actual Volume", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]
+  ]), "VOLUME");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["Direct Labor", 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    ["TOTAL ALL", 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+  ]), "FCST CPU");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ["Direct Labor", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ["TOTAL ALL", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  ]), "FCST 26");
+  const forecast = extractForecastWorkbook(wb, XLSX);
+  const rows = buildAnnualDashboardRows(forecast);
+  assert.equal(rows.some((row) => row.group === "大科目"), false);
+  assert.equal(rows.some((row) => row.label === "直接人工"), false);
+  assert.ok(rows.some((row) => row.label === "单台制造费"));
+});
+
+test("cooking unit uses new headcount rows without mojibake placeholders", () => {
+  const row = (label, scenario) => COOKING_UNIT.dashboardRows.find((item) => item.label === label && item.scenario === scenario);
+
+  assert.equal(COOKING_UNIT.dashboardRows.some((item) => /\?/.test(item.label) || /\?/.test(item.scenario) || item.unit === "?"), false);
+  assert.deepEqual(row("直接员工", "预算").values, [286, 317, 317, 258, 258, 258, 258, 258, 295, 295, 343, 343]);
+  assert.deepEqual(row("直接员工", "26年").values, [294, 300, 325, 265, 258, 258, 258, 258, 295, 295, 343, 343]);
+  assert.deepEqual(row("间接员工", "预算").values, [133, 136, 136, 127, 127, 127, 127, 127, 133, 133, 142, 142]);
+  assert.deepEqual(row("间接员工", "26年").values, [127, 126, 125, 113, 127, 127, 127, 127, 133, 133, 142, 142]);
+  assert.deepEqual(row("白领", "预算").values, Array(12).fill(34));
+  assert.deepEqual(row("白领", "26年").values, [30, 31, 30, 28, 34, 34, 34, 34, 34, 34, 34, 34]);
+});
+
+test("public 2025 baseline covers all 12 same-period months", () => {
+  assert.deepEqual(Object.keys(BASELINE_25_BY_MONTH).map(Number), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  assert.ok(BASELINE_25_BY_MONTH[12].volume > 0);
+  assert.ok(BASELINE_25_BY_MONTH[12].accounts.length > 50);
+});
+
+test("dashboard rows expose complete English labels", () => {
+  const row = {
+    group: "核心",
+    label: "单台制造费",
+    scenario: "同期",
+    unit: "€/台"
+  };
+  assert.deepEqual(localizeDashboardRow(row, "en"), {
+    group: "Core",
+    label: "Unit manufacturing cost",
+    scenario: "Same period",
+    unit: "€/pc"
+  });
+});
+
+test("zero SAP future months do not overwrite forecast actuals", () => {
+  const forecast = {
+    volume: {
+      actual: [10, 20, 30, 40, null, null, null, null, null, null, null, null],
+      budget: Array(12).fill(100),
+      std: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120]
+    },
+    hc: { actualTotal: Array(12).fill(10), budgetTotal: Array(12).fill(10) },
+    totalAll: {
+      amountMonths: [1, 2, 3, 4, null, null, null, null, null, null, null, null],
+      budgetMonths: [20, 20, 20, 20, 5, 6, 7, 8, 9, 10, 11, 12],
+      unitMonths: Array(12).fill(100)
+    }
+  };
+  const resultByMonth = new Map([
+    [4, { volume26: 40, summary: { totalAmount26: 400 } }],
+    [5, { volume26: null, summary: { totalAmount26: 0 } }]
+  ]);
+  const jiangyue = {
+    amount: { actual: [null, null, null, null, 15, 16] },
+    volume: { actual: [null, null, null, null, 150, 160] },
+    unit: { actual: [null, null, null, null, 100, 100] }
+  };
+
+  const rows = buildAnnualDashboardRows(forecast, { resultByMonth, jiangyue });
+  const amount = rows.find((row) => row.label === "制造费用金额" && row.scenario === "26年");
+  const volume = rows.find((row) => row.label === "产量" && row.scenario === "26年");
+
+  assert.equal(amount.values[3], 400);
+  assert.equal(amount.values[4], 5);
+  assert.equal(volume.values[4], 50);
+});
+
+test("account plan overrides are applied before cumulative unit cost and manufacturing rate", () => {
+  const forecast = {
+    volume: {
+      actual: Array(12).fill(1000),
+      budget: Array(12).fill(1000),
+      std: Array(12).fill(1000)
+    },
+    categories: [],
+    totalAll: {
+      amountMonths: Array(12).fill(100),
+      budgetMonths: Array(12).fill(100),
+      unitMonths: Array(12).fill(100)
+    }
+  };
+  const jiangyue = {
+    price: {
+      same: Array(12).fill(10),
+      budget: Array(12).fill(10),
+      actual: Array(12).fill(10)
+    }
+  };
+  const accountForecastByMonth = {
+    1: { totalAmount: 999, volume: 999 },
+    5: { totalAmount: 300, volume: 2000 }
+  };
+
+  const rows = buildAnnualDashboardRows(forecast, { jiangyue, accountForecastByMonth });
+  const amount = rows.find((row) => row.label === "制造费用金额" && row.scenario === "26年");
+  const volume = rows.find((row) => row.label === "产量" && row.scenario === "26年");
+  const unit = rows.find((row) => row.label === "单台制造费" && row.scenario === "26年");
+  const cumulativeUnit = rows.find((row) => row.label === "单台制造费累计" && row.scenario === "26年");
+  const output = rows.find((row) => row.label === "产值" && row.scenario === "26年");
+  const rate = rows.find((row) => row.label === "制造费率" && row.scenario === "26年");
+  const cumulativeRate = rows.find((row) => row.label === "制造费率累计" && row.scenario === "26年");
+
+  assert.equal(amount.values[0], 100);
+  assert.equal(volume.values[0], 1000);
+  assert.equal(amount.values[4], 300);
+  assert.equal(volume.values[4], 2000);
+  assert.equal(unit.values[4], 150);
+  assert.equal(cumulativeUnit.values[4], 700 * 1000 / 6000);
+  assert.equal(output.values[4], 20);
+  assert.equal(rate.values[4], 15);
+  assert.equal(cumulativeRate.values[4], 700 / 60);
+});
+
+test("UPPH uses realized direct plus indirect headcount for actual months", () => {
+  const months = Array(12).fill(1000);
+  const forecast = {
+    volume: {
+      actual: [...months],
+      budget: [...months],
+      std: [...months]
+    },
+    hc: {
+      actualTotal: Array(12).fill(330),
+      budgetTotal: Array(12).fill(330)
+    },
+    categories: [],
+    totalAll: {
+      amountMonths: Array(12).fill(100),
+      budgetMonths: Array(12).fill(100),
+      unitMonths: Array(12).fill(100)
+    }
+  };
+  const resultByMonth = new Map([
+    [1, { volume26: 47357, summary: { totalAmount26: 100 } }],
+    [2, { volume26: 42593, summary: { totalAmount26: 100 } }],
+    [3, { volume26: 23002, summary: { totalAmount26: 100 } }],
+    [4, { volume26: 40893, summary: { totalAmount26: 100 } }]
+  ]);
+
+  const rows = buildAnnualDashboardRows(forecast, { resultByMonth });
+  const actualUpph = rows.find((row) => row.label === "UPPH" && row.scenario === "26年");
+
+  assert.ok(actualUpph);
+  assert.equal(actualUpph.values[3], 40893 / (164 + 75) / 21 / 7.5);
+  assert.ok(actualUpph.values[3] < 2);
+});
+
+test("dashboard exposes DW 2026 4+8 headcount as direct, indirect and white collar", () => {
+  const forecast = {
+    volume: {
+      actual: Array(12).fill(1000),
+      budget: Array(12).fill(1000),
+      std: Array(12).fill(1000)
+    },
+    hc: {},
+    categories: [],
+    totalAll: {
+      amountMonths: Array(12).fill(100),
+      budgetMonths: Array(12).fill(100),
+      unitMonths: Array(12).fill(100)
+    }
+  };
+
+  const rows = buildAnnualDashboardRows(forecast);
+  const direct = rows.find((row) => row.label === "直接员工" && row.scenario === "26年");
+  const indirect = rows.find((row) => row.label === "间接员工" && row.scenario === "26年");
+  const white = rows.find((row) => row.label === "白领" && row.scenario === "26年");
+
+  assert.ok(direct);
+  assert.ok(indirect);
+  assert.ok(white);
+  assert.equal(direct.values[0], 235);
+  assert.equal(direct.values[3], 164);
+  assert.equal(direct.values[4], 247);
+  assert.equal(direct.values[11], 252);
+  assert.equal(indirect.values[0], 85);
+  assert.equal(indirect.values[3], 75);
+  assert.equal(indirect.values[11], 85);
+  assert.equal(white.values[0], 26);
+  assert.equal(white.values[3], 24.67);
+  assert.equal(white.values[4], 26.5);
+  assert.equal(white.values[11], 27.5);
+  assert.equal(rows.find((row) => row.label === "直接员工" && row.scenario === "同期").values[0], 218);
+  assert.equal(rows.find((row) => row.label === "直接员工" && row.scenario === "预算").values[0], 244);
+  assert.equal(rows.find((row) => row.label === "间接员工" && row.scenario === "同期").values[3], 93);
+  assert.equal(rows.find((row) => row.label === "白领" && row.scenario === "预算").values[7], 27.5);
+  assert.equal(rows.some((row) => row.label === "用人"), false);
+});
