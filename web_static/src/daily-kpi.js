@@ -280,10 +280,65 @@ const dailyCopy = {
   }
 };
 
-dailyCopy.en.productionInputLabels = dailyCopy.zh.productionInputLabels;
-dailyCopy.en.peopleInputLabels = dailyCopy.zh.peopleInputLabels;
-dailyCopy.en.groupLabels = dailyCopy.zh.groupLabels;
-dailyCopy.en.metricLabels = dailyCopy.zh.metricLabels;
+dailyCopy.en.productionInputLabels = {
+  volume: "Actual output",
+  directPeople: "Direct labor",
+  indirectPeople: "Indirect labor",
+  workDays: "Workdays",
+  availableHours: "Daily effective hours",
+  planOutput: "Planned output",
+  goodOutput: "Good output",
+  qsRunTime: "QS run time (min)",
+  qsDownTime: "QS downtime (min)",
+  qsStandardOutput: "QS standard capacity",
+  doorRunTime: "Door run time (min)",
+  doorDownTime: "Door downtime (min)",
+  doorStandardOutput: "Door standard capacity",
+  transferRunTime: "Transfer run time (min)",
+  transferDownTime: "Transfer downtime (min)",
+  transferStandardOutput: "Transfer standard capacity",
+  inventory: "Inventory value",
+  dos: "DOS"
+};
+dailyCopy.en.peopleInputLabels = {
+  plannedAttendance: "Planned attendance",
+  absencePeople: "Absent people",
+  paidAbsPeople: "Paid absence",
+  unpaidAbsPeople: "Unpaid absence",
+  directBlueCollar: "Direct blue-collar",
+  indirectBlueCollar: "Indirect blue-collar",
+  whiteCollar: "White-collar",
+  budgetVolume: "Budget volume",
+  overtimePeople: "Overtime people",
+  overtimeHours: "Overtime hours"
+};
+dailyCopy.en.groupLabels = {
+  base: "Base volume & labor",
+  oee: "OEE calculation",
+  stock: "Inventory, DOS & detail",
+  peopleBase: "Attendance & absence",
+  peopleHeadcount: "Headcount",
+  peopleOvertime: "Overtime & volume"
+};
+dailyCopy.en.metricLabels = {
+  volume: "Volume",
+  upph: "UPPH",
+  efficiency: "Efficiency",
+  oeeQs: "OEE QS",
+  oeeDoor: "OEE Door",
+  oeeTransfer: "OEE Transfer",
+  inventory: "Inventory",
+  dos: "DOS",
+  overtimeDirect: "Direct overtime",
+  absenteeism: "Absenteeism",
+  paidAbs: "Paid absence rate",
+  unpaidAbs: "Unpaid absence rate",
+  hcDirect: "Direct blue-collar",
+  budgetVolumes: "Budget volume",
+  hcIndirect: "Indirect blue-collar",
+  hcWhite: "White-collar",
+  overtime: "Overtime rate"
+};
 dailyCopy.en.formulas = {
   volume: "Shop floor entry",
   upph: "Output / (direct + indirect labor) / workdays / 7.5",

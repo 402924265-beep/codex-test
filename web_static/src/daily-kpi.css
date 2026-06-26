@@ -234,6 +234,14 @@ body.daily-kpi-mode .tabbar {
   font-weight: 650;
 }
 
+.daily-table .daily-formula-cell {
+  white-space: normal;
+  min-width: 140px;
+  max-width: 220px;
+  font-size: 12px;
+  color: #486277;
+}
+
 .daily-table tr.risk td:first-child {
   border-left: 4px solid #c92a2a;
 }
