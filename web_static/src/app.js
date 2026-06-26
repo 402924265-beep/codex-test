@@ -45,6 +45,21 @@ const VERSION = "20260617-public-rolling-v37";
 
 const i18n = {
   zh: {
+    sidebarTitle: "制造费用经营驾驶舱",
+    cookingName: "厨电工厂",
+    dishwasherName: "洗碗机",
+    indiaName: "印度",
+    pakistanName: "巴基斯坦",
+    sectionTurkey: "土耳其",
+    sectionOverseas: "海外工厂预留",
+    cookingSubtitle: "厨电制造费用经营驾驶舱",
+    dishwasherSubtitle: "洗碗机制造费用经营驾驶舱",
+    cookingSource: "当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目",
+    dishwasherSource: "当前：洗碗机 · 已内置5+7预测、国内财务表、May Actual",
+    cookingAppTitle: "厨电制造费用经营驾驶舱",
+    dishwasherAppTitle: "洗碗机制造费用经营驾驶舱",
+    cookingAppSubtitle: "整合同期、预算、实际、人数与降费项目，形成费用发生制经营视图",
+    dishwasherAppSubtitle: "导入财务数据，输出全年驾驶舱、月度差异、项目因素",
     appTitle: "洗碗机制造费三张表工作台",
     appSubtitle: "导入财务数据，输出全年驾驶舱、月度差异、项目因素",
     language: "语言",
@@ -230,6 +245,21 @@ const i18n = {
     emptyCategoryChart: "导入SAP报表后显示大科目对比"
   },
   en: {
+    sidebarTitle: "Supply Cost Cockpit",
+    cookingName: "Cooking appliance",
+    dishwasherName: "Dishwasher",
+    indiaName: "India",
+    pakistanName: "Pakistan",
+    sectionTurkey: "Turkey",
+    sectionOverseas: "Overseas plants",
+    cookingSubtitle: "Cooking appliance cost cockpit",
+    dishwasherSubtitle: "Dishwasher cost cockpit",
+    cookingSource: "Current: Cooking · built-in same-period, budget, actual, headcount, projects",
+    dishwasherSource: "Current: DW · built-in 5+7 forecast, domestic finance, May actual",
+    cookingAppTitle: "Cooking MFG Cost Cockpit",
+    dishwasherAppTitle: "Dishwasher MFG Cost Cockpit",
+    cookingAppSubtitle: "Integrate same-period, budget, actual, headcount and cost-reduction projects",
+    dishwasherAppSubtitle: "Import finance data and export dashboard, variance and projects",
     appTitle: "Dishwasher MFG Cost Workbench",
     appSubtitle: "Import finance data and export the three-table analysis",
     language: "Language",
@@ -942,29 +972,23 @@ function updateUnitChrome(unitId) {
     button.classList.toggle("active", button.dataset.unit === unitId);
   }
   if (els.unitName) {
-    els.unitName.textContent = unitId === "cooking" ? COOKING_UNIT.name : "洗碗机";
+    els.unitName.textContent = unitId === "cooking" ? t("cookingName") : t("dishwasherName");
   }
   if (els.unitSubtitle) {
-    els.unitSubtitle.textContent = unitId === "cooking"
-      ? "厨电制造费用经营驾驶舱"
-      : "洗碗机制造费用经营驾驶舱";
+    els.unitSubtitle.textContent = unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
   }
   if (els.unitSource) {
-    els.unitSource.textContent = unitId === "cooking"
-      ? "当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目"
-      : "当前：洗碗机 · 已内置5+7预测、国内财务表、May Actual";
+    els.unitSource.textContent = unitId === "cooking" ? t("cookingSource") : t("dishwasherSource");
   }
   const headerTitle = document.querySelector(".app-header h1");
   const headerSubtitle = document.querySelector(".app-header p");
   if (headerTitle) {
-    headerTitle.textContent = unitId === "cooking" ? "厨电制造费用经营驾驶舱" : "洗碗机制造费用经营驾驶舱";
+    headerTitle.textContent = unitId === "cooking" ? t("cookingAppTitle") : t("dishwasherAppTitle");
   }
   if (headerSubtitle) {
-    headerSubtitle.textContent = unitId === "cooking"
-      ? "整合同期、预算、实际、人数与降费项目，形成费用发生制经营视图"
-      : "导入财务数据，输出全年驾驶舱、月度差异、项目因素";
+    headerSubtitle.textContent = unitId === "cooking" ? t("cookingAppSubtitle") : t("dishwasherAppSubtitle");
   }
-  document.title = unitId === "cooking" ? "厨电制造费用经营驾驶舱" : "洗碗机制造费用经营驾驶舱";
+  document.title = unitId === "cooking" ? t("cookingAppTitle") : t("dishwasherAppTitle");
 }
 
 function cookingProjectImpactType(item) {
