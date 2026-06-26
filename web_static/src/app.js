@@ -644,7 +644,7 @@ const state = {
   factors: [],
   factorSummary: null,
   chartHitZones: [],
-  language: "zh",
+  language: "en",
   dashboardGroup: "all",
   dashboardBasis: "same",
   metricScenario: "all",

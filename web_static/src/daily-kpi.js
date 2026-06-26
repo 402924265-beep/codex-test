@@ -371,8 +371,8 @@ const peopleInputGroups = [
 ];
 
 function lang() {
-  const value = document.getElementById("languageSelect")?.value || "zh";
-  return dailyCopy[value] ? value : "zh";
+  const value = document.getElementById("languageSelect")?.value || "en";
+  return dailyCopy[value] ? value : "en";
 }
 
 function d(key) {
