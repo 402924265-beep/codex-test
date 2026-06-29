@@ -28,6 +28,28 @@ body.daily-kpi-mode .tabbar {
   color: #082235;
 }
 
+.business-shell.sidebar-collapsed .daily-subnav {
+  justify-items: center;
+}
+
+.business-shell.sidebar-collapsed .daily-subnav button {
+  width: 48px;
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+  text-align: center;
+}
+
+.business-shell.sidebar-collapsed .daily-subnav button::before {
+  content: attr(data-short);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
 .daily-kpi-view {
   display: none;
 }
