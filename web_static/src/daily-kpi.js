@@ -603,14 +603,17 @@ function installNav() {
   if (!dwButton || document.querySelector(".daily-subnav")) return;
   const nav = document.createElement("div");
   nav.className = "daily-subnav";
-  nav.innerHTML = `<button type="button" data-daily-page="production">${d("productionDaily")}</button><button type="button" data-daily-page="people">${d("peopleDaily")}</button>`;
+  nav.innerHTML = `<button type="button" data-daily-page="production" data-short="PROD" aria-label="${d("productionDaily")}" title="${d("productionDaily")}">${d("productionDaily")}</button><button type="button" data-daily-page="people" data-short="HC" aria-label="${d("peopleDaily")}" title="${d("peopleDaily")}">${d("peopleDaily")}</button>`;
   dwButton.insertAdjacentElement("afterend", nav);
 }
 
 function renderDailyViews() {
   installNav();
   document.querySelectorAll(".daily-subnav [data-daily-page]").forEach((button) => {
-    button.textContent = button.dataset.dailyPage === "production" ? d("productionDaily") : d("peopleDaily");
+    const label = button.dataset.dailyPage === "production" ? d("productionDaily") : d("peopleDaily");
+    button.textContent = label;
+    button.setAttribute("aria-label", label);
+    button.setAttribute("title", label);
   });
   document.getElementById("dailyProductionView")?.remove();
   document.getElementById("dailyPeopleView")?.remove();
