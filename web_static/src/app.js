@@ -41,7 +41,7 @@ import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./acco
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
 
-const VERSION = "20260617-public-rolling-v37";
+const VERSION = "20260713-hr-budget-i18n-v1";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -254,7 +254,44 @@ const i18n = {
     previousUnit: "上月单台",
     unit26: "26单台"
     ,unitEuroPc: "€/台",
-    emptyCategoryChart: "导入SAP报表后显示大科目对比"
+    emptyCategoryChart: "导入SAP报表后显示大科目对比",
+    roleBrand: "三张表制造费用经营驾驶舱",
+    roleTestVersion: "预算协同测试版",
+    roleSelectTitle: "选择你的工作角色",
+    roleSelectHint: "当前为内部测试版，无需密码。不同角色进入后只显示职责范围内的数据与操作。",
+    costRole: "成本角色",
+    costRoleHint: "查看经营驾驶舱、月度差异、全部预算科目和降费项目",
+    hrRole: "人力角色",
+    hrRoleHint: "仅查看和校核人力预算参数、人力小科目及异常",
+    fullView: "完整视图",
+    limitedView: "受限视图",
+    enterWorkspace: "进入工作台",
+    roleSwitchHint: "演示身份可在页面右上角随时切换",
+    cockpitBrand: "制造费用经营驾驶舱",
+    turkey: "土耳其",
+    cookingFactory: "厨电工厂",
+    dishwasher: "洗碗机",
+    overseasReserved: "海外工厂预留",
+    india: "印度",
+    pakistan: "巴基斯坦",
+    currentBusinessUnit: "当前经营单元",
+    permission: "权限",
+    financeAdmin: "财务管理员",
+    hrHuman: "HR 人力",
+    procurementAdmin: "行政/间接采购",
+    businessLeader: "经营负责人",
+    readonlyVisitor: "只读访客",
+    switchRole: "切换角色",
+    cookingSubtitle: "厨电制造费用经营驾驶舱",
+    dishwasherSubtitle: "洗碗机制造费用经营驾驶舱",
+    cookingSource: "当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目",
+    dishwasherSource: "当前：洗碗机 · 已内置5+7预测、国内财务表、May Actual",
+    cookingHeaderHint: "整合同期、预算、实际、人数与降费项目，形成费用发生制经营视图",
+    roleAccess: "角色权限",
+    supplyCostControl: "供应链成本控制",
+    cookingAppliance: "厨电",
+    dishwasherAppliance: "洗碗机",
+    comingSoon: "即将开放"
   },
   en: {
     appTitle: "Dishwasher MFG Cost Workbench",
@@ -439,7 +476,44 @@ const i18n = {
     previousUnit: "Previous month unit",
     unit26: "2026 unit"
     ,unitEuroPc: "€/pc",
-    emptyCategoryChart: "Import April actual table to show category comparison"
+    emptyCategoryChart: "Import April actual table to show category comparison",
+    roleBrand: "Three-Table Manufacturing Cost Cockpit",
+    roleTestVersion: "Budget Collaboration Preview",
+    roleSelectTitle: "Select your work role",
+    roleSelectHint: "No password is required in this internal preview. Each role only sees data and actions within its responsibility.",
+    costRole: "Cost Controller",
+    costRoleHint: "View the cockpit, monthly variance, all budget accounts and cost reduction projects",
+    hrRole: "HR",
+    hrRoleHint: "View and validate HR budget parameters, HR accounts and exceptions only",
+    fullView: "Full view",
+    limitedView: "Restricted view",
+    enterWorkspace: "Enter workspace",
+    roleSwitchHint: "The demo role can be switched from the upper-right corner",
+    cockpitBrand: "Manufacturing Cost Cockpit",
+    turkey: "Türkiye",
+    cookingFactory: "Cooking Factory",
+    dishwasher: "Dishwasher",
+    overseasReserved: "Reserved overseas plants",
+    india: "India",
+    pakistan: "Pakistan",
+    currentBusinessUnit: "Current business unit",
+    permission: "Permission",
+    financeAdmin: "Finance administrator",
+    hrHuman: "HR",
+    procurementAdmin: "Administration / Indirect Procurement",
+    businessLeader: "Business leader",
+    readonlyVisitor: "Read-only visitor",
+    switchRole: "Switch role",
+    cookingSubtitle: "Cooking Manufacturing Cost Cockpit",
+    dishwasherSubtitle: "Dishwasher Manufacturing Cost Cockpit",
+    cookingSource: "Current: Cooking Factory · Same period, budget, actual, headcount and projects built in",
+    dishwasherSource: "Current: Dishwasher · 5+7 forecast, finance table and May Actual built in",
+    cookingHeaderHint: "Combine same period, budget, actual, headcount and projects into an accrual-based operating view",
+    roleAccess: "Role Access",
+    supplyCostControl: "Supply Cost Control",
+    cookingAppliance: "Cooking appliance",
+    dishwasherAppliance: "Dishwasher",
+    comingSoon: "Coming soon"
   },
   tr: {
     appTitle: "Bulaşık Makinesi Üretim Gideri",
@@ -624,7 +698,44 @@ const i18n = {
     previousUnit: "Önceki ay birim",
     unit26: "2026 birim"
     ,unitEuroPc: "€/adet",
-    emptyCategoryChart: "Kategori karşılaştırması için SAP gerçekleşen yükleyin"
+    emptyCategoryChart: "Kategori karşılaştırması için SAP gerçekleşen yükleyin",
+    roleBrand: "Üç Tablolu Üretim Gideri Kokpiti",
+    roleTestVersion: "Bütçe İş Birliği Önizlemesi",
+    roleSelectTitle: "Çalışma rolünüzü seçin",
+    roleSelectHint: "Bu dahili önizlemede parola gerekmez. Her rol yalnızca kendi sorumluluğundaki veri ve işlemleri görür.",
+    costRole: "Maliyet Kontrol Rolü",
+    costRoleHint: "Kokpit, aylık farklar, tüm bütçe hesapları ve maliyet düşürme projelerini görüntüler",
+    hrRole: "İnsan Kaynakları",
+    hrRoleHint: "Yalnızca İK bütçe parametrelerini, İK hesaplarını ve istisnaları görüntüler ve doğrular",
+    fullView: "Tam görünüm",
+    limitedView: "Kısıtlı görünüm",
+    enterWorkspace: "Çalışma alanına gir",
+    roleSwitchHint: "Demo rolü sağ üst köşeden değiştirilebilir",
+    cockpitBrand: "Üretim Gideri Kokpiti",
+    turkey: "Türkiye",
+    cookingFactory: "Pişirme Fabrikası",
+    dishwasher: "Bulaşık Makinesi",
+    overseasReserved: "Yurt dışı tesis rezervi",
+    india: "Hindistan",
+    pakistan: "Pakistan",
+    currentBusinessUnit: "Geçerli iş birimi",
+    permission: "Yetki",
+    financeAdmin: "Finans yöneticisi",
+    hrHuman: "İnsan Kaynakları",
+    procurementAdmin: "İdari / Dolaylı Satın Alma",
+    businessLeader: "İş birimi yöneticisi",
+    readonlyVisitor: "Salt okunur ziyaretçi",
+    switchRole: "Rol değiştir",
+    cookingSubtitle: "Pişirme Üretim Gideri Kokpiti",
+    dishwasherSubtitle: "Bulaşık Makinesi Üretim Gideri Kokpiti",
+    cookingSource: "Geçerli: Pişirme Fabrikası · Aynı dönem, bütçe, gerçekleşen, çalışan ve projeler hazır",
+    dishwasherSource: "Geçerli: Bulaşık Makinesi · 5+7 tahmin, finans tablosu ve Mayıs gerçekleşeni hazır",
+    cookingHeaderHint: "Aynı dönem, bütçe, gerçekleşen, çalışan ve projeleri tahakkuk bazlı işletme görünümünde birleştirir",
+    roleAccess: "Rol Yetkisi",
+    supplyCostControl: "Tedarik Maliyet Kontrolü",
+    cookingAppliance: "Pişirme ürünleri",
+    dishwasherAppliance: "Bulaşık makinesi",
+    comingSoon: "Yakında"
   }
 };
 
@@ -1083,29 +1194,23 @@ function updateUnitChrome(unitId) {
     button.classList.toggle("active", button.dataset.unit === unitId);
   }
   if (els.unitName) {
-    els.unitName.textContent = unitId === "cooking" ? COOKING_UNIT.name : "洗碗机";
+    els.unitName.textContent = unitId === "cooking" ? t("cookingFactory") : t("dishwasher");
   }
   if (els.unitSubtitle) {
-    els.unitSubtitle.textContent = unitId === "cooking"
-      ? "厨电制造费用经营驾驶舱"
-      : "洗碗机制造费用经营驾驶舱";
+    els.unitSubtitle.textContent = unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
   }
   if (els.unitSource) {
-    els.unitSource.textContent = unitId === "cooking"
-      ? "当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目"
-      : "当前：洗碗机 · 已内置5+7预测、国内财务表、May Actual";
+    els.unitSource.textContent = unitId === "cooking" ? t("cookingSource") : t("dishwasherSource");
   }
   const headerTitle = document.querySelector(".app-header h1");
   const headerSubtitle = document.querySelector(".app-header p");
   if (headerTitle) {
-    headerTitle.textContent = unitId === "cooking" ? "厨电制造费用经营驾驶舱" : "洗碗机制造费用经营驾驶舱";
+    headerTitle.textContent = unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
   }
   if (headerSubtitle) {
-    headerSubtitle.textContent = unitId === "cooking"
-      ? "整合同期、预算、实际、人数与降费项目，形成费用发生制经营视图"
-      : "导入财务数据，输出全年驾驶舱、月度差异、项目因素";
+    headerSubtitle.textContent = unitId === "cooking" ? t("cookingHeaderHint") : t("appSubtitle");
   }
-  document.title = unitId === "cooking" ? "厨电制造费用经营驾驶舱" : "洗碗机制造费用经营驾驶舱";
+  document.title = unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
 }
 
 function cookingProjectImpactType(item) {
@@ -2472,12 +2577,109 @@ const HR_BUDGET_DEFAULTS = {
   reviewHeadcount: 374,
   reviewWorkdays: 21
 };
+const HR_I18N = {
+  zh: {
+    breadcrumb: "第二张表 / 月度差异分析 / 预算 / 人力费用", title: "DW 人力预算工作台", subtitle: "按 Excel 人员底表与参数自动计算，责任人负责填写变动、核对结果并处理异常。",
+    permission: "人力角色 · 仅显示人力预算", saveReview: "保存校核", submitBudget: "提交人力预算", mapping: "测试假设映射", mappingNote: "测试假设映射：将源表 {source} 数据作为 DW 洗碗机预算样例，不代表源文件真实业务归属。", realSource: "源文件真实数",
+    baseBudget: "基础数据与预算", exceptionReview: "异常校核", approvalRecords: "审批记录", headcountPlan: "人数计划", calendarHours: "工作日与工时", wagePolicy: "工资政策", adjustmentNotes: "调整说明",
+    inputTitle: "人力责任人填报区", inputHint: "灰字为 Excel 预算标准，绿色为校核值；偏离标准必须填写理由并留痕。", editable: "可编辑", resetExcel: "恢复Excel原值",
+    noUnsaved: "当前无未保存变更", recordedVariance: "已有 {count} 项已记录偏差，可在“审批记录”中追溯。", alignedStandard: "当前校核值与 Excel 预算标准一致。", aligned: "已对齐", pendingChanges: "{count} 项待保存变更", adjustmentReason: "调整理由", required: "必填", reasonPlaceholder: "说明调整原因、依据和影响月份",
+    employeeCategory: "人员类别", annualAverage: "全年平均", direct: "直接蓝领", indirect: "间接蓝领", whiteCollar: "白领", checkedHeadcount: "校核在岗人数", standard: "标准", headcountRule: "预算标准取自 Excel 原值。新增、离职或编制调整只修改校核值，保存时必须说明依据。",
+    calendarHeader: "日历与工时", owner: "责任人", workingDays: "工作日", realHours: "每日实际工时", paidHours: "每日计薪工时", hrCheck: "人力核对", calendarRule: "汇率属于财务参数，只展示不允许人力修改；工作日和工时由人力按月核对。",
+    budgetStandard: "预算标准", variance: "偏差", backendRule: "后台展开规则", backendRuleText: "按生效日期把工资增长率应用到人员薪资基数，再计算奖金、社保和失业保险。", notesHint: "修改人数、日历或工资政策后，填写原因和影响月份。", notesPlaceholder: "例如：7月新增40名直接员工，9月工资增长参数调整……",
+    baseResponsibility: "基础数据与责任分层", baseResponsibilityHint: "只把需要展示、填写和核对的数据放到前台。", excelBuiltIn: "Excel 内置数据", displayOnly: "只展示 · 不填写", monthlyReview: "责任人每月核对", sourceData: "源数据", pendingReview: "待校核",
+    budgetYear: "预算年度", sourceOrg: "源数据组织", employeeRecords: "人员底表记录", sourceCurrency: "源币种", outputCurrency: "输出币种", year: "年", people: "人", day: "天", hour: "小时", systemDisplay: "系统展示", sourcePeriod: "源文件预算期间", mappedToDw: "测试时映射为 DW 洗碗机", boardRecords: "Board 人员记录数", boardCurrency: "Board 原始币种", managementCurrency: "网站统一管理口径",
+    juneHeadcount: "6月预算在岗人数", juneWorkday: "6月工作日", dailyReal: "每日实际工时", dailyPaid: "每日计薪工时", juneFx: "6月 EUR/TRY", needsCheck: "需核对", financeParameter: "财务参数", activeSummary: "由人员月度在岗标记汇总", tdWorkday: "Parameters · TD 工作日", fxFormula: "TRY 金额 ÷ 汇率 = EUR",
+    ownerMustFill: "责任人需要填写", hrFill: "HR填写", personnelChange: "人员变动", personnelChangeText: "新增人员、离职月份、部门/岗位和 Direct / Indirect 属性", salaryPolicy: "薪资与政策", salaryPolicyText: "薪资基数、工资增长参数、奖金与福利资格", adjustmentRule: "仅在覆盖系统建议或异常超阈值时填写", backendCalc: "后台计算 · 无需填写", systemCalc: "系统计算", backendCalcText: "工资增长展开、工时汇总、社保与失业险、人员到科目汇总、TRY 转 EUR、财务模板输出。",
+    resultTitle: "DW 人力预算结果（按小科目）", resultHint: "单位：EUR；当前为 Excel 基线结果。填报值已保存，正式规则接入后将在这里联动重算。", account: "小科目", annualBudget: "全年预算", dataStatus: "数据状态", sourceCalculated: "源表已计算", totalHrCost: "人力费用合计", converted: "已换算",
+    formulaTrace: "公式追溯 · 工资（6月）", formulaPath: "Board 人员输入 → Parameters 政策参数 → Tower 按人计算 → For Finance 科目汇总 → EUR 换算", reviewNote: "校核说明", reviewPlaceholder: "仅在覆盖系统建议或发现源数据异常时填写原因和影响范围",
+    missingSource: "待补底表", missingSourceHint: "源 Excel 没有独立标准的数据不进入自动预算，待责任部门补齐。", items: "项", workwear: "工作服", mealUnit: "餐补独立单价", adminProcurement: "行政/采购", hr: "人力", noIndependentStandard: "源表未发现独立标准", cashAidIncluded: "当前归入 Aid In Cash", workwearAction: "后续接入采购单价和发放周期", mealAction: "后续确认是否拆分为独立小科目",
+    hrAccounts: "人力费用科目", manualReview: "需人工校核", currentReview: "当前需核对", exceptionText: "{accounts}受人员变动、政策或一次性事项影响，需要责任人确认。", reviewPrinciple: "校核原则", reviewPrincipleText: "源表结果保持不变，调整必须留下责任人、原因和影响月份", reviewPrincipleHint: "系统计算过程在后台执行，但支持按科目追溯到来源与汇率", reviewOpinion: "校核意见", reviewOpinionPlaceholder: "填写确认或调整原因",
+    approvalProgress: "预算审批进度", excelLoaded: "Excel 数据载入", completed: "已完成", tdMapped: "TD 数据假设映射为 DW", hrReview: "人力校核", currentNode: "当前节点", hrReviewHint: "核对人数、工时和异常科目", costReview: "成本复核", pending: "待处理", budgetPublish: "预算发布", basisNote: "口径说明", monthlyFx: "换算：按月度 EUR/TRY",
+    adjustmentRecords: "预算调整记录", adjustmentRecordsHint: "每一项偏离预算标准的修改都记录责任人、时间、前后值和理由。", timeOwner: "时间 / 责任人", adjustmentItem: "调整项", period: "期间", before: "修改前", after: "修改后", operation: "操作", sameAsAbove: "同上", noRecords: "尚无预算调整记录。修改校核值并填写理由后，记录会显示在这里。", systemRecords: "系统记录", node: "节点", dataBasis: "数据口径", status: "状态", dataPreparation: "数据准备", load: "载入", businessMapping: "业务映射", assumedMapped: "{source} 假设映射为 DW", testVersion: "测试版", pendingConfirm: "待确认",
+    wages: "工资", overtime: "加班费", bonus: "奖金", cashAid: "现金补助", socialSecurity: "社会保险", unemployment: "失业保险", rdIncentive: "研发激励抵减", incentive: "其他激励抵减", indemnity: "离职补偿", mbo: "绩效奖金（MBO）",
+    restoredDraft: "已恢复为 Excel 预算标准，请填写理由后保存", reasonRequired: "有预算变更，必须先填写调整理由", submittedTrace: "人力预算已提交财务复核并留痕", savedTrace: "已保存 {count} 项变更并写入记录", noPendingSave: "当前没有待保存变更", saveAction: "保存校核", submitAction: "提交人力预算"
+  },
+  en: {
+    breadcrumb: "Table 2 / Monthly Variance / Budget / HR Cost", title: "DW HR Budget Workspace", subtitle: "Calculations follow the Excel employee roster and parameters. Owners enter changes, validate results and resolve exceptions.",
+    permission: "HR role · HR budget only", saveReview: "Save validation", submitBudget: "Submit HR budget", mapping: "Test assumption mapping", mappingNote: "Test mapping: {source} data is used as the DW Dishwasher budget sample. This does not represent the source file's actual business ownership.", realSource: "Real source data",
+    baseBudget: "Base Data & Budget", exceptionReview: "Exception Review", approvalRecords: "Approval Records", headcountPlan: "Headcount Plan", calendarHours: "Workdays & Hours", wagePolicy: "Wage Policy", adjustmentNotes: "Adjustment Notes",
+    inputTitle: "HR Owner Input", inputHint: "Grey text is the Excel budget standard and green fields are validated values. Any deviation requires a reason and audit trail.", editable: "Editable", resetExcel: "Restore Excel values",
+    noUnsaved: "No unsaved changes", recordedVariance: "{count} recorded deviations can be traced in Approval Records.", alignedStandard: "Validated values match the Excel budget standard.", aligned: "Aligned", pendingChanges: "{count} changes pending", adjustmentReason: "Adjustment reason", required: "Required", reasonPlaceholder: "Describe the reason, evidence and affected months",
+    employeeCategory: "Employee category", annualAverage: "Annual average", direct: "Direct blue collar", indirect: "Indirect blue collar", whiteCollar: "White collar", checkedHeadcount: "Validated headcount", standard: "Std.", headcountRule: "The budget standard comes from Excel. Change only the validated value for hires, leavers or staffing adjustments and provide evidence when saving.",
+    calendarHeader: "Calendar & Hours", owner: "Owner", workingDays: "Working days", realHours: "Actual hours/day", paidHours: "Paid hours/day", hrCheck: "HR validation", calendarRule: "FX is a finance parameter and read-only for HR. HR validates workdays and hours monthly.",
+    budgetStandard: "Budget standard", variance: "Variance", backendRule: "Backend expansion rule", backendRuleText: "Apply wage increase rates to employee salary bases by effective date, then calculate bonus, social security and unemployment insurance.", notesHint: "After changing headcount, calendar or wage policy, state the reason and affected months.", notesPlaceholder: "Example: 40 direct employees added in July; September wage increase parameter revised...",
+    baseResponsibility: "Base Data & Responsibilities", baseResponsibilityHint: "Only data that must be viewed, entered or validated is shown here.", excelBuiltIn: "Excel built-in data", displayOnly: "Display only", monthlyReview: "Monthly owner validation", sourceData: "Source data", pendingReview: "Pending review",
+    budgetYear: "Budget year", sourceOrg: "Source organization", employeeRecords: "Employee roster records", sourceCurrency: "Source currency", outputCurrency: "Output currency", year: "year", people: "people", day: "day", hour: "hour", systemDisplay: "System display", sourcePeriod: "Budget period in source file", mappedToDw: "Mapped to DW Dishwasher for testing", boardRecords: "Board employee record count", boardCurrency: "Original Board currency", managementCurrency: "Website management currency",
+    juneHeadcount: "June budget headcount", juneWorkday: "June working days", dailyReal: "Actual hours/day", dailyPaid: "Paid hours/day", juneFx: "June EUR/TRY", needsCheck: "Review", financeParameter: "Finance parameter", activeSummary: "Summed from monthly active flags", tdWorkday: "Parameters · TD working days", fxFormula: "TRY amount ÷ FX = EUR",
+    ownerMustFill: "Owner input required", hrFill: "HR input", personnelChange: "Personnel changes", personnelChangeText: "New hires, leaving month, department/position and Direct/Indirect attribute", salaryPolicy: "Salary & policy", salaryPolicyText: "Salary base, wage increase parameters, bonus and benefit eligibility", adjustmentRule: "Required only when overriding system advice or an exception threshold", backendCalc: "Backend calculation · No input", systemCalc: "System", backendCalcText: "Wage expansion, hour totals, social/unemployment insurance, employee-to-account allocation, TRY-to-EUR conversion and finance output.",
+    resultTitle: "DW HR Budget Results by Account", resultHint: "Unit: EUR. These are the current Excel baseline results; saved inputs will recalculate here when the formal rules engine is connected.", account: "Account", annualBudget: "Annual budget", dataStatus: "Data status", sourceCalculated: "Source calculated", totalHrCost: "Total HR cost", converted: "Converted",
+    formulaTrace: "Formula trace · Wages (June)", formulaPath: "Board employee input → Parameters policy → Tower person-level calculation → For Finance account summary → EUR conversion", reviewNote: "Validation note", reviewPlaceholder: "Required only when overriding system advice or identifying source-data issues",
+    missingSource: "Missing Base Tables", missingSourceHint: "Items without an independent standard in the source Excel are excluded from automatic budgeting until the responsible team supplies them.", items: "items", workwear: "Workwear", mealUnit: "Separate meal allowance rate", adminProcurement: "Admin / Procurement", hr: "HR", noIndependentStandard: "No independent standard found", cashAidIncluded: "Currently included in Aid In Cash", workwearAction: "Connect procurement price and issue cycle", mealAction: "Confirm whether to split into a separate account",
+    hrAccounts: "HR cost accounts", manualReview: "Manual review", currentReview: "Current review items", exceptionText: "{accounts} are affected by staffing, policy or one-off items and require owner confirmation.", reviewPrinciple: "Validation principle", reviewPrincipleText: "Keep source results unchanged; every adjustment must record owner, reason and affected months", reviewPrincipleHint: "Calculations run in the backend and remain traceable to source and FX", reviewOpinion: "Validation comment", reviewOpinionPlaceholder: "Enter confirmation or adjustment reason",
+    approvalProgress: "Budget approval progress", excelLoaded: "Excel data loaded", completed: "Completed", tdMapped: "TD data assumed as DW", hrReview: "HR validation", currentNode: "Current step", hrReviewHint: "Validate headcount, hours and exception accounts", costReview: "Cost review", pending: "Pending", budgetPublish: "Budget release", basisNote: "Basis", monthlyFx: "Conversion: monthly EUR/TRY",
+    adjustmentRecords: "Budget Adjustment Records", adjustmentRecordsHint: "Every deviation from the budget standard records owner, time, before/after values and reason.", timeOwner: "Time / Owner", adjustmentItem: "Item", period: "Period", before: "Before", after: "After", operation: "Action", sameAsAbove: "Same as above", noRecords: "No budget adjustments yet. Change a validated value and enter a reason to create a record.", systemRecords: "System Records", node: "Step", dataBasis: "Data basis", status: "Status", dataPreparation: "Data preparation", load: "Load", businessMapping: "Business mapping", assumedMapped: "{source} assumed as DW", testVersion: "Preview", pendingConfirm: "Pending confirmation",
+    wages: "Wages", overtime: "Overtime", bonus: "Bonus", cashAid: "Aid in Cash", socialSecurity: "Social Security", unemployment: "Unemployment Insurance", rdIncentive: "R&D Incentive Offset", incentive: "Other Incentive Offset", indemnity: "Indemnity", mbo: "Performance Bonus (MBO)",
+    restoredDraft: "Restored to the Excel budget standard. Enter a reason and save.", reasonRequired: "A reason is required for budget changes", submittedTrace: "HR budget submitted for finance review with an audit trail", savedTrace: "Saved {count} changes to the audit trail", noPendingSave: "No pending changes", saveAction: "Save validation", submitAction: "Submit HR budget"
+  },
+  tr: {
+    breadcrumb: "Tablo 2 / Aylık Fark / Bütçe / İK Gideri", title: "DW İK Bütçe Çalışma Alanı", subtitle: "Hesaplamalar Excel çalışan listesi ve parametrelerine dayanır. Sorumlular değişiklikleri girer, sonuçları doğrular ve istisnaları çözer.",
+    permission: "İK rolü · Yalnızca İK bütçesi", saveReview: "Doğrulamayı kaydet", submitBudget: "İK bütçesini gönder", mapping: "Test varsayımı eşlemesi", mappingNote: "Test eşlemesi: {source} verileri DW Bulaşık Makinesi bütçe örneği olarak kullanılır. Bu, kaynak dosyanın gerçek iş sahipliğini göstermez.", realSource: "Gerçek kaynak verisi",
+    baseBudget: "Temel Veri ve Bütçe", exceptionReview: "İstisna Kontrolü", approvalRecords: "Onay Kayıtları", headcountPlan: "Çalışan Planı", calendarHours: "İş Günü ve Saat", wagePolicy: "Ücret Politikası", adjustmentNotes: "Değişiklik Açıklaması",
+    inputTitle: "İK Sorumlusu Girişi", inputHint: "Gri metin Excel bütçe standardını, yeşil alan doğrulanan değeri gösterir. Her sapma gerekçe ve denetim izi gerektirir.", editable: "Düzenlenebilir", resetExcel: "Excel değerlerini geri yükle",
+    noUnsaved: "Kaydedilmemiş değişiklik yok", recordedVariance: "{count} kayıtlı sapma Onay Kayıtlarında izlenebilir.", alignedStandard: "Doğrulanan değerler Excel bütçe standardıyla uyumlu.", aligned: "Uyumlu", pendingChanges: "{count} değişiklik bekliyor", adjustmentReason: "Değişiklik gerekçesi", required: "Zorunlu", reasonPlaceholder: "Gerekçe, dayanak ve etkilenen ayları açıklayın",
+    employeeCategory: "Çalışan kategorisi", annualAverage: "Yıllık ortalama", direct: "Direkt mavi yaka", indirect: "Endirekt mavi yaka", whiteCollar: "Beyaz yaka", checkedHeadcount: "Doğrulanan çalışan", standard: "Std.", headcountRule: "Bütçe standardı Excel'den gelir. İşe giriş, ayrılış veya kadro değişikliğinde yalnızca doğrulanan değeri değiştirin ve kayıtta dayanak belirtin.",
+    calendarHeader: "Takvim ve Saat", owner: "Sorumlu", workingDays: "İş günü", realHours: "Gerçek saat/gün", paidHours: "Ücretli saat/gün", hrCheck: "İK doğrulaması", calendarRule: "Kur finans parametresidir ve İK için salt okunurdur. İş günü ve saatleri İK aylık doğrular.",
+    budgetStandard: "Bütçe standardı", variance: "Sapma", backendRule: "Arka uç uygulama kuralı", backendRuleText: "Ücret artış oranlarını yürürlük tarihine göre çalışan ücret tabanına uygular; prim, sosyal güvenlik ve işsizlik sigortasını hesaplar.", notesHint: "Çalışan, takvim veya ücret politikası değişikliğinde gerekçe ve etkilenen ayları yazın.", notesPlaceholder: "Örnek: Temmuz'da 40 direkt çalışan eklendi; Eylül ücret artış parametresi güncellendi...",
+    baseResponsibility: "Temel Veri ve Sorumluluklar", baseResponsibilityHint: "Yalnızca görüntülenmesi, girilmesi veya doğrulanması gereken veriler önde gösterilir.", excelBuiltIn: "Excel hazır verisi", displayOnly: "Yalnızca görüntüle", monthlyReview: "Aylık sorumlu doğrulaması", sourceData: "Kaynak veri", pendingReview: "Kontrol bekliyor",
+    budgetYear: "Bütçe yılı", sourceOrg: "Kaynak organizasyon", employeeRecords: "Çalışan listesi kaydı", sourceCurrency: "Kaynak para birimi", outputCurrency: "Çıktı para birimi", year: "yıl", people: "kişi", day: "gün", hour: "saat", systemDisplay: "Sistem gösterimi", sourcePeriod: "Kaynak dosya bütçe dönemi", mappedToDw: "Test için DW Bulaşık Makinesine eşlendi", boardRecords: "Board çalışan kayıt sayısı", boardCurrency: "Board orijinal para birimi", managementCurrency: "Web yönetim para birimi",
+    juneHeadcount: "Haziran bütçe çalışanı", juneWorkday: "Haziran iş günü", dailyReal: "Gerçek saat/gün", dailyPaid: "Ücretli saat/gün", juneFx: "Haziran EUR/TRY", needsCheck: "Kontrol", financeParameter: "Finans parametresi", activeSummary: "Aylık aktif işaretlerinden toplam", tdWorkday: "Parameters · TD iş günü", fxFormula: "TRY tutarı ÷ kur = EUR",
+    ownerMustFill: "Sorumlu girişi gerekli", hrFill: "İK girişi", personnelChange: "Personel değişikliği", personnelChangeText: "Yeni işe giriş, ayrılış ayı, bölüm/pozisyon ve Direct/Indirect özelliği", salaryPolicy: "Ücret ve politika", salaryPolicyText: "Ücret tabanı, ücret artış parametresi, prim ve yan hak uygunluğu", adjustmentRule: "Yalnızca sistem önerisi aşılırsa veya istisna eşiği geçilirse gereklidir", backendCalc: "Arka uç hesabı · Giriş yok", systemCalc: "Sistem", backendCalcText: "Ücret artışı, saat toplamı, sosyal/işsizlik sigortası, çalışan-hesap dağıtımı, TRY-EUR dönüşümü ve finans çıktısı.",
+    resultTitle: "Hesap Bazında DW İK Bütçe Sonuçları", resultHint: "Birim: EUR. Bunlar mevcut Excel baz sonuçlarıdır; resmi kural motoru bağlandığında kayıtlı girişler burada yeniden hesaplanır.", account: "Hesap", annualBudget: "Yıllık bütçe", dataStatus: "Veri durumu", sourceCalculated: "Kaynak hesaplandı", totalHrCost: "Toplam İK gideri", converted: "Dönüştürüldü",
+    formulaTrace: "Formül izi · Ücretler (Haziran)", formulaPath: "Board çalışan girişi → Parameters politika → Tower kişi bazlı hesap → For Finance hesap özeti → EUR dönüşümü", reviewNote: "Doğrulama notu", reviewPlaceholder: "Yalnızca sistem önerisi aşılırsa veya kaynak veri sorunu bulunursa doldurun",
+    missingSource: "Eksik Temel Tablolar", missingSourceHint: "Kaynak Excel'de bağımsız standardı olmayan kalemler, sorumlu ekip tamamlayana kadar otomatik bütçeye girmez.", items: "kalem", workwear: "İş kıyafeti", mealUnit: "Ayrı yemek yardımı oranı", adminProcurement: "İdari / Satın Alma", hr: "İK", noIndependentStandard: "Bağımsız standart bulunamadı", cashAidIncluded: "Şu anda Aid In Cash içinde", workwearAction: "Satın alma fiyatı ve dağıtım periyodu bağlanacak", mealAction: "Ayrı hesaba bölünüp bölünmeyeceği doğrulanacak",
+    hrAccounts: "İK gider hesapları", manualReview: "Manuel kontrol", currentReview: "Mevcut kontrol kalemleri", exceptionText: "{accounts} personel, politika veya tek seferlik kalemlerden etkilenir ve sorumlu onayı gerektirir.", reviewPrinciple: "Doğrulama ilkesi", reviewPrincipleText: "Kaynak sonuç değişmez; her düzeltmede sorumlu, gerekçe ve etkilenen ay kaydedilir", reviewPrincipleHint: "Hesap arka uçta çalışır ve kaynak ile kura kadar izlenebilir", reviewOpinion: "Doğrulama görüşü", reviewOpinionPlaceholder: "Onay veya değişiklik gerekçesini girin",
+    approvalProgress: "Bütçe onay süreci", excelLoaded: "Excel verisi yüklendi", completed: "Tamamlandı", tdMapped: "TD verisi DW olarak varsayıldı", hrReview: "İK doğrulaması", currentNode: "Geçerli adım", hrReviewHint: "Çalışan, saat ve istisna hesaplarını doğrulayın", costReview: "Maliyet kontrolü", pending: "Bekliyor", budgetPublish: "Bütçe yayını", basisNote: "Esas", monthlyFx: "Dönüşüm: aylık EUR/TRY",
+    adjustmentRecords: "Bütçe Değişiklik Kayıtları", adjustmentRecordsHint: "Bütçe standardından her sapma; sorumlu, zaman, önce/sonra değeri ve gerekçeyle kaydedilir.", timeOwner: "Zaman / Sorumlu", adjustmentItem: "Kalem", period: "Dönem", before: "Önce", after: "Sonra", operation: "İşlem", sameAsAbove: "Yukarıdakiyle aynı", noRecords: "Henüz bütçe değişikliği yok. Kayıt oluşturmak için doğrulanan değeri değiştirip gerekçe girin.", systemRecords: "Sistem Kayıtları", node: "Adım", dataBasis: "Veri esası", status: "Durum", dataPreparation: "Veri hazırlığı", load: "Yükle", businessMapping: "İş eşlemesi", assumedMapped: "{source} DW olarak varsayıldı", testVersion: "Önizleme", pendingConfirm: "Onay bekliyor",
+    wages: "Ücretler", overtime: "Fazla Mesai", bonus: "Prim", cashAid: "Nakdi Yardım", socialSecurity: "Sosyal Güvenlik", unemployment: "İşsizlik Sigortası", rdIncentive: "Ar-Ge Teşvik Mahsubu", incentive: "Diğer Teşvik Mahsubu", indemnity: "Kıdem Tazminatı", mbo: "Performans Primi (MBO)",
+    restoredDraft: "Excel bütçe standardına dönüldü. Gerekçe girip kaydedin.", reasonRequired: "Bütçe değişiklikleri için gerekçe zorunludur", submittedTrace: "İK bütçesi denetim iziyle finans kontrolüne gönderildi", savedTrace: "{count} değişiklik denetim izine kaydedildi", noPendingSave: "Bekleyen değişiklik yok", saveAction: "Doğrulamayı kaydet", submitAction: "İK bütçesini gönder"
+  }
+};
 let hrBudgetDrivers = loadHrBudgetDrivers();
 let hrBudgetView = "drivers";
 let hrBudgetInputView = "headcount";
 let hrBudgetInputs = loadHrBudgetInputs();
 let hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
 let hrBudgetAudit = loadHrBudgetAudit();
+
+function hrT(key, values = {}) {
+  let text = HR_I18N[state.language]?.[key] || HR_I18N.zh[key] || key;
+  for (const [name, value] of Object.entries(values)) text = text.replaceAll(`{${name}}`, String(value));
+  return text;
+}
+
+function hrMonth(index) {
+  return localizeMonthLabel(index, state.language);
+}
+
+function hrAccountLabel(account) {
+  if (state.language === "zh") return account.label;
+  return hrT(account.key) || account.sourceLabel;
+}
+
+function hrUnitLabel(unit) {
+  const map = { 人: "people", 天: "day", 小时: "hour", 年: "year" };
+  return map[unit] ? hrT(map[unit]) : unit;
+}
+
+function hrChangeLabel(change) {
+  const keys = { direct: "direct", indirect: "indirect", whiteCollar: "whiteCollar", workingDays: "workingDays", realHoursPerDay: "realHours", paidHoursPerDay: "paidHours", wageRates: "wagePolicy" };
+  return hrT(keys[change.key] || change.key);
+}
+
+function hrChangePeriod(change, data = hrBudgetData()) {
+  return change.section === "policy" ? (data.wageIncreaseStages?.[change.index]?.label || `${change.index + 1}`) : hrMonth(change.index);
+}
 const ROLLING_ROLE_LABELS = {
   finance: "财务管理员",
   hr: "HR 人力",
@@ -3017,25 +3219,25 @@ function renderHrBudgetWorkspace() {
     <div class="hrb-shell">
       <header class="hrb-header">
         <div>
-          <div class="hrb-breadcrumb">第二张表 / 月度差异分析 / 预算 / 人力费用</div>
-          <h3>DW 人力预算工作台</h3>
-          <p>按 Excel 人员底表与参数自动计算，责任人负责填写变动、核对结果并处理异常。</p>
+          <div class="hrb-breadcrumb">${hrT("breadcrumb")}</div>
+          <h3>${hrT("title")}</h3>
+          <p>${hrT("subtitle")}</p>
         </div>
         <div class="hrb-header-actions">
-          <span class="hrb-permission">人力角色 · 仅显示人力预算</span>
-          <button type="button" class="ghost-button" data-hr-action="save">保存校核</button>
-          <button type="button" data-hr-action="submit">提交人力预算</button>
+          <span class="hrb-permission">${hrT("permission")}</span>
+          <button type="button" class="ghost-button" data-hr-action="save">${hrT("saveReview")}</button>
+          <button type="button" data-hr-action="submit">${hrT("submitBudget")}</button>
         </div>
       </header>
       <div class="hrb-source-banner">
-        <div><b>测试假设映射</b><span>${escapeHtml(data.sourceOrganization)} → ${escapeHtml(data.mappedBusiness)}</span></div>
-        <p>${escapeHtml(data.mappingNote)}</p>
-        <span class="hrb-tag source">源文件真实数</span>
+        <div><b>${hrT("mapping")}</b><span>${escapeHtml(data.sourceOrganization)} → DW ${t("dishwasher")}</span></div>
+        <p>${escapeHtml(hrT("mappingNote", { source: data.sourceOrganization }))}</p>
+        <span class="hrb-tag source">${hrT("realSource")}</span>
       </div>
       <nav class="hrb-view-tabs" aria-label="人力预算视图">
-        <button type="button" class="${hrBudgetView === "drivers" ? "active" : ""}" data-hr-view="drivers">基础数据与预算</button>
-        <button type="button" class="${hrBudgetView === "exceptions" ? "active" : ""}" data-hr-view="exceptions">异常校核 <span>${needsReview}</span></button>
-        <button type="button" class="${hrBudgetView === "audit" ? "active" : ""}" data-hr-view="audit">审批记录</button>
+        <button type="button" class="${hrBudgetView === "drivers" ? "active" : ""}" data-hr-view="drivers">${hrT("baseBudget")}</button>
+        <button type="button" class="${hrBudgetView === "exceptions" ? "active" : ""}" data-hr-view="exceptions">${hrT("exceptionReview")} <span>${needsReview}</span></button>
+        <button type="button" class="${hrBudgetView === "audit" ? "active" : ""}" data-hr-view="audit">${hrT("approvalRecords")}</button>
       </nav>
       ${content}
     </div>
@@ -3044,10 +3246,10 @@ function renderHrBudgetWorkspace() {
 
 function hrBudgetInputWorkbench(data) {
   const views = [
-    ["headcount", "人数计划"],
-    ["calendar", "工作日与工时"],
-    ["policy", "工资政策"],
-    ["notes", "调整说明"]
+    ["headcount", hrT("headcountPlan")],
+    ["calendar", hrT("calendarHours")],
+    ["policy", hrT("wagePolicy")],
+    ["notes", hrT("adjustmentNotes")]
   ];
   let body = hrBudgetHeadcountInputs(data);
   if (hrBudgetInputView === "calendar") body = hrBudgetCalendarInputs(data);
@@ -3057,8 +3259,8 @@ function hrBudgetInputWorkbench(data) {
   const standardChanges = hrBudgetChanges(defaultHrBudgetInputs(), hrBudgetInputs);
   return `<section class="hrb-input-workbench">
     <div class="hrb-input-header">
-      <div><span>HR INPUT</span><h4>人力责任人填报区</h4><p>灰字为 Excel 预算标准，绿色为校核值；偏离标准必须填写理由并留痕。</p></div>
-      <div class="hrb-input-actions"><span class="hrb-tag editable">可编辑</span><button type="button" class="ghost-button" data-hr-input-action="reset">恢复Excel原值</button><button type="button" data-hr-action="save">保存校核</button></div>
+      <div><span>HR INPUT</span><h4>${hrT("inputTitle")}</h4><p>${hrT("inputHint")}</p></div>
+      <div class="hrb-input-actions"><span class="hrb-tag editable">${hrT("editable")}</span><button type="button" class="ghost-button" data-hr-input-action="reset">${hrT("resetExcel")}</button><button type="button" data-hr-action="save">${hrT("saveReview")}</button></div>
     </div>
     <div class="hrb-input-tabs">${views.map(([key, label]) => `<button type="button" class="${hrBudgetInputView === key ? "active" : ""}" data-hr-input-view="${key}">${label}</button>`).join("")}</div>
     <div class="hrb-input-body">${body}</div>
@@ -3068,87 +3270,87 @@ function hrBudgetInputWorkbench(data) {
 
 function hrBudgetChangeGate(pendingChanges, standardChanges) {
   if (!pendingChanges.length) {
-    return `<div class="hrb-change-gate clear"><div><b>当前无未保存变更</b><span>${standardChanges.length ? `已有 ${standardChanges.length} 项已记录偏差，可在“审批记录”中追溯。` : "当前校核值与 Excel 预算标准一致。"}</span></div><span class="hrb-status ok">已对齐</span></div>`;
+    return `<div class="hrb-change-gate clear"><div><b>${hrT("noUnsaved")}</b><span>${standardChanges.length ? hrT("recordedVariance", { count: standardChanges.length }) : hrT("alignedStandard")}</span></div><span class="hrb-status ok">${hrT("aligned")}</span></div>`;
   }
-  const preview = pendingChanges.slice(0, 3).map((item) => `${item.period}${item.label} ${formatHrEur(item.before, 2)} → ${formatHrEur(item.after, 2)}`).join("；");
-  return `<div class="hrb-change-gate pending"><div class="hrb-change-summary"><b>${pendingChanges.length} 项待保存变更</b><span>${escapeHtml(preview)}${pendingChanges.length > 3 ? "……" : ""}</span></div><label><span>调整理由 <em>必填</em></span><textarea data-hr-input-notes placeholder="说明调整原因、依据和影响月份">${escapeHtml(hrBudgetInputs.notes || "")}</textarea></label></div>`;
+  const preview = pendingChanges.slice(0, 3).map((item) => `${hrChangePeriod(item)} ${hrChangeLabel(item)} ${formatHrEur(item.before, 2)} → ${formatHrEur(item.after, 2)}`).join(" · ");
+  return `<div class="hrb-change-gate pending"><div class="hrb-change-summary"><b>${hrT("pendingChanges", { count: pendingChanges.length })}</b><span>${escapeHtml(preview)}${pendingChanges.length > 3 ? "..." : ""}</span></div><label><span>${hrT("adjustmentReason")} <em>${hrT("required")}</em></span><textarea data-hr-input-notes placeholder="${escapeHtml(hrT("reasonPlaceholder"))}">${escapeHtml(hrBudgetInputs.notes || "")}</textarea></label></div>`;
 }
 
 function hrBudgetHeadcountInputs(data) {
   const rows = [
-    ["direct", "直接蓝领", "BC Direct"],
-    ["indirect", "间接蓝领", "BC Indirect"],
-    ["whiteCollar", "白领", "White Collar"]
+    ["direct", hrT("direct"), "BC Direct"],
+    ["indirect", hrT("indirect"), "BC Indirect"],
+    ["whiteCollar", hrT("whiteCollar"), "White Collar"]
   ];
   const totals = Array.from({ length: 12 }, (_, index) => rows.reduce((sum, [key]) => sum + Number(hrBudgetInputs.headcount[key]?.[index] || 0), 0));
-  return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>人员类别</th>${data.months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}<th>全年平均</th></tr></thead><tbody>${rows.map(([key, label, source]) => `<tr><th><b>${label}</b><small>${source}</small></th>${data.months.map((_, index) => {
+  return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>${hrT("employeeCategory")}</th>${data.months.map((_, index) => `<th>${escapeHtml(hrMonth(index))}</th>`).join("")}<th>${hrT("annualAverage")}</th></tr></thead><tbody>${rows.map(([key, label, source]) => `<tr><th><b>${label}</b><small>${source}</small></th>${data.months.map((_, index) => {
     const cell = hrBudgetCellState("headcount", key, index);
-    return `<td><div class="hrb-input-cell ${cell.changed ? "changed" : ""}"><input type="number" min="0" step="1" data-hr-input="headcount.${key}.${index}" value="${escapeHtml(cell.current)}" /><small>标准 ${formatHrEur(cell.standard)}</small>${cell.changed ? `<em>${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta)}</em>` : ""}</div></td>`;
-  }).join("")}<td><strong>${formatHrEur((hrBudgetInputs.headcount[key] || []).reduce((sum, value) => sum + Number(value || 0), 0) / 12, 1)}</strong></td></tr>`).join("")}<tr class="hrb-input-total"><th>校核在岗人数</th>${totals.map((value) => `<td><strong>${formatHrEur(value)}</strong></td>`).join("")}<td><strong>${formatHrEur(totals.reduce((sum, value) => sum + value, 0) / 12, 1)}</strong></td></tr></tbody></table></div><p class="hrb-input-hint">预算标准取自 Excel 原值。新增、离职或编制调整只修改校核值，保存时必须说明依据。</p>`;
+    return `<td><div class="hrb-input-cell ${cell.changed ? "changed" : ""}"><input type="number" min="0" step="1" data-hr-input="headcount.${key}.${index}" value="${escapeHtml(cell.current)}" /><small>${hrT("standard")} ${formatHrEur(cell.standard)}</small>${cell.changed ? `<em>${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta)}</em>` : ""}</div></td>`;
+  }).join("")}<td><strong>${formatHrEur((hrBudgetInputs.headcount[key] || []).reduce((sum, value) => sum + Number(value || 0), 0) / 12, 1)}</strong></td></tr>`).join("")}<tr class="hrb-input-total"><th>${hrT("checkedHeadcount")}</th>${totals.map((value) => `<td><strong>${formatHrEur(value)}</strong></td>`).join("")}<td><strong>${formatHrEur(totals.reduce((sum, value) => sum + value, 0) / 12, 1)}</strong></td></tr></tbody></table></div><p class="hrb-input-hint">${hrT("headcountRule")}</p>`;
 }
 
 function hrBudgetCalendarInputs(data) {
   const rows = [
-    ["workingDays", "工作日", "天", 1],
-    ["realHoursPerDay", "每日实际工时", "小时", 0.01],
-    ["paidHoursPerDay", "每日计薪工时", "小时", 0.01]
+    ["workingDays", hrT("workingDays"), hrT("day"), 1],
+    ["realHoursPerDay", hrT("realHours"), hrT("hour"), 0.01],
+    ["paidHoursPerDay", hrT("paidHours"), hrT("hour"), 0.01]
   ];
-  return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>日历与工时</th>${data.months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}<th>责任人</th></tr></thead><tbody>${rows.map(([key, label, unit, step]) => `<tr><th><b>${label}</b><small>${unit}</small></th>${data.months.map((_, index) => {
+  return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>${hrT("calendarHeader")}</th>${data.months.map((_, index) => `<th>${escapeHtml(hrMonth(index))}</th>`).join("")}<th>${hrT("owner")}</th></tr></thead><tbody>${rows.map(([key, label, unit, step]) => `<tr><th><b>${label}</b><small>${unit}</small></th>${data.months.map((_, index) => {
     const cell = hrBudgetCellState("calendar", key, index);
-    return `<td><div class="hrb-input-cell ${cell.changed ? "changed" : ""}"><input type="number" min="0" step="${step}" data-hr-input="calendar.${key}.${index}" value="${escapeHtml(cell.current)}" /><small>标准 ${formatHrEur(cell.standard, 2)}</small>${cell.changed ? `<em>${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta, 2)}</em>` : ""}</div></td>`;
-  }).join("")}<td><span class="hrb-tag editable">人力核对</span></td></tr>`).join("")}</tbody></table></div><p class="hrb-input-hint">汇率属于财务参数，只展示不允许人力修改；工作日和工时由人力按月核对。</p>`;
+    return `<td><div class="hrb-input-cell ${cell.changed ? "changed" : ""}"><input type="number" min="0" step="${step}" data-hr-input="calendar.${key}.${index}" value="${escapeHtml(cell.current)}" /><small>${hrT("standard")} ${formatHrEur(cell.standard, 2)}</small>${cell.changed ? `<em>${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta, 2)}</em>` : ""}</div></td>`;
+  }).join("")}<td><span class="hrb-tag editable">${hrT("hrCheck")}</span></td></tr>`).join("")}</tbody></table></div><p class="hrb-input-hint">${hrT("calendarRule")}</p>`;
 }
 
 function hrBudgetPolicyInputs(data) {
   const stages = data.wageIncreaseStages || [];
   return `<div class="hrb-policy-grid">${stages.map((stage, index) => {
     const cell = hrBudgetCellState("policy", "wageRates", index);
-    return `<label class="${cell.changed ? "changed" : ""}"><span><b>${escapeHtml(stage.label)}</b><small>预算标准 ${formatHrEur(cell.standard, 2)}%</small></span><span class="hrb-policy-input"><input type="number" step="0.01" data-hr-input="policy.wageRates.${index}" value="${escapeHtml(cell.current.toFixed(2))}" /><em>%</em></span>${cell.changed ? `<strong class="hrb-policy-delta">偏差 ${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta, 2)}%</strong>` : ""}</label>`;
-  }).join("")}<div class="hrb-policy-rule"><b>后台展开规则</b><p>按生效日期把工资增长率应用到人员薪资基数，再计算奖金、社保和失业保险。</p></div></div>`;
+    return `<label class="${cell.changed ? "changed" : ""}"><span><b>${escapeHtml(stage.label)}</b><small>${hrT("budgetStandard")} ${formatHrEur(cell.standard, 2)}%</small></span><span class="hrb-policy-input"><input type="number" step="0.01" data-hr-input="policy.wageRates.${index}" value="${escapeHtml(cell.current.toFixed(2))}" /><em>%</em></span>${cell.changed ? `<strong class="hrb-policy-delta">${hrT("variance")} ${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta, 2)}%</strong>` : ""}</label>`;
+  }).join("")}<div class="hrb-policy-rule"><b>${hrT("backendRule")}</b><p>${hrT("backendRuleText")}</p></div></div>`;
 }
 
 function hrBudgetNotesInput() {
-  return `<label class="hrb-notes-input"><span><b>调整说明</b><small>修改人数、日历或工资政策后，填写原因和影响月份。</small></span><textarea data-hr-input-notes placeholder="例如：7月新增40名直接员工，9月工资增长参数调整……">${escapeHtml(hrBudgetInputs.notes || "")}</textarea></label>`;
+  return `<label class="hrb-notes-input"><span><b>${hrT("adjustmentNotes")}</b><small>${hrT("notesHint")}</small></span><textarea data-hr-input-notes placeholder="${escapeHtml(hrT("notesPlaceholder"))}">${escapeHtml(hrBudgetInputs.notes || "")}</textarea></label>`;
 }
 
 function hrBudgetDriverView(data, total) {
   const reviewIndex = 5;
   const sourceRows = [
-    ["预算年度", data.budgetYear, "年", "系统展示", "源文件预算期间"],
-    ["源数据组织", data.sourceOrganization, "", "系统展示", "测试时映射为 DW 洗碗机"],
-    ["人员底表记录", data.listedEmployees, "人", "系统展示", "Board 人员记录数"],
-    ["源币种", data.sourceCurrency, "", "系统展示", "Board 原始币种"],
-    ["输出币种", data.outputCurrency, "", "系统展示", "网站统一管理口径"]
+    [hrT("budgetYear"), data.budgetYear, hrT("year"), hrT("systemDisplay"), hrT("sourcePeriod")],
+    [hrT("sourceOrg"), data.sourceOrganization, "", hrT("systemDisplay"), hrT("mappedToDw")],
+    [hrT("employeeRecords"), data.listedEmployees, hrT("people"), hrT("systemDisplay"), hrT("boardRecords")],
+    [hrT("sourceCurrency"), data.sourceCurrency, "", hrT("systemDisplay"), hrT("boardCurrency")],
+    [hrT("outputCurrency"), data.outputCurrency, "", hrT("systemDisplay"), hrT("managementCurrency")]
   ];
   const reviewRows = [
-    ["6月预算在岗人数", data.activeHeadcount?.[reviewIndex], "人", "需核对", "由人员月度在岗标记汇总"],
-    ["6月工作日", data.workingDays?.[reviewIndex], "天", "需核对", "Parameters · TD 工作日"],
-    ["每日实际工时", Number(data.realHoursPerDay?.[reviewIndex] || 0).toFixed(2), "小时", "需核对", "Parameters · Real"],
-    ["每日计薪工时", Number(data.paidHoursPerDay?.[reviewIndex] || 0).toFixed(2), "小时", "需核对", "Parameters · Paid"],
-    ["6月 EUR/TRY", Number(data.eurTry?.[reviewIndex] || 0).toFixed(4), "", "财务参数", "TRY 金额 ÷ 汇率 = EUR"]
+    [hrT("juneHeadcount"), data.activeHeadcount?.[reviewIndex], hrT("people"), hrT("needsCheck"), hrT("activeSummary")],
+    [hrT("juneWorkday"), data.workingDays?.[reviewIndex], hrT("day"), hrT("needsCheck"), hrT("tdWorkday")],
+    [hrT("dailyReal"), Number(data.realHoursPerDay?.[reviewIndex] || 0).toFixed(2), hrT("hour"), hrT("needsCheck"), "Parameters · Real"],
+    [hrT("dailyPaid"), Number(data.paidHoursPerDay?.[reviewIndex] || 0).toFixed(2), hrT("hour"), hrT("needsCheck"), "Parameters · Paid"],
+    [hrT("juneFx"), Number(data.eurTry?.[reviewIndex] || 0).toFixed(4), "", hrT("financeParameter"), hrT("fxFormula")]
   ];
   return `
     ${hrBudgetInputWorkbench(data)}
     <div class="hrb-layout hrb-real-layout">
       <section class="hrb-drivers">
-        <div class="hrb-section-title"><div><h4>基础数据与责任分层</h4><p>只把需要展示、填写和核对的数据放到前台。</p></div><span>Excel 内置数据</span></div>
-        ${hrBudgetDataGroup("只展示 · 不填写", sourceRows, "source")}
-        ${hrBudgetDataGroup("责任人每月核对", reviewRows, "review")}
+        <div class="hrb-section-title"><div><h4>${hrT("baseResponsibility")}</h4><p>${hrT("baseResponsibilityHint")}</p></div><span>${hrT("excelBuiltIn")}</span></div>
+        ${hrBudgetDataGroup(hrT("displayOnly"), sourceRows, "source")}
+        ${hrBudgetDataGroup(hrT("monthlyReview"), reviewRows, "review")}
         <div class="hrb-data-group">
-          <div class="hrb-data-group-title"><b>责任人需要填写</b><span class="hrb-tag editable">HR填写</span></div>
+          <div class="hrb-data-group-title"><b>${hrT("ownerMustFill")}</b><span class="hrb-tag editable">${hrT("hrFill")}</span></div>
           <div class="hrb-responsibility-list">
-            <p><b>人员变动</b><span>新增人员、离职月份、部门/岗位和 Direct / Indirect 属性</span></p>
-            <p><b>薪资与政策</b><span>薪资基数、工资增长参数、奖金与福利资格</span></p>
-            <p><b>调整说明</b><span>仅在覆盖系统建议或异常超阈值时填写</span></p>
+            <p><b>${hrT("personnelChange")}</b><span>${hrT("personnelChangeText")}</span></p>
+            <p><b>${hrT("salaryPolicy")}</b><span>${hrT("salaryPolicyText")}</span></p>
+            <p><b>${hrT("adjustmentNotes")}</b><span>${hrT("adjustmentRule")}</span></p>
           </div>
         </div>
         <div class="hrb-data-group backend">
-          <div class="hrb-data-group-title"><b>后台计算 · 无需填写</b><span class="hrb-tag system">系统计算</span></div>
-          <p>工资增长展开、工时汇总、社保与失业险、人员到科目汇总、TRY 转 EUR、财务模板输出。</p>
+          <div class="hrb-data-group-title"><b>${hrT("backendCalc")}</b><span class="hrb-tag system">${hrT("systemCalc")}</span></div>
+          <p>${hrT("backendCalcText")}</p>
         </div>
       </section>
       <section class="hrb-results">
-        <div class="hrb-section-title"><div><h4>DW 人力预算结果（按小科目）</h4><p>单位：EUR；当前为 Excel 基线结果。填报值已保存，正式规则接入后将在这里联动重算。</p></div><strong>€ ${formatHrEur(total)}</strong></div>
+        <div class="hrb-section-title"><div><h4>${hrT("resultTitle")}</h4><p>${hrT("resultHint")}</p></div><strong>€ ${formatHrEur(total)}</strong></div>
         ${hrBudgetResultTable(data)}
       </section>
     </div>
@@ -3158,7 +3360,7 @@ function hrBudgetDriverView(data, total) {
 }
 
 function hrBudgetDataGroup(title, rows, tone) {
-  return `<div class="hrb-data-group"><div class="hrb-data-group-title"><b>${title}</b><span class="hrb-tag ${tone}">${tone === "source" ? "源数据" : "待校核"}</span></div><div class="hrb-driver-table">${rows.map(([label, value, unit, source, note]) => `
+  return `<div class="hrb-data-group"><div class="hrb-data-group-title"><b>${title}</b><span class="hrb-tag ${tone}">${tone === "source" ? hrT("sourceData") : hrT("pendingReview")}</span></div><div class="hrb-driver-table">${rows.map(([label, value, unit, source, note]) => `
     <div class="hrb-driver-row">
       <span><b>${escapeHtml(label)}</b><small>${escapeHtml(note)}</small></span>
       <span class="hrb-static-value"><strong>${escapeHtml(value)}</strong><em>${escapeHtml(unit)}</em></span>
@@ -3169,10 +3371,10 @@ function hrBudgetDataGroup(title, rows, tone) {
 function hrBudgetResultTable(data) {
   const accounts = data.accounts || [];
   const totalMonths = Array.from({ length: 12 }, (_, index) => accounts.reduce((sum, account) => sum + Number(account.monthly?.[index] || 0), 0));
-  return `<div class="hrb-result-wrap"><table class="hrb-result-table"><thead><tr><th>小科目</th>${(data.months || []).map((month) => `<th class="budget">${escapeHtml(month)}</th>`).join("")}<th>全年预算</th><th>数据状态</th></tr></thead><tbody>${accounts.map((account) => {
+  return `<div class="hrb-result-wrap"><table class="hrb-result-table"><thead><tr><th>${hrT("account")}</th>${(data.months || []).map((_, index) => `<th class="budget">${escapeHtml(hrMonth(index))}</th>`).join("")}<th>${hrT("annualBudget")}</th><th>${hrT("dataStatus")}</th></tr></thead><tbody>${accounts.map((account) => {
     const pending = ["overtime", "cashAid", "indemnity"].includes(account.key);
-    return `<tr><th><span>${escapeHtml(account.label)}</span><small>${escapeHtml(account.sourceLabel)}</small></th>${account.monthly.map((value) => `<td>${value < 0 ? "-" : ""}€${formatHrEur(Math.abs(value))}</td>`).join("")}<td><strong>${account.annual < 0 ? "-" : ""}€${formatHrEur(Math.abs(account.annual))}</strong></td><td><span class="hrb-status ${pending ? "pending" : "ok"}">${pending ? "需核对" : "源表已计算"}</span></td></tr>`;
-  }).join("")}<tr class="hrb-total-row"><th>人力费用合计</th>${totalMonths.map((value) => `<td><strong>€${formatHrEur(value)}</strong></td>`).join("")}<td><strong>€${formatHrEur(totalMonths.reduce((sum, value) => sum + value, 0))}</strong></td><td><span class="hrb-status ok">已换算</span></td></tr></tbody></table></div>`;
+    return `<tr><th><span>${escapeHtml(hrAccountLabel(account))}</span><small>${escapeHtml(account.sourceLabel)}</small></th>${account.monthly.map((value) => `<td>${value < 0 ? "-" : ""}€${formatHrEur(Math.abs(value))}</td>`).join("")}<td><strong>${account.annual < 0 ? "-" : ""}€${formatHrEur(Math.abs(account.annual))}</strong></td><td><span class="hrb-status ${pending ? "pending" : "ok"}">${pending ? hrT("needsCheck") : hrT("sourceCalculated")}</span></td></tr>`;
+  }).join("")}<tr class="hrb-total-row"><th>${hrT("totalHrCost")}</th>${totalMonths.map((value) => `<td><strong>€${formatHrEur(value)}</strong></td>`).join("")}<td><strong>€${formatHrEur(totalMonths.reduce((sum, value) => sum + value, 0))}</strong></td><td><span class="hrb-status ok">${hrT("converted")}</span></td></tr></tbody></table></div>`;
 }
 
 function hrBudgetFormulaPanel(data) {
@@ -3181,26 +3383,31 @@ function hrBudgetFormulaPanel(data) {
   const eur = Number(wage?.monthly?.[monthIndex] || 0);
   const fx = Number(data.eurTry?.[monthIndex] || 1);
   const sourceTry = eur * fx;
-  return `<section class="hrb-formula"><div><span>公式追溯 · 工资（6月）</span><strong>${formatHrEur(sourceTry, 2)} TRY ÷ ${fx.toFixed(4)} EUR/TRY = €${formatHrEur(eur, 2)}</strong><small>Board 人员输入 → Parameters 政策参数 → Tower 按人计算 → For Finance 科目汇总 → EUR 换算</small></div><label><span>校核说明</span><textarea placeholder="仅在覆盖系统建议或发现源数据异常时填写原因和影响范围"></textarea></label></section>`;
+  return `<section class="hrb-formula"><div><span>${hrT("formulaTrace")}</span><strong>${formatHrEur(sourceTry, 2)} TRY ÷ ${fx.toFixed(4)} EUR/TRY = €${formatHrEur(eur, 2)}</strong><small>${hrT("formulaPath")}</small></div><label><span>${hrT("reviewNote")}</span><textarea placeholder="${escapeHtml(hrT("reviewPlaceholder"))}"></textarea></label></section>`;
 }
 
 function hrBudgetMissingSourcePanel(data) {
   const items = data.missingSourceItems || [];
-  return `<section class="hrb-source-gaps"><div class="hrb-section-title"><div><h4>待补底表</h4><p>源 Excel 没有独立标准的数据不进入自动预算，待责任部门补齐。</p></div><span>${items.length} 项</span></div><div class="hrb-gap-list">${items.map((item) => `<div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.status)}</span><em>${escapeHtml(item.owner)}</em><p>${escapeHtml(item.action)}</p></div>`).join("")}</div></section>`;
+  const localized = items.map((item) => item.label === "工作服"
+    ? { label: hrT("workwear"), owner: hrT("adminProcurement"), status: hrT("noIndependentStandard"), action: hrT("workwearAction") }
+    : { label: hrT("mealUnit"), owner: hrT("hr"), status: hrT("cashAidIncluded"), action: hrT("mealAction") });
+  return `<section class="hrb-source-gaps"><div class="hrb-section-title"><div><h4>${hrT("missingSource")}</h4><p>${hrT("missingSourceHint")}</p></div><span>${items.length} ${hrT("items")}</span></div><div class="hrb-gap-list">${localized.map((item) => `<div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.status)}</span><em>${escapeHtml(item.owner)}</em><p>${escapeHtml(item.action)}</p></div>`).join("")}</div></section>`;
 }
 
 function hrBudgetExceptionView(data, total) {
   const pending = (data.accounts || []).filter((account) => ["overtime", "cashAid", "indemnity"].includes(account.key));
-  return `<div class="hrb-exception-layout"><section class="hrb-exception-main"><div class="hrb-summary-strip"><div><span>人力费用科目</span><strong>${data.accounts.length}</strong></div><div><span>源表已计算</span><strong class="good">${data.accounts.length - pending.length}</strong></div><div><span>需人工校核</span><strong class="warn">${pending.length}</strong></div><div><span>全年预算</span><strong>€${formatHrEur(total)}</strong><small>EUR</small></div></div>${hrBudgetResultTable(data)}<div class="hrb-exception-detail"><div><h4>当前需核对</h4><p>${pending.map((account) => account.label).join("、")}受人员变动、政策或一次性事项影响，需要责任人确认。</p></div><div class="hrb-calc-box"><span>校核原则</span><strong>源表结果保持不变，调整必须留下责任人、原因和影响月份</strong><small>系统计算过程在后台执行，但支持按科目追溯到来源与汇率</small></div><label class="grow"><span>校核意见</span><input placeholder="填写确认或调整原因" /></label></div></section><aside class="hrb-approval"><h4>预算审批进度</h4><ol><li class="done"><b>Excel 数据载入</b><span>已完成</span><small>TD 数据假设映射为 DW</small></li><li class="current"><b>人力校核</b><span>当前节点</span><small>核对人数、工时和异常科目</small></li><li><b>成本复核</b><span>待处理</span></li><li><b>预算发布</b><span>待处理</span></li></ol><h4>口径说明</h4><p>源币种：TRY</p><p>输出币种：EUR</p><p>换算：按月度 EUR/TRY</p></aside></div>`;
+  const accountNames = pending.map(hrAccountLabel).join(state.language === "zh" ? "、" : ", ");
+  return `<div class="hrb-exception-layout"><section class="hrb-exception-main"><div class="hrb-summary-strip"><div><span>${hrT("hrAccounts")}</span><strong>${data.accounts.length}</strong></div><div><span>${hrT("sourceCalculated")}</span><strong class="good">${data.accounts.length - pending.length}</strong></div><div><span>${hrT("manualReview")}</span><strong class="warn">${pending.length}</strong></div><div><span>${hrT("annualBudget")}</span><strong>€${formatHrEur(total)}</strong><small>EUR</small></div></div>${hrBudgetResultTable(data)}<div class="hrb-exception-detail"><div><h4>${hrT("currentReview")}</h4><p>${escapeHtml(hrT("exceptionText", { accounts: accountNames }))}</p></div><div class="hrb-calc-box"><span>${hrT("reviewPrinciple")}</span><strong>${hrT("reviewPrincipleText")}</strong><small>${hrT("reviewPrincipleHint")}</small></div><label class="grow"><span>${hrT("reviewOpinion")}</span><input placeholder="${escapeHtml(hrT("reviewOpinionPlaceholder"))}" /></label></div></section><aside class="hrb-approval"><h4>${hrT("approvalProgress")}</h4><ol><li class="done"><b>${hrT("excelLoaded")}</b><span>${hrT("completed")}</span><small>${hrT("tdMapped")}</small></li><li class="current"><b>${hrT("hrReview")}</b><span>${hrT("currentNode")}</span><small>${hrT("hrReviewHint")}</small></li><li><b>${hrT("costReview")}</b><span>${hrT("pending")}</span></li><li><b>${hrT("budgetPublish")}</b><span>${hrT("pending")}</span></li></ol><h4>${hrT("basisNote")}</h4><p>${hrT("sourceCurrency")}: TRY</p><p>${hrT("outputCurrency")}: EUR</p><p>${hrT("monthlyFx")}</p></aside></div>`;
 }
 
 function hrBudgetAuditView(data) {
   const records = hrBudgetAudit.flatMap((record) => (record.changes || []).map((change, index) => ({ ...change, record, first: index === 0 })));
-  return `<div class="hrb-audit-view"><section><div class="hrb-audit-heading"><div><h4>预算调整记录</h4><p>每一项偏离预算标准的修改都记录责任人、时间、前后值和理由。</p></div><strong>${records.length} 项</strong></div><div class="hrb-audit-table-wrap"><table><thead><tr><th>时间 / 责任人</th><th>调整项</th><th>期间</th><th>修改前</th><th>修改后</th><th>调整理由</th><th>操作</th></tr></thead><tbody>${records.map((item) => `<tr><td>${item.first ? `<b>${escapeHtml(new Date(item.record.timestamp).toLocaleString("zh-CN", { hour12: false }))}</b><small>${escapeHtml(item.record.actor)}</small>` : ""}</td><td>${escapeHtml(item.label)}</td><td>${escapeHtml(item.period)}</td><td>${formatHrEur(item.before, 2)} ${escapeHtml(item.unit)}</td><td><strong>${formatHrEur(item.after, 2)} ${escapeHtml(item.unit)}</strong></td><td>${item.first ? escapeHtml(item.record.reason) : `<span class="hrb-audit-same">同上</span>`}</td><td>${item.first ? escapeHtml(item.record.action) : ""}</td></tr>`).join("") || `<tr><td colspan="7" class="hrb-audit-empty">尚无预算调整记录。修改校核值并填写理由后，记录会显示在这里。</td></tr>`}</tbody></table></div></section><section><h4>系统记录</h4><table><thead><tr><th>时间</th><th>节点</th><th>操作</th><th>数据口径</th><th>状态</th></tr></thead><tbody><tr><td>2026-07-13</td><td>数据准备</td><td>载入 ${escapeHtml(data.sourceFile)}</td><td>TRY → EUR</td><td><span class="hrb-status ok">完成</span></td></tr><tr><td>2026-07-13</td><td>业务映射</td><td>${escapeHtml(data.sourceOrganization)} 假设映射为 DW</td><td>测试版</td><td><span class="hrb-status pending">待确认</span></td></tr></tbody></table></section></div>`;
+  const locale = state.language === "tr" ? "tr-TR" : state.language === "en" ? "en-US" : "zh-CN";
+  return `<div class="hrb-audit-view"><section><div class="hrb-audit-heading"><div><h4>${hrT("adjustmentRecords")}</h4><p>${hrT("adjustmentRecordsHint")}</p></div><strong>${records.length} ${hrT("items")}</strong></div><div class="hrb-audit-table-wrap"><table><thead><tr><th>${hrT("timeOwner")}</th><th>${hrT("adjustmentItem")}</th><th>${hrT("period")}</th><th>${hrT("before")}</th><th>${hrT("after")}</th><th>${hrT("adjustmentReason")}</th><th>${hrT("operation")}</th></tr></thead><tbody>${records.map((item) => `<tr><td>${item.first ? `<b>${escapeHtml(new Date(item.record.timestamp).toLocaleString(locale, { hour12: false }))}</b><small>${escapeHtml(item.record.actor)}</small>` : ""}</td><td>${escapeHtml(hrChangeLabel(item))}</td><td>${escapeHtml(hrChangePeriod(item, data))}</td><td>${formatHrEur(item.before, 2)} ${escapeHtml(hrUnitLabel(item.unit))}</td><td><strong>${formatHrEur(item.after, 2)} ${escapeHtml(hrUnitLabel(item.unit))}</strong></td><td>${item.first ? escapeHtml(item.record.reason) : `<span class="hrb-audit-same">${hrT("sameAsAbove")}</span>`}</td><td>${item.first ? escapeHtml(item.record.action === "提交人力预算" ? hrT("submitAction") : hrT("saveAction")) : ""}</td></tr>`).join("") || `<tr><td colspan="7" class="hrb-audit-empty">${hrT("noRecords")}</td></tr>`}</tbody></table></div></section><section><h4>${hrT("systemRecords")}</h4><table><thead><tr><th>${hrT("period")}</th><th>${hrT("node")}</th><th>${hrT("operation")}</th><th>${hrT("dataBasis")}</th><th>${hrT("status")}</th></tr></thead><tbody><tr><td>2026-07-13</td><td>${hrT("dataPreparation")}</td><td>${hrT("load")} ${escapeHtml(data.sourceFile)}</td><td>TRY → EUR</td><td><span class="hrb-status ok">${hrT("completed")}</span></td></tr><tr><td>2026-07-13</td><td>${hrT("businessMapping")}</td><td>${escapeHtml(hrT("assumedMapped", { source: data.sourceOrganization }))}</td><td>${hrT("testVersion")}</td><td><span class="hrb-status pending">${hrT("pendingConfirm")}</span></td></tr></tbody></table></section></div>`;
 }
 
 function refreshProductNavigation() {
-  const labels = { dashboard: "经营驾驶舱", variance: "月度分析与预算", projects: "降费项目" };
+  const labels = { dashboard: t("tabDashboard"), variance: t("tabVariance"), projects: t("tabProjects") };
   for (const tab of document.querySelectorAll(".tab[data-tab]")) {
     if (labels[tab.dataset.tab]) tab.textContent = labels[tab.dataset.tab];
   }
@@ -3711,7 +3918,7 @@ async function handleRollingForecastClick(event) {
     const reason = hrBudgetInputs.notes || "";
     hrBudgetInputs = defaultHrBudgetInputs();
     hrBudgetInputs.notes = reason;
-    toast("已恢复为 Excel 预算标准，请填写理由后保存");
+    toast(hrT("restoredDraft"));
     renderHrBudgetWorkspace();
     return;
   }
@@ -3727,7 +3934,7 @@ async function handleRollingForecastClick(event) {
     const changes = hrBudgetChanges(hrBudgetSavedInputs, hrBudgetInputs);
     const reason = String(hrBudgetInputs.notes || "").trim();
     if (changes.length && !reason) {
-      toast("有预算变更，必须先填写调整理由", true);
+      toast(hrT("reasonRequired"), true);
       renderHrBudgetWorkspace();
       return;
     }
@@ -3735,7 +3942,7 @@ async function handleRollingForecastClick(event) {
       hrBudgetAudit.unshift({
         id: `hr-${Date.now()}`,
         timestamp: new Date().toISOString(),
-        actor: els.userName?.value.trim() || "人力角色",
+        actor: els.userName?.value.trim() || t("hrRole"),
         reason,
         action: hrAction === "submit" ? "提交人力预算" : "保存校核",
         changes
@@ -3747,7 +3954,7 @@ async function handleRollingForecastClick(event) {
       hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
     }
     saveHrBudgetInputs();
-    toast(hrAction === "submit" ? "人力预算已提交财务复核并留痕" : (changes.length ? `已保存 ${changes.length} 项变更并写入记录` : "当前没有待保存变更"));
+    toast(hrAction === "submit" ? hrT("submittedTrace") : (changes.length ? hrT("savedTrace", { count: changes.length }) : hrT("noPendingSave")));
     if (hrAction === "submit") hrBudgetView = "exceptions";
     renderHrBudgetWorkspace();
     return;

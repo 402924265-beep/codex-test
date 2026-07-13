@@ -56,3 +56,18 @@ test("dashboard charts avoid label overlap and heatmap includes annual column", 
   assert.match(app, /annualMetricValue/);
   assert.match(css, /repeat\(13/);
 });
+
+test("role shell and HR budget workspace expose Chinese English and Turkish copy", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+
+  assert.match(html, /data-i18n="roleSelectTitle"/);
+  assert.match(html, /data-i18n-option="financeAdmin"/);
+  assert.match(html, /data-i18n="cookingFactory"/);
+  assert.match(app, /DW HR Budget Workspace/);
+  assert.match(app, /DW İK Bütçe Çalışma Alanı/);
+  assert.match(app, /HR Owner Input/);
+  assert.match(app, /İK Sorumlusu Girişi/);
+  assert.match(app, /function hrAccountLabel/);
+  assert.match(app, /function hrChangePeriod/);
+});
