@@ -3,26 +3,89 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      if (location.protocol === "file:") {
+        location.replace("http://127.0.0.1:8780/?hrbudget=20260713-v11");
+      }
+    </script>
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260617-public-rolling-v37" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260713-dw-input-v2" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
         anonKey: "sb_publishable_kji34L4Yh1vCIPudrIKROA_hdwTjzuu"
       };
+      if (/^(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(location.hostname)) {
+        window.DW_LOCAL_API_CONFIG = { baseUrl: "" };
+      }
       window.DW_BUNDLED_FILES = {
-        forecast: "./input/01_Forecast_4plus8.xlsx",
-        forecastName: "2026 MFG Variance Reporting DW 4+8.xlsx",
-        jiang: "./input/02_Domestic_Finance_4plus8.xlsx",
-        jiangName: "4+8 Domestic Finance.xlsx",
+        forecast: "./input/01_Forecast_5plus7.xlsx",
+        forecastName: "Copy of 2026 monthly Renta DW _ May 1.xlsx",
+        jiang: "./input/02_Domestic_Finance_5plus7.xlsx",
+        jiangName: "2026 Manufacturing Cost Cumulative Domestic Finance 5+7.xlsx",
         sap: "./input/03_Dishwasher_May_Actual.xlsx",
         sapName: "Dishwasher May Actual Manufacturing Cost.xlsx",
         language: "zh"
       };
     </script>
-    <script type="module" src="./src/app.js?v=20260617-public-rolling-v37"></script>
+    <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
+    <script type="module" src="./src/app.js?v=20260713-dw-input-v3"></script>
   </head>
   <body>
+    <section id="roleLogin" class="role-login" aria-label="选择演示角色">
+      <div class="role-login-panel">
+        <div class="role-login-brand"><span>C</span><div><strong>三张表制造费用经营驾驶舱</strong><small>预算协同测试版</small></div></div>
+        <div class="role-login-copy"><span>ROLE ACCESS</span><h1>选择你的工作角色</h1><p>当前为内部测试版，无需密码。不同角色进入后只显示职责范围内的数据与操作。</p></div>
+        <div class="role-login-options">
+          <button type="button" class="active" data-login-role="finance"><b>成本角色</b><span>查看经营驾驶舱、月度差异、全部预算科目和降费项目</span><em>完整视图</em></button>
+          <button type="button" data-login-role="hr"><b>人力角色</b><span>仅查看和校核人力预算参数、人力小科目及异常</span><em>受限视图</em></button>
+        </div>
+        <button id="enterWorkspace" class="role-login-enter" type="button">进入工作台</button>
+        <small class="role-login-note">演示身份可在页面右上角随时切换</small>
+      </div>
+    </section>
+    <div class="business-shell">
+      <aside class="business-sidebar" aria-label="业务单元导航">
+        <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="收起业务导航" title="收起/展开业务导航">☰</button>
+        <div class="brand-block">
+          <span class="brand-mark">C</span>
+          <div>
+            <strong>制造费用经营驾驶舱</strong>
+            <small>Supply Cost Control</small>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <span class="section-label">土耳其</span>
+          <button class="unit-nav-item active" type="button" data-unit="cooking">
+            <span class="unit-icon">CK</span>
+            <span><strong>厨电工厂</strong><small>Cooking appliance</small></span>
+          </button>
+          <button class="unit-nav-item" type="button" data-unit="dishwasher">
+            <span class="unit-icon">DW</span>
+            <span><strong>洗碗机</strong><small>Dishwasher</small></span>
+          </button>
+        </div>
+        <div class="sidebar-section">
+          <span class="section-label">海外工厂预留</span>
+          <button class="unit-nav-item disabled" type="button" disabled>
+            <span class="unit-icon">IN</span>
+            <span><strong>印度</strong><small>Coming soon</small></span>
+          </button>
+          <button class="unit-nav-item disabled" type="button" disabled>
+            <span class="unit-icon">PK</span>
+            <span><strong>巴基斯坦</strong><small>Coming soon</small></span>
+          </button>
+        </div>
+      </aside>
+      <div class="business-main">
+        <section class="unit-ribbon">
+          <div>
+            <span class="eyebrow">当前经营单元</span>
+            <h2 id="unitName">厨电工厂</h2>
+            <p id="unitSubtitle">厨电制造费用经营驾驶舱</p>
+          </div>
+          <div id="unitSource" class="unit-source">当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目</div>
+        </section>
     <header class="app-header">
       <div>
         <h1 data-i18n="appTitle">洗碗机制造费三张表工作台</h1>
@@ -41,15 +104,15 @@
           <span data-i18n="author">填写人</span>
           <input id="userName" placeholder="姓名" />
         </label>
-        <label class="file-button secondary">
+        <label class="file-button secondary bundled-only">
           <input id="forecastFile" type="file" accept=".xlsx,.xls,.xlsm" />
           <span data-i18n="importForecast">导入预测表</span>
         </label>
-        <label class="file-button secondary">
+        <label class="file-button secondary bundled-only">
           <input id="jiangFile" type="file" accept=".xlsx,.xls,.xlsm" />
           <span data-i18n="importJiang">导入国内财务表</span>
         </label>
-        <label class="file-button">
+        <label class="file-button bundled-only">
           <input id="sapFile" type="file" accept=".xlsx,.xls,.xlsm" />
           <span data-i18n="importSap">导入实际表</span>
         </label>
@@ -60,6 +123,17 @@
     <main class="workspace">
       <section class="top-strip" aria-label="当前状态">
         <div class="status-pill" id="saveMode">本机保存</div>
+        <label class="role-control">
+          <span>权限</span>
+          <select id="roleSelect">
+            <option value="finance">财务管理员</option>
+            <option value="hr">HR 人力</option>
+            <option value="procurement">行政/间接采购</option>
+            <option value="leader">经营负责人</option>
+            <option value="readonly">只读访客</option>
+          </select>
+        </label>
+        <button id="switchRoleBtn" class="switch-role-button" type="button">切换角色</button>
         <div class="status-pill muted" id="sapStatus">待导入实际表</div>
         <div class="status-pill muted" id="forecastStatus">待导入预测表</div>
         <div class="status-pill muted" id="jiangStatus">待导入国内财务表</div>
@@ -76,11 +150,11 @@
           <div class="panel-title">
             <div>
               <h2 data-i18n="dashboardTitle">全年数据驾驶舱</h2>
-              <p data-i18n="dashboardHint">上传 4+8 预测后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。</p>
+              <p data-i18n="dashboardHint">内置 5+7 预测后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。</p>
             </div>
-            <span id="dashboardStatus">等待4+8预测文件</span>
+            <span id="dashboardStatus">等待5+7预测文件</span>
           </div>
-          <div id="annualSummary" class="smart-summary">??4+8??????????</div>
+          <div id="annualSummary" class="smart-summary">内置5+7预测加载中...</div>
           <div id="dashboardCards" class="dashboard-cards cockpit-cards"></div>
           <div class="cockpit-grid">
             <section class="cockpit-card trend-card">
@@ -285,6 +359,8 @@
         </section>
       </section>
     </main>
+      </div>
+    </div>
 
     <div id="toast" role="status" aria-live="polite"></div>
   </body>

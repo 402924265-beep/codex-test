@@ -146,6 +146,12 @@ const CATEGORY_ROWS = [
 ];
 
 export function extractForecastWorkbook(workbook, XLSX) {
+  const hasLegacyForecastSheets = findSheetName(workbook, ["VOLUME"]) && findSheetName(workbook, ["FCST CPU"]);
+  if (!hasLegacyForecastSheets) {
+    const rentaSheetName = findSheetName(workbook, ["4+8 DW 2026", "Renta DW _2026", "Renta DW_2026", "Renta DW"]);
+    if (rentaSheetName) return extractRentaForecastWorkbook(workbook, XLSX, rentaSheetName);
+  }
+
   const volumeRows = rowsFromSheet(workbook, XLSX, ["VOLUME"]);
   const cpuRows = rowsFromSheet(workbook, XLSX, ["FCST CPU"]);
   const varianceRows = rowsFromSheet(workbook, XLSX, ["FCST 26"]);
@@ -201,6 +207,31 @@ export function extractForecastWorkbook(workbook, XLSX) {
     totalAll,
     totalMfg,
     totalIncludingFc,
+    parsedAt: new Date().toISOString()
+  };
+}
+
+function extractRentaForecastWorkbook(workbook, XLSX, sheetName) {
+  const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, raw: true, defval: null });
+  const { monthCols } = detectRentaForecastMonthColumns(rows);
+  const volumes = detectRentaForecastVolumes(rows, monthCols);
+  const categories = extractRentaForecastCategories(rows, monthCols, volumes);
+  const totalAll = extractRentaForecastTotal(rows, monthCols, volumes) || totalFromCategories(categories, volumes);
+
+  return {
+    source: "5+7 forecast",
+    months: DASHBOARD_MONTHS,
+    volume: {
+      budget: Array(12).fill(null),
+      std: volumes,
+      actual: volumes,
+      delta: Array(12).fill(null)
+    },
+    hc: null,
+    categories,
+    totalAll,
+    totalMfg: totalAll,
+    totalIncludingFc: totalAll,
     parsedAt: new Date().toISOString()
   };
 }
@@ -514,6 +545,151 @@ function optionalRowsFromSheet(workbook, XLSX, candidates) {
   const sheetName = findSheetName(workbook, candidates);
   if (!sheetName) return [];
   return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, raw: true, defval: null });
+}
+
+const RENTA_FORECAST_MONTHS = [
+  ["jan", "january"],
+  ["feb", "february"],
+  ["mar", "march"],
+  ["apr", "april"],
+  ["may"],
+  ["jun", "june"],
+  ["jul", "july"],
+  ["aug", "august"],
+  ["sep", "sept", "september"],
+  ["oct", "october"],
+  ["nov", "november"],
+  ["dec", "december"]
+];
+
+const RENTA_FORECAST_CATEGORY_BY_KEY = {
+  "CS_DEPRECIATION": "Depreciation incl. FC",
+  "CS_DIRECT LABOUR": "Direct Labor",
+  "CS_DIRECT LABOR": "Direct Labor",
+  "CS_SCRAP_VARIABLE": "Scrap",
+  "CS_FIX COST": "Fixed Cost",
+  "CS_VARIABLE COST": "Other Variable (Production Consumable)",
+  "CS_OBSOLESCENCE": "Obsolete",
+  "CS_RESELLING": "Scrap Reselling",
+  "CS_FIX UTILITIES": "Fixed utilities",
+  "CS_VARIABLE UTILITIES": "Variable Utilities",
+  "CS_INDIRECT LABOUR": "Indirect Labour",
+  "CS_INDIRECT LABOR": "Indirect Labour",
+  "CS_FIXED LABOUR": "Fixed Labour",
+  "CS_FIXED LABOR": "Fixed Labour",
+  "CS_SEMIFIX": "Semifixed",
+  "CS_OVH_ADM": "Fixed Cost"
+};
+
+function detectRentaForecastMonthColumns(rows) {
+  const maxRows = Math.min(rows.length, 20);
+  for (let rowIndex = 0; rowIndex < maxRows; rowIndex += 1) {
+    const row = rows[rowIndex] || [];
+    const monthCols = RENTA_FORECAST_MONTHS.map((tokens) => findRentaForecastMonthColumn(row, tokens));
+    if (monthCols.every((col) => col >= 0)) return { headerRow: rowIndex, monthCols };
+  }
+  throw new Error("Renta forecast sheet中识别不到Jan-DEC K€列");
+}
+
+function findRentaForecastMonthColumn(row, tokens) {
+  for (let colIndex = 0; colIndex < row.length; colIndex += 1) {
+    const label = cellText(row[colIndex]).toLowerCase();
+    if (!label || label.includes("ytd")) continue;
+    const hasMonth = tokens.some((token) => label === token || label.includes(token));
+    const hasAmount = label.includes("k€") || label.includes("k eur") || label.includes("keur") || /\bk\s*$/.test(label);
+    if (hasMonth && hasAmount) return colIndex;
+  }
+  return -1;
+}
+
+function detectRentaForecastVolumes(rows, monthCols) {
+  for (let rowIndex = 0; rowIndex < Math.min(rows.length, 8); rowIndex += 1) {
+    const row = rows[rowIndex] || [];
+    if (!row.some((cell) => normalizeLabel(cellText(cell)) === "volume")) continue;
+    const values = monthCols.map((colIndex) => num(row[colIndex]));
+    if (values.some((value) => Number.isFinite(value) && value > 100)) return values;
+  }
+  return monthCols.map(() => null);
+}
+
+function extractRentaForecastCategories(rows, monthCols, volumes) {
+  const map = new Map();
+  for (const row of rows) {
+    const codeCol = findRentaForecastAccountCodeColumn(row || []);
+    if (codeCol === -1) continue;
+    const key = rentaForecastSummaryKey(row[3] ?? row[codeCol + 2]);
+    const label = RENTA_FORECAST_CATEGORY_BY_KEY[key] || "Fixed Cost";
+    const current = map.get(label) || {
+      label,
+      labelZh: zhCategory(label),
+      amountMonths: Array(12).fill(0),
+      budgetMonths: Array(12).fill(null),
+      varianceMonths: Array(12).fill(null),
+      unitMonths: Array(12).fill(null),
+      total: 0
+    };
+    monthCols.forEach((colIndex, monthIndex) => {
+      const value = num(row[colIndex]);
+      if (Number.isFinite(value)) current.amountMonths[monthIndex] += value;
+    });
+    map.set(label, current);
+  }
+
+  return [...map.values()].map((item) => ({
+    ...item,
+    amountMonths: item.amountMonths.map((value) => Number.isFinite(value) ? value : null),
+    unitMonths: item.amountMonths.map((value, index) => unit(value, volumes[index])),
+    total: item.amountMonths.reduce((sum, value) => sum + (Number(value) || 0), 0)
+  }));
+}
+
+function extractRentaForecastTotal(rows, monthCols, volumes) {
+  for (let rowIndex = rows.length - 1; rowIndex >= 0; rowIndex -= 1) {
+    const row = rows[rowIndex] || [];
+    const hasTotal = row.slice(0, 5).some((cell) => cellText(cell).trim().toUpperCase() === "TOTAL");
+    if (!hasTotal) continue;
+    const amountMonths = monthCols.map((colIndex) => num(row[colIndex]));
+    if (!amountMonths.some(Number.isFinite)) continue;
+    return makeRentaForecastTotal(amountMonths, volumes);
+  }
+  return null;
+}
+
+function totalFromCategories(categories, volumes) {
+  const amountMonths = Array.from({ length: 12 }, (_, index) =>
+    categories.reduce((sum, item) => sum + (Number(item.amountMonths?.[index]) || 0), 0)
+  );
+  return makeRentaForecastTotal(amountMonths, volumes);
+}
+
+function makeRentaForecastTotal(amountMonths, volumes) {
+  return {
+    label: "TOTAL ALL",
+    labelZh: zhCategory("TOTAL ALL"),
+    amountMonths,
+    total: amountMonths.reduce((sum, value) => sum + (Number(value) || 0), 0),
+    unitMonths: amountMonths.map((value, index) => unit(value, volumes[index])),
+    budgetMonths: Array(12).fill(null),
+    varianceMonths: Array(12).fill(null)
+  };
+}
+
+function findRentaForecastAccountCodeColumn(row) {
+  const limit = Math.min(row.length, 5);
+  for (let index = 0; index < limit; index += 1) {
+    if (rentaForecastAccountCode(row[index])) return index;
+  }
+  return -1;
+}
+
+function rentaForecastAccountCode(value) {
+  const textValue = cellText(value);
+  const match = textValue.match(/(?:^|[^\w.])(\d{10}|\d{6})(?![\w.])/);
+  return match ? match[1] : "";
+}
+
+function rentaForecastSummaryKey(value) {
+  return cellText(value).replace(/^\*+\s*/, "").trim().toUpperCase();
 }
 
 function findSheetName(workbook, candidates) {

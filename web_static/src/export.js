@@ -52,7 +52,7 @@ export function buildAnalysisWorkbookSheets({
 
 function buildCostDataSheet(rows, forecast) {
   if (!rows?.length) {
-    return [{ 分组: "数据来源", 指标: "说明", 口径: "待导入4+8/5+7滚动预测" }];
+    return [{ 分组: "数据来源", 指标: "说明", 口径: "待加载内置5+7滚动预测" }];
   }
 
   const output = [];
@@ -69,7 +69,7 @@ function buildCostDataSheet(rows, forecast) {
   output.push({
     分组: "数据来源",
     指标: "滚动预测",
-    口径: forecast?.source || "4+8/5+7 forecast",
+    口径: forecast?.source || "5+7 forecast",
     年度: forecast?.parsedAt || ""
   });
   return output;
@@ -232,7 +232,7 @@ function sumFactorMonth(items, field, monthIndex, fallbackField) {
 
 function buildFormulaSheet(forecast, result) {
   return [
-    { 项目: "26年滚动预测", 说明: forecast?.source || "由用户导入4+8/5+7预测表，已发生月份为实际，后续月份为预测。" },
+    { 项目: "26年滚动预测", 说明: forecast?.source || "内置5+7预测表，已发生月份为实际，后续月份为预测。" },
     { 项目: "25同期", 说明: "取自2025 monthly Renta DW _ DEC_ACT.xlsx，覆盖1-12月同期。" },
     { 项目: "同比差异", 说明: "26年滚动预测或SAP实际 - 25同期。" },
     { 项目: "环比差异", 说明: "本月SAP实际或滚动预测 - 上月实际或滚动预测。" },

@@ -40,6 +40,31 @@ test("extracts 4+8 forecast volume, amount, unit, and budget variance", () => {
   assert.ok(rows.some((row) => row.label === "工作日"));
 });
 
+test("extracts 5+7 Renta forecast from month columns and ignores YTD", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    [null, "Renta DW Cost Evolution", null, "Volume", 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 8700],
+    [],
+    [],
+    [],
+    ["HQD PERIMETER", null, null, null, "Jan K€", "Feb K€", "Mar K€", "Apr K€", "May K€", "June K€", "July K€", "Aug K€", "Sep K€", "Oct K€", "Nov K€", "DEC K€", "YTD K€"],
+    ["YES", 6666010188, "Salary - Blue collar direct employees", "* CS_DIRECT LABOUR", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 780],
+    ["YES", 6666021500, "Repairs cost", "* CS_FIX COST", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 78],
+    [null, null, "TOTAL", null, 11, 22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 132, 858]
+  ]), "4+8 DW 2026");
+
+  const forecast = extractForecastWorkbook(wb, XLSX);
+  const snapshot = monthSnapshot(forecast, 12);
+
+  assert.equal(forecast.source, "5+7 forecast");
+  assert.equal(forecast.volume.actual[11], 1200);
+  assert.equal(snapshot.amount, 132);
+  assert.equal(snapshot.unitCost, 110);
+  assert.equal(forecast.totalAll.total, 858);
+  assert.equal(forecast.categories.find((row) => row.label === "Direct Labor").amountMonths[0], 10);
+  assert.equal(forecast.categories.find((row) => row.label === "Fixed Cost").amountMonths[11], 12);
+});
+
 test("annual dashboard puts order volume before other metric cards", () => {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([

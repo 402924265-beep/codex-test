@@ -1,6 +1,7 @@
 const STORAGE_KEYS = {
   analyses: "dw-shared-analyses-v2",
   factors: "dw-shared-factors-v2",
+  rollingForecast: "dw-rolling-forecast-v1",
   user: "dw-user-name"
 };
 
@@ -39,6 +40,20 @@ export function createStore(config = globalThis.window?.DW_SUPABASE_CONFIG) {
       writeJson(STORAGE_KEYS.factors, items);
       return items;
     },
+    async loadRollingForecast() {
+      return localApi ? localApi.loadRollingForecast() : readJson(STORAGE_KEYS.rollingForecast, { drafts: {}, submitted: {} });
+    },
+    async saveRollingForecast(payload) {
+      const normalized = {
+        drafts: payload?.drafts || {},
+        submitted: payload?.submitted || {},
+        role: payload?.role || "",
+        updated_at: new Date().toISOString()
+      };
+      if (localApi) return localApi.saveRollingForecast(normalized);
+      writeJson(STORAGE_KEYS.rollingForecast, normalized);
+      return normalized;
+    },
     getUser() {
       return localStorage.getItem(STORAGE_KEYS.user) || "";
     },
@@ -75,6 +90,18 @@ export class LocalApiStore {
       body: JSON.stringify(items)
     });
     return items;
+  }
+
+  async loadRollingForecast() {
+    return this.request("/api/rolling-forecast");
+  }
+
+  async saveRollingForecast(payload) {
+    await this.request("/api/rolling-forecast", {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    });
+    return payload;
   }
 
   async request(path, options = {}) {

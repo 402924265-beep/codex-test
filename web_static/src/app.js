@@ -39,8 +39,36 @@ import { PROJECT_SEEDS, localizeProjectField, localizeProjectText, projectImpact
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
+import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
 
 const VERSION = "20260617-public-rolling-v37";
+
+const COOKING_HEADCOUNT_ROWS = [
+  {
+    label: "直接员工",
+    rows: [
+      { scenario: "同期", values: [279, 296, 293, 296, 293, 260, 247, 239, 248, 310, 310, 280] },
+      { scenario: "预算", values: [286, 317, 317, 258, 258, 258, 258, 258, 295, 295, 343, 343] },
+      { scenario: "26年", values: [294, 300, 325, 265, 258, 258, 258, 258, 295, 295, 343, 343] }
+    ]
+  },
+  {
+    label: "间接员工",
+    rows: [
+      { scenario: "同期", values: [170, 181, 180, 182, 178, 148, 126, 127, 120, 132, 134, 133] },
+      { scenario: "预算", values: [133, 136, 136, 127, 127, 127, 127, 127, 133, 133, 142, 142] },
+      { scenario: "26年", values: [127, 126, 125, 113, 127, 127, 127, 127, 133, 133, 142, 142] }
+    ]
+  },
+  {
+    label: "白领",
+    rows: [
+      { scenario: "同期", values: [58, 58, 56, 55, 53, 38, 35, 38, 33, 31, 31, 31] },
+      { scenario: "预算", values: [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34] },
+      { scenario: "26年", values: [30, 31, 30, 28, 34, 34, 34, 34, 34, 34, 34, 34] }
+    ]
+  }
+];
 
 const i18n = {
   zh: {
@@ -213,7 +241,7 @@ const i18n = {
     summaryEmpty: "导入 SAP 报表后，本月摘要会根据下方科目原因自动汇总。",
     better: "优化",
     worse: "恶化",
-    forecastUnitLine: "；4+8本月单台 {unit} €/台",
+    forecastUnitLine: "；5+7本月单台 {unit} €/台",
     compactSummary: "{month}单台同比{direction} {unitDiff} €/台，制造费差额 {mfgDiff} K€；重点原因 {filled}/{total} 已填写；上涨因素 {increase} K€，下降因素 {decrease} K€{forecast}",
     noMatchingAccounts: "没有符合条件的科目",
     analysisSaved: "原因已保存",
@@ -266,7 +294,7 @@ const i18n = {
     manufacturingDiff: "MFG variance",
     factorNet: "Net factor impact",
     dashboardTitle: "Year Dashboard",
-    dashboardHint: "Upload the 4+8 forecast to view all 12 months in one screen.",
+    dashboardHint: "Upload the 5+7 forecast to view all 12 months in one screen.",
     monthSummary: "Monthly Summary & Root Causes",
     summaryHint: "Auto summary around unit cost, value variance, and key accounts.",
     autoFromSite: "Generated from website inputs",
@@ -320,11 +348,11 @@ const i18n = {
     increase: "Increase",
     decrease: "Decrease",
     delete: "Del",
-    emptyForecast: "Import a 4+8 forecast file to show the 12-month dashboard",
+    emptyForecast: "Import a 5+7 forecast file to show the 12-month dashboard",
     emptySap: "Import the actual table to show account details",
-    waitingForecast: "Waiting for 4+8 forecast",
+    waitingForecast: "Waiting for 5+7 forecast",
     waitingSap: "SAP actuals not imported",
-    waitingForecastPill: "4+8 forecast not imported",
+    waitingForecastPill: "5+7 forecast not imported",
     placeholderMajor: "Key variance: cause, owner, action, expected impact",
     placeholderSmall: "Short reason",
     dashboardGroup: "Metric group",
@@ -340,7 +368,7 @@ const i18n = {
     waterfallHint: "Manufacturing cost / output value",
     other: "Other",
     fullYear: "Full year",
-    annualSummaryEmpty: "Import the 4+8 forecast to generate the annual summary.",
+    annualSummaryEmpty: "Import the 5+7 forecast to generate the annual summary.",
     monthlySummaryEmpty: "Import the actual table to generate the monthly summary.",
     allIndicators: "All metrics",
     allScenarios: "All bases",
@@ -362,9 +390,9 @@ const i18n = {
     hideDetail: "Hide detail",
     loadedYearModel: "Year model loaded",
     readingFile: "Reading",
-    importedForecast: "Imported 4+8",
+    importedForecast: "Imported 5+7",
     importedSap: "Imported SAP",
-    loadedForecast: "Loaded 4+8 forecast",
+    loadedForecast: "Loaded 5+7 forecast",
     loadedSap: "Loaded SAP actuals",
     loadedJiang: "Loaded domestic finance table",
     noTimeData: "Work-hour / workday data pending",
@@ -398,7 +426,7 @@ const i18n = {
     summaryEmpty: "After importing SAP actuals, this month summary will be generated from account-level reasons below.",
     better: "better",
     worse: "worse",
-    forecastUnitLine: "; 4+8 unit cost {unit} €/pc",
+    forecastUnitLine: "; 5+7 unit cost {unit} €/pc",
     compactSummary: "{month} unit cost is {direction} by {unitDiff} €/pc YoY; MFG variance {mfgDiff} K€; key reasons completed {filled}/{total}; increases {increase} K€, decreases {decrease} K€{forecast}",
     noMatchingAccounts: "No matching accounts",
     analysisSaved: "Reason saved",
@@ -418,7 +446,7 @@ const i18n = {
     appSubtitle: "Finans verisini yükle, üç analiz tablosunu üret",
     language: "Dil",
     author: "Yazan",
-    importForecast: "4+8 tahmin yükle",
+    importForecast: "5+7 tahmin yükle",
     importJiang: "Jiang Yue tablosunu yükle",
     importSap: "SAP gerçekleşen yükle",
     exportAnalysis: "Çalışma kitabı indir",
@@ -451,7 +479,7 @@ const i18n = {
     manufacturingDiff: "Üretim farkı",
     factorNet: "Net faktör etkisi",
     dashboardTitle: "Yıllık Veri Panosu",
-    dashboardHint: "4+8 tahmini yükleyince 12 ay tek ekranda görünür.",
+    dashboardHint: "5+7 tahmini yükleyince 12 ay tek ekranda görünür.",
     monthSummary: "Aylık Özet ve Nedenler",
     summaryHint: "Birim maliyet, tutar farkı ve önemli hesaplardan otomatik özet.",
     autoFromSite: "Site girişlerinden üretildi",
@@ -505,11 +533,11 @@ const i18n = {
     increase: "Artış",
     decrease: "Azalış",
     delete: "Sil",
-    emptyForecast: "12 aylık pano için 4+8 tahmin dosyasını yükleyin",
+    emptyForecast: "12 aylık pano için 5+7 tahmin dosyasını yükleyin",
     emptySap: "Hesap detayları için SAP gerçekleşen dosyasını yükleyin",
-    waitingForecast: "4+8 tahmin bekleniyor",
+    waitingForecast: "5+7 tahmin bekleniyor",
     waitingSap: "SAP gerçekleşen yüklenmedi",
-    waitingForecastPill: "4+8 tahmin yüklenmedi",
+    waitingForecastPill: "5+7 tahmin yüklenmedi",
     placeholderMajor: "Önemli fark: neden, sorumlu, aksiyon, beklenen etki",
     placeholderSmall: "Kısa neden",
     dashboardGroup: "Gösterge grubu",
@@ -525,7 +553,7 @@ const i18n = {
     waterfallHint: "Kırmızı kötüleşme, yeşil iyileşme",
     other: "Diğer",
     fullYear: "Yıl",
-    annualSummaryEmpty: "Yıllık özet için 4+8 tahminini yükleyin.",
+    annualSummaryEmpty: "Yıllık özet için 5+7 tahminini yükleyin.",
     monthlySummaryEmpty: "Aylık özet için SAP gerçekleşeni yükleyin.",
     allIndicators: "Tüm göstergeler",
     allScenarios: "Tüm bazlar",
@@ -547,9 +575,9 @@ const i18n = {
     hideDetail: "Detayı gizle",
     loadedYearModel: "Yıllık model yüklendi",
     readingFile: "Okunuyor",
-    importedForecast: "4+8 içe aktarıldı",
+    importedForecast: "5+7 içe aktarıldı",
     importedSap: "SAP içe aktarıldı",
-    loadedForecast: "4+8 tahmin yüklendi",
+    loadedForecast: "5+7 tahmin yüklendi",
     loadedSap: "SAP gerçekleşen yüklendi",
     loadedJiang: "Yurtiçi finans tablosu yüklendi",
     noTimeData: "İş saati / iş günü verisi bekleniyor",
@@ -583,7 +611,7 @@ const i18n = {
     summaryEmpty: "SAP gerçekleşen yüklendikten sonra aylık özet aşağıdaki hesap nedenlerinden üretilecek.",
     better: "iyileşti",
     worse: "kötüleşti",
-    forecastUnitLine: "; 4+8 birim maliyet {unit} €/adet",
+    forecastUnitLine: "; 5+7 birim maliyet {unit} €/adet",
     compactSummary: "{month} birim maliyet YoY {direction}: {unitDiff} €/adet; üretim farkı {mfgDiff} K€; ana nedenler {filled}/{total}; artış {increase} K€, azalış {decrease} K€{forecast}",
     noMatchingAccounts: "Eşleşen hesap yok",
     analysisSaved: "Neden kaydedildi",
@@ -628,9 +656,16 @@ const state = {
   rollingSelectedCode: null,
   rollingTaskFilter: "all",
   rollingViewMode: "fill",
+  rollingRole: localStorage.getItem("dwRollingRole.v1") || "finance",
+  activeUnit: "cooking",
   sapFileName: "",
   forecastFileName: "",
   jiangFileName: ""
+};
+
+const unitSnapshots = {
+  dishwasher: null,
+  cooking: null
 };
 
 const els = {
@@ -646,6 +681,10 @@ const els = {
   languageSelect: document.getElementById("languageSelect"),
   userName: document.getElementById("userName"),
   saveMode: document.getElementById("saveMode"),
+  roleSelect: document.getElementById("roleSelect"),
+  roleLogin: document.getElementById("roleLogin"),
+  enterWorkspace: document.getElementById("enterWorkspace"),
+  switchRoleBtn: document.getElementById("switchRoleBtn"),
   analysisAuthor: document.getElementById("analysisAuthor"),
   submitAnalysesBtn: document.getElementById("submitAnalysesBtn"),
   analysisSaveStatus: document.getElementById("analysisSaveStatus"),
@@ -689,6 +728,12 @@ const els = {
   addDecreaseBtn: document.getElementById("addDecreaseBtn"),
   factorMonthSelect: document.getElementById("factorMonthSelect"),
   saveFactorsBtn: document.getElementById("saveFactorsBtn"),
+  businessShell: document.querySelector(".business-shell"),
+  sidebarToggle: document.getElementById("sidebarToggle"),
+  unitButtons: document.querySelectorAll("[data-unit]"),
+  unitName: document.getElementById("unitName"),
+  unitSubtitle: document.getElementById("unitSubtitle"),
+  unitSource: document.getElementById("unitSource"),
   toast: document.getElementById("toast")
 };
 
@@ -696,8 +741,11 @@ bootstrap();
 
 async function bootstrap() {
   bindEvents();
+  setSidebarCollapsed(localStorage.getItem("dw.sidebarCollapsed") === "1");
+  initializeDemoRoleAccess();
   installMetricHoverTooltip();
   els.saveMode.textContent = store.label;
+  if (els.roleSelect) els.roleSelect.value = state.rollingRole;
   els.userName.value = store.getUser();
   if (els.analysisAuthor) els.analysisAuthor.value = els.userName.value;
   try {
@@ -709,6 +757,11 @@ async function bootstrap() {
     state.factors = (!storedFactors.length || legacySeedData)
       ? seedCostReductionProjects()
       : mergeMissingProjectSeeds(storedFactors);
+    const rollingForecast = await store.loadRollingForecast?.();
+    if (rollingForecast) {
+      state.rollingForecastDrafts = rollingForecast.drafts || state.rollingForecastDrafts;
+      state.rollingForecastSubmitted = rollingForecast.submitted || state.rollingForecastSubmitted;
+    }
   } catch (error) {
     toast(error.message || String(error), true);
   }
@@ -716,6 +769,12 @@ async function bootstrap() {
   recalcFactors();
   renderAll();
   await loadBundledFiles();
+  saveUnitSnapshot("dishwasher");
+  if (state.activeUnit === "cooking") {
+    applyCookingUnit();
+  } else {
+    updateUnitChrome("dishwasher");
+  }
 }
 
 async function loadBundledFiles() {
@@ -731,20 +790,391 @@ async function loadBundledFiles() {
       });
       await handler({ target: { files: [file] } });
     };
-    await load(config.forecast, config.forecastName || "01_Forecast_4plus8.xlsx", handleForecastFileChange);
-    await load(config.jiang, config.jiangName || "02_Domestic_Finance_4plus8.xlsx", handleJiangFileChange);
+    await load(config.forecast, config.forecastName || "01_Forecast_5plus7.xlsx", handleForecastFileChange);
+    await load(config.jiang, config.jiangName || "02_Domestic_Finance_5plus7.xlsx", handleJiangFileChange);
     await load(config.sap, config.sapName || "03_April_Actual.xlsx", handleSapFileChange);
     if (config.language && i18n[config.language]) {
       els.languageSelect.value = config.language;
       applyLanguage(config.language);
       renderAll();
     }
+    saveUnitSnapshot("dishwasher");
   } catch (error) {
     toast(error.message || String(error), true);
   }
 }
 
+function switchBusinessUnit(unitId) {
+  if (!unitId || unitId === state.activeUnit) return;
+  saveUnitSnapshot(state.activeUnit);
+  if (unitId === "dishwasher") {
+    restoreUnitSnapshot("dishwasher");
+    updateUnitChrome("dishwasher");
+    renderAll();
+    return;
+  }
+  if (unitId === "cooking") {
+    applyCookingUnit();
+  }
+}
+
+function setSidebarCollapsed(collapsed) {
+  els.businessShell?.classList.toggle("sidebar-collapsed", Boolean(collapsed));
+  if (els.sidebarToggle) {
+    els.sidebarToggle.setAttribute("aria-label", collapsed ? "展开业务导航" : "收起业务导航");
+    els.sidebarToggle.setAttribute("title", collapsed ? "展开业务导航" : "收起业务导航");
+  }
+}
+
+function saveUnitSnapshot(unitId) {
+  if (!unitId) return;
+  unitSnapshots[unitId] = {
+    workbook: state.workbook,
+    forecast: state.forecast,
+    jiangyue: state.jiangyue,
+    dashboardRows: clonePlain(state.dashboardRows),
+    resultByMonth: new Map(state.resultByMonth),
+    result: clonePlain(state.result),
+    analyses: clonePlain(state.analyses),
+    descriptionAttachments: clonePlain(state.descriptionAttachments),
+    factors: clonePlain(state.factors),
+    factorSummary: clonePlain(state.factorSummary),
+    language: state.language,
+    dashboardGroup: state.dashboardGroup,
+    dashboardBasis: state.dashboardBasis,
+    metricScenario: state.metricScenario,
+    metricMonth: state.metricMonth,
+    metricStatus: state.metricStatus,
+    metricIndicator: state.metricIndicator,
+    dashboardTableOpen: state.dashboardTableOpen,
+    factorMonth: state.factorMonth,
+    actualMonthCount: state.actualMonthCount,
+    sapFileName: state.sapFileName,
+    forecastFileName: state.forecastFileName,
+    jiangFileName: state.jiangFileName
+  };
+}
+
+function restoreUnitSnapshot(unitId) {
+  const snapshot = unitSnapshots[unitId];
+  if (!snapshot) return;
+  Object.assign(state, {
+    workbook: snapshot.workbook,
+    forecast: snapshot.forecast,
+    jiangyue: snapshot.jiangyue,
+    dashboardRows: clonePlain(snapshot.dashboardRows),
+    resultByMonth: new Map(snapshot.resultByMonth),
+    result: clonePlain(snapshot.result),
+    analyses: clonePlain(snapshot.analyses),
+    descriptionAttachments: clonePlain(snapshot.descriptionAttachments),
+    factors: clonePlain(snapshot.factors),
+    factorSummary: clonePlain(snapshot.factorSummary),
+    dashboardGroup: snapshot.dashboardGroup,
+    dashboardBasis: snapshot.dashboardBasis,
+    metricScenario: snapshot.metricScenario,
+    metricMonth: snapshot.metricMonth,
+    metricStatus: snapshot.metricStatus,
+    metricIndicator: snapshot.metricIndicator,
+    dashboardTableOpen: snapshot.dashboardTableOpen,
+    factorMonth: snapshot.factorMonth,
+    actualMonthCount: snapshot.actualMonthCount,
+    sapFileName: snapshot.sapFileName,
+    forecastFileName: snapshot.forecastFileName,
+    jiangFileName: snapshot.jiangFileName,
+    activeUnit: unitId
+  });
+  syncMonthSelectFromState();
+  syncStatusPills();
+}
+
+function applyCookingUnit() {
+  state.activeUnit = "cooking";
+  state.forecast = {
+    source: "cooking built-in",
+    months: COOKING_UNIT.months,
+    parsedAt: new Date().toISOString()
+  };
+  state.jiangyue = { source: COOKING_UNIT.sources.headcount };
+  state.dashboardRows = clonePlain(COOKING_UNIT.dashboardRows);
+  normalizeCookingHeadcountRows();
+  normalizeCookingDerivedRows();
+  appendCookingWorkdayRows();
+  appendMissingCookingTargetRows();
+  state.resultByMonth = cookingMonthlyResultMap();
+  state.result = clonePlain(state.resultByMonth.get(COOKING_UNIT.monthlyResult?.month) || [...state.resultByMonth.values()][0] || COOKING_UNIT.monthlyResult);
+  state.actualMonthCount = COOKING_UNIT.actualMonthCount;
+  state.factors = normalizeFactorsForUi(clonePlain(COOKING_UNIT.projects).map((item) => ({
+    ...item,
+    impactType: cookingProjectImpactType(item)
+  })));
+  state.factorMonth = COOKING_UNIT.monthlyResult.month;
+  state.sapFileName = "03_CK_May_Actual.xlsx";
+  state.forecastFileName = "厨电成本数据内置模型";
+  state.jiangFileName = "04_CK_JiangYue.xlsx";
+  state.metricScenario = "all";
+  state.metricMonth = "all";
+  state.metricStatus = "all";
+  state.metricIndicator = "all";
+  state.rollingViewMode = "variance";
+  state.analyses = cookingInitialAnalyses();
+  state.descriptionAttachments = {};
+  syncMonthSelectFromState();
+  if (COOKING_UNIT.monthlyResult?.month && state.resultByMonth.has(COOKING_UNIT.monthlyResult.month)) {
+    els.monthSelect.value = String(COOKING_UNIT.monthlyResult.month);
+    selectCurrentMonth();
+  }
+  syncStatusPills();
+  updateUnitChrome("cooking");
+  els.toast.classList.remove("show");
+  recalcFactors();
+  renderAll();
+}
+
+function normalizeCookingHeadcountRows() {
+  const headcountSpecs = new Map(COOKING_HEADCOUNT_ROWS.map((spec) => [spec.label, spec]));
+  const inserted = new Set();
+  const normalized = [];
+  for (const row of state.dashboardRows) {
+    const spec = headcountSpecs.get(row.label);
+    if (!spec) {
+      normalized.push(row);
+      continue;
+    }
+    if (!inserted.has(spec.label)) {
+      normalized.push(...buildCookingHeadcountRows(row, spec));
+      inserted.add(spec.label);
+    }
+  }
+  for (const spec of COOKING_HEADCOUNT_ROWS) {
+    if (!inserted.has(spec.label)) {
+      normalized.push(...buildCookingHeadcountRows({}, spec));
+    }
+  }
+  state.dashboardRows = normalized;
+}
+
+function buildCookingHeadcountRows(template, spec) {
+  return spec.rows.map(({ scenario, values }) => ({
+    ...template,
+    label: spec.label,
+    metric: template.metric || spec.label,
+    scenario,
+    unit: "人",
+    direction: template.direction || "lower",
+    values: values.slice(),
+    annual: averageFinite(values),
+    sourceIndicator: `CK headcount - ${spec.label} - ${scenario}`
+  }));
+}
+
+function normalizeCookingDerivedRows() {
+  fillCookingForecastOutputValues();
+  recalcCookingManufacturingRateRows();
+}
+
+function fillCookingForecastOutputValues() {
+  const output26 = dashboardRow("产值", "26年");
+  const outputBudget = dashboardRow("产值", "预算");
+  const volume26 = dashboardRow("产量", "26年");
+  const volumeBudget = dashboardRow("产量", "预算");
+  if (!output26 || !outputBudget || !volume26 || !volumeBudget) return;
+  output26.values = Array.from({ length: 12 }, (_, index) => {
+    const current = output26.values?.[index];
+    if (Number.isFinite(current)) return current;
+    const budgetOutput = outputBudget.values?.[index];
+    const budgetVolume = volumeBudget.values?.[index];
+    const actualVolume = volume26.values?.[index];
+    if (!Number.isFinite(budgetOutput) || !Number.isFinite(budgetVolume) || !Number.isFinite(actualVolume) || budgetVolume === 0) return null;
+    return budgetOutput / budgetVolume * actualVolume;
+  });
+  output26.annual = sum(output26.values);
+}
+
+function recalcCookingManufacturingRateRows() {
+  ["同期", "预算", "26年"].forEach((scenario) => {
+    const amount = dashboardRow("制造费用金额", scenario);
+    const output = dashboardRow("产值", scenario);
+    const rate = dashboardRow("制造费率", scenario);
+    const cumulativeRate = dashboardRow("制造费率累计", scenario);
+    if (!amount || !output) return;
+    const values = amount.values.map((cost, index) => {
+      const outputValue = output.values?.[index];
+      return Number.isFinite(cost) && Number.isFinite(outputValue) && outputValue !== 0 ? cost / outputValue : null;
+    });
+    if (rate) {
+      rate.values = values;
+      rate.annual = lastFinite(cumulativeRate?.values || values);
+    }
+    if (cumulativeRate) {
+      let cumulativeCost = 0;
+      let cumulativeOutput = 0;
+      cumulativeRate.values = amount.values.map((cost, index) => {
+        const outputValue = output.values?.[index];
+        if (Number.isFinite(cost)) cumulativeCost += cost;
+        if (Number.isFinite(outputValue)) cumulativeOutput += outputValue;
+        return cumulativeOutput ? cumulativeCost / cumulativeOutput : null;
+      });
+      cumulativeRate.annual = lastFinite(cumulativeRate.values);
+      if (rate) rate.annual = cumulativeRate.annual;
+    }
+  });
+}
+
+function dashboardRow(label, scenario) {
+  return state.dashboardRows.find((row) => row.label === label && row.scenario === scenario);
+}
+
+function cookingMonthlyResultMap() {
+  const map = new Map();
+  const monthlyResults = COOKING_UNIT.monthlyResults || {};
+  Object.entries(monthlyResults).forEach(([month, result]) => {
+    const monthNumber = Number(month);
+    if (Number.isFinite(monthNumber) && result) {
+      map.set(monthNumber, clonePlain(result));
+    }
+  });
+  if (!map.size && COOKING_UNIT.monthlyResult) {
+    map.set(COOKING_UNIT.monthlyResult.month, clonePlain(COOKING_UNIT.monthlyResult));
+  }
+  return map;
+}
+
+function appendCookingWorkdayRows() {
+  const workdayValues = {
+    "同期": [20, 20, 23, 21, 20, 18, 18, 15, 22, 24, 24, 15],
+    "预算": [20, 20, 23, 21, 14, 22, 17, 16, 22, 20, 21, 14],
+    "26年": [20, 20, 23, 21, 14, 22, 17, 16, 22, 20, 21, 14]
+  };
+  Object.entries(workdayValues).forEach(([scenario, values]) => {
+    if (state.dashboardRows.some((row) => row.label === "工作日" && row.scenario === scenario)) return;
+    state.dashboardRows.push({
+      label: "工作日",
+      metric: "工作日",
+      scenario,
+      unit: "天",
+      values: values.slice(),
+      annual: sum(values),
+      direction: "higher"
+    });
+  });
+}
+
+function appendMissingCookingTargetRows() {
+  const labels = [...new Set(state.dashboardRows.map((row) => row.label))];
+  labels.forEach((label) => {
+    const rows = state.dashboardRows.filter((row) => row.label === label);
+    if (rows.some((row) => row.scenario === "预算" || row.scenario === "目标")) return;
+    const template = rows[0];
+    if (!template) return;
+    state.dashboardRows.push({
+      label,
+      metric: template.metric || label,
+      scenario: "预算",
+      unit: template.unit,
+      values: Array.from({ length: 12 }, () => null),
+      annual: null,
+      direction: template.direction || "lower"
+    });
+  });
+}
+
+function updateUnitChrome(unitId) {
+  for (const button of els.unitButtons || []) {
+    button.classList.toggle("active", button.dataset.unit === unitId);
+  }
+  if (els.unitName) {
+    els.unitName.textContent = unitId === "cooking" ? COOKING_UNIT.name : "洗碗机";
+  }
+  if (els.unitSubtitle) {
+    els.unitSubtitle.textContent = unitId === "cooking"
+      ? "厨电制造费用经营驾驶舱"
+      : "洗碗机制造费用经营驾驶舱";
+  }
+  if (els.unitSource) {
+    els.unitSource.textContent = unitId === "cooking"
+      ? "当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目"
+      : "当前：洗碗机 · 已内置5+7预测、国内财务表、May Actual";
+  }
+  const headerTitle = document.querySelector(".app-header h1");
+  const headerSubtitle = document.querySelector(".app-header p");
+  if (headerTitle) {
+    headerTitle.textContent = unitId === "cooking" ? "厨电制造费用经营驾驶舱" : "洗碗机制造费用经营驾驶舱";
+  }
+  if (headerSubtitle) {
+    headerSubtitle.textContent = unitId === "cooking"
+      ? "整合同期、预算、实际、人数与降费项目，形成费用发生制经营视图"
+      : "导入财务数据，输出全年驾驶舱、月度差异、项目因素";
+  }
+  document.title = unitId === "cooking" ? "厨电制造费用经营驾驶舱" : "洗碗机制造费用经营驾驶舱";
+}
+
+function cookingProjectImpactType(item) {
+  const text = `${item.category || ""} ${item.strategy || ""} ${item.project || ""}`;
+  if (/订单量|规模/.test(text)) return "scale";
+  if (/人工|工资|员工|白领/.test(text)) return "wage";
+  if (/通胀/.test(text)) return "inflation";
+  return "project";
+}
+
+function syncMonthSelectFromState() {
+  const months = [...state.resultByMonth.keys()].sort((a, b) => a - b);
+  if (months.length) {
+    els.monthSelect.innerHTML = months.map((month) => `<option value="${month}">${localizeMonthLabel(month - 1, state.language)}</option>`).join("");
+    els.monthSelect.value = String(months.at(-1));
+  }
+  if (els.factorMonthSelect) {
+    els.factorMonthSelect.innerHTML = Array.from({ length: 12 }, (_, index) => {
+      const month = index + 1;
+      return `<option value="${month}">${localizeMonthLabel(index, state.language)}</option>`;
+    }).join("");
+    els.factorMonthSelect.value = String(state.factorMonth || Number(els.monthSelect.value || 5));
+  }
+}
+
+function syncStatusPills() {
+  els.saveMode.textContent = storeLabel();
+  els.sapStatus.textContent = state.sapFileName ? `${t("importedSap")}: ${state.sapFileName}` : t("waitingSap");
+  els.forecastStatus.textContent = state.forecastFileName ? `${t("importedForecast")}: ${state.forecastFileName}` : t("waitingForecastPill");
+  if (els.jiangStatus) els.jiangStatus.textContent = state.jiangFileName ? `${t("importJiang")}: ${state.jiangFileName}` : t("importJiang");
+  for (const node of [els.sapStatus, els.forecastStatus, els.jiangStatus]) node?.classList.remove("muted", "warning");
+  els.exportBtn.disabled = false;
+}
+
+function cookingInitialAnalyses() {
+  const analyses = {};
+  const monthlyResults = COOKING_UNIT.monthlyResults || {
+    [COOKING_UNIT.monthlyResult.month]: COOKING_UNIT.monthlyResult
+  };
+  for (const [month, result] of Object.entries(monthlyResults)) {
+    for (const row of result?.rows || []) {
+      const key = analysisKey(Number(month), row.code);
+      analyses[key] = {
+        description: row.descCn || row.descEn || "",
+        yoy: row.yoyReason || "",
+        mom: row.budgetReason || ""
+      };
+    }
+  }
+  return analyses;
+}
+
+function clonePlain(value) {
+  return value == null ? value : JSON.parse(JSON.stringify(value));
+}
+
 function bindEvents() {
+  for (const button of document.querySelectorAll("[data-login-role]")) {
+    button.addEventListener("click", () => {
+      for (const option of document.querySelectorAll("[data-login-role]")) option.classList.toggle("active", option === button);
+    });
+  }
+  els.enterWorkspace?.addEventListener("click", () => {
+    const selected = document.querySelector("[data-login-role].active")?.dataset.loginRole || "finance";
+    applyDemoRole(selected, true);
+  });
+  els.switchRoleBtn?.addEventListener("click", () => {
+    els.roleLogin?.classList.remove("hidden");
+  });
   els.sapFile.addEventListener("change", handleSapFileChange);
   els.forecastFile.addEventListener("change", handleForecastFileChange);
   els.jiangFile?.addEventListener("change", handleJiangFileChange);
@@ -794,7 +1224,15 @@ function bindEvents() {
   });
   els.languageSelect.addEventListener("change", () => {
     applyLanguage(els.languageSelect.value);
+    updateUnitChrome(state.activeUnit);
     renderAll();
+  });
+  els.roleSelect?.addEventListener("change", () => {
+    state.rollingRole = els.roleSelect.value || "finance";
+    localStorage.setItem("dwRollingRole.v1", state.rollingRole);
+    state.rollingSelectedCode = null;
+    if (state.rollingRole === "hr") state.rollingViewMode = "fill";
+    renderTable();
   });
   els.userName.addEventListener("input", () => {
     store.setUser(els.userName.value.trim());
@@ -820,6 +1258,17 @@ function bindEvents() {
   els.categoryChart.addEventListener("click", handleChartClick);
   els.addIncreaseBtn.addEventListener("click", () => addFactor("increase"));
   els.addDecreaseBtn?.addEventListener("click", () => addFactor("decrease"));
+  for (const button of els.unitButtons || []) {
+    button.addEventListener("click", () => {
+      if (button.disabled) return;
+      switchBusinessUnit(button.dataset.unit);
+    });
+  }
+  els.sidebarToggle?.addEventListener("click", () => {
+    const collapsed = !els.businessShell?.classList.contains("sidebar-collapsed");
+    setSidebarCollapsed(collapsed);
+    localStorage.setItem("dw.sidebarCollapsed", collapsed ? "1" : "0");
+  });
   els.factorMonthSelect?.addEventListener("change", () => {
     state.factorMonth = Number(els.factorMonthSelect.value) || 4;
     renderFactors();
@@ -975,6 +1424,13 @@ function baselineAsActual(source) {
 }
 
 function varianceCostLabels() {
+  if (state.activeUnit === "cooking") {
+    return {
+      same: "同期费用 K€",
+      previous: "预算/预测费用 K€",
+      current: "26实际费用 K€"
+    };
+  }
   const month = Number(state.result?.month || els.monthSelect.value || 1);
   const previousMonth = month === 1 ? 12 : month - 1;
   const currentBasis = month <= state.actualMonthCount ? "actual" : "forecast";
@@ -1110,14 +1566,15 @@ function renderDashboard() {
   let lastLabel = "";
   els.dashboardBody.innerHTML = rows.map((row) => {
     const localized = localizeDashboardRow(row, state.language);
+    const displayScenario = state.activeUnit === "cooking" && row.scenario === "预算" ? "目标" : localized.scenario;
     const family = metricFamily(row.label);
-    const showLabel = row.label !== lastLabel;
+    const showLabel = state.activeUnit === "cooking" || row.label !== lastLabel;
     lastLabel = row.label;
     return `
       <tr class="dashboard-row family-${family}">
         <td class="sticky-col sticky-col-1"><span class="group-chip">${escapeHtml(metricFamilyLabel(family))}</span></td>
         <td class="merged-label sticky-col sticky-col-2">${showLabel ? escapeHtml(localized.label) : ""}</td>
-        <td class="sticky-col sticky-col-3"><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
+        <td class="sticky-col sticky-col-3"><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(displayScenario)}</span></td>
         <td class="sticky-col sticky-col-4">${escapeHtml(localized.unit)}</td>
         ${row.values.map((value, index) => {
           const tooltip = metricTooltip(row, index);
@@ -1176,7 +1633,7 @@ function renderMetricFilters() {
 
 function visibleDashboardRows() {
   const monthIndex = state.metricMonth === "all" ? null : Number(state.metricMonth);
-  return state.dashboardRows.filter((row) => {
+  const rows = state.dashboardRows.filter((row) => {
     if (state.dashboardGroup !== "all" && metricFamily(row.label) !== state.dashboardGroup) return false;
     if (state.metricIndicator !== "all" && row.label !== state.metricIndicator) return false;
     if (state.metricScenario !== "all" && row.scenario !== state.metricScenario) return false;
@@ -1186,6 +1643,32 @@ function visibleDashboardRows() {
     }
     return true;
   });
+  return sortDashboardRowsForComparison(rows);
+}
+
+function sortDashboardRowsForComparison(rows) {
+  const preferredMetrics = dashboardMetricsForGroup();
+  const metricOrder = new Map(preferredMetrics.map((label, index) => [label, index]));
+  const fallbackMetricOrder = new Map();
+  state.dashboardRows.forEach((row) => {
+    if (!fallbackMetricOrder.has(row.label)) fallbackMetricOrder.set(row.label, fallbackMetricOrder.size);
+  });
+  return rows.slice().sort((a, b) => {
+    const metricA = metricOrder.has(a.label) ? metricOrder.get(a.label) : preferredMetrics.length + (fallbackMetricOrder.get(a.label) || 0);
+    const metricB = metricOrder.has(b.label) ? metricOrder.get(b.label) : preferredMetrics.length + (fallbackMetricOrder.get(b.label) || 0);
+    if (metricA !== metricB) return metricA - metricB;
+    const scenarioDiff = scenarioCompareOrder(a.scenario) - scenarioCompareOrder(b.scenario);
+    if (scenarioDiff !== 0) return scenarioDiff;
+    return fallbackMetricOrder.get(a.label) - fallbackMetricOrder.get(b.label);
+  });
+}
+
+function scenarioCompareOrder(scenario) {
+  if (scenario === "同期") return 0;
+  if (scenario === "预算" || scenario === "目标") return 1;
+  if (scenario === "26年") return 2;
+  if (scenario === "差额" || scenario === "累计差额") return 3;
+  return 9;
 }
 
 function metricFamily(labelText) {
@@ -1394,13 +1877,16 @@ function buildAnnualSummaryText() {
   const direction = unitDiff <= 0 ? t("better") : t("worse");
   const unit = t("unitEuroPc");
   const categories = topCats || t("annualTopCategoryFallback");
+  const businessName = state.activeUnit === "cooking" ? "厨电" : "洗碗机";
   if (state.language === "en") {
-    return `2026 dishwasher full-year rolling forecast unit manufacturing cost is ${formatUnit(stats.unit26)} ${unit}, ${direction} vs same period by ${formatPercent(Math.abs(ratio))}; MFG impact is ${formatMoney(impact)} K€. Main variance categories: ${categories}.`;
+    const englishName = state.activeUnit === "cooking" ? "cooking appliance" : "dishwasher";
+    return `2026 ${englishName} full-year rolling forecast unit manufacturing cost is ${formatUnit(stats.unit26)} ${unit}, ${direction} vs same period by ${formatPercent(Math.abs(ratio))}; MFG impact is ${formatMoney(impact)} K€. Main variance categories: ${categories}.`;
   }
   if (state.language === "tr") {
-    return `2026 bulaşık makinesi tam yıl hareketli tahmin birim üretim gideri ${formatUnit(stats.unit26)} ${unit}; aynı döneme göre ${direction}: ${formatPercent(Math.abs(ratio))}. Üretim gideri etkisi ${formatMoney(impact)} K€. Ana fark kategorileri: ${categories}.`;
+    const turkishName = state.activeUnit === "cooking" ? "pişirme cihazları" : "bulaşık makinesi";
+    return `2026 ${turkishName} tam yıl hareketli tahmin birim üretim gideri ${formatUnit(stats.unit26)} ${unit}; aynı döneme göre ${direction}: ${formatPercent(Math.abs(ratio))}. Üretim gideri etkisi ${formatMoney(impact)} K€. Ana fark kategorileri: ${categories}.`;
   }
-  return `2026年洗碗机全年滚动预测单台制造费为 ${formatUnit(stats.unit26)} ${unit}，较同期${direction} ${formatPercent(Math.abs(ratio))}，对应制造费影响 ${formatMoney(impact)} K€。主要差异集中在 ${categories}。`;
+  return `2026年${businessName}全年滚动预测单台制造费为 ${formatUnit(stats.unit26)} ${unit}，较同期${direction} ${formatPercent(Math.abs(ratio))}，对应制造费影响 ${formatMoney(impact)} K€。主要差异集中在 ${categories}。`;
 }
 
 function annualCategoryDiffs() {
@@ -1905,6 +2391,12 @@ function renderTable() {
   const collapsedCount = state.result.unsplitCategories?.length || 0;
   const collapsedText = collapsedCount ? ` · ${t("collapsedCategoryCompare").replace("{count}", collapsedCount)}` : "";
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedText}`;
+  if (state.rollingRole === "hr") {
+    varianceView?.classList.remove("show-legacy-variance");
+    renderRollingForecastWorkspace(rows);
+    if (els.detailBody) els.detailBody.innerHTML = "";
+    return;
+  }
   varianceView?.classList.toggle("show-legacy-variance", state.rollingViewMode === "variance");
   if (state.rollingViewMode === "variance") {
     renderVarianceAnalysisWorkspace();
@@ -1972,10 +2464,38 @@ function bindVarianceAnalysisRows() {
 const ROLLING_FORECAST_MONTHS = [6, 7, 8, 9, 10, 11, 12];
 const ROLLING_FORECAST_DRAFT_KEY = "dwRollingForecastDrafts.v1";
 const ROLLING_FORECAST_SUBMIT_KEY = "dwRollingForecastSubmitted.v1";
+const HR_BUDGET_DRIVER_KEY = "dwHrBudgetDrivers.v1";
+const HR_BUDGET_INPUT_KEY = "dwHrBudgetInputs.v2";
+const HR_BUDGET_AUDIT_KEY = "dwHrBudgetAudit.v1";
+const HR_BUDGET_DEFAULTS = {
+  reviewMonth: 6,
+  reviewHeadcount: 374,
+  reviewWorkdays: 21
+};
+let hrBudgetDrivers = loadHrBudgetDrivers();
+let hrBudgetView = "drivers";
+let hrBudgetInputView = "headcount";
+let hrBudgetInputs = loadHrBudgetInputs();
+let hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
+let hrBudgetAudit = loadHrBudgetAudit();
+const ROLLING_ROLE_LABELS = {
+  finance: "财务管理员",
+  hr: "HR 人力",
+  procurement: "行政/间接采购",
+  leader: "经营负责人",
+  readonly: "只读访客"
+};
+const ROLLING_ROLE_SCOPE = {
+  finance: "全部科目可见，价格、数量、总额、原因均可维护。",
+  hr: "只显示人力/数量相关科目，可维护数量和数量责任人。",
+  procurement: "只显示采购、行政、维修、工作服、能源和服务类科目，可维护价格、总额和明细。",
+  leader: "全部科目可见，只维护差异原因和审核意见。",
+  readonly: "全部科目只读。"
+};
 const ROLLING_FORECAST_TEXT = {
   zh: {
     title: "滚动预测协作区",
-    subtitle: "6-12月预测在这里直接维护；单价和数量为空时，总额沿用4+8预测。",
+    subtitle: "6-12月预测在这里直接维护；单价和数量为空时，总额沿用5+7预测。",
     myTasks: "我的任务",
     allTasks: "全部任务",
     ownerMissing: "责任人缺失",
@@ -1995,7 +2515,7 @@ const ROLLING_FORECAST_TEXT = {
     continueFill: "继续填",
     view: "查看",
     ownerNeeded: "待填责任人",
-    usesForecast: "沿用4+8",
+    usesForecast: "沿用5+7",
     byFormula: "单价×数量",
     byTotal: "手填总价",
     draft: "草稿",
@@ -2008,7 +2528,7 @@ const ROLLING_FORECAST_TEXT = {
     totalOwner: "总价责任人",
     reviewer: "审核责任人",
     month: "月份",
-    forecast48: "4+8预测",
+    forecast48: "5+7预测",
     unitPrice: "单价",
     quantity: "数量",
     totalAmount: "总价",
@@ -2028,8 +2548,8 @@ const ROLLING_FORECAST_TEXT = {
     reasonPlaceholder: "填写原因、责任、行动和预计影响",
     warning: "预警",
     noWarning: "正常",
-    formulaHint: "单价和数量为空时，滚动预测总额保持4+8；两者都填写后，总额=单价×数量。",
-    totalModeHint: "该科目单价不统一，请上传明细并填写总价；总价为空时，滚动预测总额保持4+8。",
+    formulaHint: "单价和数量为空时，滚动预测总额保持5+7；两者都填写后，总额=单价×数量。",
+    totalModeHint: "该科目单价不统一，请上传明细并填写总价；总价为空时，滚动预测总额保持5+7。",
     completion: "填写完整度",
     saved: "滚动预测草稿已保存",
     submittedToast: "滚动预测已提交",
@@ -2041,7 +2561,7 @@ const ROLLING_FORECAST_TEXT = {
   },
   en: {
     title: "Rolling Forecast Hub",
-    subtitle: "Maintain Jun-Dec forecast here. When unit price and quantity are blank, total keeps the 4+8 forecast.",
+    subtitle: "Maintain Jun-Dec forecast here. When unit price and quantity are blank, total keeps the 5+7 forecast.",
     myTasks: "My Tasks",
     allTasks: "All Tasks",
     ownerMissing: "Owner Missing",
@@ -2061,7 +2581,7 @@ const ROLLING_FORECAST_TEXT = {
     continueFill: "Continue",
     view: "View",
     ownerNeeded: "Owner Needed",
-    usesForecast: "Use 4+8",
+    usesForecast: "Use 5+7",
     byFormula: "Unit x Qty",
     byTotal: "Manual Total",
     draft: "Draft",
@@ -2074,7 +2594,7 @@ const ROLLING_FORECAST_TEXT = {
     totalOwner: "Total Owner",
     reviewer: "Reviewer",
     month: "Month",
-    forecast48: "4+8 Forecast",
+    forecast48: "5+7 Forecast",
     unitPrice: "Unit Price",
     quantity: "Quantity",
     totalAmount: "Total Amount",
@@ -2094,8 +2614,8 @@ const ROLLING_FORECAST_TEXT = {
     reasonPlaceholder: "Enter reason, owner, action and estimated impact",
     warning: "Warning",
     noWarning: "OK",
-    formulaHint: "Blank unit price and quantity keep the 4+8 total. When both are filled, total = unit price x quantity.",
-    totalModeHint: "This account has no unified unit price. Upload the detail file and fill the total amount. Blank total keeps the 4+8 forecast.",
+    formulaHint: "Blank unit price and quantity keep the 5+7 total. When both are filled, total = unit price x quantity.",
+    totalModeHint: "This account has no unified unit price. Upload the detail file and fill the total amount. Blank total keeps the 5+7 forecast.",
     completion: "Completion",
     saved: "Rolling forecast drafts saved",
     submittedToast: "Rolling forecast submitted",
@@ -2107,7 +2627,7 @@ const ROLLING_FORECAST_TEXT = {
   },
   tr: {
     title: "Dönen Tahmin Merkezi",
-    subtitle: "Haziran-Aralık tahmini burada tutulur. Birim fiyat ve miktar boşsa toplam 4+8 tahmini olarak kalır.",
+    subtitle: "Haziran-Aralık tahmini burada tutulur. Birim fiyat ve miktar boşsa toplam 5+7 tahmini olarak kalır.",
     myTasks: "Görevlerim",
     allTasks: "Tüm Görevler",
     ownerMissing: "Sorumlu Eksik",
@@ -2127,7 +2647,7 @@ const ROLLING_FORECAST_TEXT = {
     continueFill: "Devam",
     view: "Görüntüle",
     ownerNeeded: "Sorumlu Gerekli",
-    usesForecast: "4+8 kullan",
+    usesForecast: "5+7 kullan",
     byFormula: "Birim x Miktar",
     byTotal: "Manuel Toplam",
     draft: "Taslak",
@@ -2140,7 +2660,7 @@ const ROLLING_FORECAST_TEXT = {
     totalOwner: "Toplam Sorumlusu",
     reviewer: "Kontrol Eden",
     month: "Ay",
-    forecast48: "4+8 Tahmin",
+    forecast48: "5+7 Tahmin",
     unitPrice: "Birim Fiyat",
     quantity: "Miktar",
     totalAmount: "Toplam Tutar",
@@ -2160,8 +2680,8 @@ const ROLLING_FORECAST_TEXT = {
     reasonPlaceholder: "Neden, sorumlu, aksiyon ve tahmini etki girin",
     warning: "Uyarı",
     noWarning: "Normal",
-    formulaHint: "Birim fiyat ve miktar boşsa toplam 4+8 olarak kalır. İkisi de doluysa toplam = birim fiyat x miktar.",
-    totalModeHint: "Bu hesabın tek bir birim fiyatı yok. Detay dosyasını yükleyin ve toplam tutarı girin. Toplam boşsa 4+8 tahmini kullanılır.",
+    formulaHint: "Birim fiyat ve miktar boşsa toplam 5+7 olarak kalır. İkisi de doluysa toplam = birim fiyat x miktar.",
+    totalModeHint: "Bu hesabın tek bir birim fiyatı yok. Detay dosyasını yükleyin ve toplam tutarı girin. Toplam boşsa 5+7 tahmini kullanılır.",
     completion: "Tamamlanma",
     saved: "Dönen tahmin taslakları kaydedildi",
     submittedToast: "Dönen tahmin gönderildi",
@@ -2175,18 +2695,29 @@ const ROLLING_FORECAST_TEXT = {
 
 function renderRollingForecastWorkspace(rows) {
   if (!els.forecastWorkspace) return;
+  document.body.classList.toggle("hr-budget-mode", state.rollingRole === "hr");
+  refreshProductNavigation();
+  if (state.rollingRole === "hr") {
+    renderHrBudgetWorkspace();
+    return;
+  }
   const accountRows = rows.filter((row) => row.code);
   if (!accountRows.length) {
     els.forecastWorkspace.innerHTML = `<div class="empty-cell">${rfT("noTask")}</div>`;
     return;
   }
-  if (!state.rollingSelectedCode || !accountRows.some((row) => row.code === state.rollingSelectedCode)) {
-    state.rollingSelectedCode = accountRows[0].code;
-  }
   const allMeta = accountRows.map((row) => rollingRowMeta(row));
-  const filteredMeta = allMeta.filter((item) => rollingFilterMatches(item));
+  const roleMeta = allMeta.filter((item) => rollingRoleCanView(item.row));
+  if (!roleMeta.length) {
+    els.forecastWorkspace.innerHTML = `<div class="empty-cell">${escapeHtml(rollingRoleScope())}</div>`;
+    return;
+  }
+  if (!state.rollingSelectedCode || !roleMeta.some((item) => item.row.code === state.rollingSelectedCode)) {
+    state.rollingSelectedCode = roleMeta[0].row.code;
+  }
+  const filteredMeta = roleMeta.filter((item) => rollingFilterMatches(item));
   const selectedMeta = allMeta.find((item) => item.row.code === state.rollingSelectedCode) || allMeta[0];
-  const stats = rollingStats(allMeta);
+  const stats = rollingStats(roleMeta);
   els.forecastWorkspace.innerHTML = `
     <div class="rf-shell">
       <div class="rf-header">
@@ -2199,9 +2730,13 @@ function renderRollingForecastWorkspace(rows) {
             <button type="button" class="${state.rollingViewMode === "fill" ? "active" : ""}" data-rf-view-mode="fill">${escapeHtml(rfT("fillMode"))}</button>
             <button type="button" class="${state.rollingViewMode === "variance" ? "active" : ""}" data-rf-view-mode="variance">${escapeHtml(rfT("varianceMode"))}</button>
           </div>
-          <button type="button" class="ghost-button" data-rf-action="save-all">${escapeHtml(rfT("saveAll"))}</button>
-          <button type="button" data-rf-action="submit-all">${escapeHtml(rfT("submitAll"))}</button>
+          <button type="button" class="ghost-button" data-rf-action="save-all" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfT("saveAll"))}</button>
+          <button type="button" data-rf-action="submit-all" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfT("submitAll"))}</button>
         </div>
+      </div>
+      <div class="rf-role-strip">
+        <span><strong>${escapeHtml(rollingRoleLabel())}</strong> · ${escapeHtml(rollingRoleScope())}</span>
+        <span>可见 ${roleMeta.length}/${allMeta.length} 个小科目</span>
       </div>
       <div class="rf-stats">
         ${rfStat(rfT("myTasks"), stats.myTasks)}
@@ -2230,6 +2765,481 @@ function renderRollingForecastWorkspace(rows) {
   `;
 }
 
+function loadHrBudgetDrivers() {
+  try {
+    return { ...HR_BUDGET_DEFAULTS, ...JSON.parse(localStorage.getItem(HR_BUDGET_DRIVER_KEY) || "{}") };
+  } catch {
+    return { ...HR_BUDGET_DEFAULTS };
+  }
+}
+
+function defaultHrBudgetInputs() {
+  const data = hrBudgetData();
+  return {
+    headcount: {
+      direct: [...(data.headcountByPosition?.direct || Array(12).fill(0))],
+      indirect: [...(data.headcountByPosition?.indirect || Array(12).fill(0))],
+      whiteCollar: [...(data.headcountByPosition?.whiteCollar || Array(12).fill(0))]
+    },
+    calendar: {
+      workingDays: [...(data.workingDays || Array(12).fill(0))],
+      realHoursPerDay: [...(data.realHoursPerDay || Array(12).fill(0))],
+      paidHoursPerDay: [...(data.paidHoursPerDay || Array(12).fill(0))]
+    },
+    policy: {
+      wageRates: (data.wageIncreaseStages || []).map((item) => Number(item.rate || 0))
+    },
+    notes: ""
+  };
+}
+
+function loadHrBudgetInputs() {
+  const defaults = defaultHrBudgetInputs();
+  try {
+    const saved = JSON.parse(localStorage.getItem(HR_BUDGET_INPUT_KEY) || "null");
+    if (!saved) return defaults;
+    return {
+      headcount: { ...defaults.headcount, ...(saved.headcount || {}) },
+      calendar: { ...defaults.calendar, ...(saved.calendar || {}) },
+      policy: { ...defaults.policy, ...(saved.policy || {}) },
+      notes: saved.notes || ""
+    };
+  } catch {
+    return defaults;
+  }
+}
+
+function saveHrBudgetInputs() {
+  localStorage.setItem(HR_BUDGET_INPUT_KEY, JSON.stringify(hrBudgetInputs));
+}
+
+function cloneHrBudgetInputs(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function loadHrBudgetAudit() {
+  try {
+    return JSON.parse(localStorage.getItem(HR_BUDGET_AUDIT_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveHrBudgetAudit() {
+  localStorage.setItem(HR_BUDGET_AUDIT_KEY, JSON.stringify(hrBudgetAudit));
+}
+
+function hrBudgetChanges(fromInputs, toInputs) {
+  const data = hrBudgetData();
+  const definitions = [
+    ["headcount", "direct", "直接蓝领", "人"],
+    ["headcount", "indirect", "间接蓝领", "人"],
+    ["headcount", "whiteCollar", "白领", "人"],
+    ["calendar", "workingDays", "工作日", "天"],
+    ["calendar", "realHoursPerDay", "每日实际工时", "小时"],
+    ["calendar", "paidHoursPerDay", "每日计薪工时", "小时"],
+    ["policy", "wageRates", "工资增长率", "%"]
+  ];
+  const changes = [];
+  for (const [section, key, label, unit] of definitions) {
+    const beforeValues = fromInputs?.[section]?.[key] || [];
+    const afterValues = toInputs?.[section]?.[key] || [];
+    const length = Math.max(beforeValues.length, afterValues.length);
+    for (let index = 0; index < length; index += 1) {
+      const before = Number(beforeValues[index] || 0);
+      const after = Number(afterValues[index] || 0);
+      if (Math.abs(before - after) < 0.0001) continue;
+      const policyStage = data.wageIncreaseStages?.[index]?.label;
+      changes.push({
+        section,
+        key,
+        index,
+        label,
+        period: section === "policy" ? (policyStage || `阶段${index + 1}`) : `${index + 1}月`,
+        unit,
+        before,
+        after
+      });
+    }
+  }
+  return changes;
+}
+
+function hrBudgetCellState(section, key, index) {
+  const standard = Number(defaultHrBudgetInputs()?.[section]?.[key]?.[index] || 0);
+  const current = Number(hrBudgetInputs?.[section]?.[key]?.[index] || 0);
+  const delta = current - standard;
+  return { standard, current, delta, changed: Math.abs(delta) >= 0.0001 };
+}
+
+function legacyHrBudgetMonths() {
+  const workdays = [21, 21, 20, 21, 20, 21, 22, 21, 21, 22, 21, 22];
+  const d = hrBudgetDrivers;
+  return workdays.map((days, index) => {
+    const attendance = days / Math.max(1, d.workdays);
+    const salary = d.headcount * d.salaryBase * attendance / 10000;
+    const employerTax = salary * d.employerTaxRate / 100;
+    const uniform = d.headcount * 2 * 210 / 12 / 10000 * (index === 6 ? 1.101 : 1);
+    const meal = d.headcount * d.mealRate * days / 10000;
+    const overtime = d.headcount * (d.salaryBase / 174) * d.overtimeHours * d.overtimeMultiplier / 100 / 10000;
+    const social = salary * 0.151;
+    const welfare = salary * 0.04;
+    return { salary, employerTax, uniform, meal, overtime, social, welfare };
+  });
+}
+
+function legacyRenderHrBudgetWorkspace() {
+  const months = hrBudgetMonths();
+  const rows = [
+    ["salary", "间接员工工资", "系统", "人力编制 × 月度薪资基数 × 出勤系数"],
+    ["employerTax", "雇主税费", "系统", "间接员工工资 × 雇主税费比例"],
+    ["uniform", "工作服", "人力/行政", "人数 × 年发放次数 × 单价"],
+    ["meal", "餐补", "人力", "人数 × 餐补标准 × 工作日"],
+    ["overtime", "加班费", "人力", "人数 × 时薪 × 加班小时 × 倍率"],
+    ["social", "社保", "系统", "工资基数 × 社保标准"],
+    ["welfare", "福利费", "人力", "工资基数 × 福利标准"]
+  ];
+  const total = rows.reduce((sum, [key]) => sum + months.reduce((acc, month) => acc + month[key], 0), 0);
+  const exceptions = 2;
+  els.forecastWorkspace.innerHTML = `
+    <div class="hrb-shell">
+      <header class="hrb-header">
+        <div>
+          <div class="hrb-breadcrumb">第二张表 / 月度差异分析 / 预算 / 人力费用</div>
+          <h3>人力预算工作台</h3>
+          <p>系统按标准自动计算，责任人只需校核参数、异常和调整原因。</p>
+        </div>
+        <div class="hrb-header-actions">
+          <span class="hrb-permission">人力预算责任人 · 仅显示人力科目</span>
+          <button type="button" class="ghost-button" data-hr-action="save">保存草稿</button>
+          <button type="button" data-hr-action="submit">提交人力预算</button>
+        </div>
+      </header>
+      <nav class="hrb-view-tabs" aria-label="人力预算视图">
+        <button type="button" class="${hrBudgetView === "drivers" ? "active" : ""}" data-hr-view="drivers">预算编制</button>
+        <button type="button" class="${hrBudgetView === "exceptions" ? "active" : ""}" data-hr-view="exceptions">异常校核 <span>${exceptions}</span></button>
+        <button type="button" data-hr-view="audit">审批记录</button>
+      </nav>
+      ${hrBudgetView === "exceptions" ? hrBudgetExceptionView(rows, months, total) : hrBudgetDriverView(rows, months, total)}
+    </div>
+  `;
+}
+
+function legacyHrBudgetDriverView(rows, months, total) {
+  const fields = [
+    ["headcount", "间接人员编制（期末）", "人", "系统", "取自组织人事系统"],
+    ["workdays", "工作日天数", "天", "系统", "取自当月日历"],
+    ["bcShifts", "其中：BC班天数", "天", "系统", "按排班日历统计"],
+    ["wcShifts", "其中：WC班天数", "天", "系统", "按排班日历统计"],
+    ["salaryBase", "月度薪资基数", "元/人", "可编辑", "含基本工资和岗位津贴"],
+    ["employerTaxRate", "雇主税费比例", "%", "可编辑", "含社保、公积金及其他"],
+    ["mealRate", "餐补标准", "元/人/天", "可编辑", "出勤日享受"],
+    ["uniformCycle", "工作服更换周期", "月", "可编辑", "按月摊销"],
+    ["overtimeHours", "加班小时数", "小时/人", "可编辑", "当月人均加班小时"],
+    ["overtimeMultiplier", "加班费倍率", "%", "系统", "按公司制度"]
+  ];
+  return `
+    <div class="hrb-layout">
+      <section class="hrb-drivers">
+        <div class="hrb-section-title"><div><h4>预算驱动（2026年6月）</h4><p>蓝色为系统数据，绿色字段可由人力责任人校核。</p></div><span>10 项参数</span></div>
+        <div class="hrb-driver-table">
+          ${fields.map(([key, label, unit, source, note]) => `
+            <label class="hrb-driver-row">
+              <span><b>${label}</b><small>${note}</small></span>
+              <span class="hrb-input-wrap"><input type="number" step="0.01" data-hr-driver="${key}" value="${escapeHtml(hrBudgetDrivers[key])}" ${source === "系统" ? "disabled" : ""}/><em>${unit}</em></span>
+              <i class="${source === "系统" ? "system" : "editable"}">${source}</i>
+            </label>`).join("")}
+        </div>
+      </section>
+      <section class="hrb-results">
+        <div class="hrb-section-title"><div><h4>预算结果（按小科目）</h4><p>单位：万元；1-5月为基准，6-12月为预算。</p></div><strong>${formatMoney(total)} 万元</strong></div>
+        ${hrBudgetResultTable(rows, months)}
+      </section>
+    </div>
+    ${hrBudgetFormulaPanel(months)}
+  `;
+}
+
+function legacyHrBudgetResultTable(rows, months) {
+  return `<div class="hrb-result-wrap"><table class="hrb-result-table"><thead><tr><th>小科目</th>${Array.from({ length: 12 }, (_, index) => `<th class="${index < 5 ? "actual" : "forecast"}">${index + 1}月</th>`).join("")}<th>全年预算</th><th>校核状态</th></tr></thead><tbody>${rows.map(([key, label]) => {
+    const annual = months.reduce((sum, month) => sum + month[key], 0);
+    const pending = key === "uniform" || key === "overtime";
+    return `<tr><th>${label}</th>${months.map((month, index) => `<td class="${index < 5 ? "actual" : "forecast"}">${formatMoney(month[key])}</td>`).join("")}<td><strong>${formatMoney(annual)}</strong></td><td><span class="hrb-status ${pending ? "pending" : "ok"}">${pending ? "需校核" : "已通过"}</span></td></tr>`;
+  }).join("")}</tbody></table></div>`;
+}
+
+function legacyHrBudgetFormulaPanel(months) {
+  const current = months[5];
+  return `<section class="hrb-formula"><div><span>公式追溯 · 当前选择：间接员工工资（6月）</span><strong>${hrBudgetDrivers.headcount} 人 × ${formatMoney(hrBudgetDrivers.salaryBase)} 元/人 × ${hrBudgetDrivers.workdays}/${hrBudgetDrivers.workdays} 天 = ${formatMoney(current.salary)} 万元</strong><small>人数来源：组织人事系统　|　工资基数：人力校核　|　工作日：系统日历</small></div><label><span>差异说明</span><textarea placeholder="仅在调整系统建议时填写原因、依据和影响范围"></textarea></label></section>`;
+}
+
+function legacyHrBudgetExceptionView(rows, months, total) {
+  return `<div class="hrb-exception-layout"><section class="hrb-exception-main"><div class="hrb-summary-strip"><div><span>人力费用科目</span><strong>7</strong></div><div><span>自动通过</span><strong class="good">5</strong></div><div><span>需人工校核</span><strong class="warn">2</strong></div><div><span>预算总额</span><strong>${formatMoney(total)}</strong><small>万元</small></div></div>${hrBudgetResultTable(rows, months)}<div class="hrb-exception-detail"><div><h4>工作服 · 7月异常</h4><p>系统建议 1.19 万元，责任人调整后 1.31 万元，差异 +10.1%</p></div><div class="hrb-calc-box"><span>系统计算</span><strong>34 人 × 2 次/年 × 210 元/件 = 14,280 元/年</strong><small>人数取自人力编制，单价取自采购标准</small></div><label><span>调整后单价（元/件）</span><input value="232" /></label><label class="grow"><span>调整原因</span><input value="供应商价格上调" /></label></div></section><aside class="hrb-approval"><h4>预算审批进度</h4><ol><li class="done"><b>系统计算</b><span>2026-07-13 09:15</span><small>自动完成标准预算</small></li><li class="current"><b>人力校核</b><span>当前节点</span><small>请核对异常并完善原因</small></li><li><b>财务复核</b><span>待处理</span></li><li><b>预算发布</b><span>待处理</span></li></ol><h4>操作记录</h4><p>10:20　张三调整工作服7月单价</p><p>10:18　张三填写调整原因</p></aside></div>`;
+}
+
+function hrBudgetData() {
+  return window.HR_BUDGET_REAL_DATA || {
+    months: Array.from({ length: 12 }, (_, index) => `${index + 1}月`),
+    eurTry: Array(12).fill(1),
+    activeHeadcount: Array(12).fill(0),
+    workingDays: Array(12).fill(0),
+    realHoursPerDay: Array(12).fill(0),
+    paidHoursPerDay: Array(12).fill(0),
+    accounts: [],
+    missingSourceItems: []
+  };
+}
+
+function formatHrEur(value, digits = 0) {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  }).format(Number(value || 0));
+}
+
+function hrBudgetAnnualTotal(data = hrBudgetData()) {
+  return (data.accounts || []).reduce((sum, account) => sum + Number(account.annual || 0), 0);
+}
+
+function renderHrBudgetWorkspace() {
+  if (state.activeUnit !== "dishwasher") {
+    if (unitSnapshots.dishwasher) restoreUnitSnapshot("dishwasher");
+    else state.activeUnit = "dishwasher";
+    updateUnitChrome("dishwasher");
+  }
+  const data = hrBudgetData();
+  const total = hrBudgetAnnualTotal(data);
+  const needsReview = (data.accounts || []).filter((account) => ["overtime", "cashAid", "indemnity"].includes(account.key)).length;
+  let content = hrBudgetDriverView(data, total);
+  if (hrBudgetView === "exceptions") content = hrBudgetExceptionView(data, total);
+  if (hrBudgetView === "audit") content = hrBudgetAuditView(data);
+  els.forecastWorkspace.innerHTML = `
+    <div class="hrb-shell">
+      <header class="hrb-header">
+        <div>
+          <div class="hrb-breadcrumb">第二张表 / 月度差异分析 / 预算 / 人力费用</div>
+          <h3>DW 人力预算工作台</h3>
+          <p>按 Excel 人员底表与参数自动计算，责任人负责填写变动、核对结果并处理异常。</p>
+        </div>
+        <div class="hrb-header-actions">
+          <span class="hrb-permission">人力角色 · 仅显示人力预算</span>
+          <button type="button" class="ghost-button" data-hr-action="save">保存校核</button>
+          <button type="button" data-hr-action="submit">提交人力预算</button>
+        </div>
+      </header>
+      <div class="hrb-source-banner">
+        <div><b>测试假设映射</b><span>${escapeHtml(data.sourceOrganization)} → ${escapeHtml(data.mappedBusiness)}</span></div>
+        <p>${escapeHtml(data.mappingNote)}</p>
+        <span class="hrb-tag source">源文件真实数</span>
+      </div>
+      <nav class="hrb-view-tabs" aria-label="人力预算视图">
+        <button type="button" class="${hrBudgetView === "drivers" ? "active" : ""}" data-hr-view="drivers">基础数据与预算</button>
+        <button type="button" class="${hrBudgetView === "exceptions" ? "active" : ""}" data-hr-view="exceptions">异常校核 <span>${needsReview}</span></button>
+        <button type="button" class="${hrBudgetView === "audit" ? "active" : ""}" data-hr-view="audit">审批记录</button>
+      </nav>
+      ${content}
+    </div>
+  `;
+}
+
+function hrBudgetInputWorkbench(data) {
+  const views = [
+    ["headcount", "人数计划"],
+    ["calendar", "工作日与工时"],
+    ["policy", "工资政策"],
+    ["notes", "调整说明"]
+  ];
+  let body = hrBudgetHeadcountInputs(data);
+  if (hrBudgetInputView === "calendar") body = hrBudgetCalendarInputs(data);
+  if (hrBudgetInputView === "policy") body = hrBudgetPolicyInputs(data);
+  if (hrBudgetInputView === "notes") body = hrBudgetNotesInput();
+  const pendingChanges = hrBudgetChanges(hrBudgetSavedInputs, hrBudgetInputs);
+  const standardChanges = hrBudgetChanges(defaultHrBudgetInputs(), hrBudgetInputs);
+  return `<section class="hrb-input-workbench">
+    <div class="hrb-input-header">
+      <div><span>HR INPUT</span><h4>人力责任人填报区</h4><p>灰字为 Excel 预算标准，绿色为校核值；偏离标准必须填写理由并留痕。</p></div>
+      <div class="hrb-input-actions"><span class="hrb-tag editable">可编辑</span><button type="button" class="ghost-button" data-hr-input-action="reset">恢复Excel原值</button><button type="button" data-hr-action="save">保存校核</button></div>
+    </div>
+    <div class="hrb-input-tabs">${views.map(([key, label]) => `<button type="button" class="${hrBudgetInputView === key ? "active" : ""}" data-hr-input-view="${key}">${label}</button>`).join("")}</div>
+    <div class="hrb-input-body">${body}</div>
+    ${hrBudgetChangeGate(pendingChanges, standardChanges)}
+  </section>`;
+}
+
+function hrBudgetChangeGate(pendingChanges, standardChanges) {
+  if (!pendingChanges.length) {
+    return `<div class="hrb-change-gate clear"><div><b>当前无未保存变更</b><span>${standardChanges.length ? `已有 ${standardChanges.length} 项已记录偏差，可在“审批记录”中追溯。` : "当前校核值与 Excel 预算标准一致。"}</span></div><span class="hrb-status ok">已对齐</span></div>`;
+  }
+  const preview = pendingChanges.slice(0, 3).map((item) => `${item.period}${item.label} ${formatHrEur(item.before, 2)} → ${formatHrEur(item.after, 2)}`).join("；");
+  return `<div class="hrb-change-gate pending"><div class="hrb-change-summary"><b>${pendingChanges.length} 项待保存变更</b><span>${escapeHtml(preview)}${pendingChanges.length > 3 ? "……" : ""}</span></div><label><span>调整理由 <em>必填</em></span><textarea data-hr-input-notes placeholder="说明调整原因、依据和影响月份">${escapeHtml(hrBudgetInputs.notes || "")}</textarea></label></div>`;
+}
+
+function hrBudgetHeadcountInputs(data) {
+  const rows = [
+    ["direct", "直接蓝领", "BC Direct"],
+    ["indirect", "间接蓝领", "BC Indirect"],
+    ["whiteCollar", "白领", "White Collar"]
+  ];
+  const totals = Array.from({ length: 12 }, (_, index) => rows.reduce((sum, [key]) => sum + Number(hrBudgetInputs.headcount[key]?.[index] || 0), 0));
+  return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>人员类别</th>${data.months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}<th>全年平均</th></tr></thead><tbody>${rows.map(([key, label, source]) => `<tr><th><b>${label}</b><small>${source}</small></th>${data.months.map((_, index) => {
+    const cell = hrBudgetCellState("headcount", key, index);
+    return `<td><div class="hrb-input-cell ${cell.changed ? "changed" : ""}"><input type="number" min="0" step="1" data-hr-input="headcount.${key}.${index}" value="${escapeHtml(cell.current)}" /><small>标准 ${formatHrEur(cell.standard)}</small>${cell.changed ? `<em>${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta)}</em>` : ""}</div></td>`;
+  }).join("")}<td><strong>${formatHrEur((hrBudgetInputs.headcount[key] || []).reduce((sum, value) => sum + Number(value || 0), 0) / 12, 1)}</strong></td></tr>`).join("")}<tr class="hrb-input-total"><th>校核在岗人数</th>${totals.map((value) => `<td><strong>${formatHrEur(value)}</strong></td>`).join("")}<td><strong>${formatHrEur(totals.reduce((sum, value) => sum + value, 0) / 12, 1)}</strong></td></tr></tbody></table></div><p class="hrb-input-hint">预算标准取自 Excel 原值。新增、离职或编制调整只修改校核值，保存时必须说明依据。</p>`;
+}
+
+function hrBudgetCalendarInputs(data) {
+  const rows = [
+    ["workingDays", "工作日", "天", 1],
+    ["realHoursPerDay", "每日实际工时", "小时", 0.01],
+    ["paidHoursPerDay", "每日计薪工时", "小时", 0.01]
+  ];
+  return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>日历与工时</th>${data.months.map((month) => `<th>${escapeHtml(month)}</th>`).join("")}<th>责任人</th></tr></thead><tbody>${rows.map(([key, label, unit, step]) => `<tr><th><b>${label}</b><small>${unit}</small></th>${data.months.map((_, index) => {
+    const cell = hrBudgetCellState("calendar", key, index);
+    return `<td><div class="hrb-input-cell ${cell.changed ? "changed" : ""}"><input type="number" min="0" step="${step}" data-hr-input="calendar.${key}.${index}" value="${escapeHtml(cell.current)}" /><small>标准 ${formatHrEur(cell.standard, 2)}</small>${cell.changed ? `<em>${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta, 2)}</em>` : ""}</div></td>`;
+  }).join("")}<td><span class="hrb-tag editable">人力核对</span></td></tr>`).join("")}</tbody></table></div><p class="hrb-input-hint">汇率属于财务参数，只展示不允许人力修改；工作日和工时由人力按月核对。</p>`;
+}
+
+function hrBudgetPolicyInputs(data) {
+  const stages = data.wageIncreaseStages || [];
+  return `<div class="hrb-policy-grid">${stages.map((stage, index) => {
+    const cell = hrBudgetCellState("policy", "wageRates", index);
+    return `<label class="${cell.changed ? "changed" : ""}"><span><b>${escapeHtml(stage.label)}</b><small>预算标准 ${formatHrEur(cell.standard, 2)}%</small></span><span class="hrb-policy-input"><input type="number" step="0.01" data-hr-input="policy.wageRates.${index}" value="${escapeHtml(cell.current.toFixed(2))}" /><em>%</em></span>${cell.changed ? `<strong class="hrb-policy-delta">偏差 ${cell.delta > 0 ? "+" : ""}${formatHrEur(cell.delta, 2)}%</strong>` : ""}</label>`;
+  }).join("")}<div class="hrb-policy-rule"><b>后台展开规则</b><p>按生效日期把工资增长率应用到人员薪资基数，再计算奖金、社保和失业保险。</p></div></div>`;
+}
+
+function hrBudgetNotesInput() {
+  return `<label class="hrb-notes-input"><span><b>调整说明</b><small>修改人数、日历或工资政策后，填写原因和影响月份。</small></span><textarea data-hr-input-notes placeholder="例如：7月新增40名直接员工，9月工资增长参数调整……">${escapeHtml(hrBudgetInputs.notes || "")}</textarea></label>`;
+}
+
+function hrBudgetDriverView(data, total) {
+  const reviewIndex = 5;
+  const sourceRows = [
+    ["预算年度", data.budgetYear, "年", "系统展示", "源文件预算期间"],
+    ["源数据组织", data.sourceOrganization, "", "系统展示", "测试时映射为 DW 洗碗机"],
+    ["人员底表记录", data.listedEmployees, "人", "系统展示", "Board 人员记录数"],
+    ["源币种", data.sourceCurrency, "", "系统展示", "Board 原始币种"],
+    ["输出币种", data.outputCurrency, "", "系统展示", "网站统一管理口径"]
+  ];
+  const reviewRows = [
+    ["6月预算在岗人数", data.activeHeadcount?.[reviewIndex], "人", "需核对", "由人员月度在岗标记汇总"],
+    ["6月工作日", data.workingDays?.[reviewIndex], "天", "需核对", "Parameters · TD 工作日"],
+    ["每日实际工时", Number(data.realHoursPerDay?.[reviewIndex] || 0).toFixed(2), "小时", "需核对", "Parameters · Real"],
+    ["每日计薪工时", Number(data.paidHoursPerDay?.[reviewIndex] || 0).toFixed(2), "小时", "需核对", "Parameters · Paid"],
+    ["6月 EUR/TRY", Number(data.eurTry?.[reviewIndex] || 0).toFixed(4), "", "财务参数", "TRY 金额 ÷ 汇率 = EUR"]
+  ];
+  return `
+    ${hrBudgetInputWorkbench(data)}
+    <div class="hrb-layout hrb-real-layout">
+      <section class="hrb-drivers">
+        <div class="hrb-section-title"><div><h4>基础数据与责任分层</h4><p>只把需要展示、填写和核对的数据放到前台。</p></div><span>Excel 内置数据</span></div>
+        ${hrBudgetDataGroup("只展示 · 不填写", sourceRows, "source")}
+        ${hrBudgetDataGroup("责任人每月核对", reviewRows, "review")}
+        <div class="hrb-data-group">
+          <div class="hrb-data-group-title"><b>责任人需要填写</b><span class="hrb-tag editable">HR填写</span></div>
+          <div class="hrb-responsibility-list">
+            <p><b>人员变动</b><span>新增人员、离职月份、部门/岗位和 Direct / Indirect 属性</span></p>
+            <p><b>薪资与政策</b><span>薪资基数、工资增长参数、奖金与福利资格</span></p>
+            <p><b>调整说明</b><span>仅在覆盖系统建议或异常超阈值时填写</span></p>
+          </div>
+        </div>
+        <div class="hrb-data-group backend">
+          <div class="hrb-data-group-title"><b>后台计算 · 无需填写</b><span class="hrb-tag system">系统计算</span></div>
+          <p>工资增长展开、工时汇总、社保与失业险、人员到科目汇总、TRY 转 EUR、财务模板输出。</p>
+        </div>
+      </section>
+      <section class="hrb-results">
+        <div class="hrb-section-title"><div><h4>DW 人力预算结果（按小科目）</h4><p>单位：EUR；当前为 Excel 基线结果。填报值已保存，正式规则接入后将在这里联动重算。</p></div><strong>€ ${formatHrEur(total)}</strong></div>
+        ${hrBudgetResultTable(data)}
+      </section>
+    </div>
+    ${hrBudgetFormulaPanel(data)}
+    ${hrBudgetMissingSourcePanel(data)}
+  `;
+}
+
+function hrBudgetDataGroup(title, rows, tone) {
+  return `<div class="hrb-data-group"><div class="hrb-data-group-title"><b>${title}</b><span class="hrb-tag ${tone}">${tone === "source" ? "源数据" : "待校核"}</span></div><div class="hrb-driver-table">${rows.map(([label, value, unit, source, note]) => `
+    <div class="hrb-driver-row">
+      <span><b>${escapeHtml(label)}</b><small>${escapeHtml(note)}</small></span>
+      <span class="hrb-static-value"><strong>${escapeHtml(value)}</strong><em>${escapeHtml(unit)}</em></span>
+      <i class="${tone === "source" ? "system" : "editable"}">${escapeHtml(source)}</i>
+    </div>`).join("")}</div></div>`;
+}
+
+function hrBudgetResultTable(data) {
+  const accounts = data.accounts || [];
+  const totalMonths = Array.from({ length: 12 }, (_, index) => accounts.reduce((sum, account) => sum + Number(account.monthly?.[index] || 0), 0));
+  return `<div class="hrb-result-wrap"><table class="hrb-result-table"><thead><tr><th>小科目</th>${(data.months || []).map((month) => `<th class="budget">${escapeHtml(month)}</th>`).join("")}<th>全年预算</th><th>数据状态</th></tr></thead><tbody>${accounts.map((account) => {
+    const pending = ["overtime", "cashAid", "indemnity"].includes(account.key);
+    return `<tr><th><span>${escapeHtml(account.label)}</span><small>${escapeHtml(account.sourceLabel)}</small></th>${account.monthly.map((value) => `<td>${value < 0 ? "-" : ""}€${formatHrEur(Math.abs(value))}</td>`).join("")}<td><strong>${account.annual < 0 ? "-" : ""}€${formatHrEur(Math.abs(account.annual))}</strong></td><td><span class="hrb-status ${pending ? "pending" : "ok"}">${pending ? "需核对" : "源表已计算"}</span></td></tr>`;
+  }).join("")}<tr class="hrb-total-row"><th>人力费用合计</th>${totalMonths.map((value) => `<td><strong>€${formatHrEur(value)}</strong></td>`).join("")}<td><strong>€${formatHrEur(totalMonths.reduce((sum, value) => sum + value, 0))}</strong></td><td><span class="hrb-status ok">已换算</span></td></tr></tbody></table></div>`;
+}
+
+function hrBudgetFormulaPanel(data) {
+  const wage = (data.accounts || []).find((account) => account.key === "wages");
+  const monthIndex = 5;
+  const eur = Number(wage?.monthly?.[monthIndex] || 0);
+  const fx = Number(data.eurTry?.[monthIndex] || 1);
+  const sourceTry = eur * fx;
+  return `<section class="hrb-formula"><div><span>公式追溯 · 工资（6月）</span><strong>${formatHrEur(sourceTry, 2)} TRY ÷ ${fx.toFixed(4)} EUR/TRY = €${formatHrEur(eur, 2)}</strong><small>Board 人员输入 → Parameters 政策参数 → Tower 按人计算 → For Finance 科目汇总 → EUR 换算</small></div><label><span>校核说明</span><textarea placeholder="仅在覆盖系统建议或发现源数据异常时填写原因和影响范围"></textarea></label></section>`;
+}
+
+function hrBudgetMissingSourcePanel(data) {
+  const items = data.missingSourceItems || [];
+  return `<section class="hrb-source-gaps"><div class="hrb-section-title"><div><h4>待补底表</h4><p>源 Excel 没有独立标准的数据不进入自动预算，待责任部门补齐。</p></div><span>${items.length} 项</span></div><div class="hrb-gap-list">${items.map((item) => `<div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.status)}</span><em>${escapeHtml(item.owner)}</em><p>${escapeHtml(item.action)}</p></div>`).join("")}</div></section>`;
+}
+
+function hrBudgetExceptionView(data, total) {
+  const pending = (data.accounts || []).filter((account) => ["overtime", "cashAid", "indemnity"].includes(account.key));
+  return `<div class="hrb-exception-layout"><section class="hrb-exception-main"><div class="hrb-summary-strip"><div><span>人力费用科目</span><strong>${data.accounts.length}</strong></div><div><span>源表已计算</span><strong class="good">${data.accounts.length - pending.length}</strong></div><div><span>需人工校核</span><strong class="warn">${pending.length}</strong></div><div><span>全年预算</span><strong>€${formatHrEur(total)}</strong><small>EUR</small></div></div>${hrBudgetResultTable(data)}<div class="hrb-exception-detail"><div><h4>当前需核对</h4><p>${pending.map((account) => account.label).join("、")}受人员变动、政策或一次性事项影响，需要责任人确认。</p></div><div class="hrb-calc-box"><span>校核原则</span><strong>源表结果保持不变，调整必须留下责任人、原因和影响月份</strong><small>系统计算过程在后台执行，但支持按科目追溯到来源与汇率</small></div><label class="grow"><span>校核意见</span><input placeholder="填写确认或调整原因" /></label></div></section><aside class="hrb-approval"><h4>预算审批进度</h4><ol><li class="done"><b>Excel 数据载入</b><span>已完成</span><small>TD 数据假设映射为 DW</small></li><li class="current"><b>人力校核</b><span>当前节点</span><small>核对人数、工时和异常科目</small></li><li><b>成本复核</b><span>待处理</span></li><li><b>预算发布</b><span>待处理</span></li></ol><h4>口径说明</h4><p>源币种：TRY</p><p>输出币种：EUR</p><p>换算：按月度 EUR/TRY</p></aside></div>`;
+}
+
+function hrBudgetAuditView(data) {
+  const records = hrBudgetAudit.flatMap((record) => (record.changes || []).map((change, index) => ({ ...change, record, first: index === 0 })));
+  return `<div class="hrb-audit-view"><section><div class="hrb-audit-heading"><div><h4>预算调整记录</h4><p>每一项偏离预算标准的修改都记录责任人、时间、前后值和理由。</p></div><strong>${records.length} 项</strong></div><div class="hrb-audit-table-wrap"><table><thead><tr><th>时间 / 责任人</th><th>调整项</th><th>期间</th><th>修改前</th><th>修改后</th><th>调整理由</th><th>操作</th></tr></thead><tbody>${records.map((item) => `<tr><td>${item.first ? `<b>${escapeHtml(new Date(item.record.timestamp).toLocaleString("zh-CN", { hour12: false }))}</b><small>${escapeHtml(item.record.actor)}</small>` : ""}</td><td>${escapeHtml(item.label)}</td><td>${escapeHtml(item.period)}</td><td>${formatHrEur(item.before, 2)} ${escapeHtml(item.unit)}</td><td><strong>${formatHrEur(item.after, 2)} ${escapeHtml(item.unit)}</strong></td><td>${item.first ? escapeHtml(item.record.reason) : `<span class="hrb-audit-same">同上</span>`}</td><td>${item.first ? escapeHtml(item.record.action) : ""}</td></tr>`).join("") || `<tr><td colspan="7" class="hrb-audit-empty">尚无预算调整记录。修改校核值并填写理由后，记录会显示在这里。</td></tr>`}</tbody></table></div></section><section><h4>系统记录</h4><table><thead><tr><th>时间</th><th>节点</th><th>操作</th><th>数据口径</th><th>状态</th></tr></thead><tbody><tr><td>2026-07-13</td><td>数据准备</td><td>载入 ${escapeHtml(data.sourceFile)}</td><td>TRY → EUR</td><td><span class="hrb-status ok">完成</span></td></tr><tr><td>2026-07-13</td><td>业务映射</td><td>${escapeHtml(data.sourceOrganization)} 假设映射为 DW</td><td>测试版</td><td><span class="hrb-status pending">待确认</span></td></tr></tbody></table></section></div>`;
+}
+
+function refreshProductNavigation() {
+  const labels = { dashboard: "经营驾驶舱", variance: "月度分析与预算", projects: "降费项目" };
+  for (const tab of document.querySelectorAll(".tab[data-tab]")) {
+    if (labels[tab.dataset.tab]) tab.textContent = labels[tab.dataset.tab];
+  }
+}
+
+function initializeDemoRoleAccess() {
+  const savedRole = sessionStorage.getItem("dwDemoRole");
+  for (const option of Array.from(els.roleSelect?.options || [])) {
+    if (!['finance', 'hr'].includes(option.value)) option.remove();
+  }
+  if (savedRole === "finance" || savedRole === "hr") {
+    applyDemoRole(savedRole, true);
+  } else {
+    els.roleLogin?.classList.remove("hidden");
+  }
+}
+
+function applyDemoRole(role, closeLogin = true) {
+  const normalizedRole = role === "hr" ? "hr" : "finance";
+  state.rollingRole = normalizedRole;
+  localStorage.setItem("dwRollingRole.v1", normalizedRole);
+  sessionStorage.setItem("dwDemoRole", normalizedRole);
+  if (els.roleSelect) els.roleSelect.value = normalizedRole;
+  document.body.classList.toggle("demo-role-hr", normalizedRole === "hr");
+  document.body.classList.toggle("demo-role-cost", normalizedRole === "finance");
+  state.rollingSelectedCode = null;
+  if (closeLogin) els.roleLogin?.classList.add("hidden");
+  if (normalizedRole === "hr") {
+    if (state.activeUnit !== "dishwasher") switchBusinessUnit("dishwasher");
+    setSidebarCollapsed(true);
+    state.rollingViewMode = "fill";
+    switchTab("variance");
+  } else {
+    setSidebarCollapsed(false);
+    switchTab("dashboard");
+  }
+  renderAll();
+}
+
 function rfStat(labelText, value, className = "") {
   return `<div class="rf-stat ${className}"><span>${escapeHtml(labelText)}</span><strong>${escapeHtml(value)}</strong></div>`;
 }
@@ -2240,7 +3250,9 @@ function rfFilterButton(value, labelText) {
 
 function rfTaskRow(item) {
   const row = item.row;
-  const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
+  const accountLabel = state.activeUnit === "cooking" && state.language === "zh" && row.descCn
+    ? row.descCn
+    : localizeAccountLabel(row.code, row.descEn, state.language);
   const selected = row.code === state.rollingSelectedCode;
   const taskLabel = item.warningCount
     ? rfT("warningHint")
@@ -2293,7 +3305,7 @@ function rfEditor(item) {
           ${totalOnly ? rfTotalModeHeader(showVariance) : rfUnitQtyHeader(showVariance)}
         </thead>
         <tbody>
-          ${ROLLING_FORECAST_MONTHS.map((month) => rfMonthRow(row.code, month, totalOnly, showVariance)).join("")}
+          ${ROLLING_FORECAST_MONTHS.map((month) => rfMonthRow(row, month, totalOnly, showVariance)).join("")}
         </tbody>
       </table>
     </div>
@@ -2305,8 +3317,8 @@ function rfEditor(item) {
         <small>${escapeHtml(rfT("ownerMissing"))}: ${item.ownerMissingCount} · ${escapeHtml(rfT("warnings"))}: ${item.warningCount}</small>
       </div>
       <div class="rf-actions">
-        <button type="button" class="ghost-button" data-rf-action="save-current">${escapeHtml(rfT("saveCurrent"))}</button>
-        <button type="button" data-rf-action="submit-current">${escapeHtml(rfT("submitCurrent"))}</button>
+        <button type="button" class="ghost-button" data-rf-action="save-current" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfT("saveCurrent"))}</button>
+        <button type="button" data-rf-action="submit-current" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfT("submitCurrent"))}</button>
       </div>
     </div>
   `;
@@ -2343,7 +3355,8 @@ function rfTotalModeHeader(showVariance = state.rollingViewMode === "variance") 
   `;
 }
 
-function rfMonthRow(code, month, totalOnly = isRollingTotalOnlyCode(code), showVariance = state.rollingViewMode === "variance") {
+function rfMonthRow(row, month, totalOnly = isRollingTotalOnlyRow(row), showVariance = state.rollingViewMode === "variance") {
+  const code = row.code;
   const draft = rollingMonthDraft(code, month);
   const base = forecastAmountForAccount(code, month);
   const totalInfo = rollingTotalInfo(code, month);
@@ -2357,14 +3370,14 @@ function rfMonthRow(code, month, totalOnly = isRollingTotalOnlyCode(code), showV
         <td>${escapeHtml(localizeMonthLabel(month - 1, state.language))}</td>
         <td>${formatMoney(base)}</td>
         <td class="rf-detail-cell">
-          <label class="rf-detail-upload">
-            <input type="file" data-rf-field="detailName" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" />
+          <label class="rf-detail-upload ${rollingCanEditField("detailName", row) ? "" : "disabled"}">
+            <input type="file" data-rf-field="detailName" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" ${rollingInputDisabledAttr("detailName", row)} />
             <span>${escapeHtml(detailLabel)}</span>
           </label>
           <small>${escapeHtml(draft.detailName || rfT("detailRequired"))}</small>
         </td>
-        <td><input inputmode="decimal" data-rf-field="totalAmount" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.totalAmount)}" placeholder="--" /></td>
-        <td><input data-rf-field="totalOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.totalOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" /></td>
+        <td><input inputmode="decimal" data-rf-field="totalAmount" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.totalAmount)}" placeholder="--" ${rollingInputDisabledAttr("totalAmount", row)} /></td>
+        <td><input data-rf-field="totalOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.totalOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" ${rollingInputDisabledAttr("totalOwner", row)} /></td>
         <td class="rf-total ${totalClass}" data-rf-total-cell><strong>${formatMoney(totalInfo.total)}</strong><small>${escapeHtml(totalInfo.source)}</small></td>
         ${showVariance ? `<td data-rf-yoy-cell class="${valueClass(variance.yoy)}">${formatVarianceWithRate(variance.yoy, variance.same)}</td><td data-rf-mom-cell class="${valueClass(variance.mom)}">${formatVarianceWithRate(variance.mom, variance.previous)}</td>` : ""}
         <td data-rf-warning-cell>${warning.level ? `<span class="rf-warning ${warning.level}">${escapeHtml(warning.label)}</span>` : `<span class="rf-ok">${escapeHtml(rfT("noWarning"))}</span>`}</td>
@@ -2375,10 +3388,10 @@ function rfMonthRow(code, month, totalOnly = isRollingTotalOnlyCode(code), showV
     <tr>
       <td>${escapeHtml(localizeMonthLabel(month - 1, state.language))}</td>
       <td>${formatMoney(base)}</td>
-      <td><input inputmode="decimal" data-rf-field="unitPrice" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.unitPrice)}" placeholder="--" /></td>
-      <td><input data-rf-field="priceOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.priceOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" /></td>
-      <td><input inputmode="decimal" data-rf-field="quantity" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.quantity)}" placeholder="--" /></td>
-      <td><input data-rf-field="quantityOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.quantityOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" /></td>
+      <td><input inputmode="decimal" data-rf-field="unitPrice" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.unitPrice)}" placeholder="--" ${rollingInputDisabledAttr("unitPrice", row)} /></td>
+      <td><input data-rf-field="priceOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.priceOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" ${rollingInputDisabledAttr("priceOwner", row)} /></td>
+      <td><input inputmode="decimal" data-rf-field="quantity" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.quantity)}" placeholder="--" ${rollingInputDisabledAttr("quantity", row)} /></td>
+      <td><input data-rf-field="quantityOwner" data-rf-code="${escapeHtml(code)}" data-rf-month="${month}" value="${escapeHtml(draft.quantityOwner)}" placeholder="${escapeHtml(rfT("ownerNeeded"))}" ${rollingInputDisabledAttr("quantityOwner", row)} /></td>
       <td class="rf-total ${totalClass}" data-rf-total-cell><strong>${formatMoney(totalInfo.total)}</strong><small>${escapeHtml(totalInfo.source)}</small></td>
       ${showVariance ? `<td data-rf-yoy-cell class="${valueClass(variance.yoy)}">${formatVarianceWithRate(variance.yoy, variance.same)}</td><td data-rf-mom-cell class="${valueClass(variance.mom)}">${formatVarianceWithRate(variance.mom, variance.previous)}</td>` : ""}
       <td data-rf-warning-cell>${warning.level ? `<span class="rf-warning ${warning.level}">${escapeHtml(warning.label)}</span>` : `<span class="rf-ok">${escapeHtml(rfT("noWarning"))}</span>`}</td>
@@ -2407,11 +3420,11 @@ function rfVarianceReasonPanel(row) {
       <div class="rf-reason-grid">
         <label>
           <span>${escapeHtml(rfT("yoyReason"))}</span>
-          <textarea data-rf-analysis-key="${escapeHtml(key)}" data-rf-analysis-mode="yoy" placeholder="${escapeHtml(rfT("reasonPlaceholder"))}">${escapeHtml(yoyAnalysis)}</textarea>
+          <textarea data-rf-analysis-key="${escapeHtml(key)}" data-rf-analysis-mode="yoy" placeholder="${escapeHtml(rfT("reasonPlaceholder"))}" ${rollingCanEditReasons() ? "" : "disabled"}>${escapeHtml(yoyAnalysis)}</textarea>
         </label>
         <label>
           <span>${escapeHtml(rfT("momReason"))}</span>
-          <textarea data-rf-analysis-key="${escapeHtml(key)}" data-rf-analysis-mode="mom" placeholder="${escapeHtml(rfT("reasonPlaceholder"))}">${escapeHtml(momAnalysis)}</textarea>
+          <textarea data-rf-analysis-key="${escapeHtml(key)}" data-rf-analysis-mode="mom" placeholder="${escapeHtml(rfT("reasonPlaceholder"))}" ${rollingCanEditReasons() ? "" : "disabled"}>${escapeHtml(momAnalysis)}</textarea>
         </label>
       </div>
     </div>
@@ -2610,7 +3623,135 @@ function forecastLogicForRow(row) {
   return state.language === "en" ? "fill unit price, quantity and responsible owners" : state.language === "tr" ? "birim fiyat, miktar ve sorumluları doldurun" : "填写单价、数量和责任人";
 }
 
-function handleRollingForecastClick(event) {
+function rollingRoleLabel() {
+  return ROLLING_ROLE_LABELS[state.rollingRole] || ROLLING_ROLE_LABELS.finance;
+}
+
+function rollingRoleScope() {
+  return ROLLING_ROLE_SCOPE[state.rollingRole] || ROLLING_ROLE_SCOPE.finance;
+}
+
+function rollingRoleCanView(row) {
+  const role = state.rollingRole || "finance";
+  if (role === "finance" || role === "leader" || role === "readonly") return true;
+  const scopes = rollingRowScopes(row);
+  if (role === "hr") return scopes.has("hr");
+  if (role === "procurement") return scopes.has("procurement");
+  return true;
+}
+
+function rollingCanEditField(field, row) {
+  const role = state.rollingRole || "finance";
+  if (role === "finance") return true;
+  if (role === "readonly" || role === "leader") return false;
+  const scopes = rollingRowScopes(row);
+  if (role === "hr") {
+    return scopes.has("hr") && ["quantity", "quantityOwner"].includes(field);
+  }
+  if (role === "procurement") {
+    return scopes.has("procurement") && ["unitPrice", "priceOwner", "totalAmount", "totalOwner", "detailName"].includes(field);
+  }
+  return false;
+}
+
+function rollingCanEditReasons() {
+  return state.rollingRole !== "readonly";
+}
+
+function rollingCanSave() {
+  return state.rollingRole !== "readonly";
+}
+
+function rollingCanSubmit() {
+  return ["finance", "hr", "procurement"].includes(state.rollingRole);
+}
+
+function rollingInputDisabledAttr(field, row) {
+  return rollingCanEditField(field, row) ? "" : `disabled title="${escapeHtml(rollingRoleScope())}"`;
+}
+
+function rollingRowScopes(row) {
+  const text = rollingRowText(row);
+  const scopes = new Set();
+  if (/\b(labou?r|salary|wage|overtime|headcount|people|direct|indirect)\b/.test(text)
+    || /人工|工资|加班|人数|人力|蓝领|白领|员工|工时/.test(text)) {
+    scopes.add("hr");
+  }
+  if (/\b(uniform|transport|repair|maint|material|tool|spare|purchase|purchasing|consumable|utility|utilities|energy|service|office|admin|travel|training|work\s*clothes)\b/.test(text)
+    || /工作服|工装|班车|维修|维护|备件|采购|物料|耗材|能源|水电|服务|办公|行政|差旅|培训/.test(text)) {
+    scopes.add("procurement");
+  }
+  if (text.includes("uniform") || text.includes("transport") || /工作服|工装|班车/.test(text)) {
+    scopes.add("hr");
+    scopes.add("procurement");
+  }
+  if (!scopes.size) scopes.add("procurement");
+  return scopes;
+}
+
+function rollingRowText(row) {
+  return [
+    row?.code,
+    row?.category,
+    row?.descEn,
+    row?.descCn,
+    localizeAccountLabel(row?.code, row?.descEn, "zh")
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+async function handleRollingForecastClick(event) {
+  const inputView = event.target.closest("[data-hr-input-view]")?.dataset.hrInputView;
+  if (inputView) {
+    hrBudgetInputView = inputView;
+    renderHrBudgetWorkspace();
+    return;
+  }
+  const inputAction = event.target.closest("[data-hr-input-action]")?.dataset.hrInputAction;
+  if (inputAction === "reset") {
+    const reason = hrBudgetInputs.notes || "";
+    hrBudgetInputs = defaultHrBudgetInputs();
+    hrBudgetInputs.notes = reason;
+    toast("已恢复为 Excel 预算标准，请填写理由后保存");
+    renderHrBudgetWorkspace();
+    return;
+  }
+  const hrView = event.target.closest("[data-hr-view]");
+  if (hrView) {
+    const requestedView = hrView.dataset.hrView;
+    hrBudgetView = ["drivers", "exceptions", "audit"].includes(requestedView) ? requestedView : "drivers";
+    renderHrBudgetWorkspace();
+    return;
+  }
+  const hrAction = event.target.closest("[data-hr-action]")?.dataset.hrAction;
+  if (hrAction) {
+    const changes = hrBudgetChanges(hrBudgetSavedInputs, hrBudgetInputs);
+    const reason = String(hrBudgetInputs.notes || "").trim();
+    if (changes.length && !reason) {
+      toast("有预算变更，必须先填写调整理由", true);
+      renderHrBudgetWorkspace();
+      return;
+    }
+    if (changes.length) {
+      hrBudgetAudit.unshift({
+        id: `hr-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        actor: els.userName?.value.trim() || "人力角色",
+        reason,
+        action: hrAction === "submit" ? "提交人力预算" : "保存校核",
+        changes
+      });
+      hrBudgetAudit = hrBudgetAudit.slice(0, 100);
+      saveHrBudgetAudit();
+      hrBudgetInputs.notes = "";
+      saveHrBudgetInputs();
+      hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
+    }
+    saveHrBudgetInputs();
+    toast(hrAction === "submit" ? "人力预算已提交财务复核并留痕" : (changes.length ? `已保存 ${changes.length} 项变更并写入记录` : "当前没有待保存变更"));
+    if (hrAction === "submit") hrBudgetView = "exceptions";
+    renderHrBudgetWorkspace();
+    return;
+  }
   const modeButton = event.target.closest("[data-rf-view-mode]");
   if (modeButton) {
     state.rollingViewMode = modeButton.dataset.rfViewMode === "variance" ? "variance" : "fill";
@@ -2631,38 +3772,70 @@ function handleRollingForecastClick(event) {
   }
   const action = event.target.closest("[data-rf-action]")?.dataset.rfAction;
   if (!action) return;
+  if ((action.includes("save") && !rollingCanSave()) || (action.includes("submit") && !rollingCanSubmit())) {
+    toast(rollingRoleScope(), true);
+    return;
+  }
   if (action === "save-all") {
-    saveRollingForecastDrafts();
+    await saveRollingForecastDrafts();
     toast(rfT("saved"));
     return;
   }
   if (action === "save-current") {
-    saveRollingForecastDrafts();
+    await saveRollingForecastDrafts();
     toast(rfT("currentSaved"));
     return;
   }
   if (action === "submit-current") {
     if (state.rollingSelectedCode) state.rollingForecastSubmitted[state.rollingSelectedCode] = new Date().toISOString();
     state.rollingViewMode = "variance";
-    saveRollingForecastDrafts();
+    await saveRollingForecastDrafts();
     toast(rfT("currentSubmitted"));
     renderTable();
     return;
   }
   if (action === "submit-all") {
-    for (const row of visibleRows()) {
+    for (const row of visibleRows().filter(rollingRoleCanView)) {
       if (row.code) state.rollingForecastSubmitted[row.code] = new Date().toISOString();
     }
     state.rollingViewMode = "variance";
-    saveRollingForecastDrafts();
+    await saveRollingForecastDrafts();
     toast(rfT("submittedToast"));
     renderTable();
   }
 }
 
 function handleRollingForecastInput(event) {
+  const hrInput = event.target.closest("[data-hr-input]");
+  if (hrInput) {
+    const [section, key, indexText] = hrInput.dataset.hrInput.split(".");
+    const index = Number(indexText);
+    const value = Number(hrInput.value);
+    if (Number.isFinite(value) && Array.isArray(hrBudgetInputs[section]?.[key]) && Number.isInteger(index)) {
+      hrBudgetInputs[section][key][index] = value;
+      if (event.type === "change") renderHrBudgetWorkspace();
+    }
+    return;
+  }
+  const notesInput = event.target.closest("[data-hr-input-notes]");
+  if (notesInput) {
+    hrBudgetInputs.notes = notesInput.value;
+    return;
+  }
+  const hrDriver = event.target.closest("[data-hr-driver]");
+  if (hrDriver) {
+    const value = Number(hrDriver.value);
+    if (Number.isFinite(value)) hrBudgetDrivers[hrDriver.dataset.hrDriver] = value;
+    localStorage.setItem(HR_BUDGET_DRIVER_KEY, JSON.stringify(hrBudgetDrivers));
+    if (event.type === "change") renderHrBudgetWorkspace();
+    return;
+  }
   const analysisTarget = event.target.closest("[data-rf-analysis-key]");
   if (analysisTarget) {
+    if (!rollingCanEditReasons()) {
+      toast(rollingRoleScope(), true);
+      return;
+    }
     const key = analysisTarget.dataset.rfAnalysisKey;
     state.analyses[key] = {
       ...analysisReasons(state.analyses[key]),
@@ -2677,6 +3850,12 @@ function handleRollingForecastInput(event) {
   }
   const target = event.target.closest("[data-rf-field]");
   if (!target) return;
+  const row = rollingRowForCode(target.dataset.rfCode);
+  if (!rollingCanEditField(target.dataset.rfField, row)) {
+    toast(rollingRoleScope(), true);
+    renderTable();
+    return;
+  }
   const value = target.type === "file" ? target.files?.[0]?.name || "" : target.value;
   setRollingMonthDraft(target.dataset.rfCode, target.dataset.rfMonth, target.dataset.rfField, value);
   if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = t("unsavedChanges");
@@ -2720,10 +3899,15 @@ function refreshRollingMatrixRows(code) {
   }
 }
 
-function saveRollingForecastDrafts() {
+async function saveRollingForecastDrafts() {
   try {
     localStorage.setItem(ROLLING_FORECAST_DRAFT_KEY, JSON.stringify(state.rollingForecastDrafts));
     localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
+    await store.saveRollingForecast?.({
+      drafts: state.rollingForecastDrafts,
+      submitted: state.rollingForecastSubmitted,
+      role: state.rollingRole
+    });
     if (els.analysisSaveStatus) els.analysisSaveStatus.textContent = rfT("saved");
   } catch (error) {
     toast(error.message || String(error), true);
@@ -2847,7 +4031,7 @@ function visibleRows() {
     if (filter === "blank" && !((highYoy && !yoyAnalysis.trim()) || (highMom && !momAnalysis.trim()))) return false;
     if (!search) return true;
     const localizedAccount = localizeAccountLabel(row.code, row.descEn, state.language);
-    return `${row.code} ${row.descEn} ${localizedAccount} ${row.category} ${description} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
+    return `${row.code} ${row.descEn} ${row.descCn || ""} ${localizedAccount} ${row.category} ${description} ${yoyAnalysis} ${momAnalysis}`.toLowerCase().includes(search);
   });
   rows.sort((a, b) => {
     if (sortBy === "code") return a.code.localeCompare(b.code, "zh-Hans-CN", { numeric: true });
@@ -2876,10 +4060,10 @@ function rowToHtml(row) {
   const attachmentName = state.descriptionAttachments[key] || "";
   const summarySuffix = state.language === "tr" ? "kategori toplamı" : state.language === "en" ? "category total" : "大科目汇总";
   const unsplitLabel = state.language === "tr"
-    ? "4+8 tahmini alt hesaplara dağıtılmamıştır"
+    ? "5+7 tahmini alt hesaplara dağıtılmamıştır"
     : state.language === "en"
-      ? "4+8 forecast is not split by account"
-      : "4+8预测未拆分到小科目";
+      ? "5+7 forecast is not split by account"
+      : "5+7预测未拆分到小科目";
   return `
     <tr class="${major ? "high" : ""} ${row.amountDiff > 0 ? "cost-worse" : row.amountDiff < 0 ? "cost-better" : ""}">
       <td><div class="account-code">${escapeHtml(row.isCategorySummary ? `${localizeCategory(row.category, state.language)} (${summarySuffix})` : row.code)}</div><div class="desc">${escapeHtml(row.isCategorySummary ? unsplitLabel : accountLabel)}</div></td>
@@ -3079,7 +4263,9 @@ function renderFactors() {
 }
 
 function factorRowHtml(item, index) {
-  const display = (field) => localizeProjectField(item, field, state.language);
+  const display = (field) => state.activeUnit === "cooking"
+    ? (item[field] ?? "")
+    : localizeProjectField(item, field, state.language);
   return `
     <tr data-index="${index}">
       <td><input data-field="category" value="${escapeHtml(display("category"))}" /></td>
@@ -3196,7 +4382,7 @@ function renderProjectImpactCards() {
 
 function renderLocalizedProjectImpactCards() {
   if (!els.projectImpactCards) return;
-  if (state.factorMonth === 4) {
+  if (state.activeUnit !== "cooking" && state.factorMonth === 4) {
     const card = (title, value, note, klass = "") => `
       <div class="impact-card ${klass || (value < 0 ? "bad" : "good")}">
         <span>${escapeHtml(projectMonthLabel())} · ${escapeHtml(localizeProjectText(title, state.language))}</span>
@@ -3267,7 +4453,9 @@ function buildLocalizedProjectSummaryText() {
     .slice()
     .sort((a, b) => Math.abs(monthValue(b, "actualMonths", "actualCumulative")) - Math.abs(monthValue(a, "actualMonths", "actualCumulative")))
     .slice(0, 3)
-    .map((item) => localizeProjectField(item, "project", state.language) || localizeProjectField(item, "strategy", state.language) || localizeProjectField(item, "category", state.language))
+    .map((item) => state.activeUnit === "cooking"
+      ? (item.project || item.strategy || item.category)
+      : localizeProjectField(item, "project", state.language) || localizeProjectField(item, "strategy", state.language) || localizeProjectField(item, "category", state.language))
     .join(state.language === "zh" ? "、" : "; ");
   const achieved = formatPercent(planned ? actual / planned : null);
   if (state.language === "en") {
@@ -3409,6 +4597,11 @@ function switchTab(name) {
   document.getElementById("dashboardView").classList.toggle("active", name === "dashboard");
   document.getElementById("varianceView").classList.toggle("active", name === "variance");
   document.getElementById("projectsView").classList.toggle("active", name === "projects");
+  if (name === "variance") renderTable();
+  if (name === "projects") {
+    syncMonthSelectFromState();
+    renderFactors();
+  }
 }
 
 function applyLanguage(language) {
