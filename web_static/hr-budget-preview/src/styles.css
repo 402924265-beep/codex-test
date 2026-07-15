@@ -997,6 +997,27 @@ body.hr-budget-mode #varianceView .legacy-variance-table {
   display: none;
 }
 
+body.rolling-fill-mode #varianceView > .month-switch-panel,
+body.rolling-fill-mode #varianceView > #monthlyKpiGrid,
+body.rolling-fill-mode #varianceView > .narrative-panel,
+body.rolling-fill-mode #varianceView > .split-view,
+body.rolling-fill-mode #varianceView .table-panel > .panel-title,
+body.rolling-fill-mode #varianceView .table-panel > .variance-toolbar,
+body.rolling-fill-mode #varianceView .legacy-variance-table {
+  display: none;
+}
+
+body.rolling-fill-mode #varianceView .table-panel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.rolling-fill-mode #varianceView .forecast-workspace {
+  min-height: 0;
+}
+
 body.hr-budget-mode #varianceView .table-panel {
   padding: 0;
   border: 0;
@@ -3053,6 +3074,358 @@ tr.high td:first-child {
 .hrb-audit-same { color: #91a0aa; }
 .hrb-audit-empty { height: 110px !important; color: #7b8f9e !important; text-align: center !important; }
 
+.rf-status-workbench {
+  gap: 14px;
+}
+
+.rf-status-header {
+  min-height: 58px;
+  padding: 9px 12px 9px 16px;
+  background: #fff;
+  border-radius: 6px;
+}
+
+.rf-status-header h3 {
+  min-width: 150px;
+  font-size: 19px;
+}
+
+.rf-status-summary {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(132px, 1fr));
+  gap: 6px;
+  padding: 3px;
+  border: 1px solid #d7e3eb;
+  border-radius: 6px;
+  background: #f1f5f8;
+}
+
+.rf-status-summary-item {
+  height: 34px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #365166;
+  font-size: 12px;
+}
+
+.rf-status-summary-item.complete {
+  background: #078b72;
+  color: #fff;
+}
+
+.rf-status-summary-item.baseline:hover {
+  background: #fff;
+  color: #174d75;
+}
+
+.rf-status-summary-item strong {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rf-compact-mode-toggle {
+  grid-template-columns: repeat(2, 58px);
+}
+
+.rf-account-group {
+  overflow: hidden;
+  border: 1px solid #d8e4ec;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.rf-account-group-head {
+  height: 38px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #dfe8ee;
+}
+
+.rf-account-group-head h4 {
+  margin: 0;
+  color: #153851;
+  font-size: 13px;
+}
+
+.rf-account-group-head strong {
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.rf-account-group.complete .rf-account-group-head {
+  background: #eff8f5;
+  border-top: 3px solid #078b72;
+}
+
+.rf-account-group.complete .rf-account-group-head h4,
+.rf-account-group.complete .rf-account-group-head strong {
+  color: #08775d;
+}
+
+.rf-account-group.complete .rf-account-group-head strong {
+  background: #dcefe9;
+}
+
+.rf-account-group.baseline .rf-account-group-head {
+  background: #f3f7fa;
+  border-top: 3px solid #237fc2;
+}
+
+.rf-account-group.baseline .rf-account-group-head h4,
+.rf-account-group.baseline .rf-account-group-head strong {
+  color: #235c86;
+}
+
+.rf-account-group.baseline .rf-account-group-head strong {
+  background: #e1edf5;
+}
+
+.rf-account-table-wrap {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.rf-account-table {
+  width: 100%;
+  min-width: 1480px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.rf-account-table col.rf-col-code { width: 126px; }
+.rf-account-table col.rf-col-name { width: 178px; }
+.rf-account-table col.rf-col-source { width: 88px; }
+.rf-account-table col.rf-col-month { width: 72px; }
+.rf-account-table col.rf-col-annual { width: 104px; }
+.rf-account-table col.rf-col-status { width: 88px; }
+
+.rf-account-table th,
+.rf-account-table td {
+  height: 38px;
+  padding: 6px 7px;
+  border-right: 1px solid #e3eaf0;
+  border-bottom: 1px solid #e3eaf0;
+  color: #18364e;
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rf-account-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #edf3f7;
+  color: #365166;
+  font-weight: 700;
+  text-align: center;
+}
+
+.rf-account-table thead tr:first-child th {
+  height: 32px;
+}
+
+.rf-account-table thead tr:first-child th:nth-child(4) {
+  background: #e8f4f1;
+  color: #08775d;
+}
+
+.rf-account-table thead tr:first-child th:nth-child(5) {
+  background: #fff5e4;
+  color: #9a6100;
+}
+
+.rf-account-table thead th small {
+  display: block;
+  margin-top: 2px;
+  color: #718595;
+  font-size: 9px;
+}
+
+.rf-account-table .rf-account-months th {
+  top: 32px;
+  height: 29px;
+  background: #f7f9fb;
+  font-size: 10px;
+}
+
+.rf-account-table th:nth-child(1),
+.rf-account-table td:nth-child(1) {
+  width: 122px;
+  text-align: left;
+}
+
+.rf-account-table th:nth-child(2),
+.rf-account-table td:nth-child(2) {
+  width: 152px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+
+.rf-account-table th:nth-child(3),
+.rf-account-table td:nth-child(3) {
+  width: 82px;
+  text-align: center;
+}
+
+.rf-account-table th:nth-child(n+4):nth-child(-n+15),
+.rf-account-table td:nth-child(n+4):nth-child(-n+15) {
+  width: 70px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rf-account-table th:nth-child(16),
+.rf-account-table td:nth-child(16) {
+  width: 90px;
+}
+
+.rf-account-table th:nth-child(17),
+.rf-account-table td:nth-child(17) {
+  width: 84px;
+  text-align: center;
+}
+
+.rf-account-row {
+  cursor: pointer;
+}
+
+.rf-account-row:hover td {
+  background: #f8fbfd;
+}
+
+.rf-account-group.complete .rf-account-row td {
+  background: #fbfefc;
+}
+
+.rf-account-row.selected td {
+  background: #edf7ff !important;
+}
+
+.rf-account-row.selected td:first-child {
+  box-shadow: inset 3px 0 #1684c7;
+}
+
+.rf-row-toggle {
+  width: 22px;
+  height: 22px;
+  margin-right: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #235c86;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.rf-source,
+.rf-status-action {
+  min-height: 22px;
+  padding: 3px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.rf-source.complete,
+.rf-status-action.complete {
+  color: #08775d;
+  background: #dff3ec;
+}
+
+.rf-source.baseline {
+  color: #466274;
+  background: #e9eff3;
+}
+
+.rf-status-action {
+  border: 1px solid #9dc6e2;
+  color: #176da5;
+  background: #f5fbff;
+}
+
+.rf-status-action.complete {
+  border-color: transparent;
+}
+
+.rf-month-value.actual {
+  color: #3f586b;
+  background: #fafcfd;
+}
+
+.rf-month-value.forecast {
+  color: #123d5c;
+}
+
+.rf-annual strong {
+  color: #092d49;
+  font-variant-numeric: tabular-nums;
+}
+
+.rf-account-detail-row > td {
+  padding: 0;
+  background: #f7fafc;
+  text-align: left;
+}
+
+.rf-compact-editor {
+  padding: 10px 12px 12px 34px;
+  border-left: 3px solid #1684c7;
+}
+
+.rf-compact-editor-head {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rf-compact-editor-head > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rf-compact-editor-head strong {
+  color: #153851;
+  font-size: 12px;
+}
+
+.rf-compact-editor-head span {
+  color: #718595;
+  font-size: 10px;
+}
+
+.rf-compact-editor .rf-matrix-wrap {
+  padding: 6px 0 0;
+}
+
+.rf-compact-editor .rf-matrix {
+  max-width: 1020px;
+  background: #fff;
+}
+
 @media (max-width: 900px) {
   body { min-width: 0; }
   .app-header,
@@ -3078,4 +3451,8 @@ tr.high td:first-child {
   .hrb-change-gate { align-items: stretch; flex-direction: column; }
   .hrb-change-gate.pending label { width: 100%; }
   .rf-hr-source { grid-template-columns: 1fr; }
+  .rf-status-header { align-items: stretch; flex-direction: column; }
+  .rf-status-header h3 { min-width: 0; }
+  .rf-status-summary { width: 100%; }
+  .rf-account-table-wrap { max-height: none; }
 }

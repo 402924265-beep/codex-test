@@ -42,7 +42,7 @@ import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-lab
 import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 
-const VERSION = "20260715-hr-budget-sync-v2";
+const VERSION = "20260715-budget-status-workbench-v3";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -2486,6 +2486,7 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 
 function renderTable() {
   const varianceView = document.getElementById("varianceView");
+  document.body.classList.toggle("rolling-fill-mode", state.rollingRole !== "hr" && state.rollingViewMode === "fill");
   if (!state.result) {
     varianceView?.classList.remove("show-legacy-variance");
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
@@ -2939,54 +2940,220 @@ function renderRollingForecastWorkspace(rows) {
     els.forecastWorkspace.innerHTML = `<div class="empty-cell">${escapeHtml(rollingRoleScope())}</div>`;
     return;
   }
-  if (!state.rollingSelectedCode || !roleMeta.some((item) => item.row.code === state.rollingSelectedCode)) {
-    state.rollingSelectedCode = roleMeta[0].row.code;
+  if (state.rollingSelectedCode && !roleMeta.some((item) => item.row.code === state.rollingSelectedCode)) {
+    state.rollingSelectedCode = null;
   }
   const filteredMeta = roleMeta.filter((item) => rollingFilterMatches(item));
-  const selectedMeta = allMeta.find((item) => item.row.code === state.rollingSelectedCode) || allMeta[0];
-  const stats = rollingStats(roleMeta);
+  const selectedMeta = allMeta.find((item) => item.row.code === state.rollingSelectedCode) || null;
+  const budgetedMeta = roleMeta.filter((item) => item.hasHrBudget);
+  const excelMeta = roleMeta.filter((item) => !item.hasHrBudget);
+  const visibleBudgeted = filteredMeta.filter((item) => item.hasHrBudget);
+  const visibleExcel = filteredMeta.filter((item) => !item.hasHrBudget);
   els.forecastWorkspace.innerHTML = `
-    <div class="rf-shell">
-      <div class="rf-header">
-        <div>
-          <h3>${escapeHtml(rfT("title"))}</h3>
-          <p>${escapeHtml(rfT("subtitle"))}</p>
+    <div class="rf-shell rf-status-workbench">
+      <div class="rf-header rf-status-header">
+        <h3>${escapeHtml(rfCompactT("title"))}</h3>
+        <div class="rf-status-summary" aria-label="${escapeHtml(rfCompactT("budgetStatus"))}">
+          <button type="button" class="rf-status-summary-item complete" data-rf-anchor="budgeted">
+            <span>${escapeHtml(rfCompactT("completed"))}</span>
+            <strong>${budgetedMeta.length}</strong>
+          </button>
+          <button type="button" class="rf-status-summary-item baseline" data-rf-anchor="excel">
+            <span>${escapeHtml(rfCompactT("excelBaseline"))}</span>
+            <strong>${excelMeta.length}</strong>
+          </button>
         </div>
         <div class="rf-actions">
-          <div class="rf-mode-toggle">
-            <button type="button" class="${state.rollingViewMode === "fill" ? "active" : ""}" data-rf-view-mode="fill">${escapeHtml(rfT("fillMode"))}</button>
-            <button type="button" class="${state.rollingViewMode === "variance" ? "active" : ""}" data-rf-view-mode="variance">${escapeHtml(rfT("varianceMode"))}</button>
+          <div class="rf-mode-toggle rf-compact-mode-toggle">
+            <button type="button" class="active" data-rf-view-mode="fill">${escapeHtml(rfCompactT("budgetView"))}</button>
+            <button type="button" data-rf-view-mode="variance">${escapeHtml(rfCompactT("varianceView"))}</button>
           </div>
-          <button type="button" class="ghost-button" data-rf-action="save-all" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfT("saveAll"))}</button>
-          <button type="button" data-rf-action="submit-all" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfT("submitAll"))}</button>
+          <button type="button" class="ghost-button" data-rf-action="save-all" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfCompactT("save"))}</button>
+          <button type="button" data-rf-action="submit-all" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfCompactT("submit"))}</button>
         </div>
       </div>
-      <div class="rf-role-strip">
-        <span><strong>${escapeHtml(rollingRoleLabel())}</strong> · ${escapeHtml(rollingRoleScope())}</span>
-        <span>可见 ${roleMeta.length}/${allMeta.length} 个小科目</span>
+      ${rfAccountGroup("budgeted", rfCompactT("completedHr"), visibleBudgeted, selectedMeta)}
+      ${rfAccountGroup("excel", rfCompactT("excelPending"), visibleExcel, selectedMeta)}
+    </div>
+  `;
+}
+
+function rfCompactT(key) {
+  const copy = {
+    zh: {
+      title: "滚动预测",
+      budgetView: "预算",
+      varianceView: "差异",
+      budgetStatus: "预算状态",
+      completed: "已完成预算",
+      excelBaseline: "Excel基线",
+      completedHr: "已完成预算（人力）",
+      excelPending: "Excel基线（待预算）",
+      save: "保存草稿",
+      submit: "提交预算",
+      code: "科目编码",
+      account: "科目名称",
+      source: "来源",
+      actualBaseline: "1-5月 实际/基线",
+      budgetPeriod: "6-12月 预算",
+      annual: "全年合计",
+      status: "状态",
+      hrBudget: "人力预算",
+      excel: "Excel",
+      done: "已完成",
+      start: "开始预算",
+      view: "查看",
+      detail: "6-12月预算明细",
+      close: "收起",
+      noAccounts: "暂无科目"
+    },
+    en: {
+      title: "Rolling Forecast",
+      budgetView: "Budget",
+      varianceView: "Variance",
+      budgetStatus: "Budget status",
+      completed: "Budgeted",
+      excelBaseline: "Excel baseline",
+      completedHr: "Budgeted (HR)",
+      excelPending: "Excel baseline (pending)",
+      save: "Save draft",
+      submit: "Submit budget",
+      code: "Account",
+      account: "Account name",
+      source: "Source",
+      actualBaseline: "Jan-May actual/baseline",
+      budgetPeriod: "Jun-Dec budget",
+      annual: "Annual total",
+      status: "Status",
+      hrBudget: "HR budget",
+      excel: "Excel",
+      done: "Completed",
+      start: "Start budget",
+      view: "View",
+      detail: "Jun-Dec budget detail",
+      close: "Collapse",
+      noAccounts: "No accounts"
+    },
+    tr: {
+      title: "Dönen Tahmin",
+      budgetView: "Bütçe",
+      varianceView: "Fark",
+      budgetStatus: "Bütçe durumu",
+      completed: "Bütçelendi",
+      excelBaseline: "Excel baz",
+      completedHr: "Bütçelendi (İK)",
+      excelPending: "Excel baz (bekliyor)",
+      save: "Taslağı kaydet",
+      submit: "Bütçeyi gönder",
+      code: "Hesap",
+      account: "Hesap adı",
+      source: "Kaynak",
+      actualBaseline: "Oca-May gerçek/baz",
+      budgetPeriod: "Haz-Ara bütçe",
+      annual: "Yıllık toplam",
+      status: "Durum",
+      hrBudget: "İK bütçesi",
+      excel: "Excel",
+      done: "Tamamlandı",
+      start: "Bütçeyi başlat",
+      view: "Görüntüle",
+      detail: "Haz-Ara bütçe detayı",
+      close: "Daralt",
+      noAccounts: "Hesap yok"
+    }
+  };
+  return copy[state.language]?.[key] || copy.zh[key] || key;
+}
+
+function rfAccountGroup(id, title, items, selectedMeta) {
+  const groupClass = id === "budgeted" ? "complete" : "baseline";
+  return `
+    <section class="rf-account-group ${groupClass}" data-rf-group="${escapeHtml(id)}">
+      <div class="rf-account-group-head">
+        <h4>${escapeHtml(title)}</h4>
+        <strong>${items.length}</strong>
       </div>
-      <div class="rf-stats">
-        ${rfStat(rfT("myTasks"), stats.myTasks)}
-        ${rfStat(rfT("ownerMissing"), stats.ownerMissing)}
-        ${rfStat(rfT("warnings"), stats.warnings, stats.warnings ? "warn" : "")}
-        ${rfStat(rfT("drafts"), stats.drafts)}
-        ${rfStat(rfT("submitted"), stats.submitted, "ok")}
+      <div class="rf-account-table-wrap">
+        <table class="rf-account-table">
+          <colgroup>
+            <col class="rf-col-code" />
+            <col class="rf-col-name" />
+            <col class="rf-col-source" />
+            ${Array.from({ length: 12 }, () => `<col class="rf-col-month" />`).join("")}
+            <col class="rf-col-annual" />
+            <col class="rf-col-status" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>${escapeHtml(rfCompactT("code"))}</th>
+              <th>${escapeHtml(rfCompactT("account"))}</th>
+              <th>${escapeHtml(rfCompactT("source"))}</th>
+              <th colspan="5">${escapeHtml(rfCompactT("actualBaseline"))}</th>
+              <th colspan="7">${escapeHtml(rfCompactT("budgetPeriod"))}</th>
+              <th>${escapeHtml(rfCompactT("annual"))}<small>K€</small></th>
+              <th>${escapeHtml(rfCompactT("status"))}</th>
+            </tr>
+            <tr class="rf-account-months">
+              <th></th><th></th><th></th>
+              ${Array.from({ length: 12 }, (_, index) => `<th>${escapeHtml(localizeMonthLabel(index, state.language))}</th>`).join("")}
+              <th></th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((item) => rfAccountStatusRow(item, selectedMeta)).join("") || `<tr><td colspan="17" class="rf-empty">${escapeHtml(rfCompactT("noAccounts"))}</td></tr>`}
+          </tbody>
+        </table>
       </div>
-      <div class="rf-layout">
-        <aside class="rf-task-panel">
-          <div class="rf-filter-tabs">
-            ${rfFilterButton("all", rfT("allTasks"))}
-            ${rfFilterButton("my", rfT("myTasks"))}
-            ${rfFilterButton("missing", rfT("ownerMissing"))}
-            ${rfFilterButton("warning", rfT("warnings"))}
-          </div>
-          <div class="rf-task-list">
-            ${filteredMeta.map((item) => rfTaskRow(item)).join("") || `<div class="rf-empty">${escapeHtml(rfT("noTask"))}</div>`}
-          </div>
-        </aside>
-        <section class="rf-editor">
-          ${rfEditor(selectedMeta)}
-        </section>
+    </section>
+  `;
+}
+
+function rfAccountStatusRow(item, selectedMeta) {
+  const row = item.row;
+  const selected = row.code === selectedMeta?.row?.code;
+  const accountLabel = state.activeUnit === "cooking" && state.language === "zh" && row.descCn
+    ? row.descCn
+    : localizeAccountLabel(row.code, row.descEn, state.language);
+  const months = Array.from({ length: 12 }, (_, index) => rfAccountMonthAmount(row.code, index + 1));
+  const annual = months.reduce((sum, value) => Number.isFinite(value) ? sum + value : sum, 0);
+  const statusClass = item.hasHrBudget ? "complete" : "baseline";
+  const source = item.hasHrBudget ? rfCompactT("hrBudget") : rfCompactT("excel");
+  const action = item.hasHrBudget ? rfCompactT("view") : rfCompactT("start");
+  return `
+    <tr class="rf-account-row ${selected ? "selected" : ""}" data-rf-select="${escapeHtml(row.code)}">
+      <td><button type="button" class="rf-row-toggle" data-rf-select="${escapeHtml(row.code)}" aria-expanded="${selected}">${selected ? "−" : "+"}</button><b>${escapeHtml(row.code)}</b></td>
+      <td title="${escapeHtml(accountLabel)}">${escapeHtml(shortText(accountLabel, 30))}</td>
+      <td><span class="rf-source ${statusClass}">${escapeHtml(source)}</span></td>
+      ${months.map((value, index) => `<td class="rf-month-value ${index >= 5 ? "forecast" : "actual"}">${formatMoney(value)}</td>`).join("")}
+      <td class="rf-annual"><strong>${formatMoney(annual)}</strong></td>
+      <td><button type="button" class="rf-status-action ${statusClass}" data-rf-select="${escapeHtml(row.code)}">${escapeHtml(item.hasHrBudget ? rfCompactT("done") : action)}</button></td>
+    </tr>
+    ${selected ? `<tr class="rf-account-detail-row"><td colspan="17">${rfCompactEditor(item)}</td></tr>` : ""}
+  `;
+}
+
+function rfAccountMonthAmount(code, month) {
+  if (month >= 6) return rollingTotalInfo(code, month).total;
+  return referenceAmountForAccount(code, month, "current");
+}
+
+function rfCompactEditor(item) {
+  const row = item.row;
+  const totalOnly = item.totalOnly;
+  return `
+    <div class="rf-compact-editor">
+      <div class="rf-compact-editor-head">
+        <div><strong>${escapeHtml(rfCompactT("detail"))}</strong><span>${escapeHtml(row.code)} · K€</span></div>
+        <div class="rf-actions">
+          <button type="button" class="ghost-button" data-rf-action="save-current" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfCompactT("save"))}</button>
+          <button type="button" data-rf-action="submit-current" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfCompactT("submit"))}</button>
+        </div>
+      </div>
+      <div class="rf-matrix-wrap">
+        <table class="rf-matrix ${totalOnly ? "rf-total-mode" : ""}">
+          <thead>${totalOnly ? rfTotalModeHeader(false) : rfUnitQtyHeader(false)}</thead>
+          <tbody>${ROLLING_FORECAST_MONTHS.map((month) => rfMonthRow(row, month, totalOnly, false)).join("")}</tbody>
+        </table>
       </div>
     </div>
   `;
@@ -4079,9 +4246,14 @@ async function handleRollingForecastClick(event) {
     renderTable();
     return;
   }
+  const anchorButton = event.target.closest("[data-rf-anchor]");
+  if (anchorButton) {
+    els.forecastWorkspace?.querySelector(`[data-rf-group="${anchorButton.dataset.rfAnchor}"]`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
   const selectButton = event.target.closest("[data-rf-select]");
   if (selectButton) {
-    state.rollingSelectedCode = selectButton.dataset.rfSelect;
+    state.rollingSelectedCode = state.rollingSelectedCode === selectButton.dataset.rfSelect ? null : selectButton.dataset.rfSelect;
     renderTable();
     return;
   }
