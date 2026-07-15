@@ -40,8 +40,9 @@ import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
+import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 
-const VERSION = "20260713-hr-budget-i18n-v1";
+const VERSION = "20260715-hr-budget-sync-v2";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -2492,6 +2493,7 @@ function renderTable() {
     if (els.detailBody) els.detailBody.innerHTML = `<tr><td colspan="8" class="empty-cell">${t("emptySap")}</td></tr>`;
     return;
   }
+  if (state.rollingRole !== "hr") ensureHrBudgetBaselineSync();
   const rows = visibleRows();
   const collapsedCount = state.result.unsplitCategories?.length || 0;
   const collapsedText = collapsedCount ? ` · ${t("collapsedCategoryCompare").replace("{count}", collapsedCount)}` : "";
@@ -2572,6 +2574,7 @@ const ROLLING_FORECAST_SUBMIT_KEY = "dwRollingForecastSubmitted.v1";
 const HR_BUDGET_DRIVER_KEY = "dwHrBudgetDrivers.v1";
 const HR_BUDGET_INPUT_KEY = "dwHrBudgetInputs.v2";
 const HR_BUDGET_AUDIT_KEY = "dwHrBudgetAudit.v1";
+const HR_BUDGET_SYNC_KEY = "dwHrBudgetSync.v1";
 const HR_BUDGET_DEFAULTS = {
   reviewMonth: 6,
   reviewHeadcount: 374,
@@ -2759,7 +2762,14 @@ const ROLLING_FORECAST_TEXT = {
     currentSubmitted: "当前科目已提交",
     missingOwnerHint: "请补责任人",
     warningHint: "超过上月20%",
-    status: "状态"
+    status: "状态",
+    hrBudgetSource: "人力预算",
+    hrBudgetSynced: "人力预算已同步",
+    hrBudgetSyncHint: "{time} · {owner} · 数据来自 For Finance",
+    hrMappedAccounts: "对应人力科目",
+    hrAdjustmentReason: "调整原因",
+    hrBaselineReason: "Excel预算基线同步",
+    hrFormulaPending: "当前同步源表预算结果；参数变更将在完整计算公式接入后联动重算。"
   },
   en: {
     title: "Rolling Forecast Hub",
@@ -2825,7 +2835,14 @@ const ROLLING_FORECAST_TEXT = {
     currentSubmitted: "Current account submitted",
     missingOwnerHint: "Add owner",
     warningHint: "Over 20% vs previous month",
-    status: "Status"
+    status: "Status",
+    hrBudgetSource: "HR Budget",
+    hrBudgetSynced: "HR budget synced",
+    hrBudgetSyncHint: "{time} · {owner} · Source: For Finance",
+    hrMappedAccounts: "Mapped HR accounts",
+    hrAdjustmentReason: "Adjustment reason",
+    hrBaselineReason: "Excel budget baseline sync",
+    hrFormulaPending: "The source budget result is synced now; driver changes will recalculate after the full formulas are connected."
   },
   tr: {
     title: "Dönen Tahmin Merkezi",
@@ -2891,7 +2908,14 @@ const ROLLING_FORECAST_TEXT = {
     currentSubmitted: "Seçili hesap gönderildi",
     missingOwnerHint: "Sorumlu ekle",
     warningHint: "Önceki aya göre %20 üzeri",
-    status: "Durum"
+    status: "Durum",
+    hrBudgetSource: "İK Bütçesi",
+    hrBudgetSynced: "İK bütçesi eşitlendi",
+    hrBudgetSyncHint: "{time} · {owner} · Kaynak: For Finance",
+    hrMappedAccounts: "Eşlenen İK hesapları",
+    hrAdjustmentReason: "Değişiklik nedeni",
+    hrBaselineReason: "Excel bütçe baz senkronu",
+    hrFormulaPending: "Şimdilik kaynak bütçe sonucu eşitlenir; parametre değişiklikleri tüm formüller bağlandıktan sonra yeniden hesaplanır."
   }
 };
 
@@ -2903,6 +2927,7 @@ function renderRollingForecastWorkspace(rows) {
     renderHrBudgetWorkspace();
     return;
   }
+  ensureHrBudgetBaselineSync();
   const accountRows = rows.filter((row) => row.code);
   if (!accountRows.length) {
     els.forecastWorkspace.innerHTML = `<div class="empty-cell">${rfT("noTask")}</div>`;
@@ -3029,6 +3054,57 @@ function loadHrBudgetAudit() {
 
 function saveHrBudgetAudit() {
   localStorage.setItem(HR_BUDGET_AUDIT_KEY, JSON.stringify(hrBudgetAudit));
+}
+
+function loadHrBudgetSyncMeta() {
+  try {
+    return JSON.parse(localStorage.getItem(HR_BUDGET_SYNC_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function applyHrBudgetSync(reason = "", action = "baseline") {
+  const output = buildHrBudgetAccountSync(hrBudgetData());
+  const timestamp = new Date().toISOString();
+  const actor = els.userName?.value.trim() || (action === "baseline" ? "Excel" : t("hrRole"));
+  const meta = {
+    version: VERSION,
+    timestamp,
+    actor,
+    reason: String(reason || rfT("hrBaselineReason")).trim(),
+    action,
+    sourceFile: hrBudgetData().sourceFile,
+    mappedCodes: Object.keys(output).length
+  };
+
+  for (const [code, entry] of Object.entries(output)) {
+    const accountDraft = state.rollingForecastDrafts[code] || {};
+    for (const [month, amount] of Object.entries(entry.months || {})) {
+      accountDraft[month] = {
+        ...(accountDraft[month] || {}),
+        hrBudgetAmount: Number(Number(amount || 0).toFixed(6)),
+        hrBudgetOwner: actor,
+        hrBudgetUpdatedAt: timestamp,
+        hrBudgetReason: meta.reason,
+        hrBudgetKeys: [...entry.accountKeys],
+        hrBudgetLabels: [...entry.sourceLabels]
+      };
+    }
+    state.rollingForecastDrafts[code] = accountDraft;
+    if (action === "submit") state.rollingForecastSubmitted[code] = timestamp;
+  }
+  localStorage.setItem(HR_BUDGET_SYNC_KEY, JSON.stringify(meta));
+  localStorage.setItem(ROLLING_FORECAST_DRAFT_KEY, JSON.stringify(state.rollingForecastDrafts));
+  localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
+  return meta;
+}
+
+function ensureHrBudgetBaselineSync() {
+  const meta = loadHrBudgetSyncMeta();
+  const hasSyncedAmount = Object.values(state.rollingForecastDrafts || {}).some((account) => Object.values(account || {}).some((month) => Number.isFinite(Number(month?.hrBudgetAmount))));
+  const staleReason = !meta?.reason || meta.reason === "hrBaselineReason";
+  if (!hasSyncedAmount || meta?.version !== VERSION || staleReason) applyHrBudgetSync(staleReason ? rfT("hrBaselineReason") : meta.reason, meta?.action || "baseline");
 }
 
 function hrBudgetChanges(fromInputs, toInputs) {
@@ -3461,7 +3537,9 @@ function rfTaskRow(item) {
     ? row.descCn
     : localizeAccountLabel(row.code, row.descEn, state.language);
   const selected = row.code === state.rollingSelectedCode;
-  const taskLabel = item.warningCount
+  const taskLabel = item.hasHrBudget
+    ? rfT("hrBudgetSource")
+    : item.warningCount
     ? rfT("warningHint")
     : item.ownerMissing
       ? rfT("missingOwnerHint")
@@ -3487,12 +3565,27 @@ function rfTaskRow(item) {
   `;
 }
 
+function rfHrBudgetSourcePanel(item) {
+  if (!item.hasHrBudget) return "";
+  const source = item.months.find((month) => month.hasHrBudget)?.draft;
+  if (!source) return "";
+  const locale = state.language === "tr" ? "tr-TR" : state.language === "en" ? "en-US" : "zh-CN";
+  const time = source.hrBudgetUpdatedAt
+    ? new Date(source.hrBudgetUpdatedAt).toLocaleString(locale, { hour12: false })
+    : "--";
+  const labels = source.hrBudgetLabels.length ? source.hrBudgetLabels.join(" + ") : "For Finance";
+  return `<section class="rf-hr-source">
+    <div><span>${escapeHtml(rfT("hrBudgetSynced"))}</span><strong>${escapeHtml(labels)}</strong><small>${escapeHtml(rfT("hrBudgetSyncHint", { time, owner: source.hrBudgetOwner || t("hrRole") }))}</small></div>
+    <div><span>${escapeHtml(rfT("hrAdjustmentReason"))}</span><strong>${escapeHtml(source.hrBudgetReason || rfT("hrBaselineReason"))}</strong><small>${escapeHtml(rfT("hrFormulaPending"))}</small></div>
+  </section>`;
+}
+
 function rfEditor(item) {
   const row = item.row;
   const accountLabel = localizeAccountLabel(row.code, row.descEn, state.language);
   const totalOnly = item.totalOnly;
   const showVariance = state.rollingViewMode === "variance";
-  const ownerSummary = item.ownerMissing ? rfT("ownerNeeded") : totalOnly ? rfT("byTotal") : rfT("byFormula");
+  const ownerSummary = item.hasHrBudget ? rfT("hrBudgetSource") : item.ownerMissing ? rfT("ownerNeeded") : totalOnly ? rfT("byTotal") : rfT("byFormula");
   return `
     <div class="rf-editor-head">
       <div>
@@ -3501,10 +3594,11 @@ function rfEditor(item) {
         <p>${escapeHtml(localizeCategory(row.category, state.language))} · ${escapeHtml(rfT("forecastLogic"))}: ${escapeHtml(forecastLogicForRow(row))}</p>
       </div>
       <div class="rf-status-stack">
-        <span class="rf-chip ${item.submitted ? "ok" : item.hasDraft ? "draft" : ""}">${escapeHtml(item.submitted ? rfT("submitted") : item.hasDraft ? rfT("draft") : rfT("usesForecast"))}</span>
+        <span class="rf-chip ${item.submitted || item.hasHrBudget ? "ok" : item.hasDraft ? "draft" : ""}">${escapeHtml(item.submitted ? rfT("submitted") : item.hasHrBudget ? rfT("hrBudgetSource") : item.hasDraft ? rfT("draft") : rfT("usesForecast"))}</span>
         <span class="rf-chip ${item.ownerMissing ? "muted" : "ok"}">${escapeHtml(ownerSummary)}</span>
       </div>
     </div>
+    ${rfHrBudgetSourcePanel(item)}
     <div class="rf-formula-note">${escapeHtml(totalOnly ? rfT("totalModeHint") : rfT("formulaHint"))}</div>
     <div class="rf-matrix-wrap">
       <table class="rf-matrix ${totalOnly ? "rf-total-mode" : ""} ${showVariance ? "rf-variance-mode" : ""}">
@@ -3569,7 +3663,7 @@ function rfMonthRow(row, month, totalOnly = isRollingTotalOnlyRow(row), showVari
   const totalInfo = rollingTotalInfo(code, month);
   const warning = rollingWarningInfo(code, month);
   const variance = showVariance ? rollingVarianceInfo(code, month) : null;
-  const totalClass = warning.level === "severe" ? "severe" : warning.level === "warn" ? "warn" : "";
+  const totalClass = `${warning.level === "severe" ? "severe" : warning.level === "warn" ? "warn" : ""} ${totalInfo.sourceType === "hr" ? "hr-source" : ""}`.trim();
   if (totalOnly) {
     const detailLabel = draft.detailName ? rfT("replaceDetail") : rfT("uploadDetail");
     return `
@@ -3679,6 +3773,7 @@ function rollingRowMeta(row) {
     const hasUnit = String(draft.unitPrice || "").trim() !== "";
     const hasQty = String(draft.quantity || "").trim() !== "";
     const hasTotal = String(draft.totalAmount || "").trim() !== "";
+    const hasHrBudget = Number.isFinite(draft.hrBudgetAmount);
     const hasOwner = totalOnly
       ? String(draft.totalOwner || "").trim()
       : String(draft.priceOwner || "").trim() || String(draft.quantityOwner || "").trim();
@@ -3686,9 +3781,10 @@ function rollingRowMeta(row) {
     return {
       month,
       draft,
-      hasDraft: totalOnly ? hasTotal || hasOwner || hasDetail : hasUnit || hasQty || hasOwner,
-      hasFormula: totalOnly ? hasTotal : hasUnit && hasQty,
-      ownerMissing: totalOnly
+      hasHrBudget,
+      hasDraft: (totalOnly ? hasTotal || hasOwner || hasDetail : hasUnit || hasQty || hasOwner) || hasHrBudget,
+      hasFormula: (totalOnly ? hasTotal : hasUnit && hasQty) || hasHrBudget,
+      ownerMissing: hasHrBudget ? !String(draft.hrBudgetOwner || "").trim() : totalOnly
         ? !String(draft.totalOwner || "").trim()
         : !String(draft.priceOwner || "").trim() || !String(draft.quantityOwner || "").trim(),
       warning: rollingWarningInfo(row.code, month)
@@ -3698,11 +3794,13 @@ function rollingRowMeta(row) {
   const ownerMissingCount = months.filter((item) => item.ownerMissing).length;
   const formulaCount = months.filter((item) => item.hasFormula).length;
   const hasDraft = months.some((item) => item.hasDraft);
+  const hasHrBudget = months.some((item) => item.hasHrBudget);
   return {
     row,
     totalOnly,
     months,
     hasDraft,
+    hasHrBudget,
     hasFormula: formulaCount > 0,
     ownerMissing: ownerMissingCount > 0,
     ownerMissingCount,
@@ -3746,7 +3844,13 @@ function rollingMonthDraft(code, month) {
     quantityOwner: String(monthDraft.quantityOwner || ""),
     totalAmount: String(monthDraft.totalAmount || ""),
     totalOwner: String(monthDraft.totalOwner || ""),
-    detailName: String(monthDraft.detailName || "")
+    detailName: String(monthDraft.detailName || ""),
+    hrBudgetAmount: Number.isFinite(Number(monthDraft.hrBudgetAmount)) ? Number(monthDraft.hrBudgetAmount) : null,
+    hrBudgetOwner: String(monthDraft.hrBudgetOwner || ""),
+    hrBudgetUpdatedAt: String(monthDraft.hrBudgetUpdatedAt || ""),
+    hrBudgetReason: String(monthDraft.hrBudgetReason || ""),
+    hrBudgetKeys: Array.isArray(monthDraft.hrBudgetKeys) ? [...monthDraft.hrBudgetKeys] : [],
+    hrBudgetLabels: Array.isArray(monthDraft.hrBudgetLabels) ? [...monthDraft.hrBudgetLabels] : []
   };
 }
 
@@ -3772,6 +3876,7 @@ function rollingTotalInfo(code, month) {
   if (isRollingTotalOnlyCode(code)) {
     const total = parseOptionalNumber(draft.totalAmount);
     if (Number.isFinite(total)) return { total, source: rfT("byTotal") };
+    if (Number.isFinite(draft.hrBudgetAmount)) return { total: draft.hrBudgetAmount, source: rfT("hrBudgetSource"), sourceType: "hr" };
     return { total: forecastAmountForAccount(code, month), source: rfT("usesForecast") };
   }
   const unit = parseOptionalNumber(draft.unitPrice);
@@ -3779,6 +3884,7 @@ function rollingTotalInfo(code, month) {
   if (Number.isFinite(unit) && Number.isFinite(qty)) {
     return { total: unit * qty, source: rfT("byFormula") };
   }
+  if (Number.isFinite(draft.hrBudgetAmount)) return { total: draft.hrBudgetAmount, source: rfT("hrBudgetSource"), sourceType: "hr" };
   return { total: forecastAmountForAccount(code, month), source: rfT("usesForecast") };
 }
 
@@ -3954,6 +4060,8 @@ async function handleRollingForecastClick(event) {
       hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
     }
     saveHrBudgetInputs();
+    applyHrBudgetSync(reason || rfT("hrBaselineReason"), hrAction);
+    await saveRollingForecastDrafts();
     toast(hrAction === "submit" ? hrT("submittedTrace") : (changes.length ? hrT("savedTrace", { count: changes.length }) : hrT("noPendingSave")));
     if (hrAction === "submit") hrBudgetView = "exceptions";
     renderHrBudgetWorkspace();
@@ -4139,8 +4247,10 @@ function loadRollingForecastSubmitted() {
   }
 }
 
-function rfT(key) {
-  return ROLLING_FORECAST_TEXT[state.language]?.[key] || ROLLING_FORECAST_TEXT.zh[key] || key;
+function rfT(key, values = {}) {
+  let text = ROLLING_FORECAST_TEXT[state.language]?.[key] || ROLLING_FORECAST_TEXT.zh[key] || key;
+  for (const [name, value] of Object.entries(values)) text = text.replaceAll(`{${name}}`, String(value));
+  return text;
 }
 
 async function submitCurrentMonthAnalyses() {
@@ -4227,7 +4337,7 @@ function visibleRows() {
   const filter = els.analysisFilter.value;
   const category = els.categoryFilter.value;
   const sortBy = els.sortBy.value;
-  const rows = state.result.rows.filter((row) => {
+  const rows = rowsWithHrBudgetAccounts(state.result.rows).filter((row) => {
     const yoyAnalysis = analysisReason(state.analyses, state.result.month, row.code, "yoy");
     const momAnalysis = analysisReason(state.analyses, state.result.month, row.code, "mom");
     const description = analysisReason(state.analyses, state.result.month, row.code, "description");
@@ -4251,6 +4361,50 @@ function visibleRows() {
     return Math.abs(b[key] || 0) - Math.abs(a[key] || 0);
   });
   return rows;
+}
+
+function rowsWithHrBudgetAccounts(rows) {
+  if (state.activeUnit !== "dishwasher" || Number(state.result?.month || 0) < 6) return rows;
+  const output = buildHrBudgetAccountSync(hrBudgetData());
+  const existingCodes = new Set(rows.map((row) => String(row.code || "")));
+  const month = Number(state.result.month);
+  const volume25 = Number(state.result.volume25 || 0);
+  const volume26 = Number(state.result.volume26 || 0);
+  const additions = [];
+
+  for (const code of Object.keys(output)) {
+    if (existingCodes.has(String(code))) continue;
+    const planRows = ACCOUNT_BUDGET_DW_BY_MONTH[month]?.accounts || [];
+    const source = planRows.find((row) => String(row.code) === String(code) && row.category)
+      || planRows.find((row) => String(row.code) === String(code));
+    if (!source) continue;
+    const amount26 = rollingTotalInfo(code, month).total;
+    const amount25 = referenceAmountForAccount(code, month, "same");
+    const previousAmount26 = month > 1 ? rollingTotalInfo(code, month - 1).total : null;
+    const unit25 = Number.isFinite(amount25) && volume25 ? amount25 * 1000 / volume25 : null;
+    const unit26 = Number.isFinite(amount26) && volume26 ? amount26 * 1000 / volume26 : null;
+    const previousVolume26 = Number(state.result.previousVolume26 || 0);
+    const previousUnit26 = Number.isFinite(previousAmount26) && previousVolume26 ? previousAmount26 * 1000 / previousVolume26 : null;
+    additions.push({
+      code,
+      descEn: source.descEn,
+      category: source.category || source.summaryKey || "",
+      summaryKey: source.summaryKey || source.category || "",
+      amount25,
+      previousAmount26,
+      amount26,
+      amountDiff: Number.isFinite(amount26) && Number.isFinite(amount25) ? amount26 - amount25 : null,
+      momAmountDiff: Number.isFinite(amount26) && Number.isFinite(previousAmount26) ? amount26 - previousAmount26 : null,
+      unit25,
+      unit26,
+      previousUnit26,
+      unitDiff: Number.isFinite(unit26) && Number.isFinite(unit25) ? unit26 - unit25 : null,
+      momUnitDiff: Number.isFinite(unit26) && Number.isFinite(previousUnit26) ? unit26 - previousUnit26 : null,
+      isHighImpact: false,
+      isHrBudgetAccount: true
+    });
+  }
+  return [...rows, ...additions];
 }
 
 function rowToHtml(row) {

@@ -1790,6 +1790,43 @@ body.hr-budget-mode #varianceView .table-panel {
   color: var(--green);
 }
 
+.rf-hr-source {
+  margin: 12px 16px 0;
+  padding: 11px 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 14px;
+  border-left: 4px solid #078b72;
+  background: #eef9f5;
+}
+
+.rf-hr-source > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.rf-hr-source span,
+.rf-hr-source small {
+  color: #607b72;
+  font-size: 11px;
+}
+
+.rf-hr-source strong {
+  overflow-wrap: anywhere;
+  color: #075f50;
+  font-size: 13px;
+}
+
+.rf-total.hr-source {
+  background: #e8f6f1;
+}
+
+.rf-total.hr-source strong,
+.rf-total.hr-source small {
+  color: #08775d;
+}
+
 .rf-formula-note {
   margin: 12px 16px 0;
   padding: 10px 12px;
@@ -3040,4 +3077,5 @@ tr.high td:first-child {
   .hrb-policy-grid { grid-template-columns: 1fr; }
   .hrb-change-gate { align-items: stretch; flex-direction: column; }
   .hrb-change-gate.pending label { width: 100%; }
+  .rf-hr-source { grid-template-columns: 1fr; }
 }
