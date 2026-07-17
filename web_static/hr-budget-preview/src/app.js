@@ -41,10 +41,10 @@ import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./acco
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
-import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260716-admin-v3";
-import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260716-admin-v1";
+import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
+import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
 
-const VERSION = "20260717-adaptive-v1";
+const VERSION = "20260717-standards-v2";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -3389,19 +3389,48 @@ function adminBudgetResults() {
   if (selected) state.adminSelectedAccount = selected.code;
   const actualBand = state.language === "en" ? "Jan-May Excel baseline" : state.language === "tr" ? "Oca-May Excel baz" : "1-5月 Excel基线";
   const forecastBand = state.language === "en" ? "Jun-Dec rolling budget" : state.language === "tr" ? "Haz-Ara güncel bütçe" : "6-12月 滚动预算";
-  return `<section class="adb-results"><div class="adb-table-wrap"><table class="adb-budget-table"><thead><tr class="adb-month-bands"><th colspan="2">${escapeHtml(adminT("categories"))}</th><th colspan="5" class="baseline">${escapeHtml(actualBand)}</th><th colspan="7" class="forecast">${escapeHtml(forecastBand)}</th><th colspan="2">${escapeHtml(adminT("annualTotal"))}</th></tr><tr><th>${escapeHtml(adminT("resultAccountName"))}</th><th>${escapeHtml(adminT("resultAccountCode"))}</th>${resultMonths.map((month) => `<th>${escapeHtml(localizeMonthLabel(month - 1, state.language))}<small>K€</small></th>`).join("")}<th>${escapeHtml(adminT("annualTotal"))}<small>K€</small></th><th>${escapeHtml(adminT("status"))}</th></tr></thead><tbody>${accounts.map((account) => `<tr class="${selected?.code === account.code ? "selected" : ""}" data-admin-result="${escapeHtml(account.code)}"><td><b>${escapeHtml(account.label)}</b><small>${escapeHtml(adminT("sourceCategories"))}: ${escapeHtml(account.sources.join(" / "))}</small></td><td>${escapeHtml(account.code)}</td>${resultMonths.map((month) => `<td>${formatMoney(account.months[month - 1])}</td>`).join("")}<td><strong>${formatMoney(account.annual)}</strong></td><td><span class="adb-status ready">${escapeHtml(adminT("ready"))}</span></td></tr>`).join("")}</tbody></table></div>${selected ? adminBudgetAccountDetail(selected) : ""}</section>`;
+  return `<section class="adb-results"><div class="adb-table-wrap"><table class="adb-budget-table"><thead><tr class="adb-month-bands"><th colspan="2">${escapeHtml(adminT("categories"))}</th><th colspan="5" class="baseline">${escapeHtml(actualBand)}</th><th colspan="7" class="forecast">${escapeHtml(forecastBand)}</th><th colspan="2">${escapeHtml(adminT("annualTotal"))}</th></tr><tr><th>${escapeHtml(adminT("resultAccountName"))}</th><th>${escapeHtml(adminT("resultAccountCode"))}</th>${resultMonths.map((month) => `<th>${escapeHtml(localizeMonthLabel(month - 1, state.language))}<small>K€</small></th>`).join("")}<th>${escapeHtml(adminT("annualTotal"))}<small>K€</small></th><th>${escapeHtml(adminT("status"))}</th></tr></thead><tbody>${accounts.map((account) => adminBudgetResultRow(account, selected, resultMonths)).join("")}</tbody></table></div></section>`;
+}
+
+function adminBudgetResultRow(account, selected, resultMonths) {
+  const isSelected = selected?.code === account.code;
+  const row = `<tr class="${isSelected ? "selected" : ""}" data-admin-result="${escapeHtml(account.code)}"><td><b>${escapeHtml(account.label)}</b><small>${escapeHtml(adminT("sourceCategories"))}: ${escapeHtml(account.sources.join(" / "))}</small></td><td>${escapeHtml(account.code)}</td>${resultMonths.map((month) => `<td>${formatMoney(account.months[month - 1])}</td>`).join("")}<td><strong>${formatMoney(account.annual)}</strong></td><td><span class="adb-status ready">${escapeHtml(adminT("ready"))}</span></td></tr>`;
+  return `${row}${isSelected ? `<tr class="adb-inline-detail-row"><td colspan="16">${adminBudgetAccountDetail(account)}</td></tr>` : ""}`;
+}
+
+function revealAdminInlineDetail() {
+  requestAnimationFrame(() => {
+    const wrap = els.forecastWorkspace?.querySelector(".adb-table-wrap");
+    const detail = wrap?.querySelector(".adb-inline-detail-row");
+    if (!wrap || !detail) return;
+    const detailBottom = detail.offsetTop + detail.offsetHeight;
+    const visibleBottom = wrap.scrollTop + wrap.clientHeight;
+    if (detailBottom > visibleBottom) wrap.scrollTop = detailBottom - wrap.clientHeight + 2;
+    else if (detail.offsetTop < wrap.scrollTop + 68) wrap.scrollTop = Math.max(0, detail.offsetTop - 68);
+  });
 }
 
 function adminBudgetAccountDetail(account) {
   const categories = (account.categoryIds || []).map((id) => ADMIN_BUDGET_DATA.categories.find((item) => item.id === id)).filter(Boolean);
   const primary = categories[0];
   const drivers = primary ? (ADMIN_DRIVER_MATRIX[primary.id] || []).slice(0, 4) : [];
-  const max = Math.max(...account.months, 1);
-  const points = account.months.map((value, index) => `${index * (100 / 11)},${88 - (Number(value || 0) / max) * 64}`).join(" ");
+  const pendingValue = state.language === "en" ? "Pending owner input" : state.language === "tr" ? "Sorumlu girişi bekleniyor" : "待责任部门提供";
+  const standards = primary?.standards || drivers.map((item) => ({ ...item, value: pendingValue, unit: "", provider: item.provider }));
   const sourceLabel = state.language === "en" ? "Budget source" : state.language === "tr" ? "Bütçe kaynağı" : "预算来源";
-  const driverLabel = state.language === "en" ? "Driver responsibility" : state.language === "tr" ? "Sürücü sorumluluğu" : "驱动责任";
-  const trendLabel = state.language === "en" ? "Monthly budget trend" : state.language === "tr" ? "Aylık bütçe eğilimi" : "月度预算趋势";
-  return `<section class="adb-account-detail"><div class="adb-account-formula"><span>${escapeHtml(account.code)}</span><h4>${escapeHtml(account.label)}</h4><b>${escapeHtml(primary ? adminFormula(primary) : adminT("sourceStandard"))}</b><small>${escapeHtml(sourceLabel)}：${escapeHtml(account.sources.join(" / "))}</small></div><div class="adb-account-drivers"><strong>${escapeHtml(driverLabel)}</strong><div>${drivers.map((item) => `<span><small>${escapeHtml(adminDriverLabel(item))}</small><b>${escapeHtml(adminProvider(item.provider))}</b></span>`).join("")}</div></div><div class="adb-account-trend"><strong>${escapeHtml(trendLabel)}</strong><svg viewBox="0 0 100 94" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="88" x2="100" y2="88"></line><line x1="0" y1="56" x2="100" y2="56"></line><polyline points="${points}"></polyline></svg></div></section>`;
+  const standardLabel = state.language === "en" ? "Budget standard" : state.language === "tr" ? "Bütçe standardı" : "预算标准";
+  const reviewedLabel = state.language === "en" ? "Standard reviewed" : state.language === "tr" ? "Standart kontrol edildi" : "标准已校核";
+  const reasonLabel = state.language === "en" ? "Change reason: contract or policy update" : state.language === "tr" ? "Değişiklik nedeni: sözleşme veya politika güncellemesi" : "调整原因：合同或政策标准更新";
+  const recordLabel = state.language === "en" ? "Change record retained" : state.language === "tr" ? "Değişiklik kaydı saklandı" : "变更记录：已保留责任人和时间";
+  return `<div class="adb-account-detail"><div class="adb-account-formula"><span>${escapeHtml(account.code)} · ${escapeHtml(sourceLabel)}</span><h4>${escapeHtml(account.label)}${escapeHtml(standardLabel)}</h4><b>${escapeHtml(primary ? adminFormula(primary) : adminT("sourceStandard"))}</b><small>${escapeHtml(account.sources.join(" / "))}</small></div><div class="adb-account-drivers">${standards.map((item) => `<span class="${item.value === pendingValue ? "pending" : ""}"><small>${escapeHtml(adminDriverLabel(item))} · ${escapeHtml(adminProvider(item.provider))}</small><b>${escapeHtml(item.value)}${item.unit ? ` <em>${escapeHtml(adminStandardUnit(item))}</em>` : ""}</b></span>`).join("")}</div><div class="adb-review-card"><strong>${escapeHtml(primary?.standards ? reviewedLabel : pendingValue)}</strong><span>${escapeHtml(primary?.standards ? reasonLabel : adminT("pendingNote"))}</span><small>${escapeHtml(recordLabel)}</small></div></div>`;
+}
+
+function adminStandardUnit(item) {
+  if (state.language === "zh") return item.unit || "";
+  const units = {
+    en: { headcount: "people/month", workdays: "days/month", mealPrice: "TRY/person-day (Jan-Jun / Jul-Dec)", sundayOt: "people", itemPrice: "TRY/item", issueQty: "issues by item", surcharge: "source factor" },
+    tr: { headcount: "kişi/ay", workdays: "gün/ay", mealPrice: "TRY/kişi-gün (Oca-Haz / Tem-Ara)", sundayOt: "kişi", itemPrice: "TRY/adet", issueQty: "ürüne göre dağıtım", surcharge: "kaynak katsayısı" }
+  };
+  return units[state.language]?.[item.key] || item.unit || "";
 }
 
 function adminBudgetResultAccounts() {
@@ -4527,6 +4556,7 @@ async function handleRollingForecastClick(event) {
   if (adminResult) {
     state.adminSelectedAccount = adminResult;
     renderAdminBudgetWorkspace();
+    revealAdminInlineDetail();
     return;
   }
   const adminAction = event.target.closest("[data-admin-action]")?.dataset.adminAction;

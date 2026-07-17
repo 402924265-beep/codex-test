@@ -1298,7 +1298,9 @@ body.admin-budget-mode #varianceView .table-panel {
 .adb-budget-table tr.pending td { background: #fafbfc; color: #7b8b95; }
 .adb-budget-table input { width: 72px; height: 30px; padding: 4px 6px; border: 1px solid #b9d5d0; border-radius: 4px; color: #0a3e59; background: #f6fbfa; text-align: right; }
 
-.adb-account-detail { min-height: 150px; display: grid; grid-template-columns: minmax(280px, 1.05fr) minmax(460px, 1.55fr) minmax(300px, .9fr); border: 1px solid #cfdfe8; border-top: 3px solid #008b7d; background: #fff; }
+.adb-inline-detail-row { cursor: default !important; }
+.adb-inline-detail-row > td { padding: 0 !important; background: #f5fafc !important; text-align: left !important; }
+.adb-account-detail { min-height: 126px; display: grid; grid-template-columns: minmax(300px, 1.05fr) minmax(560px, 1.7fr) minmax(260px, .8fr); border-top: 3px solid #008b7d; background: #f5fafc; }
 .adb-account-formula, .adb-account-drivers, .adb-account-trend { padding: 14px 16px; border-right: 1px solid #d8e3e9; }
 .adb-account-detail > div:last-child { border-right: 0; }
 .adb-account-formula { display: grid; align-content: center; gap: 4px; }
@@ -1307,13 +1309,19 @@ body.admin-budget-mode #varianceView .table-panel {
 .adb-account-formula b { color: #294e64; font-size: 12px; line-height: 1.45; }
 .adb-account-formula small { color: #708796; }
 .adb-account-drivers > strong, .adb-account-trend > strong { color: #31576e; font-size: 11px; }
-.adb-account-drivers > div { margin-top: 10px; display: grid; grid-template-columns: repeat(2, minmax(130px, 1fr)); gap: 7px; }
-.adb-account-drivers span { min-height: 43px; padding: 6px 9px; display: grid; align-content: center; border: 1px solid #b8d9d2; border-radius: 4px; background: #eef8f5; }
+.adb-account-drivers { display: grid; grid-template-columns: repeat(3, minmax(150px, 1fr)); gap: 8px; align-content: center; }
+.adb-account-drivers span { min-height: 58px; padding: 8px 10px; display: grid; align-content: center; border: 1px solid #b8d9d2; border-radius: 4px; background: #fff; }
 .adb-account-drivers small { color: #6d8492; font-size: 9px; }
-.adb-account-drivers b { color: #0a5f56; font-size: 11px; }
+.adb-account-drivers b { color: #0a5f56; font-size: 13px; }
+.adb-account-drivers b em { color: #6d8492; font-size: 9px; font-style: normal; font-weight: 500; }
+.adb-account-drivers span.pending { border-color: #dfc99c; background: #fff9ed; }
+.adb-account-drivers span.pending b { color: #9a6500; }
 .adb-account-trend svg { width: 100%; height: 92px; margin-top: 8px; overflow: visible; }
 .adb-account-trend line { stroke: #dce6eb; stroke-width: 1; }
 .adb-account-trend polyline { fill: none; stroke: #078778; stroke-width: 2.3; vector-effect: non-scaling-stroke; }
+.adb-review-card { margin: 14px; padding: 12px 14px; display: grid; align-content: center; gap: 7px; border-left: 4px solid #df941d; background: #fff3d6; }
+.adb-review-card strong { color: #8b5600; }
+.adb-review-card span, .adb-review-card small { color: #5d6870; font-size: 10px; }
 
 .adb-status { display: inline-block; padding: 3px 7px; border-radius: 3px; font-size: 10px; font-weight: 800; white-space: nowrap; }
 .adb-status.ready { color: #007763; background: #e3f3ed; }

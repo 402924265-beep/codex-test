@@ -1,4 +1,4 @@
-import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, adminCategoryMonthlyEur } from "./admin-budget-data.js";
+import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 
 export function buildAdminBudgetAccountSync(data = ADMIN_BUDGET_DATA, overrides = {}, months = ADMIN_BUDGET_MONTHS) {
   const output = {};
@@ -19,4 +19,3 @@ export function buildAdminBudgetAccountSync(data = ADMIN_BUDGET_DATA, overrides 
 export function adminBudgetSyncTotal(output, month) {
   return Object.values(output || {}).reduce((sum, entry) => sum + Number(entry.months?.[String(month)] || 0), 0);
 }
-
