@@ -1,4 +1,4 @@
-import { cellText, normalizeNumber } from "./parser.js?v=20260608-metric-groups-v9";
+import { cellText, normalizeNumber } from "./parser.js?v=20260717-june-6plus6-v1";
 import {
   annualManufacturingRate,
   combineHeadcount,
@@ -157,10 +157,15 @@ export function extractForecastWorkbook(workbook, XLSX) {
   const varianceRows = rowsFromSheet(workbook, XLSX, ["FCST 26"]);
   const hcRows = optionalRowsFromSheet(workbook, XLSX, ["HC 2026"]);
 
+  const ckVolumeRow = volumeRows.find((row) => sameLabel(cellText(row[0]), "CK2")
+    && sameLabel(cellText(row[1]), "Volume")
+    && sameLabel(cellText(row[2]), "TOTAL"));
+  const ckActualVolume = ckVolumeRow ? rowMonths(ckVolumeRow, 3) : null;
+  const ckBudgetVolume = ckVolumeRow ? rowMonths(ckVolumeRow, 23) : null;
   const volume = {
-    budget: rowMonths(findRow(volumeRows, "Budget Volume"), 1),
-    std: rowMonths(findRow(volumeRows, "STD Volume"), 1),
-    actual: rowMonths(findRow(volumeRows, "Actual Volume"), 1)
+    budget: ckBudgetVolume || rowMonths(findRow(volumeRows, "Budget Volume"), 1),
+    std: ckActualVolume || rowMonths(findRow(volumeRows, "STD Volume"), 1),
+    actual: ckActualVolume || rowMonths(findRow(volumeRows, "Actual Volume"), 1)
   };
   volume.delta = volume.actual.map((value, index) => nullableDiff(value, volume.budget[index]));
 
@@ -291,13 +296,13 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const kpiHeadcount = getKpiHeadcount("DW");
   const directEmployeesSame = normalizeMonths(kpiHeadcount.direct.same);
   const directEmployeesBudget = normalizeMonths(kpiHeadcount.direct.budget);
-  const directEmployees26 = normalizeMonths(kpiHeadcount.direct.actual);
+  const directEmployees26 = preferSeries(forecast.hc?.actualDirect, kpiHeadcount.direct.actual);
   const indirectEmployeesSame = normalizeMonths(kpiHeadcount.indirect.same);
   const indirectEmployeesBudget = normalizeMonths(kpiHeadcount.indirect.budget);
-  const indirectEmployees26 = normalizeMonths(kpiHeadcount.indirect.actual);
+  const indirectEmployees26 = preferSeries(forecast.hc?.actualIndirect, kpiHeadcount.indirect.actual);
   const whiteCollarSame = normalizeMonths(kpiHeadcount.white.same);
   const whiteCollarBudget = normalizeMonths(kpiHeadcount.white.budget);
-  const whiteCollar26 = normalizeMonths(kpiHeadcount.white.actual);
+  const whiteCollar26 = preferSeries(forecast.hc?.actualFixed, kpiHeadcount.white.actual);
   const hcSame = combineHeadcount(directEmployeesSame, indirectEmployeesSame);
   const hcBudget = combineHeadcount(directEmployeesBudget, indirectEmployeesBudget);
   const hcActual = combineHeadcount(directEmployees26, indirectEmployees26);

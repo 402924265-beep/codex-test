@@ -142,7 +142,7 @@ function collapseUnsplitForecastRows(rows, categories, unsplitCategorySet, volum
     .filter((item) => unsplitCategorySet.has(item.category))
     .map((item) => ({
       code: `CATEGORY::${item.category}`,
-      descEn: "4+8 forecast is available at category level only",
+      descEn: "Rolling forecast is available at category level only",
       category: item.category,
       amount25: item.amount25,
       previousAmount26: item.previousAmount26,
@@ -157,7 +157,7 @@ function collapseUnsplitForecastRows(rows, categories, unsplitCategorySet, volum
       unitDiff: item.unitDiff,
       momUnitDiff: item.momUnitDiff,
       status: "category_only",
-      statusLabel: "4+8未拆分到小科目",
+      statusLabel: "滚动预测未拆分到小科目",
       sourceRows26: [],
       accountComparisonAvailable: false,
       isCategorySummary: true,

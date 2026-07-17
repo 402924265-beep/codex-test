@@ -19,17 +19,17 @@
         window.DW_LOCAL_API_CONFIG = { baseUrl: "" };
       }
       window.DW_BUNDLED_FILES = {
-        forecast: "./input/01_Forecast_5plus7.xlsx",
-        forecastName: "Copy of 2026 monthly Renta DW _ May 1.xlsx",
+        forecast: "./input/01_DW_6plus6_Forecast.xlsx",
+        forecastName: "2026 MFG Variance Reporting_ DW_06.2026 6+6 FCST V1.xlsx",
         jiang: "./input/02_Domestic_Finance_5plus7.xlsx",
         jiangName: "2026 Manufacturing Cost Cumulative Domestic Finance 5+7.xlsx",
-        sap: "./input/03_Dishwasher_May_Actual.xlsx",
-        sapName: "Dishwasher May Actual Manufacturing Cost.xlsx",
+        sap: "./input/03_Dishwasher_June_Actual.xlsx",
+        sapName: "2026 monthly Renta DW _ June.xlsx",
         language: "en"
       };
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260717-en-default-v1"></script>
+    <script type="module" src="./src/app.js?v=20260717-june-6plus6-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -152,11 +152,11 @@
           <div class="panel-title">
             <div>
               <h2 data-i18n="dashboardTitle">全年数据驾驶舱</h2>
-              <p data-i18n="dashboardHint">内置 5+7 预测后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。</p>
+              <p data-i18n="dashboardHint">The 6+6 forecast shows Jan-Jun actuals and Jul-Dec forecast in one screen.</p>
             </div>
-            <span id="dashboardStatus">等待5+7预测文件</span>
+            <span id="dashboardStatus">Loading 6+6 forecast</span>
           </div>
-          <div id="annualSummary" class="smart-summary">内置5+7预测加载中...</div>
+          <div id="annualSummary" class="smart-summary">Loading the built-in 6+6 forecast...</div>
           <div id="dashboardCards" class="dashboard-cards cockpit-cards"></div>
           <div class="cockpit-grid">
             <section class="cockpit-card trend-card">

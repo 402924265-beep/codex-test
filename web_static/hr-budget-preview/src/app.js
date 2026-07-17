@@ -3,8 +3,8 @@ import {
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
-import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260615-total-reconcile-v25";
-import { buildReconciliation } from "./reconcile.js?v=20260615-category-collapse-v29";
+import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260717-june-6plus6-v1";
+import { buildReconciliation } from "./reconcile.js?v=20260717-june-6plus6-v1";
 import { exportAnalysisWorkbook } from "./export.js?v=20260615-dynamic-month-v28";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
 import { createStore } from "./store.js?v=20260612-duplicate-accounts-v23";
@@ -16,7 +16,7 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260612-duplicate-accounts-v23";
+} from "./forecast-parser.js?v=20260717-june-6plus6-v1";
 import {
   analysisKey,
   analysisReason,
@@ -39,12 +39,12 @@ import { PROJECT_SEEDS, localizeProjectField, localizeProjectText, projectImpact
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
-import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
+import { COOKING_UNIT } from "./cooking-data.js?v=20260717-june-6plus6-v1";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
 
-const VERSION = "20260717-en-default-v1";
+const VERSION = "20260717-june-6plus6-v1";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -52,7 +52,7 @@ const COOKING_HEADCOUNT_ROWS = [
     rows: [
       { scenario: "同期", values: [279, 296, 293, 296, 293, 260, 247, 239, 248, 310, 310, 280] },
       { scenario: "预算", values: [286, 317, 317, 258, 258, 258, 258, 258, 295, 295, 343, 343] },
-      { scenario: "26年", values: [294, 300, 325, 265, 258, 258, 258, 258, 295, 295, 343, 343] }
+      { scenario: "26年", values: [294, 300, 325, 277, 265, 265, 264, 264, 264, 275, 275, 275] }
     ]
   },
   {
@@ -60,7 +60,7 @@ const COOKING_HEADCOUNT_ROWS = [
     rows: [
       { scenario: "同期", values: [170, 181, 180, 182, 178, 148, 126, 127, 120, 132, 134, 133] },
       { scenario: "预算", values: [133, 136, 136, 127, 127, 127, 127, 127, 133, 133, 142, 142] },
-      { scenario: "26年", values: [127, 126, 125, 113, 127, 127, 127, 127, 133, 133, 142, 142] }
+      { scenario: "26年", values: [127, 126, 125, 113, 113, 114, 113, 113, 113, 121, 121, 121] }
     ]
   },
   {
@@ -68,7 +68,7 @@ const COOKING_HEADCOUNT_ROWS = [
     rows: [
       { scenario: "同期", values: [58, 58, 56, 55, 53, 38, 35, 38, 33, 31, 31, 31] },
       { scenario: "预算", values: [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34] },
-      { scenario: "26年", values: [30, 31, 30, 28, 34, 34, 34, 34, 34, 34, 34, 34] }
+      { scenario: "26年", values: [30.5, 31.17, 31.17, 27.67, 27.67, 27.67, 34, 34, 34, 34, 34, 34] }
     ]
   }
 ];
@@ -244,7 +244,7 @@ const i18n = {
     summaryEmpty: "导入 SAP 报表后，本月摘要会根据下方科目原因自动汇总。",
     better: "优化",
     worse: "恶化",
-    forecastUnitLine: "；5+7本月单台 {unit} €/台",
+    forecastUnitLine: "；6+6本月单台 {unit} €/台",
     compactSummary: "{month}单台同比{direction} {unitDiff} €/台，制造费差额 {mfgDiff} K€；重点原因 {filled}/{total} 已填写；上涨因素 {increase} K€，下降因素 {decrease} K€{forecast}",
     noMatchingAccounts: "没有符合条件的科目",
     analysisSaved: "原因已保存",
@@ -291,7 +291,7 @@ const i18n = {
     cookingSubtitle: "厨电制造费用经营驾驶舱",
     dishwasherSubtitle: "洗碗机制造费用经营驾驶舱",
     cookingSource: "当前：厨电工厂 · 已内置同期、预算、实际、人数、降费项目",
-    dishwasherSource: "当前：洗碗机 · 已内置5+7预测、国内财务表、May Actual",
+    dishwasherSource: "当前：洗碗机 · 已内置6+6预测、国内财务表、六月实际",
     cookingHeaderHint: "整合同期、预算、实际、人数与降费项目，形成费用发生制经营视图",
     roleAccess: "角色权限",
     supplyCostControl: "供应链成本控制",
@@ -337,7 +337,7 @@ const i18n = {
     manufacturingDiff: "MFG variance",
     factorNet: "Net factor impact",
     dashboardTitle: "Year Dashboard",
-    dashboardHint: "Upload the 5+7 forecast to view all 12 months in one screen.",
+    dashboardHint: "The 6+6 forecast shows Jan-Jun actuals and Jul-Dec forecast in one screen.",
     monthSummary: "Monthly Summary & Root Causes",
     summaryHint: "Auto summary around unit cost, value variance, and key accounts.",
     autoFromSite: "Generated from website inputs",
@@ -391,11 +391,11 @@ const i18n = {
     increase: "Increase",
     decrease: "Decrease",
     delete: "Del",
-    emptyForecast: "Import a 5+7 forecast file to show the 12-month dashboard",
+    emptyForecast: "Import a 6+6 forecast file to show the 12-month dashboard",
     emptySap: "Import the actual table to show account details",
-    waitingForecast: "Waiting for 5+7 forecast",
+    waitingForecast: "Waiting for 6+6 forecast",
     waitingSap: "SAP actuals not imported",
-    waitingForecastPill: "5+7 forecast not imported",
+    waitingForecastPill: "6+6 forecast not imported",
     placeholderMajor: "Key variance: cause, owner, action, expected impact",
     placeholderSmall: "Short reason",
     dashboardGroup: "Metric group",
@@ -411,7 +411,7 @@ const i18n = {
     waterfallHint: "Manufacturing cost / output value",
     other: "Other",
     fullYear: "Full year",
-    annualSummaryEmpty: "Import the 5+7 forecast to generate the annual summary.",
+    annualSummaryEmpty: "Import the 6+6 forecast to generate the annual summary.",
     monthlySummaryEmpty: "Import the actual table to generate the monthly summary.",
     allIndicators: "All metrics",
     allScenarios: "All bases",
@@ -433,9 +433,9 @@ const i18n = {
     hideDetail: "Hide detail",
     loadedYearModel: "Year model loaded",
     readingFile: "Reading",
-    importedForecast: "Imported 5+7",
+    importedForecast: "Imported 6+6",
     importedSap: "Imported SAP",
-    loadedForecast: "Loaded 5+7 forecast",
+    loadedForecast: "Loaded 6+6 forecast",
     loadedSap: "Loaded SAP actuals",
     loadedJiang: "Loaded domestic finance table",
     noTimeData: "Work-hour / workday data pending",
@@ -469,7 +469,7 @@ const i18n = {
     summaryEmpty: "After importing SAP actuals, this month summary will be generated from account-level reasons below.",
     better: "better",
     worse: "worse",
-    forecastUnitLine: "; 5+7 unit cost {unit} €/pc",
+    forecastUnitLine: "; 6+6 unit cost {unit} €/pc",
     compactSummary: "{month} unit cost is {direction} by {unitDiff} €/pc YoY; MFG variance {mfgDiff} K€; key reasons completed {filled}/{total}; increases {increase} K€, decreases {decrease} K€{forecast}",
     noMatchingAccounts: "No matching accounts",
     analysisSaved: "Reason saved",
@@ -516,7 +516,7 @@ const i18n = {
     cookingSubtitle: "Cooking Manufacturing Cost Cockpit",
     dishwasherSubtitle: "Dishwasher Manufacturing Cost Cockpit",
     cookingSource: "Current: Cooking Factory · Same period, budget, actual, headcount and projects built in",
-    dishwasherSource: "Current: Dishwasher · 5+7 forecast, finance table and May Actual built in",
+    dishwasherSource: "Current: Dishwasher · 6+6 forecast, finance table and June actuals built in",
     cookingHeaderHint: "Combine same period, budget, actual, headcount and projects into an accrual-based operating view",
     roleAccess: "Role Access",
     supplyCostControl: "Supply Cost Control",
@@ -529,7 +529,7 @@ const i18n = {
     appSubtitle: "Finans verisini yükle, üç analiz tablosunu üret",
     language: "Dil",
     author: "Yazan",
-    importForecast: "5+7 tahmin yükle",
+    importForecast: "6+6 tahmin yükle",
     importJiang: "Jiang Yue tablosunu yükle",
     importSap: "SAP gerçekleşen yükle",
     exportAnalysis: "Çalışma kitabı indir",
@@ -562,7 +562,7 @@ const i18n = {
     manufacturingDiff: "Üretim farkı",
     factorNet: "Net faktör etkisi",
     dashboardTitle: "Yıllık Veri Panosu",
-    dashboardHint: "5+7 tahmini yükleyince 12 ay tek ekranda görünür.",
+    dashboardHint: "6+6 tahmini, Ocak-Haziran gerçekleşen ve Temmuz-Aralık tahminini tek ekranda gösterir.",
     monthSummary: "Aylık Özet ve Nedenler",
     summaryHint: "Birim maliyet, tutar farkı ve önemli hesaplardan otomatik özet.",
     autoFromSite: "Site girişlerinden üretildi",
@@ -616,11 +616,11 @@ const i18n = {
     increase: "Artış",
     decrease: "Azalış",
     delete: "Sil",
-    emptyForecast: "12 aylık pano için 5+7 tahmin dosyasını yükleyin",
+    emptyForecast: "12 aylık pano için 6+6 tahmin dosyasını yükleyin",
     emptySap: "Hesap detayları için SAP gerçekleşen dosyasını yükleyin",
-    waitingForecast: "5+7 tahmin bekleniyor",
+    waitingForecast: "6+6 tahmin bekleniyor",
     waitingSap: "SAP gerçekleşen yüklenmedi",
-    waitingForecastPill: "5+7 tahmin yüklenmedi",
+    waitingForecastPill: "6+6 tahmin yüklenmedi",
     placeholderMajor: "Önemli fark: neden, sorumlu, aksiyon, beklenen etki",
     placeholderSmall: "Kısa neden",
     dashboardGroup: "Gösterge grubu",
@@ -636,7 +636,7 @@ const i18n = {
     waterfallHint: "Kırmızı kötüleşme, yeşil iyileşme",
     other: "Diğer",
     fullYear: "Yıl",
-    annualSummaryEmpty: "Yıllık özet için 5+7 tahminini yükleyin.",
+    annualSummaryEmpty: "Yıllık özet için 6+6 tahminini yükleyin.",
     monthlySummaryEmpty: "Aylık özet için SAP gerçekleşeni yükleyin.",
     allIndicators: "Tüm göstergeler",
     allScenarios: "Tüm bazlar",
@@ -658,9 +658,9 @@ const i18n = {
     hideDetail: "Detayı gizle",
     loadedYearModel: "Yıllık model yüklendi",
     readingFile: "Okunuyor",
-    importedForecast: "5+7 içe aktarıldı",
+    importedForecast: "6+6 içe aktarıldı",
     importedSap: "SAP içe aktarıldı",
-    loadedForecast: "5+7 tahmin yüklendi",
+    loadedForecast: "6+6 tahmin yüklendi",
     loadedSap: "SAP gerçekleşen yüklendi",
     loadedJiang: "Yurtiçi finans tablosu yüklendi",
     noTimeData: "İş saati / iş günü verisi bekleniyor",
@@ -694,7 +694,7 @@ const i18n = {
     summaryEmpty: "SAP gerçekleşen yüklendikten sonra aylık özet aşağıdaki hesap nedenlerinden üretilecek.",
     better: "iyileşti",
     worse: "kötüleşti",
-    forecastUnitLine: "; 5+7 birim maliyet {unit} €/adet",
+    forecastUnitLine: "; 6+6 birim maliyet {unit} €/adet",
     compactSummary: "{month} birim maliyet YoY {direction}: {unitDiff} €/adet; üretim farkı {mfgDiff} K€; ana nedenler {filled}/{total}; artış {increase} K€, azalış {decrease} K€{forecast}",
     noMatchingAccounts: "Eşleşen hesap yok",
     analysisSaved: "Neden kaydedildi",
@@ -741,7 +741,7 @@ const i18n = {
     cookingSubtitle: "Pişirme Üretim Gideri Kokpiti",
     dishwasherSubtitle: "Bulaşık Makinesi Üretim Gideri Kokpiti",
     cookingSource: "Geçerli: Pişirme Fabrikası · Aynı dönem, bütçe, gerçekleşen, çalışan ve projeler hazır",
-    dishwasherSource: "Geçerli: Bulaşık Makinesi · 5+7 tahmin, finans tablosu ve Mayıs gerçekleşeni hazır",
+    dishwasherSource: "Geçerli: Bulaşık Makinesi · 6+6 tahmin, finans tablosu ve Haziran gerçekleşeni hazır",
     cookingHeaderHint: "Aynı dönem, bütçe, gerçekleşen, çalışan ve projeleri tahakkuk bazlı işletme görünümünde birleştirir",
     roleAccess: "Rol Yetkisi",
     supplyCostControl: "Tedarik Maliyet Kontrolü",
@@ -773,7 +773,7 @@ const state = {
   metricIndicator: "all",
   dashboardTableOpen: true,
   factorMonth: 4,
-  actualMonthCount: 4,
+  actualMonthCount: 6,
   rollingForecastDrafts: loadRollingForecastDrafts(),
   rollingForecastSubmitted: loadRollingForecastSubmitted(),
   rollingSelectedCode: null,
@@ -1035,9 +1035,9 @@ function applyCookingUnit() {
     impactType: cookingProjectImpactType(item)
   })));
   state.factorMonth = COOKING_UNIT.monthlyResult.month;
-  state.sapFileName = "03_CK_May_Actual.xlsx";
-  state.forecastFileName = "厨电成本数据内置模型";
-  state.jiangFileName = "04_CK_JiangYue.xlsx";
+  state.sapFileName = "Cooking 2026 CK Actual Cost June.xlsx";
+  state.forecastFileName = "2026 MFG Variance Reporting - CK-June V1 Shared.xlsx";
+  state.jiangFileName = "HC 2026 · CK 6+6 Forecast";
   state.metricScenario = "all";
   state.metricMonth = "all";
   state.metricStatus = "all";
@@ -2585,7 +2585,7 @@ function bindVarianceAnalysisRows() {
   }
 }
 
-const ROLLING_FORECAST_MONTHS = [6, 7, 8, 9, 10, 11, 12];
+const ROLLING_FORECAST_MONTHS = [7, 8, 9, 10, 11, 12];
 const ROLLING_FORECAST_DRAFT_KEY = "dwRollingForecastDrafts.v1";
 const ROLLING_FORECAST_SUBMIT_KEY = "dwRollingForecastSubmitted.v1";
 const HR_BUDGET_DRIVER_KEY = "dwHrBudgetDrivers.v1";
@@ -2725,7 +2725,7 @@ const ROLLING_ROLE_SCOPE = {
 const ROLLING_FORECAST_TEXT = {
   zh: {
     title: "滚动预测协作区",
-    subtitle: "6-12月预测在这里直接维护；单价和数量为空时，总额沿用5+7预测。",
+    subtitle: "7-12月预测在这里直接维护；单价和数量为空时，总额沿用6+6预测。",
     myTasks: "我的任务",
     allTasks: "全部任务",
     ownerMissing: "责任人缺失",
@@ -2745,7 +2745,7 @@ const ROLLING_FORECAST_TEXT = {
     continueFill: "继续填",
     view: "查看",
     ownerNeeded: "待填责任人",
-    usesForecast: "沿用5+7",
+    usesForecast: "沿用6+6",
     byFormula: "单价×数量",
     byTotal: "手填总价",
     draft: "草稿",
@@ -2758,7 +2758,7 @@ const ROLLING_FORECAST_TEXT = {
     totalOwner: "总价责任人",
     reviewer: "审核责任人",
     month: "月份",
-    forecast48: "5+7预测",
+    forecast48: "6+6预测",
     unitPrice: "单价",
     quantity: "数量",
     totalAmount: "总价",
@@ -2778,8 +2778,8 @@ const ROLLING_FORECAST_TEXT = {
     reasonPlaceholder: "填写原因、责任、行动和预计影响",
     warning: "预警",
     noWarning: "正常",
-    formulaHint: "单价和数量为空时，滚动预测总额保持5+7；两者都填写后，总额=单价×数量。",
-    totalModeHint: "该科目单价不统一，请上传明细并填写总价；总价为空时，滚动预测总额保持5+7。",
+    formulaHint: "单价和数量为空时，滚动预测总额保持6+6；两者都填写后，总额=单价×数量。",
+    totalModeHint: "该科目单价不统一，请上传明细并填写总价；总价为空时，滚动预测总额保持6+6。",
     completion: "填写完整度",
     saved: "滚动预测草稿已保存",
     submittedToast: "滚动预测已提交",
@@ -2798,7 +2798,7 @@ const ROLLING_FORECAST_TEXT = {
   },
   en: {
     title: "Rolling Forecast Hub",
-    subtitle: "Maintain Jun-Dec forecast here. When unit price and quantity are blank, total keeps the 5+7 forecast.",
+    subtitle: "Maintain Jul-Dec forecast here. When unit price and quantity are blank, total keeps the 6+6 forecast.",
     myTasks: "My Tasks",
     allTasks: "All Tasks",
     ownerMissing: "Owner Missing",
@@ -2818,7 +2818,7 @@ const ROLLING_FORECAST_TEXT = {
     continueFill: "Continue",
     view: "View",
     ownerNeeded: "Owner Needed",
-    usesForecast: "Use 5+7",
+    usesForecast: "Use 6+6",
     byFormula: "Unit x Qty",
     byTotal: "Manual Total",
     draft: "Draft",
@@ -2831,7 +2831,7 @@ const ROLLING_FORECAST_TEXT = {
     totalOwner: "Total Owner",
     reviewer: "Reviewer",
     month: "Month",
-    forecast48: "5+7 Forecast",
+    forecast48: "6+6 Forecast",
     unitPrice: "Unit Price",
     quantity: "Quantity",
     totalAmount: "Total Amount",
@@ -2851,8 +2851,8 @@ const ROLLING_FORECAST_TEXT = {
     reasonPlaceholder: "Enter reason, owner, action and estimated impact",
     warning: "Warning",
     noWarning: "OK",
-    formulaHint: "Blank unit price and quantity keep the 5+7 total. When both are filled, total = unit price x quantity.",
-    totalModeHint: "This account has no unified unit price. Upload the detail file and fill the total amount. Blank total keeps the 5+7 forecast.",
+    formulaHint: "Blank unit price and quantity keep the 6+6 total. When both are filled, total = unit price x quantity.",
+    totalModeHint: "This account has no unified unit price. Upload the detail file and fill the total amount. Blank total keeps the 6+6 forecast.",
     completion: "Completion",
     saved: "Rolling forecast drafts saved",
     submittedToast: "Rolling forecast submitted",
@@ -2871,7 +2871,7 @@ const ROLLING_FORECAST_TEXT = {
   },
   tr: {
     title: "Dönen Tahmin Merkezi",
-    subtitle: "Haziran-Aralık tahmini burada tutulur. Birim fiyat ve miktar boşsa toplam 5+7 tahmini olarak kalır.",
+    subtitle: "Temmuz-Aralık tahmini burada tutulur. Birim fiyat ve miktar boşsa toplam 6+6 tahmini olarak kalır.",
     myTasks: "Görevlerim",
     allTasks: "Tüm Görevler",
     ownerMissing: "Sorumlu Eksik",
@@ -2891,7 +2891,7 @@ const ROLLING_FORECAST_TEXT = {
     continueFill: "Devam",
     view: "Görüntüle",
     ownerNeeded: "Sorumlu Gerekli",
-    usesForecast: "5+7 kullan",
+    usesForecast: "6+6 kullan",
     byFormula: "Birim x Miktar",
     byTotal: "Manuel Toplam",
     draft: "Taslak",
@@ -2904,7 +2904,7 @@ const ROLLING_FORECAST_TEXT = {
     totalOwner: "Toplam Sorumlusu",
     reviewer: "Kontrol Eden",
     month: "Ay",
-    forecast48: "5+7 Tahmin",
+    forecast48: "6+6 Tahmin",
     unitPrice: "Birim Fiyat",
     quantity: "Miktar",
     totalAmount: "Toplam Tutar",
@@ -2924,8 +2924,8 @@ const ROLLING_FORECAST_TEXT = {
     reasonPlaceholder: "Neden, sorumlu, aksiyon ve tahmini etki girin",
     warning: "Uyarı",
     noWarning: "Normal",
-    formulaHint: "Birim fiyat ve miktar boşsa toplam 5+7 olarak kalır. İkisi de doluysa toplam = birim fiyat x miktar.",
-    totalModeHint: "Bu hesabın tek bir birim fiyatı yok. Detay dosyasını yükleyin ve toplam tutarı girin. Toplam boşsa 5+7 tahmini kullanılır.",
+    formulaHint: "Birim fiyat ve miktar boşsa toplam 6+6 olarak kalır. İkisi de doluysa toplam = birim fiyat x miktar.",
+    totalModeHint: "Bu hesabın tek bir birim fiyatı yok. Detay dosyasını yükleyin ve toplam tutarı girin. Toplam boşsa 6+6 tahmini kullanılır.",
     completion: "Tamamlanma",
     saved: "Dönen tahmin taslakları kaydedildi",
     submittedToast: "Dönen tahmin gönderildi",
@@ -3180,7 +3180,7 @@ function rfCleanAccountLabel(code, label) {
 }
 
 function rfAccountMonthAmount(code, month) {
-  if (month >= 6) return rollingTotalInfo(code, month).total;
+  if (month >= 7) return rollingTotalInfo(code, month).total;
   return referenceAmountForAccount(code, month, "current");
 }
 
@@ -5020,10 +5020,10 @@ function rowToHtml(row) {
   const attachmentName = state.descriptionAttachments[key] || "";
   const summarySuffix = state.language === "tr" ? "kategori toplamı" : state.language === "en" ? "category total" : "大科目汇总";
   const unsplitLabel = state.language === "tr"
-    ? "5+7 tahmini alt hesaplara dağıtılmamıştır"
+    ? "6+6 tahmini alt hesaplara dağıtılmamıştır"
     : state.language === "en"
-      ? "5+7 forecast is not split by account"
-      : "5+7预测未拆分到小科目";
+      ? "6+6 forecast is not split by account"
+      : "6+6预测未拆分到小科目";
   return `
     <tr class="${major ? "high" : ""} ${row.amountDiff > 0 ? "cost-worse" : row.amountDiff < 0 ? "cost-better" : ""}">
       <td><div class="account-code">${escapeHtml(row.isCategorySummary ? `${localizeCategory(row.category, state.language)} (${summarySuffix})` : row.code)}</div><div class="desc">${escapeHtml(row.isCategorySummary ? unsplitLabel : accountLabel)}</div></td>

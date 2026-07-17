@@ -163,7 +163,16 @@ export function extractActualFromWorkbook(workbook, month, xlsx) {
   const sapSheetName = findSheetName(workbook, ["SAP_ACT_EUR", "SAP Actual extraction"]);
   if (sapSheetName) return extractSapActualFromWorkbook(workbook, month, xlsx);
 
-  const rentaSheetName = findSheetName(workbook, ["4+8 DW 2026", "Renta DW _2026", "Renta DW_2026", "Renta DW"]);
+  const rentaSheetName = findSheetName(workbook, [
+    "6+6 DW 2026",
+    "4+8 DW 2026",
+    "Renta CK TOTAL_2026",
+    "Renta CK TOTAL_2025",
+    "Renta CK TOTAL",
+    "Renta DW _2026",
+    "Renta DW_2026",
+    "Renta DW"
+  ]);
   if (rentaSheetName) {
     const rows = xlsx.utils.sheet_to_json(workbook.Sheets[rentaSheetName], { header: 1, raw: true, defval: null });
     return {
