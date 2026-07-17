@@ -44,7 +44,7 @@ import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
 
-const VERSION = "20260717-standards-v2";
+const VERSION = "20260717-en-default-v1";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -764,7 +764,7 @@ const state = {
   factors: [],
   factorSummary: null,
   chartHitZones: [],
-  language: "zh",
+  language: "en",
   dashboardGroup: "all",
   dashboardBasis: "same",
   metricScenario: "all",
