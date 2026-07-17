@@ -41,8 +41,10 @@ import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./acco
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 import { COOKING_UNIT } from "./cooking-data.js?v=20260709-ck-online-logic-v5";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
+import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260716-admin-v3";
+import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260716-admin-v1";
 
-const VERSION = "20260715-budget-status-workbench-v3";
+const VERSION = "20260717-adaptive-v1";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -264,6 +266,9 @@ const i18n = {
     costRoleHint: "查看经营驾驶舱、月度差异、全部预算科目和降费项目",
     hrRole: "人力角色",
     hrRoleHint: "仅查看和校核人力预算参数、人力小科目及异常",
+    adminRole: "行政部门",
+    adminRoleHint: "仅校核行政预算标准、月度金额和变更原因",
+    adminDepartment: "行政部门",
     fullView: "完整视图",
     limitedView: "受限视图",
     enterWorkspace: "进入工作台",
@@ -486,6 +491,9 @@ const i18n = {
     costRoleHint: "View the cockpit, monthly variance, all budget accounts and cost reduction projects",
     hrRole: "HR",
     hrRoleHint: "View and validate HR budget parameters, HR accounts and exceptions only",
+    adminRole: "Administration",
+    adminRoleHint: "Validate administration budget standards, monthly amounts and change reasons only",
+    adminDepartment: "Administration",
     fullView: "Full view",
     limitedView: "Restricted view",
     enterWorkspace: "Enter workspace",
@@ -708,6 +716,9 @@ const i18n = {
     costRoleHint: "Kokpit, aylık farklar, tüm bütçe hesapları ve maliyet düşürme projelerini görüntüler",
     hrRole: "İnsan Kaynakları",
     hrRoleHint: "Yalnızca İK bütçe parametrelerini, İK hesaplarını ve istisnaları görüntüler ve doğrular",
+    adminRole: "İdari İşler",
+    adminRoleHint: "Yalnızca idari bütçe standartlarını, aylık tutarları ve değişiklik nedenlerini doğrular",
+    adminDepartment: "İdari İşler",
     fullView: "Tam görünüm",
     limitedView: "Kısıtlı görünüm",
     enterWorkspace: "Çalışma alanına gir",
@@ -766,6 +777,9 @@ const state = {
   rollingForecastDrafts: loadRollingForecastDrafts(),
   rollingForecastSubmitted: loadRollingForecastSubmitted(),
   rollingSelectedCode: null,
+  adminSelectedCategory: "canteen",
+  adminSelectedAccount: "6666010314",
+  adminBudgetView: "conditions",
   rollingTaskFilter: "all",
   rollingViewMode: "fill",
   rollingRole: localStorage.getItem("dwRollingRole.v1") || "finance",
@@ -920,7 +934,8 @@ function switchBusinessUnit(unitId) {
   if (!unitId || unitId === state.activeUnit) return;
   saveUnitSnapshot(state.activeUnit);
   if (unitId === "dishwasher") {
-    restoreUnitSnapshot("dishwasher");
+    if (unitSnapshots.dishwasher) restoreUnitSnapshot("dishwasher");
+    else state.activeUnit = "dishwasher";
     updateUnitChrome("dishwasher");
     renderAll();
     return;
@@ -1337,7 +1352,7 @@ function bindEvents() {
     state.rollingRole = els.roleSelect.value || "finance";
     localStorage.setItem("dwRollingRole.v1", state.rollingRole);
     state.rollingSelectedCode = null;
-    if (state.rollingRole === "hr") state.rollingViewMode = "fill";
+    if (["hr", "admin"].includes(state.rollingRole)) state.rollingViewMode = "fill";
     renderTable();
   });
   els.userName.addEventListener("input", () => {
@@ -2486,7 +2501,7 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 
 function renderTable() {
   const varianceView = document.getElementById("varianceView");
-  document.body.classList.toggle("rolling-fill-mode", state.rollingRole !== "hr" && state.rollingViewMode === "fill");
+  document.body.classList.toggle("rolling-fill-mode", !["hr", "admin"].includes(state.rollingRole) && state.rollingViewMode === "fill");
   if (!state.result) {
     varianceView?.classList.remove("show-legacy-variance");
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
@@ -2495,11 +2510,12 @@ function renderTable() {
     return;
   }
   if (state.rollingRole !== "hr") ensureHrBudgetBaselineSync();
+  if (state.rollingRole !== "admin") ensureAdminBudgetBaselineSync();
   const rows = visibleRows();
   const collapsedCount = state.result.unsplitCategories?.length || 0;
   const collapsedText = collapsedCount ? ` · ${t("collapsedCategoryCompare").replace("{count}", collapsedCount)}` : "";
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedText}`;
-  if (state.rollingRole === "hr") {
+  if (["hr", "admin"].includes(state.rollingRole)) {
     varianceView?.classList.remove("show-legacy-variance");
     renderRollingForecastWorkspace(rows);
     if (els.detailBody) els.detailBody.innerHTML = "";
@@ -2576,6 +2592,9 @@ const HR_BUDGET_DRIVER_KEY = "dwHrBudgetDrivers.v1";
 const HR_BUDGET_INPUT_KEY = "dwHrBudgetInputs.v2";
 const HR_BUDGET_AUDIT_KEY = "dwHrBudgetAudit.v1";
 const HR_BUDGET_SYNC_KEY = "dwHrBudgetSync.v1";
+const ADMIN_BUDGET_INPUT_KEY = "dwAdminBudgetInputs.v1";
+const ADMIN_BUDGET_AUDIT_KEY = "dwAdminBudgetAudit.v1";
+const ADMIN_BUDGET_SYNC_KEY = "dwAdminBudgetSync.v1";
 const HR_BUDGET_DEFAULTS = {
   reviewMonth: 6,
   reviewHeadcount: 374,
@@ -2655,6 +2674,9 @@ let hrBudgetInputView = "headcount";
 let hrBudgetInputs = loadHrBudgetInputs();
 let hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
 let hrBudgetAudit = loadHrBudgetAudit();
+let adminBudgetInputs = loadAdminBudgetInputs();
+let adminBudgetSavedInputs = clonePlain(adminBudgetInputs);
+let adminBudgetAudit = loadAdminBudgetAudit();
 
 function hrT(key, values = {}) {
   let text = HR_I18N[state.language]?.[key] || HR_I18N.zh[key] || key;
@@ -2687,6 +2709,7 @@ function hrChangePeriod(change, data = hrBudgetData()) {
 const ROLLING_ROLE_LABELS = {
   finance: "财务管理员",
   hr: "HR 人力",
+  admin: "行政部门",
   procurement: "行政/间接采购",
   leader: "经营负责人",
   readonly: "只读访客"
@@ -2694,6 +2717,7 @@ const ROLLING_ROLE_LABELS = {
 const ROLLING_ROLE_SCOPE = {
   finance: "全部科目可见，价格、数量、总额、原因均可维护。",
   hr: "只显示人力/数量相关科目，可维护数量和数量责任人。",
+  admin: "仅显示行政预算科目，可校核标准、填写调整原因并提交。",
   procurement: "只显示采购、行政、维修、工作服、能源和服务类科目，可维护价格、总额和明细。",
   leader: "全部科目可见，只维护差异原因和审核意见。",
   readonly: "全部科目只读。"
@@ -2923,12 +2947,18 @@ const ROLLING_FORECAST_TEXT = {
 function renderRollingForecastWorkspace(rows) {
   if (!els.forecastWorkspace) return;
   document.body.classList.toggle("hr-budget-mode", state.rollingRole === "hr");
+  document.body.classList.toggle("admin-budget-mode", state.rollingRole === "admin");
   refreshProductNavigation();
   if (state.rollingRole === "hr") {
     renderHrBudgetWorkspace();
     return;
   }
+  if (state.rollingRole === "admin") {
+    renderAdminBudgetWorkspace();
+    return;
+  }
   ensureHrBudgetBaselineSync();
+  ensureAdminBudgetBaselineSync();
   const accountRows = rows.filter((row) => row.code);
   if (!accountRows.length) {
     els.forecastWorkspace.innerHTML = `<div class="empty-cell">${rfT("noTask")}</div>`;
@@ -2945,10 +2975,10 @@ function renderRollingForecastWorkspace(rows) {
   }
   const filteredMeta = roleMeta.filter((item) => rollingFilterMatches(item));
   const selectedMeta = allMeta.find((item) => item.row.code === state.rollingSelectedCode) || null;
-  const budgetedMeta = roleMeta.filter((item) => item.hasHrBudget);
-  const excelMeta = roleMeta.filter((item) => !item.hasHrBudget);
-  const visibleBudgeted = filteredMeta.filter((item) => item.hasHrBudget);
-  const visibleExcel = filteredMeta.filter((item) => !item.hasHrBudget);
+  const budgetedMeta = roleMeta.filter((item) => item.hasCompletedBudget);
+  const excelMeta = roleMeta.filter((item) => !item.hasCompletedBudget);
+  const visibleBudgeted = filteredMeta.filter((item) => item.hasCompletedBudget);
+  const visibleExcel = filteredMeta.filter((item) => !item.hasCompletedBudget);
   els.forecastWorkspace.innerHTML = `
     <div class="rf-shell rf-status-workbench">
       <div class="rf-header rf-status-header">
@@ -2972,7 +3002,7 @@ function renderRollingForecastWorkspace(rows) {
           <button type="button" data-rf-action="submit-all" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfCompactT("submit"))}</button>
         </div>
       </div>
-      ${rfAccountGroup("budgeted", rfCompactT("completedHr"), visibleBudgeted, selectedMeta)}
+      ${rfAccountGroup("budgeted", rfCompactT("completedAll"), visibleBudgeted, selectedMeta)}
       ${rfAccountGroup("excel", rfCompactT("excelPending"), visibleExcel, selectedMeta)}
     </div>
   `;
@@ -2987,7 +3017,7 @@ function rfCompactT(key) {
       budgetStatus: "预算状态",
       completed: "已完成预算",
       excelBaseline: "Excel基线",
-      completedHr: "已完成预算（人力）",
+      completedAll: "已完成预算",
       excelPending: "Excel基线（待预算）",
       save: "保存草稿",
       submit: "提交预算",
@@ -2999,6 +3029,8 @@ function rfCompactT(key) {
       annual: "全年合计",
       status: "状态",
       hrBudget: "人力预算",
+      adminBudget: "行政预算",
+      combinedBudget: "人力+行政",
       excel: "Excel",
       done: "已完成",
       start: "开始预算",
@@ -3014,7 +3046,7 @@ function rfCompactT(key) {
       budgetStatus: "Budget status",
       completed: "Budgeted",
       excelBaseline: "Excel baseline",
-      completedHr: "Budgeted (HR)",
+      completedAll: "Budgeted",
       excelPending: "Excel baseline (pending)",
       save: "Save draft",
       submit: "Submit budget",
@@ -3026,6 +3058,8 @@ function rfCompactT(key) {
       annual: "Annual total",
       status: "Status",
       hrBudget: "HR budget",
+      adminBudget: "Administration",
+      combinedBudget: "HR + Administration",
       excel: "Excel",
       done: "Completed",
       start: "Start budget",
@@ -3041,7 +3075,7 @@ function rfCompactT(key) {
       budgetStatus: "Bütçe durumu",
       completed: "Bütçelendi",
       excelBaseline: "Excel baz",
-      completedHr: "Bütçelendi (İK)",
+      completedAll: "Bütçelendi",
       excelPending: "Excel baz (bekliyor)",
       save: "Taslağı kaydet",
       submit: "Bütçeyi gönder",
@@ -3053,6 +3087,8 @@ function rfCompactT(key) {
       annual: "Yıllık toplam",
       status: "Durum",
       hrBudget: "İK bütçesi",
+      adminBudget: "İdari bütçe",
+      combinedBudget: "İK + İdari",
       excel: "Excel",
       done: "Tamamlandı",
       start: "Bütçeyi başlat",
@@ -3110,26 +3146,37 @@ function rfAccountGroup(id, title, items, selectedMeta) {
 
 function rfAccountStatusRow(item, selectedMeta) {
   const row = item.row;
-  const selected = row.code === selectedMeta?.row?.code;
-  const accountLabel = state.activeUnit === "cooking" && state.language === "zh" && row.descCn
+  const selectable = !item.hasCompletedBudget;
+  const selected = selectable && row.code === selectedMeta?.row?.code;
+  const rawAccountLabel = state.activeUnit === "cooking" && state.language === "zh" && row.descCn
     ? row.descCn
     : localizeAccountLabel(row.code, row.descEn, state.language);
+  const accountLabel = rfCleanAccountLabel(row.code, rawAccountLabel);
   const months = Array.from({ length: 12 }, (_, index) => rfAccountMonthAmount(row.code, index + 1));
   const annual = months.reduce((sum, value) => Number.isFinite(value) ? sum + value : sum, 0);
-  const statusClass = item.hasHrBudget ? "complete" : "baseline";
-  const source = item.hasHrBudget ? rfCompactT("hrBudget") : rfCompactT("excel");
-  const action = item.hasHrBudget ? rfCompactT("view") : rfCompactT("start");
+  const statusClass = item.hasCompletedBudget ? "complete" : "baseline";
+  const source = item.hasHrBudget && item.hasAdminBudget ? rfCompactT("combinedBudget") : item.hasHrBudget ? rfCompactT("hrBudget") : item.hasAdminBudget ? rfCompactT("adminBudget") : rfCompactT("excel");
+  const action = item.hasCompletedBudget ? rfCompactT("view") : rfCompactT("start");
   return `
-    <tr class="rf-account-row ${selected ? "selected" : ""}" data-rf-select="${escapeHtml(row.code)}">
-      <td><button type="button" class="rf-row-toggle" data-rf-select="${escapeHtml(row.code)}" aria-expanded="${selected}">${selected ? "−" : "+"}</button><b>${escapeHtml(row.code)}</b></td>
+    <tr class="rf-account-row ${selected ? "selected" : ""} ${selectable ? "selectable" : "read-only"}" ${selectable ? `data-rf-select="${escapeHtml(row.code)}"` : ""}>
+      <td>${selectable ? `<button type="button" class="rf-row-toggle" data-rf-select="${escapeHtml(row.code)}" aria-expanded="${selected}">${selected ? "−" : "+"}</button>` : `<span class="rf-row-spacer"></span>`}<b>${escapeHtml(row.code)}</b></td>
       <td title="${escapeHtml(accountLabel)}">${escapeHtml(shortText(accountLabel, 30))}</td>
       <td><span class="rf-source ${statusClass}">${escapeHtml(source)}</span></td>
       ${months.map((value, index) => `<td class="rf-month-value ${index >= 5 ? "forecast" : "actual"}">${formatMoney(value)}</td>`).join("")}
       <td class="rf-annual"><strong>${formatMoney(annual)}</strong></td>
-      <td><button type="button" class="rf-status-action ${statusClass}" data-rf-select="${escapeHtml(row.code)}">${escapeHtml(item.hasHrBudget ? rfCompactT("done") : action)}</button></td>
+      <td>${item.hasCompletedBudget ? `<span class="rf-status-action complete">${escapeHtml(rfCompactT("done"))}</span>` : `<button type="button" class="rf-status-action ${statusClass}" data-rf-select="${escapeHtml(row.code)}">${escapeHtml(action)}</button>`}</td>
     </tr>
     ${selected ? `<tr class="rf-account-detail-row"><td colspan="17">${rfCompactEditor(item)}</td></tr>` : ""}
   `;
+}
+
+function rfCleanAccountLabel(code, label) {
+  const source = String(label || "").trim();
+  const normalizedCode = String(code || "").trim();
+  if (!source || !normalizedCode) return source;
+  const escapedCode = normalizedCode.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const cleaned = source.replace(new RegExp(`^${escapedCode}(?:\\s*[-·:：/]\\s*|\\s+)`, "i"), "").trim();
+  return cleaned || source;
 }
 
 function rfAccountMonthAmount(code, month) {
@@ -3157,6 +3204,259 @@ function rfCompactEditor(item) {
       </div>
     </div>
   `;
+}
+
+function adminT(key) {
+  const copy = {
+    zh: {
+      title: "DW 行政预算工作台", subtitle: "按 Administration Budget R2 标准校核，变更必须填写原因。", permission: "行政角色 · 仅显示行政预算",
+      conditions: "预算条件", results: "预算结果", rules: "计算口径", audit: "变更记录", save: "保存责任人", submit: "提交行政预算",
+      categories: "预算科目", completed: "已完成预算", pending: "待补标准", annual: "DW全年预算", source: "源文件",
+      category: "科目", account: "三张表科目号", standard: "Excel标准", status: "状态", ready: "已预算", missing: "未完成",
+      annualTotal: "全年", reason: "调整原因", reasonHint: "仅在修改Excel预算标准时填写原因和依据", formula: "计算逻辑", drivers: "需核对数据", allocation: "月度展开",
+      changed: "已修改", unchanged: "与Excel一致", sourceUnit: "源表TRY，网站与第二张表统一为K€", noAudit: "暂无变更记录",
+      reasonRequired: "修改预算标准后必须填写对应科目的调整原因", saved: "行政预算校核已保存并留痕", submitted: "行政预算已提交并同步到第二张表",
+      time: "时间", owner: "责任人", beforeAfter: "修改前 → 修改后", operation: "操作", pendingNote: "源表尚无DW预算结果，不同步到第二张表"
+      ,provider: "提供部门", system: "数据来源", frequency: "更新频率", condition: "预算条件", ownerPending: "待指定责任人", fixedFormula: "固定计算公式", resultReadonly: "系统计算结果，只读并同步到第二张表", responsibilitySaved: "责任人分工已保存"
+      ,resultAccountName: "小科目名称", resultAccountCode: "小科目号", sourceCategories: "预算来源", sourceStandard: "按来源系统标准"
+    },
+    en: {
+      title: "DW Administration Budget", subtitle: "Validate Administration Budget R2 standards. Every override requires a reason.", permission: "Administration role · Administration budget only",
+      conditions: "Budget inputs", results: "Budget results", rules: "Calculation rules", audit: "Change log", save: "Save owners", submit: "Submit admin budget",
+      categories: "Budget items", completed: "Budgeted", pending: "Standard missing", annual: "DW annual budget", source: "Source file",
+      category: "Item", account: "Account", standard: "Excel standard", status: "Status", ready: "Budgeted", missing: "Incomplete",
+      annualTotal: "Annual", reason: "Change reason", reasonHint: "Required only when overriding the Excel budget standard", formula: "Formula", drivers: "Review inputs", allocation: "Monthly allocation",
+      changed: "Changed", unchanged: "Matches Excel", sourceUnit: "Source in TRY; site and second table use K€", noAudit: "No changes recorded",
+      reasonRequired: "Enter a reason for every changed budget item", saved: "Administration review saved with audit trail", submitted: "Administration budget submitted and synced to the second table",
+      time: "Time", owner: "Owner", beforeAfter: "Before → After", operation: "Action", pendingNote: "No DW result in source; excluded from second-table sync"
+      ,provider: "Provider", system: "Data source", frequency: "Frequency", condition: "Budget input", ownerPending: "Assign owner", fixedFormula: "Fixed formula", resultReadonly: "System-calculated, read-only and synced to the second table", responsibilitySaved: "Responsibility owners saved"
+      ,resultAccountName: "Account name", resultAccountCode: "Account code", sourceCategories: "Budget sources", sourceStandard: "Source-system standard"
+    },
+    tr: {
+      title: "DW İdari Bütçe", subtitle: "Administration Budget R2 standartlarını doğrulayın. Her değişiklik gerekçe gerektirir.", permission: "İdari rol · Yalnızca idari bütçe",
+      conditions: "Bütçe girdileri", results: "Bütçe sonuçları", rules: "Hesaplama kuralları", audit: "Değişiklik kaydı", save: "Sorumluları kaydet", submit: "İdari bütçeyi gönder",
+      categories: "Bütçe kalemleri", completed: "Bütçelendi", pending: "Standart eksik", annual: "DW yıllık bütçe", source: "Kaynak dosya",
+      category: "Kalem", account: "Hesap", standard: "Excel standardı", status: "Durum", ready: "Bütçelendi", missing: "Eksik",
+      annualTotal: "Yıllık", reason: "Değişiklik nedeni", reasonHint: "Yalnızca Excel bütçe standardı değiştirildiğinde zorunludur", formula: "Formül", drivers: "Kontrol verileri", allocation: "Aylık dağılım",
+      changed: "Değişti", unchanged: "Excel ile aynı", sourceUnit: "Kaynak TRY; web ve ikinci tablo K€", noAudit: "Değişiklik kaydı yok",
+      reasonRequired: "Değiştirilen her bütçe kalemi için gerekçe girin", saved: "İdari bütçe kontrolü denetim iziyle kaydedildi", submitted: "İdari bütçe ikinci tabloya gönderildi",
+      time: "Zaman", owner: "Sorumlu", beforeAfter: "Önce → Sonra", operation: "İşlem", pendingNote: "Kaynakta DW sonucu yok; ikinci tabloya aktarılmaz"
+      ,provider: "Sağlayan bölüm", system: "Veri kaynağı", frequency: "Sıklık", condition: "Bütçe girdisi", ownerPending: "Sorumlu ata", fixedFormula: "Sabit formül", resultReadonly: "Sistem hesabı salt okunur ve ikinci tabloya aktarılır", responsibilitySaved: "Sorumlular kaydedildi"
+      ,resultAccountName: "Hesap adı", resultAccountCode: "Hesap kodu", sourceCategories: "Bütçe kaynakları", sourceStandard: "Kaynak sistem standardı"
+    }
+  };
+  return copy[state.language]?.[key] || copy.zh[key] || key;
+}
+
+const ADMIN_CATEGORY_TR = {
+  fleetFuel: "Araç Filosu ve Yakıt", canteen: "Yemekhane", shuttle: "Servis", hiring: "İşe Alım", training: "Eğitim", sodexo: "Sodexo Yan Hakkı", security: "Güvenlik", cleaning: "Temizlik", flatRent: "Konut Kirası", otherSuppliers: "Diğer Tedarikçiler", doctorNurse: "Doktor ve Hemşire", uniforms: "İş Kıyafetleri", socialAids: "Sosyal Yardımlar", ramadanFood: "Ramazan Gıda Yardımı", shoes: "Ayakkabı Yardımı", entertainment: "Çalışan Etkinlikleri", mobile: "Mobil İletişim", rewards: "Çalışan Ödülleri", waste: "Atık Yönetimi", hiringHealth: "İşe Giriş Sağlık Kontrolü", socialAudits: "Sosyal Uygunluk Denetimi", waterBottles: "İçme Suyu", hrPrograms: "İK Sistemleri ve Programları", privateHealth: "Özel Sağlık Sigortası", otherAdmin: "Diğer İdari Giderler"
+};
+
+const ADMIN_FORMULA_EN = {
+  fleetFuel: "Monthly rent x 12 + monthly fuel litres x fuel price x 12, summarized by cost center", canteen: "(eligible headcount x workdays + Sunday overtime headcount x 5) x monthly meal price", shuttle: "Attendance x workdays x shuttle rate; rate = route cost / (16 x target occupancy) x 2", hiring: "Recruitment-channel baseline x (1 + 30%) + planned-vacancy cost", training: "Department baseline x (1 + 30%); selected R&D cost allocated by headcount share x training pool x EUR/TRY", sodexo: "Eligible roster x 250 workdays x TRY 455/day", security: "Service FTE x 2026 monthly rate x 12 x 1.1 + fixed allowance", cleaning: "Service FTE x 2026 monthly rate x 12 x 1.1 + fixed allowance", flatRent: "Monthly rent x 12; shared housing allocated by cost center", otherSuppliers: "Service FTE x 2026 monthly rate x 12; selected items x 1.1", doctorNurse: "Doctor/nurse FTE x monthly service rate x 12", uniforms: "Eligible headcount x item price x issue quantity x 1.2 + special equipment", socialAids: "H1 eligible headcount x TRY 8,000 + H2 eligible headcount x TRY 8,000", ramadanFood: "Eligible headcount x food-package price x 1.1", shoes: "Eligible headcount x shoe price x 2 issues x 1.1", entertainment: "Activity headcount/count x 2026 price + fixed corporate events", mobile: "2025 monthly cost x 1.3 x 12; selected items x quantity", rewards: "Reward quantity x 2026 reward price", waste: "[((7-month actual / 7 x 12 + 7-month actual) x disposal rate) + transport] x 1.3", hiringHealth: "Planned hires x (TRY 1,500 x 1.3)", socialAudits: "2025 Sedex audit cost x 1.3", waterBottles: "Quantity x (TRY 500 x 1.3)", hrPrograms: "Fixed licence quantity x EUR/TRY; other systems = 2025 cost x 1.3", privateHealth: "Headcount by grade/dependent type x 2026 premium + life insurance", otherAdmin: "First 9 months actual / 9 x 12"
+};
+
+const ADMIN_FORMULA_TR = {
+  fleetFuel: "Aylık kira x 12 + aylık yakıt litresi x yakıt fiyatı x 12; masraf merkezi bazında toplam", canteen: "(uygun çalışan x iş günü + Pazar mesaisi çalışanı x 5) x aylık yemek fiyatı", shuttle: "Katılım x iş günü x servis birim fiyatı; fiyat = hat maliyeti / (16 x hedef doluluk) x 2", hiring: "İşe alım kanal bazı x (1 + %30) + planlı açık pozisyon maliyeti", training: "Bölüm bazı x (1 + %30); seçili Ar-Ge gideri çalışan payı x eğitim havuzu x EUR/TRY", sodexo: "Uygun çalışan listesi x 250 iş günü x 455 TRY/gün", security: "Hizmet çalışanı x 2026 aylık fiyat x 12 x 1.1 + sabit yardım", cleaning: "Hizmet çalışanı x 2026 aylık fiyat x 12 x 1.1 + sabit yardım", flatRent: "Aylık kira x 12; ortak konut masraf merkezi bazında dağıtılır", otherSuppliers: "Hizmet çalışanı x 2026 aylık fiyat x 12; seçili kalemler x 1.1", doctorNurse: "Doktor/hemşire sayısı x aylık hizmet fiyatı x 12", uniforms: "Uygun çalışan x ürün fiyatı x dağıtım adedi x 1.2 + özel ekipman", socialAids: "İlk yarı çalışan x 8.000 TRY + ikinci yarı çalışan x 8.000 TRY", ramadanFood: "Uygun çalışan x gıda paketi fiyatı x 1.1", shoes: "Uygun çalışan x ayakkabı fiyatı x 2 dağıtım x 1.1", entertainment: "Etkinlik çalışanı/adedi x 2026 fiyatı + sabit şirket etkinlikleri", mobile: "2025 aylık gideri x 1.3 x 12; seçili kalemler x adet", rewards: "Ödül adedi x 2026 ödül fiyatı", waste: "[((7 aylık gerçekleşen / 7 x 12 + 7 aylık gerçekleşen) x bertaraf fiyatı) + nakliye] x 1.3", hiringHealth: "Planlı işe alım x (1.500 TRY x 1.3)", socialAudits: "2025 Sedex denetim gideri x 1.3", waterBottles: "Adet x (500 TRY x 1.3)", hrPrograms: "Sabit lisans adedi x EUR/TRY; diğer sistemler = 2025 gideri x 1.3", privateHealth: "Unvan/yakın türü çalışan adedi x 2026 primi + hayat sigortası", otherAdmin: "İlk 9 ay gerçekleşen / 9 x 12"
+};
+
+const ADMIN_DRIVER_EN = { vehicleList:"Vehicle and allocation list",rentPrice:"Monthly rent",fuelQuota:"Monthly fuel quota",fuelPrice:"Fuel price",headcount:"Eligible headcount",workdays:"Workdays",sundayOt:"Sunday overtime headcount",mealPrice:"Meal unit price",routeCost:"Route cost",occupancy:"Target occupancy",channelBaseline:"Recruitment-channel baseline",vacancies:"Planned vacancies",increase:"Increase rate",trainingPlan:"Department training plan",trainingPrice:"Course/training-pool price",fx:"EUR/TRY rate",roster:"Eligible roster",annualDays:"Annual workdays",dailyPrice:"Daily rate",fte:"Service FTE",monthlyPrice:"Monthly service rate",allowance:"Fixed allowance",housingList:"Housing list",allocation:"Cost-center allocation",surcharge:"Surcharge factor",issueQty:"Issue quantity/frequency",itemPrice:"Item unit price",aidStandard:"Aid standard",tisRate:"TIS increase rate",packagePrice:"Food-package price",issueRule:"Issue rule",shoePrice:"Shoe unit price",activityPlan:"Activity plan and count",activityPrice:"Activity unit price",userCount:"User quantity",monthlyTariff:"Monthly tariff",rewardQty:"Reward quantities",rewardPrice:"Reward unit price",wasteQty:"Waste quantity",handlingPrice:"Disposal unit price",transportPrice:"Transport fee",actualBaseline:"Actual baseline",hiringQty:"Planned hires",checkPrice:"Health-check price",auditPlan:"Audit plan",auditPrice:"Audit fee",quantity:"Quantity",unitPrice:"Unit price",licenseQty:"Licence quantity",licensePrice:"Licence unit price",insuredRoster:"Insured roster and dependent type",premium:"2026 premium",lifeInsurance:"Life-insurance standard",actual9m:"First 9 months actual",scope:"Expense scope" };
+const ADMIN_DRIVER_TR = { vehicleList:"Araç ve dağılım listesi",rentPrice:"Aylık kira",fuelQuota:"Aylık yakıt limiti",fuelPrice:"Yakıt fiyatı",headcount:"Uygun çalışan sayısı",workdays:"İş günleri",sundayOt:"Pazar mesaisi çalışanı",mealPrice:"Yemek birim fiyatı",routeCost:"Hat maliyeti",occupancy:"Hedef doluluk",channelBaseline:"İşe alım kanal bazı",vacancies:"Planlı açık pozisyon",increase:"Artış oranı",trainingPlan:"Bölüm eğitim planı",trainingPrice:"Kurs/eğitim havuzu fiyatı",fx:"EUR/TRY kuru",roster:"Uygun çalışan listesi",annualDays:"Yıllık iş günü",dailyPrice:"Günlük fiyat",fte:"Hizmet çalışanı",monthlyPrice:"Aylık hizmet fiyatı",allowance:"Sabit yardım",housingList:"Konut listesi",allocation:"Masraf merkezi dağılımı",surcharge:"Ek katsayı",issueQty:"Dağıtım adedi/sıklığı",itemPrice:"Ürün birim fiyatı",aidStandard:"Yardım standardı",tisRate:"TİS artış oranı",packagePrice:"Gıda paketi fiyatı",issueRule:"Dağıtım kuralı",shoePrice:"Ayakkabı birim fiyatı",activityPlan:"Etkinlik planı ve adedi",activityPrice:"Etkinlik birim fiyatı",userCount:"Kullanıcı adedi",monthlyTariff:"Aylık tarife",rewardQty:"Ödül adetleri",rewardPrice:"Ödül birim fiyatı",wasteQty:"Atık miktarı",handlingPrice:"Bertaraf birim fiyatı",transportPrice:"Nakliye ücreti",actualBaseline:"Gerçekleşen baz",hiringQty:"Planlı işe alım",checkPrice:"Sağlık kontrolü fiyatı",auditPlan:"Denetim planı",auditPrice:"Denetim ücreti",quantity:"Miktar",unitPrice:"Birim fiyat",licenseQty:"Lisans adedi",licensePrice:"Lisans birim fiyatı",insuredRoster:"Sigortalı listesi ve yakın türü",premium:"2026 primi",lifeInsurance:"Hayat sigortası standardı",actual9m:"İlk 9 ay gerçekleşen",scope:"Gider kapsamı" };
+
+const ADMIN_SYSTEM_I18N = {
+  en: {"车辆台账":"Vehicle register","采购合同":"Procurement contract","车辆政策":"Vehicle policy","HR人员系统":"HR system","系统日历":"System calendar","考勤系统":"Attendance system","班车线路台账":"Shuttle-route register","招聘台账":"Recruitment register","编制计划":"Workforce plan","预算参数":"Budget parameters","培训计划":"Training plan","财务参数":"Finance parameters","福利合同":"Benefit contract","供应商排班":"Supplier roster","服务合同":"Service contract","住房台账":"Housing register","租赁合同":"Lease contract","成本中心规则":"Cost-center rules","职业健康台账":"Occupational-health register","发放政策":"Issue policy","福利政策":"Benefit policy","劳资政策":"Labor policy","活动计划":"Activity plan","通讯台账":"Communication register","奖励计划":"Reward plan","奖励政策":"Reward policy","废弃物台账":"Waste register","SAP":"SAP","审核计划":"Audit plan","领用台账":"Consumption register","系统许可台账":"Licence register","保险合同":"Insurance contract","科目范围":"Account scope"},
+  tr: {"车辆台账":"Araç kaydı","采购合同":"Satın alma sözleşmesi","车辆政策":"Araç politikası","HR人员系统":"İK sistemi","系统日历":"Sistem takvimi","考勤系统":"Puantaj sistemi","班车线路台账":"Servis hat kaydı","招聘台账":"İşe alım kaydı","编制计划":"Kadro planı","预算参数":"Bütçe parametreleri","培训计划":"Eğitim planı","财务参数":"Finans parametreleri","福利合同":"Yan hak sözleşmesi","供应商排班":"Tedarikçi vardiyası","服务合同":"Hizmet sözleşmesi","住房台账":"Konut kaydı","租赁合同":"Kira sözleşmesi","成本中心规则":"Masraf merkezi kuralları","职业健康台账":"İş sağlığı kaydı","发放政策":"Dağıtım politikası","福利政策":"Yan hak politikası","劳资政策":"Çalışma politikası","活动计划":"Etkinlik planı","通讯台账":"İletişim kaydı","奖励计划":"Ödül planı","奖励政策":"Ödül politikası","废弃物台账":"Atık kaydı","SAP":"SAP","审核计划":"Denetim planı","领用台账":"Tüketim kaydı","系统许可台账":"Lisans kaydı","保险合同":"Sigorta sözleşmesi","科目范围":"Hesap kapsamı"}
+};
+
+const ADMIN_PROVIDER_I18N = {
+  en: { "行政部门":"Administration", "间接采购":"Indirect Procurement", "人力资源":"HR", "财务部门":"Finance", "EHS/生产部门":"EHS / Production", "人力资源/合规":"HR / Compliance", "间接采购/IT":"Indirect Procurement / IT" },
+  tr: { "行政部门":"İdari İşler", "间接采购":"Endirekt Satın Alma", "人力资源":"İnsan Kaynakları", "财务部门":"Finans", "EHS/生产部门":"EHS / Üretim", "人力资源/合规":"İK / Uygunluk", "间接采购/IT":"Endirekt Satın Alma / BT" }
+};
+
+function adminCategoryLabel(category) {
+  if (state.language === "en") return category.sourceLabel;
+  if (state.language === "tr") return ADMIN_CATEGORY_TR[category.id] || category.sourceLabel;
+  return category.label;
+}
+
+function adminFormula(category) {
+  if (state.language === "en") return ADMIN_FORMULA_EN[category.id] || category.formula;
+  if (state.language === "tr") return ADMIN_FORMULA_TR[category.id] || category.formula;
+  return category.formula;
+}
+
+function adminDriverLabel(item) {
+  if (state.language === "en") return ADMIN_DRIVER_EN[item.key] || item.key;
+  if (state.language === "tr") return ADMIN_DRIVER_TR[item.key] || item.key;
+  return item.label;
+}
+
+function adminProvider(value) {
+  return ADMIN_PROVIDER_I18N[state.language]?.[value] || value;
+}
+
+function adminDriverSystem(item) {
+  if (state.language === "zh") return item.system;
+  return ADMIN_SYSTEM_I18N[state.language]?.[item.system] || item.system;
+}
+
+function adminFrequency(value) {
+  if (state.language === "en") return value === "年度" ? "Annual" : value === "半年度" ? "Semiannual" : "Monthly";
+  if (state.language === "tr") return value === "年度" ? "Yıllık" : value === "半年度" ? "Altı aylık" : "Aylık";
+  return value;
+}
+
+function defaultAdminBudgetInputs() {
+  return {
+    months: Object.fromEntries(ADMIN_BUDGET_DATA.categories.map((item) => [item.id, [...item.monthlyTry]])),
+    reasons: {},
+    owners: {}
+  };
+}
+
+function loadAdminBudgetInputs() {
+  const defaults = defaultAdminBudgetInputs();
+  try {
+    const saved = JSON.parse(localStorage.getItem(ADMIN_BUDGET_INPUT_KEY) || "null");
+    if (!saved) return defaults;
+    return { months: { ...defaults.months, ...(saved.months || {}) }, reasons: { ...(saved.reasons || {}) }, owners: { ...(saved.owners || {}) } };
+  } catch {
+    return defaults;
+  }
+}
+
+function loadAdminBudgetAudit() {
+  try { return JSON.parse(localStorage.getItem(ADMIN_BUDGET_AUDIT_KEY) || "[]"); } catch { return []; }
+}
+
+function saveAdminBudgetState() {
+  localStorage.setItem(ADMIN_BUDGET_INPUT_KEY, JSON.stringify(adminBudgetInputs));
+  localStorage.setItem(ADMIN_BUDGET_AUDIT_KEY, JSON.stringify(adminBudgetAudit));
+}
+
+function adminCategoryChanged(category) {
+  const current = adminBudgetInputs.months[category.id] || [];
+  const saved = adminBudgetSavedInputs.months?.[category.id] || category.monthlyTry || [];
+  return current.some((value, index) => Math.abs(Number(value || 0) - Number(saved[index] || 0)) > 0.01);
+}
+
+function adminPendingChanges() {
+  return ADMIN_BUDGET_DATA.categories.filter(adminCategoryChanged);
+}
+
+function adminMonthlyKeur(category, index) {
+  return Number(category.monthlyTry?.[index] || 0) / ADMIN_BUDGET_DATA.eurTry / 1000;
+}
+
+function adminAnnualKeur(category) {
+  return (category.monthlyTry || []).reduce((sum, value) => sum + Number(value || 0), 0) / ADMIN_BUDGET_DATA.eurTry / 1000;
+}
+
+function renderAdminBudgetWorkspace() {
+  if (!els.forecastWorkspace) return;
+  const ready = ADMIN_BUDGET_DATA.categories.filter((item) => item.ready);
+  const pending = ADMIN_BUDGET_DATA.categories.filter((item) => !item.ready);
+  const annual = ready.reduce((sum, item) => sum + adminAnnualKeur(item), 0);
+  const selected = ADMIN_BUDGET_DATA.categories.find((item) => item.id === state.adminSelectedCategory) || ADMIN_BUDGET_DATA.categories[0];
+  const nav = `<nav class="adb-tabs">${[["conditions","conditions"],["results","results"],["audit","audit"]].map(([id,key]) => `<button type="button" class="${state.adminBudgetView === id ? "active" : ""}" data-admin-view="${id}">${escapeHtml(adminT(key))}</button>`).join("")}</nav>`;
+  const content = state.adminBudgetView === "results" ? adminBudgetResults() : state.adminBudgetView === "audit" ? adminAuditView() : adminConditionView(selected);
+  const versions = state.language === "en" ? ["2026 Budget", "5+7 Forecast", "Variance"] : state.language === "tr" ? ["2026 Bütçe", "5+7 Tahmin", "Fark"] : ["2026预算", "5+7预测", "差异版"];
+  els.forecastWorkspace.innerHTML = `<div class="adb-shell">
+    <header class="adb-header"><div><span>${escapeHtml(adminT("permission"))}</span><h3>${escapeHtml(adminT("title"))}</h3><p>${escapeHtml(adminT("subtitle"))}</p></div><div class="adb-version-switch">${versions.map((label, index) => `<span class="${index === 1 ? "active" : ""}">${escapeHtml(label)}</span>`).join("")}</div><div class="adb-actions"><button type="button" class="ghost-button" data-admin-action="save">${escapeHtml(adminT("save"))}</button><button type="button" data-admin-action="submit">${escapeHtml(adminT("submit"))}</button></div></header>
+    ${nav}
+    <section class="adb-kpis"><div><span>${escapeHtml(adminT("categories"))}</span><strong>${ADMIN_BUDGET_DATA.categories.length}</strong></div><div class="good"><span>${escapeHtml(adminT("completed"))}</span><strong>${ready.length}</strong></div><div class="warn"><span>${escapeHtml(adminT("pending"))}</span><strong>${pending.length}</strong></div><div><span>${escapeHtml(adminT("annual"))}</span><strong>€${formatMoney(annual)}K</strong></div><div><span>${escapeHtml(adminT("source"))}</span><strong>R2</strong><small>${escapeHtml(ADMIN_BUDGET_DATA.sourceFile)}</small></div></section>
+    ${content}
+  </div>`;
+}
+
+function adminConditionView(selected) {
+  return `<section class="adb-condition-layout"><aside class="adb-category-list">${ADMIN_BUDGET_DATA.categories.map((category) => `<button type="button" class="${selected.id === category.id ? "active" : ""}" data-admin-select="${category.id}"><span><b>${escapeHtml(adminCategoryLabel(category))}</b><small>${escapeHtml(category.sourceLabel)}</small></span><em class="adb-status ${category.ready ? "ready" : "missing"}">${escapeHtml(category.ready ? adminT("ready") : adminT("missing"))}</em></button>`).join("")}</aside><section class="adb-condition-main">${adminSelectedPanel(selected)}${adminDriverTable(selected)}</section></section>`;
+}
+
+function adminSelectedPanel(category) {
+  return `<header class="adb-condition-head"><div><span>${escapeHtml(category.sourceLabel)}</span><h4>${escapeHtml(adminCategoryLabel(category))}</h4><b>${escapeHtml(category.accountCode)}</b></div><div><span>${escapeHtml(adminT("fixedFormula"))}</span><strong>${escapeHtml(adminFormula(category))}</strong><small>${escapeHtml(state.language === "zh" ? category.allocation : adminT("sourceStandard"))}</small></div></header>`;
+}
+
+function adminDriverTable(category) {
+  const drivers = ADMIN_DRIVER_MATRIX[category.id] || [];
+  return `<div class="adb-driver-table"><table><thead><tr><th>${escapeHtml(adminT("condition"))}</th><th>${escapeHtml(adminT("standard"))}</th><th>${escapeHtml(adminT("provider"))}</th><th>${escapeHtml(adminT("owner"))}</th><th>${escapeHtml(adminT("system"))}</th><th>${escapeHtml(adminT("frequency"))}</th></tr></thead><tbody>${drivers.map((item) => `<tr><td><b>${escapeHtml(adminDriverLabel(item))}</b></td><td>${escapeHtml(state.language === "zh" ? item.standard : adminT("sourceStandard"))}</td><td><span class="adb-provider">${escapeHtml(adminProvider(item.provider))}</span></td><td><input data-admin-owner="${category.id}.${item.key}" value="${escapeHtml(adminBudgetInputs.owners?.[category.id]?.[item.key] || "")}" placeholder="${escapeHtml(adminT("ownerPending"))}" /></td><td>${escapeHtml(adminDriverSystem(item))}</td><td>${escapeHtml(adminFrequency(item.frequency))}</td></tr>`).join("")}</tbody></table>${category.ready ? `<p class="adb-result-note">${escapeHtml(adminT("resultReadonly"))}</p>` : `<p class="adb-pending-note">${escapeHtml(adminT("pendingNote"))}</p>`}</div>`;
+}
+
+function adminBudgetResults() {
+  const accounts = adminBudgetResultAccounts();
+  const resultMonths = Array.from({ length: 12 }, (_, index) => index + 1);
+  const selected = accounts.find((item) => item.code === state.adminSelectedAccount) || accounts[0];
+  if (selected) state.adminSelectedAccount = selected.code;
+  const actualBand = state.language === "en" ? "Jan-May Excel baseline" : state.language === "tr" ? "Oca-May Excel baz" : "1-5月 Excel基线";
+  const forecastBand = state.language === "en" ? "Jun-Dec rolling budget" : state.language === "tr" ? "Haz-Ara güncel bütçe" : "6-12月 滚动预算";
+  return `<section class="adb-results"><div class="adb-table-wrap"><table class="adb-budget-table"><thead><tr class="adb-month-bands"><th colspan="2">${escapeHtml(adminT("categories"))}</th><th colspan="5" class="baseline">${escapeHtml(actualBand)}</th><th colspan="7" class="forecast">${escapeHtml(forecastBand)}</th><th colspan="2">${escapeHtml(adminT("annualTotal"))}</th></tr><tr><th>${escapeHtml(adminT("resultAccountName"))}</th><th>${escapeHtml(adminT("resultAccountCode"))}</th>${resultMonths.map((month) => `<th>${escapeHtml(localizeMonthLabel(month - 1, state.language))}<small>K€</small></th>`).join("")}<th>${escapeHtml(adminT("annualTotal"))}<small>K€</small></th><th>${escapeHtml(adminT("status"))}</th></tr></thead><tbody>${accounts.map((account) => `<tr class="${selected?.code === account.code ? "selected" : ""}" data-admin-result="${escapeHtml(account.code)}"><td><b>${escapeHtml(account.label)}</b><small>${escapeHtml(adminT("sourceCategories"))}: ${escapeHtml(account.sources.join(" / "))}</small></td><td>${escapeHtml(account.code)}</td>${resultMonths.map((month) => `<td>${formatMoney(account.months[month - 1])}</td>`).join("")}<td><strong>${formatMoney(account.annual)}</strong></td><td><span class="adb-status ready">${escapeHtml(adminT("ready"))}</span></td></tr>`).join("")}</tbody></table></div>${selected ? adminBudgetAccountDetail(selected) : ""}</section>`;
+}
+
+function adminBudgetAccountDetail(account) {
+  const categories = (account.categoryIds || []).map((id) => ADMIN_BUDGET_DATA.categories.find((item) => item.id === id)).filter(Boolean);
+  const primary = categories[0];
+  const drivers = primary ? (ADMIN_DRIVER_MATRIX[primary.id] || []).slice(0, 4) : [];
+  const max = Math.max(...account.months, 1);
+  const points = account.months.map((value, index) => `${index * (100 / 11)},${88 - (Number(value || 0) / max) * 64}`).join(" ");
+  const sourceLabel = state.language === "en" ? "Budget source" : state.language === "tr" ? "Bütçe kaynağı" : "预算来源";
+  const driverLabel = state.language === "en" ? "Driver responsibility" : state.language === "tr" ? "Sürücü sorumluluğu" : "驱动责任";
+  const trendLabel = state.language === "en" ? "Monthly budget trend" : state.language === "tr" ? "Aylık bütçe eğilimi" : "月度预算趋势";
+  return `<section class="adb-account-detail"><div class="adb-account-formula"><span>${escapeHtml(account.code)}</span><h4>${escapeHtml(account.label)}</h4><b>${escapeHtml(primary ? adminFormula(primary) : adminT("sourceStandard"))}</b><small>${escapeHtml(sourceLabel)}：${escapeHtml(account.sources.join(" / "))}</small></div><div class="adb-account-drivers"><strong>${escapeHtml(driverLabel)}</strong><div>${drivers.map((item) => `<span><small>${escapeHtml(adminDriverLabel(item))}</small><b>${escapeHtml(adminProvider(item.provider))}</b></span>`).join("")}</div></div><div class="adb-account-trend"><strong>${escapeHtml(trendLabel)}</strong><svg viewBox="0 0 100 94" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="88" x2="100" y2="88"></line><line x1="0" y1="56" x2="100" y2="56"></line><polyline points="${points}"></polyline></svg></div></section>`;
+}
+
+function adminBudgetResultAccounts() {
+  const output = buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, {}, Array.from({ length: 12 }, (_, index) => index + 1));
+  return Object.entries(output).map(([code, entry]) => {
+    const row = rollingRowForCode(code);
+    const rawLabel = row ? (state.activeUnit === "cooking" && state.language === "zh" && row.descCn ? row.descCn : localizeAccountLabel(code, row.descEn, state.language)) : localizeAccountLabel(code, "", state.language);
+    const sources = (entry.categoryIds || []).map((id) => adminCategoryLabel(ADMIN_BUDGET_DATA.categories.find((item) => item.id === id) || { id, label: id, sourceLabel: id }));
+    const months = Array.from({ length: 12 }, (_, index) => Number(entry.months?.[String(index + 1)] || 0));
+    return { code, label: rfCleanAccountLabel(code, rawLabel) || code, sources, categoryIds: entry.categoryIds || [], months, annual: months.reduce((sum, value) => sum + value, 0) };
+  }).sort((left, right) => left.code.localeCompare(right.code));
+}
+
+function adminRulesView() {
+  return `<section class="adb-rules"><table><thead><tr><th>${escapeHtml(adminT("category"))}</th><th>${escapeHtml(adminT("formula"))}</th><th>${escapeHtml(adminT("drivers"))}</th><th>${escapeHtml(adminT("allocation"))}</th><th>${escapeHtml(adminT("status"))}</th></tr></thead><tbody>${ADMIN_BUDGET_DATA.categories.map((item) => `<tr><td><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.sourceLabel)}</small></td><td>${escapeHtml(item.formula)}</td><td>${escapeHtml(item.drivers)}</td><td>${escapeHtml(item.allocation)}</td><td><span class="adb-status ${item.ready ? "ready" : "missing"}">${escapeHtml(item.ready ? adminT("ready") : adminT("missing"))}</span></td></tr>`).join("")}</tbody></table></section>`;
+}
+
+function adminAuditView() {
+  return `<section class="adb-audit"><table><thead><tr><th>${escapeHtml(adminT("time"))}</th><th>${escapeHtml(adminT("owner"))}</th><th>${escapeHtml(adminT("category"))}</th><th>${escapeHtml(adminT("beforeAfter"))}</th><th>${escapeHtml(adminT("reason"))}</th><th>${escapeHtml(adminT("operation"))}</th></tr></thead><tbody>${adminBudgetAudit.map((item) => `<tr><td>${escapeHtml(new Date(item.timestamp).toLocaleString())}</td><td>${escapeHtml(item.actor)}</td><td>${escapeHtml(item.label)}<small>${escapeHtml(item.period)}</small></td><td>${formatMoney(item.before / ADMIN_BUDGET_DATA.eurTry / 1000)} → ${formatMoney(item.after / ADMIN_BUDGET_DATA.eurTry / 1000)} K€</td><td>${escapeHtml(item.reason)}</td><td>${escapeHtml(item.action)}</td></tr>`).join("") || `<tr><td colspan="6" class="empty-cell">${escapeHtml(adminT("noAudit"))}</td></tr>`}</tbody></table></section>`;
+}
+
+function adminBudgetChanges() {
+  const changes = [];
+  for (const category of ADMIN_BUDGET_DATA.categories) {
+    const before = adminBudgetSavedInputs.months?.[category.id] || category.monthlyTry || [];
+    const after = adminBudgetInputs.months?.[category.id] || [];
+    after.forEach((value, index) => {
+      if (Math.abs(Number(value || 0) - Number(before[index] || 0)) > 0.01) changes.push({ category, index, before: Number(before[index] || 0), after: Number(value || 0) });
+    });
+  }
+  return changes;
+}
+
+function applyAdminBudgetSync(reason = "Excel baseline", action = "baseline") {
+  const output = buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, {});
+  const timestamp = new Date().toISOString();
+  const actor = els.userName?.value.trim() || (action === "baseline" ? "Excel" : adminT("permission"));
+  for (const [code, entry] of Object.entries(output)) {
+    const accountDraft = state.rollingForecastDrafts[code] || {};
+    for (const [month, amount] of Object.entries(entry.months || {})) {
+      accountDraft[month] = { ...(accountDraft[month] || {}), adminBudgetAmount: Number(Number(amount || 0).toFixed(6)), adminBudgetOwner: actor, adminBudgetUpdatedAt: timestamp, adminBudgetReason: reason, adminBudgetCategoryIds: [...entry.categoryIds], adminBudgetLabels: [...entry.sourceLabels] };
+    }
+    state.rollingForecastDrafts[code] = accountDraft;
+    if (action === "submit") state.rollingForecastSubmitted[code] = timestamp;
+  }
+  localStorage.setItem(ADMIN_BUDGET_SYNC_KEY, JSON.stringify({ version: VERSION, timestamp, actor, reason, action, mappedCodes: Object.keys(output).length }));
+  localStorage.setItem(ROLLING_FORECAST_DRAFT_KEY, JSON.stringify(state.rollingForecastDrafts));
+  localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
+}
+
+function ensureAdminBudgetBaselineSync() {
+  let meta = null;
+  try { meta = JSON.parse(localStorage.getItem(ADMIN_BUDGET_SYNC_KEY) || "null"); } catch { meta = null; }
+  const hasAmount = Object.values(state.rollingForecastDrafts || {}).some((account) => Object.values(account || {}).some((month) => Number.isFinite(Number(month?.adminBudgetAmount))));
+  if (!hasAmount || meta?.version !== VERSION) applyAdminBudgetSync(meta?.reason || "Excel baseline", meta?.action || "baseline");
 }
 
 function loadHrBudgetDrivers() {
@@ -3659,9 +3959,9 @@ function refreshProductNavigation() {
 function initializeDemoRoleAccess() {
   const savedRole = sessionStorage.getItem("dwDemoRole");
   for (const option of Array.from(els.roleSelect?.options || [])) {
-    if (!['finance', 'hr'].includes(option.value)) option.remove();
+    if (!['finance', 'hr', 'admin'].includes(option.value)) option.remove();
   }
-  if (savedRole === "finance" || savedRole === "hr") {
+  if (["finance", "hr", "admin"].includes(savedRole)) {
     applyDemoRole(savedRole, true);
   } else {
     els.roleLogin?.classList.remove("hidden");
@@ -3669,16 +3969,17 @@ function initializeDemoRoleAccess() {
 }
 
 function applyDemoRole(role, closeLogin = true) {
-  const normalizedRole = role === "hr" ? "hr" : "finance";
+  const normalizedRole = ["hr", "admin"].includes(role) ? role : "finance";
   state.rollingRole = normalizedRole;
   localStorage.setItem("dwRollingRole.v1", normalizedRole);
   sessionStorage.setItem("dwDemoRole", normalizedRole);
   if (els.roleSelect) els.roleSelect.value = normalizedRole;
   document.body.classList.toggle("demo-role-hr", normalizedRole === "hr");
+  document.body.classList.toggle("demo-role-admin", normalizedRole === "admin");
   document.body.classList.toggle("demo-role-cost", normalizedRole === "finance");
   state.rollingSelectedCode = null;
   if (closeLogin) els.roleLogin?.classList.add("hidden");
-  if (normalizedRole === "hr") {
+  if (["hr", "admin"].includes(normalizedRole)) {
     if (state.activeUnit !== "dishwasher") switchBusinessUnit("dishwasher");
     setSidebarCollapsed(true);
     state.rollingViewMode = "fill";
@@ -3941,6 +4242,8 @@ function rollingRowMeta(row) {
     const hasQty = String(draft.quantity || "").trim() !== "";
     const hasTotal = String(draft.totalAmount || "").trim() !== "";
     const hasHrBudget = Number.isFinite(draft.hrBudgetAmount);
+    const hasAdminBudget = Number.isFinite(draft.adminBudgetAmount);
+    const hasCompletedBudget = hasHrBudget || hasAdminBudget;
     const hasOwner = totalOnly
       ? String(draft.totalOwner || "").trim()
       : String(draft.priceOwner || "").trim() || String(draft.quantityOwner || "").trim();
@@ -3949,9 +4252,11 @@ function rollingRowMeta(row) {
       month,
       draft,
       hasHrBudget,
-      hasDraft: (totalOnly ? hasTotal || hasOwner || hasDetail : hasUnit || hasQty || hasOwner) || hasHrBudget,
-      hasFormula: (totalOnly ? hasTotal : hasUnit && hasQty) || hasHrBudget,
-      ownerMissing: hasHrBudget ? !String(draft.hrBudgetOwner || "").trim() : totalOnly
+      hasAdminBudget,
+      hasCompletedBudget,
+      hasDraft: (totalOnly ? hasTotal || hasOwner || hasDetail : hasUnit || hasQty || hasOwner) || hasCompletedBudget,
+      hasFormula: (totalOnly ? hasTotal : hasUnit && hasQty) || hasCompletedBudget,
+      ownerMissing: hasCompletedBudget ? !(String(draft.hrBudgetOwner || draft.adminBudgetOwner || "").trim()) : totalOnly
         ? !String(draft.totalOwner || "").trim()
         : !String(draft.priceOwner || "").trim() || !String(draft.quantityOwner || "").trim(),
       warning: rollingWarningInfo(row.code, month)
@@ -3962,12 +4267,15 @@ function rollingRowMeta(row) {
   const formulaCount = months.filter((item) => item.hasFormula).length;
   const hasDraft = months.some((item) => item.hasDraft);
   const hasHrBudget = months.some((item) => item.hasHrBudget);
+  const hasAdminBudget = months.some((item) => item.hasAdminBudget);
   return {
     row,
     totalOnly,
     months,
     hasDraft,
     hasHrBudget,
+    hasAdminBudget,
+    hasCompletedBudget: hasHrBudget || hasAdminBudget,
     hasFormula: formulaCount > 0,
     ownerMissing: ownerMissingCount > 0,
     ownerMissingCount,
@@ -4018,6 +4326,12 @@ function rollingMonthDraft(code, month) {
     hrBudgetReason: String(monthDraft.hrBudgetReason || ""),
     hrBudgetKeys: Array.isArray(monthDraft.hrBudgetKeys) ? [...monthDraft.hrBudgetKeys] : [],
     hrBudgetLabels: Array.isArray(monthDraft.hrBudgetLabels) ? [...monthDraft.hrBudgetLabels] : []
+    ,adminBudgetAmount: Number.isFinite(Number(monthDraft.adminBudgetAmount)) ? Number(monthDraft.adminBudgetAmount) : null,
+    adminBudgetOwner: String(monthDraft.adminBudgetOwner || ""),
+    adminBudgetUpdatedAt: String(monthDraft.adminBudgetUpdatedAt || ""),
+    adminBudgetReason: String(monthDraft.adminBudgetReason || ""),
+    adminBudgetCategoryIds: Array.isArray(monthDraft.adminBudgetCategoryIds) ? [...monthDraft.adminBudgetCategoryIds] : [],
+    adminBudgetLabels: Array.isArray(monthDraft.adminBudgetLabels) ? [...monthDraft.adminBudgetLabels] : []
   };
 }
 
@@ -4040,10 +4354,11 @@ function forecastAmountForAccount(code, month) {
 
 function rollingTotalInfo(code, month) {
   const draft = rollingMonthDraft(code, month);
+  const completed = completedBudgetInfo(draft);
   if (isRollingTotalOnlyCode(code)) {
     const total = parseOptionalNumber(draft.totalAmount);
     if (Number.isFinite(total)) return { total, source: rfT("byTotal") };
-    if (Number.isFinite(draft.hrBudgetAmount)) return { total: draft.hrBudgetAmount, source: rfT("hrBudgetSource"), sourceType: "hr" };
+    if (completed) return completed;
     return { total: forecastAmountForAccount(code, month), source: rfT("usesForecast") };
   }
   const unit = parseOptionalNumber(draft.unitPrice);
@@ -4051,8 +4366,17 @@ function rollingTotalInfo(code, month) {
   if (Number.isFinite(unit) && Number.isFinite(qty)) {
     return { total: unit * qty, source: rfT("byFormula") };
   }
-  if (Number.isFinite(draft.hrBudgetAmount)) return { total: draft.hrBudgetAmount, source: rfT("hrBudgetSource"), sourceType: "hr" };
+  if (completed) return completed;
   return { total: forecastAmountForAccount(code, month), source: rfT("usesForecast") };
+}
+
+function completedBudgetInfo(draft) {
+  const hr = Number.isFinite(draft.hrBudgetAmount) ? Number(draft.hrBudgetAmount) : null;
+  const admin = Number.isFinite(draft.adminBudgetAmount) ? Number(draft.adminBudgetAmount) : null;
+  if (hr === null && admin === null) return null;
+  const total = Number(hr || 0) + Number(admin || 0);
+  const source = hr !== null && admin !== null ? rfCompactT("combinedBudget") : hr !== null ? rfCompactT("hrBudget") : rfCompactT("adminBudget");
+  return { total, source, sourceType: hr !== null && admin !== null ? "combined" : hr !== null ? "hr" : "admin" };
 }
 
 function rollingWarningInfo(code, month) {
@@ -4116,6 +4440,7 @@ function rollingRoleCanView(row) {
   if (role === "finance" || role === "leader" || role === "readonly") return true;
   const scopes = rollingRowScopes(row);
   if (role === "hr") return scopes.has("hr");
+  if (role === "admin") return scopes.has("admin");
   if (role === "procurement") return scopes.has("procurement");
   return true;
 }
@@ -4128,6 +4453,7 @@ function rollingCanEditField(field, row) {
   if (role === "hr") {
     return scopes.has("hr") && ["quantity", "quantityOwner"].includes(field);
   }
+  if (role === "admin") return false;
   if (role === "procurement") {
     return scopes.has("procurement") && ["unitPrice", "priceOwner", "totalAmount", "totalOwner", "detailName"].includes(field);
   }
@@ -4143,7 +4469,7 @@ function rollingCanSave() {
 }
 
 function rollingCanSubmit() {
-  return ["finance", "hr", "procurement"].includes(state.rollingRole);
+  return ["finance", "hr", "admin", "procurement"].includes(state.rollingRole);
 }
 
 function rollingInputDisabledAttr(field, row) {
@@ -4160,12 +4486,17 @@ function rollingRowScopes(row) {
   if (/\b(uniform|transport|repair|maint|material|tool|spare|purchase|purchasing|consumable|utility|utilities|energy|service|office|admin|travel|training|work\s*clothes)\b/.test(text)
     || /工作服|工装|班车|维修|维护|备件|采购|物料|耗材|能源|水电|服务|办公|行政|差旅|培训/.test(text)) {
     scopes.add("procurement");
+    scopes.add("admin");
   }
   if (text.includes("uniform") || text.includes("transport") || /工作服|工装|班车/.test(text)) {
     scopes.add("hr");
     scopes.add("procurement");
+    scopes.add("admin");
   }
-  if (!scopes.size) scopes.add("procurement");
+  if (!scopes.size) {
+    scopes.add("procurement");
+    scopes.add("admin");
+  }
   return scopes;
 }
 
@@ -4180,6 +4511,50 @@ function rollingRowText(row) {
 }
 
 async function handleRollingForecastClick(event) {
+  const adminView = event.target.closest("[data-admin-view]")?.dataset.adminView;
+  if (adminView) {
+    state.adminBudgetView = ["conditions", "results", "audit"].includes(adminView) ? adminView : "conditions";
+    renderAdminBudgetWorkspace();
+    return;
+  }
+  const adminSelect = event.target.closest("[data-admin-select]")?.dataset.adminSelect;
+  if (adminSelect && !event.target.closest("input, textarea")) {
+    state.adminSelectedCategory = adminSelect;
+    renderAdminBudgetWorkspace();
+    return;
+  }
+  const adminResult = event.target.closest("[data-admin-result]")?.dataset.adminResult;
+  if (adminResult) {
+    state.adminSelectedAccount = adminResult;
+    renderAdminBudgetWorkspace();
+    return;
+  }
+  const adminAction = event.target.closest("[data-admin-action]")?.dataset.adminAction;
+  if (adminAction) {
+    const changes = adminBudgetChanges();
+    const missingReason = changes.find(({ category }) => !String(adminBudgetInputs.reasons?.[category.id] || "").trim());
+    if (missingReason) {
+      state.adminSelectedCategory = missingReason.category.id;
+      state.adminBudgetView = "conditions";
+      toast(adminT("reasonRequired"), true);
+      renderAdminBudgetWorkspace();
+      return;
+    }
+    const timestamp = new Date().toISOString();
+    const actor = els.userName?.value.trim() || adminT("permission");
+    for (const change of changes) {
+      adminBudgetAudit.unshift({ id: `admin-${Date.now()}-${change.category.id}-${change.index}`, timestamp, actor, label: change.category.label, period: localizeMonthLabel(change.index, state.language), before: change.before, after: change.after, reason: adminBudgetInputs.reasons[change.category.id], action: adminAction === "submit" ? adminT("submit") : adminT("save") });
+    }
+    adminBudgetAudit = adminBudgetAudit.slice(0, 200);
+    saveAdminBudgetState();
+    adminBudgetSavedInputs = clonePlain(adminBudgetInputs);
+    applyAdminBudgetSync(changes.map((item) => adminBudgetInputs.reasons[item.category.id]).filter(Boolean).join("; ") || "Excel baseline", adminAction);
+    await saveRollingForecastDrafts();
+    if (adminAction === "submit") state.adminBudgetView = "audit";
+    toast(adminAction === "submit" ? adminT("submitted") : adminT("responsibilitySaved"));
+    renderAdminBudgetWorkspace();
+    return;
+  }
   const inputView = event.target.closest("[data-hr-input-view]")?.dataset.hrInputView;
   if (inputView) {
     hrBudgetInputView = inputView;
@@ -4293,6 +4668,28 @@ async function handleRollingForecastClick(event) {
 }
 
 function handleRollingForecastInput(event) {
+  const adminOwner = event.target.closest("[data-admin-owner]");
+  if (adminOwner) {
+    const [categoryId, driverKey] = adminOwner.dataset.adminOwner.split(".");
+    adminBudgetInputs.owners[categoryId] = { ...(adminBudgetInputs.owners[categoryId] || {}), [driverKey]: adminOwner.value };
+    return;
+  }
+  const adminMonth = event.target.closest("[data-admin-month]");
+  if (adminMonth) {
+    const [categoryId, indexText] = adminMonth.dataset.adminMonth.split(".");
+    const keur = parseOptionalNumber(adminMonth.value);
+    const index = Number(indexText);
+    if (Number.isFinite(keur) && Number.isInteger(index)) {
+      adminBudgetInputs.months[categoryId][index] = keur * ADMIN_BUDGET_DATA.eurTry * 1000;
+      if (event.type === "change") renderAdminBudgetWorkspace();
+    }
+    return;
+  }
+  const adminReason = event.target.closest("[data-admin-reason]");
+  if (adminReason) {
+    adminBudgetInputs.reasons[adminReason.dataset.adminReason] = adminReason.value;
+    return;
+  }
   const hrInput = event.target.closest("[data-hr-input]");
   if (hrInput) {
     const [section, key, indexText] = hrInput.dataset.hrInput.split(".");

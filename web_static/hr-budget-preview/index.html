@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script>
       if (location.protocol === "file:") {
-        location.replace("http://127.0.0.1:8780/?hrbudget=20260713-v12");
+        location.replace("http://127.0.0.1:8780/?adminbudget=20260716-v1");
       }
     </script>
     <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260715-budget-status-v3" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260717-adaptive-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -29,7 +29,7 @@
       };
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260715-budget-status-v3"></script>
+    <script type="module" src="./src/app.js?v=20260717-adaptive-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="选择演示角色">
@@ -39,6 +39,7 @@
         <div class="role-login-options">
           <button type="button" class="active" data-login-role="finance"><b data-i18n="costRole">成本角色</b><span data-i18n="costRoleHint">查看经营驾驶舱、月度差异、全部预算科目和降费项目</span><em data-i18n="fullView">完整视图</em></button>
           <button type="button" data-login-role="hr"><b data-i18n="hrRole">人力角色</b><span data-i18n="hrRoleHint">仅查看和校核人力预算参数、人力小科目及异常</span><em data-i18n="limitedView">受限视图</em></button>
+          <button type="button" data-login-role="admin"><b data-i18n="adminRole">行政部门</b><span data-i18n="adminRoleHint">仅校核行政预算标准、月度金额和变更原因</span><em data-i18n="limitedView">受限视图</em></button>
         </div>
         <button id="enterWorkspace" class="role-login-enter" type="button" data-i18n="enterWorkspace">进入工作台</button>
         <small class="role-login-note" data-i18n="roleSwitchHint">演示身份可在页面右上角随时切换</small>
@@ -128,6 +129,7 @@
           <select id="roleSelect">
             <option value="finance" data-i18n-option="financeAdmin">财务管理员</option>
             <option value="hr" data-i18n-option="hrHuman">HR 人力</option>
+            <option value="admin" data-i18n-option="adminDepartment">行政部门</option>
             <option value="procurement" data-i18n-option="procurementAdmin">行政/间接采购</option>
             <option value="leader" data-i18n-option="businessLeader">经营负责人</option>
             <option value="readonly" data-i18n-option="readonlyVisitor">只读访客</option>
