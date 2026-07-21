@@ -43,7 +43,7 @@ import { COOKING_UNIT } from "./cooking-data.js?v=20260717-june-6plus6-v1";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
-import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260721-factory-workbench-v1";
+import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260721-factory-workbench-v3";
 
 const VERSION = "20260717-june-6plus6-v1";
 
@@ -298,7 +298,10 @@ const i18n = {
     supplyCostControl: "供应链成本控制",
     cookingAppliance: "厨电",
     dishwasherAppliance: "洗碗机",
-    comingSoon: "即将开放"
+    comingSoon: "即将开放",
+    managementView: "综合管理",
+    factoryWorkbenchNav: "双厂工作台",
+    factoryWorkbenchNavHint: "CK + DW 综合分析"
   },
   en: {
     appTitle: "Dishwasher MFG Cost Workbench",
@@ -523,7 +526,10 @@ const i18n = {
     supplyCostControl: "Supply Cost Control",
     cookingAppliance: "Cooking appliance",
     dishwasherAppliance: "Dishwasher",
-    comingSoon: "Coming soon"
+    comingSoon: "Coming soon",
+    managementView: "Management",
+    factoryWorkbenchNav: "Factory workbench",
+    factoryWorkbenchNavHint: "CK + DW analysis"
   },
   tr: {
     appTitle: "Bulaşık Makinesi Üretim Gideri",
@@ -748,7 +754,10 @@ const i18n = {
     supplyCostControl: "Tedarik Maliyet Kontrolü",
     cookingAppliance: "Pişirme ürünleri",
     dishwasherAppliance: "Bulaşık makinesi",
-    comingSoon: "Yakında"
+    comingSoon: "Yakında",
+    managementView: "Yönetim",
+    factoryWorkbenchNav: "Fabrika çalışma alanı",
+    factoryWorkbenchNavHint: "CK + DW analizi"
   }
 };
 
@@ -783,6 +792,7 @@ const state = {
   adminBudgetView: "conditions",
   rollingTaskFilter: "all",
   rollingViewMode: "fill",
+  workbenchGroup: "all",
   rollingRole: localStorage.getItem("dwRollingRole.v1") || "finance",
   activeUnit: "cooking",
   sapFileName: "",
@@ -858,19 +868,21 @@ const els = {
   businessShell: document.querySelector(".business-shell"),
   sidebarToggle: document.getElementById("sidebarToggle"),
   unitButtons: document.querySelectorAll("[data-unit]"),
+  factoryWorkbenchNav: document.getElementById("factoryWorkbenchNav"),
   unitName: document.getElementById("unitName"),
   unitSubtitle: document.getElementById("unitSubtitle"),
   unitSource: document.getElementById("unitSource"),
   toast: document.getElementById("toast")
 };
 
-bootstrap();
+queueMicrotask(() => { void bootstrap(); });
 
 async function bootstrap() {
   bindEvents();
   setSidebarCollapsed(localStorage.getItem("dw.sidebarCollapsed") === "1");
   initializeDemoRoleAccess();
   installMetricHoverTooltip();
+  applyLanguage(els.languageSelect.value);
   els.saveMode.textContent = store.label;
   if (els.roleSelect) els.roleSelect.value = state.rollingRole;
   els.userName.value = store.getUser();
@@ -1387,6 +1399,13 @@ function bindEvents() {
       switchBusinessUnit(button.dataset.unit);
     });
   }
+  els.factoryWorkbenchNav?.addEventListener("click", () => switchTab("benchmark"));
+  document.getElementById("benchmarkView")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-fwb-group]");
+    if (!button) return;
+    state.workbenchGroup = button.dataset.fwbGroup || "all";
+    renderFactoryWorkbench();
+  });
   els.sidebarToggle?.addEventListener("click", () => {
     const collapsed = !els.businessShell?.classList.contains("sidebar-collapsed");
     setSidebarCollapsed(collapsed);
@@ -1526,6 +1545,7 @@ function renderAll() {
   renderChart();
   renderTable();
   renderFactors();
+  renderFactoryWorkbench();
 }
 
 function baselineAsActual(source) {
@@ -3982,9 +4002,9 @@ function hrBudgetAuditView(data) {
 
 function workbenchCopy() {
   const copy = {
-    zh: { tab: "双厂工作台", title: "CK + DW 双厂工作台", period: "1-6月实际累计", volume: "合计产量", cost: "制造费用", unit: "加权单台制造费", headcount: "平均在岗人数", monthly: "双厂月度经营底表", category: "制造费结构对比", semi: "半固定人相关费用", salary: "人力成本强度", factory: "工厂", metric: "指标", total: "1-6月", direct: "直接", indirect: "间接", white: "白领", workwear: "工作服", meal: "工作餐", shuttle: "班车", share: "占比", gap: "差异", future: "后续分析预留", futureItems: ["能源效率", "折旧与产能", "采购标准"], source: "数据源：最新三张表", average: "1-6月平均人数", perCapita: "累计费用 / 平均人数", combined: "双厂合计" },
-    en: { tab: "Factory workbench", title: "CK + DW Factory Workbench", period: "Jan-Jun actual cumulative", volume: "Combined volume", cost: "Manufacturing cost", unit: "Weighted unit cost", headcount: "Average headcount", monthly: "Monthly operating base", category: "Manufacturing cost mix", semi: "People-related semi-fixed cost", salary: "Labor cost intensity", factory: "Factory", metric: "Metric", total: "Jan-Jun", direct: "Direct", indirect: "Indirect", white: "White collar", workwear: "Workwear", meal: "Meals", shuttle: "Shuttle", share: "Share", gap: "Gap", future: "Reserved analysis", futureItems: ["Energy efficiency", "Depreciation & capacity", "Purchasing standards"], source: "Source: latest three-sheet workbooks", average: "Jan-Jun average HC", perCapita: "Cumulative cost / average HC", combined: "Combined" },
-    tr: { tab: "Fabrika çalışma alanı", title: "CK + DW Fabrika Çalışma Alanı", period: "Ocak-Haziran gerçekleşen kümülatif", volume: "Toplam üretim", cost: "Üretim gideri", unit: "Ağırlıklı birim maliyet", headcount: "Ortalama çalışan", monthly: "Aylık faaliyet tabanı", category: "Üretim gideri dağılımı", semi: "Kişiye bağlı yarı sabit gider", salary: "İşçilik maliyet yoğunluğu", factory: "Fabrika", metric: "Gösterge", total: "Ocak-Haziran", direct: "Direkt", indirect: "Endirekt", white: "Beyaz yaka", workwear: "İş kıyafeti", meal: "Yemek", shuttle: "Servis", share: "Pay", gap: "Fark", future: "Gelecek analiz alanı", futureItems: ["Enerji verimliliği", "Amortisman ve kapasite", "Satın alma standartları"], source: "Kaynak: en güncel üç tablo", average: "Ocak-Haziran ortalama çalışan", perCapita: "Kümülatif gider / ortalama çalışan", combined: "Toplam" },
+    zh: { tab: "双厂工作台", title: "CK + DW 双厂工作台", period: "1-6月实际累计", volume: "产量", cost: "制造费用金额", unit: "单台制造费", headcount: "平均在岗人数", workdays: "工作日", upph: "UPPH", rate: "制造费率", monthly: "双厂指标明细", category: "制造费结构对比", semi: "半固定人相关费用", salary: "人力成本强度", metric: "指标", total: "1-6月", direct: "直接员工", indirect: "间接员工", white: "白领", workwear: "工作服", meal: "工作餐", shuttle: "班车", share: "占比", gap: "差异", future: "后续分析预留", futureItems: ["能源效率", "折旧与产能", "采购标准"], source: "数据源：最新三张表", average: "1-6月平均人数", combined: "双厂合计", all: "全部", single: "单", time: "时", people: "人", efficiency: "效", fee: "费", same: "同期", target: "目标", current: "26年", cumulative: "1-6月累计", monthlyAverage: "月均", perPersonMonth: "元/人/月", cnyRate: "展示汇率 1 EUR = 8.00 CNY", yoy: "同期差异", budgetGap: "目标差异", completion: "目标完成率" },
+    en: { tab: "Factory workbench", title: "CK + DW Factory Workbench", period: "Jan-Jun actual cumulative", volume: "Volume", cost: "Manufacturing cost", unit: "Unit manufacturing cost", headcount: "Average headcount", workdays: "Workdays", upph: "UPPH", rate: "Manufacturing rate", monthly: "Combined metric detail", category: "Manufacturing cost mix", semi: "People-related semi-fixed cost", salary: "Labor cost intensity", metric: "Metric", total: "Jan-Jun", direct: "Direct employees", indirect: "Indirect employees", white: "White collar", workwear: "Workwear", meal: "Meals", shuttle: "Shuttle", share: "Share", gap: "Gap", future: "Reserved analysis", futureItems: ["Energy efficiency", "Depreciation & capacity", "Purchasing standards"], source: "Source: latest three-sheet workbooks", average: "Jan-Jun average HC", combined: "Combined", all: "All", single: "Unit", time: "Time", people: "People", efficiency: "Efficiency", fee: "Cost", same: "Same period", target: "Target", current: "2026", cumulative: "Jan-Jun total", monthlyAverage: "Monthly avg.", perPersonMonth: "CNY/person/month", cnyRate: "Display rate: 1 EUR = 8.00 CNY", yoy: "YoY variance", budgetGap: "Target variance", completion: "Target completion" },
+    tr: { tab: "Fabrika çalışma alanı", title: "CK + DW Fabrika Çalışma Alanı", period: "Ocak-Haziran gerçekleşen kümülatif", volume: "Üretim", cost: "Üretim gideri", unit: "Birim üretim maliyeti", headcount: "Ortalama çalışan", workdays: "İş günü", upph: "UPPH", rate: "Üretim gider oranı", monthly: "Birleşik gösterge detayı", category: "Üretim gideri dağılımı", semi: "Kişiye bağlı yarı sabit gider", salary: "İşçilik maliyet yoğunluğu", metric: "Gösterge", total: "Ocak-Haziran", direct: "Direkt çalışan", indirect: "Endirekt çalışan", white: "Beyaz yaka", workwear: "İş kıyafeti", meal: "Yemek", shuttle: "Servis", share: "Pay", gap: "Fark", future: "Gelecek analiz alanı", futureItems: ["Enerji verimliliği", "Amortisman ve kapasite", "Satın alma standartları"], source: "Kaynak: en güncel üç tablo", average: "Ocak-Haziran ortalama çalışan", combined: "Toplam", all: "Tümü", single: "Birim", time: "Zaman", people: "Çalışan", efficiency: "Verim", fee: "Gider", same: "Aynı dönem", target: "Hedef", current: "2026", cumulative: "Ocak-Haziran toplam", monthlyAverage: "Aylık ort.", perPersonMonth: "CNY/kişi/ay", cnyRate: "Gösterim kuru: 1 EUR = 8.00 CNY", yoy: "Dönem farkı", budgetGap: "Hedef farkı", completion: "Hedef gerçekleşme" },
   };
   return copy[state.language] || copy.zh;
 }
@@ -4009,6 +4029,131 @@ function workbenchDonutStyle(values) {
   return `conic-gradient(${stops.join(",")})`;
 }
 
+const WORKBENCH_SCENARIOS = ["同期", "目标", "26年"];
+const WORKBENCH_CNY_PER_EUR = 8;
+
+function combinedWorkbenchMonth(data, monthIndex, scenario) {
+  const ck = data.units.cooking.months[monthIndex].scenarios[scenario];
+  const dw = data.units.dishwasher.months[monthIndex].scenarios[scenario];
+  const volume = ck.volume + dw.volume;
+  const cost = ck.cost + dw.cost;
+  const direct = ck.direct + dw.direct;
+  const laborDays = (ck.direct * ck.workdays) + (dw.direct * dw.workdays);
+  const upphDenominator = (ck.upph ? ck.volume / ck.upph : 0) + (dw.upph ? dw.volume / dw.upph : 0);
+  const revenue = (ck.rate ? ck.cost / ck.rate : 0) + (dw.rate ? dw.cost / dw.rate : 0);
+  return {
+    volume,
+    cost,
+    unit: volume ? cost * 1000 / volume : null,
+    workdays: direct ? laborDays / direct : null,
+    direct,
+    indirect: ck.indirect + dw.indirect,
+    white: ck.white + dw.white,
+    upph: upphDenominator ? volume / upphDenominator : null,
+    rate: revenue ? cost / revenue : null,
+  };
+}
+
+function combinedWorkbenchH1(data, scenario) {
+  const months = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, scenario));
+  const volume = sum(months.map((month) => month.volume));
+  const cost = sum(months.map((month) => month.cost));
+  const laborBase = sum(months.map((month) => month.upph ? month.volume / month.upph : 0));
+  const revenue = sum(months.map((month) => month.rate ? month.cost / month.rate : 0));
+  return {
+    volume,
+    cost,
+    unit: volume ? cost * 1000 / volume : null,
+    workdays: sum(months.map((month) => month.workdays)),
+    direct: averageFinite(months.map((month) => month.direct)),
+    indirect: averageFinite(months.map((month) => month.indirect)),
+    white: averageFinite(months.map((month) => month.white)),
+    upph: laborBase ? volume / laborBase : null,
+    rate: revenue ? cost / revenue : null,
+  };
+}
+
+function workbenchScenarioLabel(scenario, c) {
+  return scenario === "同期" ? c.same : scenario === "目标" ? c.target : c.current;
+}
+
+function formatWorkbenchMetric(value, key) {
+  if (!Number.isFinite(value)) return "--";
+  if (key === "volume") return formatNumber(value);
+  if (["direct", "indirect", "white"].includes(key)) return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 1 });
+  if (key === "rate") return formatPercent(value);
+  return formatMoney(value);
+}
+
+function workbenchMetricUnit(key) {
+  return ({ volume: "pcs", cost: "K€", unit: "€/pc", workdays: "days", direct: "HC", indirect: "HC", white: "HC", upph: "UPPH", rate: "%" })[key] || "";
+}
+
+function workbenchTooltip(labelText, unit, actual, same, target, c) {
+  const yoy = Number.isFinite(actual) && Number.isFinite(same) ? actual - same : null;
+  const budget = Number.isFinite(actual) && Number.isFinite(target) ? actual - target : null;
+  const completion = Number.isFinite(actual) && Number.isFinite(target) && target !== 0 ? actual / target : null;
+  return `<span class="fwb-hover-card"><b>${escapeHtml(labelText)}</b><span>${escapeHtml(c.current)}: ${escapeHtml(formatWorkbenchMetric(actual, unit))}</span><em>${escapeHtml(c.yoy)}: ${escapeHtml(formatWorkbenchMetric(yoy, unit))}</em><em>${escapeHtml(c.budgetGap)}: ${escapeHtml(formatWorkbenchMetric(budget, unit))}</em><strong>${escapeHtml(c.completion)}: ${escapeHtml(formatPercent(completion))}</strong></span>`;
+}
+
+function workbenchDonutSvg(factory, entries, total, displayTotal = total) {
+  const palette = ["#0b8f7a", "#2479b8", "#e7a625", "#df5c63", "#32b8ae", "#667f98", "#75b94a", "#946bc2", "#d17a3e", "#4e9dc1", "#8896a4", "#c59756"];
+  const positive = entries.filter(([, value]) => value > 0).sort((a, b) => b[1] - a[1]);
+  const circumference = 2 * Math.PI * 72;
+  let cursor = 0;
+  const segments = positive.map(([name, value], index) => {
+    const share = value / total;
+    const segment = `<circle cx="160" cy="126" r="72" pathLength="100" fill="none" stroke="${palette[index % palette.length]}" stroke-width="34" stroke-dasharray="${share * 100} ${100 - share * 100}" stroke-dashoffset="${-cursor * 100}" transform="rotate(-90 160 126)"><title>${escapeHtml(workbenchCategoryLabel(name))}: ${formatMoney(value)} K€, ${formatPercent(share)}</title></circle>`;
+    const result = { name, value, share, color: palette[index % palette.length], start: cursor };
+    cursor += share;
+    return { segment, ...result };
+  });
+  const labels = segments.filter((item) => item.share >= 0.05).slice(0, 6).map((item) => {
+    const angle = (item.start + item.share / 2) * Math.PI * 2 - Math.PI / 2;
+    return { ...item, angle, side: Math.cos(angle) >= 0 ? "right" : "left", rawY: 126 + Math.sin(angle) * 99 };
+  });
+  for (const side of ["left", "right"]) {
+    const sideLabels = labels.filter((item) => item.side === side).sort((a, b) => a.rawY - b.rawY);
+    sideLabels.forEach((item, index) => { item.y = Math.max(24 + index * 25, item.rawY); });
+    for (let index = sideLabels.length - 1; index >= 0; index -= 1) {
+      const maxY = 228 - (sideLabels.length - 1 - index) * 25;
+      sideLabels[index].y = Math.min(sideLabels[index].y, maxY);
+    }
+  }
+  const labelSvg = labels.map((item) => {
+    const x1 = 160 + Math.cos(item.angle) * 88;
+    const y1 = 126 + Math.sin(item.angle) * 88;
+    const elbowX = item.side === "right" ? 256 : 64;
+    const textX = item.side === "right" ? 263 : 57;
+    const anchor = item.side === "right" ? "start" : "end";
+    return `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} L${elbowX},${item.y.toFixed(1)}" stroke="${item.color}" fill="none"/><text x="${textX}" y="${(item.y - 3).toFixed(1)}" text-anchor="${anchor}"><tspan>${escapeHtml(shortText(workbenchCategoryLabel(item.name), 12))}</tspan><tspan x="${textX}" dy="14">${formatPercent(item.share)}</tspan></text>`;
+  }).join("");
+  return `<svg class="fwb-donut-svg" viewBox="0 0 320 250" role="img" aria-label="${escapeHtml(factory)}">${segments.map((item) => item.segment).join("")}<circle cx="160" cy="126" r="50" fill="#fff"/><text class="fwb-donut-center" x="160" y="122" text-anchor="middle"><tspan>${factory}</tspan><tspan x="160" dy="20">${formatMoney(displayTotal)} K€</tspan></text>${labelSvg}</svg>`;
+}
+
+function workbenchDelta(actual, same, direction = "higher") {
+  if (!Number.isFinite(actual) || !Number.isFinite(same) || same === 0) return { text: "--", tone: "" };
+  const ratio = actual / same - 1;
+  const favorable = direction === "lower" ? ratio <= 0 : ratio >= 0;
+  return { text: `${ratio >= 0 ? "+" : ""}${(ratio * 100).toFixed(1)}%`, tone: favorable ? "good" : "bad" };
+}
+
+function workbenchKpiCard(group, title, actual, same, unit, direction, detail) {
+  const delta = workbenchDelta(actual, same, direction);
+  return `<div class="fwb-kpi-card"><span>${escapeHtml(group)}</span><b>${escapeHtml(title)}</b><strong class="${delta.tone}">${escapeHtml(delta.text)}</strong><small>${escapeHtml(detail)}</small><em>${escapeHtml(unit)}</em></div>`;
+}
+
+function formatWorkbenchMonthlyCny(value) {
+  if (!Number.isFinite(value)) return "--";
+  if (state.language === "zh") return `¥${(value / 10000).toFixed(2)}万/月`;
+  return `¥${formatNumber(value)}/${state.language === "tr" ? "ay" : "month"}`;
+}
+
+function formatWorkbenchCumulativeCny(value) {
+  if (!Number.isFinite(value)) return "--";
+  return state.language === "zh" ? `¥${(value / 10000).toFixed(2)}万` : `¥${formatNumber(value)}`;
+}
+
 function renderFactoryWorkbench() {
   const target = document.getElementById("factoryWorkbench");
   if (!target) return;
@@ -4017,24 +4162,26 @@ function renderFactoryWorkbench() {
   const dw = data.units.dishwasher;
   const ck = data.units.cooking;
   const monthNames = state.language === "zh" ? ["1月", "2月", "3月", "4月", "5月", "6月"] : state.language === "tr" ? ["Oca", "Şub", "Mar", "Nis", "May", "Haz"] : ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-  const monthCost = (unit, index) => unit.months[index].manufacturingCost;
-  const combinedMonth = (index, key) => {
-    if (key === "volume") return dw.months[index].volume + ck.months[index].volume;
-    if (key === "cost") return monthCost(dw, index) + monthCost(ck, index);
-    if (key === "unit") return combinedMonth(index, "cost") * 1000 / combinedMonth(index, "volume");
-    return dw.months[index].headcount[key] + ck.months[index].headcount[key];
-  };
   const metricRows = [
-    [c.volume, "volume", "pcs"], [c.cost, "cost", "K€"], [c.unit, "unit", "€/pc"],
-    [c.direct, "direct", "HC"], [c.indirect, "indirect", "HC"], [c.white, "white", "HC"],
+    [c.single, c.volume, "volume"], [c.time, c.workdays, "workdays"],
+    [c.people, c.direct, "direct"], [c.people, c.indirect, "indirect"], [c.people, c.white, "white"],
+    [c.efficiency, c.upph, "upph"], [c.fee, c.rate, "rate"], [c.fee, c.unit, "unit"], [c.fee, c.cost, "cost"],
   ];
-  const formatCell = (value, key) => key === "volume" || ["direct", "indirect", "white"].includes(key) ? formatNumber(value) : formatMoney(value);
-  const unitMonthValue = (unit, index, key) => key === "volume" ? unit.months[index].volume : key === "cost" ? monthCost(unit, index) : key === "unit" ? monthCost(unit, index) * 1000 / unit.months[index].volume : unit.months[index].headcount[key];
-  const totalValue = (unit, key) => key === "volume" ? unit.h1.volume : key === "cost" ? unit.h1.manufacturingCost : key === "unit" ? unit.h1.manufacturingCost * 1000 / unit.h1.volume : unit.h1.headcountAverage[key];
-  const matrixRows = metricRows.flatMap(([labelText, key, unitLabel]) => [["CK", ck], ["DW", dw], [c.combined, null]].map(([factory, unit], factoryIndex) => {
-    const values = Array.from({ length: 6 }, (_, index) => unit ? unitMonthValue(unit, index, key) : combinedMonth(index, key));
-    const total = unit ? totalValue(unit, key) : key === "volume" ? data.combined.volume : key === "cost" ? data.combined.manufacturingCost : key === "unit" ? data.combined.unitCost : data.combined.headcountAverage[key];
-    return `<tr class="${factoryIndex === 2 ? "combined" : ""}"><th>${factoryIndex === 0 ? `${escapeHtml(labelText)}<small>${unitLabel}</small>` : ""}</th><td>${factory}</td>${values.map((value) => `<td>${formatCell(value, key)}</td>`).join("")}<td><strong>${formatCell(total, key)}</strong></td></tr>`;
+  const visibleMetrics = state.workbenchGroup === "all" ? metricRows : metricRows.filter(([group]) => group === state.workbenchGroup);
+  const h1ByScenario = Object.fromEntries(WORKBENCH_SCENARIOS.map((scenario) => [scenario, combinedWorkbenchH1(data, scenario)]));
+  const matrixRows = visibleMetrics.flatMap(([group, labelText, key]) => WORKBENCH_SCENARIOS.map((scenario, scenarioIndex) => {
+    const values = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, scenario)[key]);
+    const total = h1ByScenario[scenario][key];
+    const actualValues = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, "26年")[key]);
+    const sameValues = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, "同期")[key]);
+    const targetValues = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, "目标")[key]);
+    const cells = values.map((value, index) => scenario === "26年"
+      ? `<td><span class="fwb-tip-cell">${formatWorkbenchMetric(value, key)}${workbenchTooltip(`${monthNames[index]} · ${labelText}`, key, actualValues[index], sameValues[index], targetValues[index], c)}</span></td>`
+      : `<td title="${escapeHtml(`${monthNames[index]} · ${labelText} · ${workbenchScenarioLabel(scenario, c)}: ${formatWorkbenchMetric(value, key)}`)}">${formatWorkbenchMetric(value, key)}</td>`).join("");
+    const totalCell = scenario === "26年"
+      ? `<span class="fwb-tip-cell"><strong>${formatWorkbenchMetric(total, key)}</strong>${workbenchTooltip(`${c.total} · ${labelText}`, key, total, h1ByScenario["同期"][key], h1ByScenario["目标"][key], c)}</span>`
+      : `<strong>${formatWorkbenchMetric(total, key)}</strong>`;
+    return `<tr class="scenario-${scenarioIndex}"><th>${scenarioIndex === 0 ? `<span class="fwb-metric-cell"><span class="fwb-group-mark">${escapeHtml(group)}</span><span><b>${escapeHtml(labelText)}</b><small>${escapeHtml(workbenchMetricUnit(key))}</small></span></span>` : ""}</th><td><span class="fwb-scenario-tag s${scenarioIndex}">${escapeHtml(workbenchScenarioLabel(scenario, c))}</span></td>${cells}<td>${totalCell}</td></tr>`;
   })).join("");
   const categoryEntries = Object.keys(ck.h1.categoryTotals).map((name) => [name, ck.h1.categoryTotals[name] || 0, dw.h1.categoryTotals[name] || 0]);
   const ckPositive = categoryEntries.map(([name, value]) => [name, Math.max(0, value)]);
@@ -4043,22 +4190,36 @@ function renderFactoryWorkbench() {
   const dwTotal = sum(dwPositive.map(([, value]) => value)) || 1;
   const ranking = categoryEntries.slice().sort((a, b) => Math.max(b[1] / ckTotal, b[2] / dwTotal) - Math.max(a[1] / ckTotal, a[2] / dwTotal));
   const semiRows = [[c.workwear, "workwear"], [c.meal, "meal"], [c.shuttle, "shuttle"]];
-  const semiMax = Math.max(1, ...semiRows.flatMap(([, key]) => [ck.h1.semiFixed[key], dw.h1.semiFixed[key]]));
+  const semiMonthlyCny = (value) => value * 1000 * WORKBENCH_CNY_PER_EUR / 6;
+  const semiCumulativeCny = (value) => value * 1000 * WORKBENCH_CNY_PER_EUR;
+  const semiMax = Math.max(1, ...semiRows.flatMap(([, key]) => [semiMonthlyCny(ck.h1.semiFixed[key]), semiMonthlyCny(dw.h1.semiFixed[key])]));
   const salaryRows = [[c.direct, "direct"], [c.indirect, "indirect"], [c.white, "white"]];
-  const salaryMax = Math.max(1, ...salaryRows.flatMap(([, key]) => [ck.h1.perCapita[key], dw.h1.perCapita[key]]));
+  const salaryMonthlyCny = (value) => value * 1000 * WORKBENCH_CNY_PER_EUR / 6;
+  const salaryMax = Math.max(1, ...salaryRows.flatMap(([, key]) => [salaryMonthlyCny(ck.h1.perCapita[key]), salaryMonthlyCny(dw.h1.perCapita[key])]));
+  const actualH1 = h1ByScenario["26年"];
+  const sameH1 = h1ByScenario["同期"];
+  const peopleActual = actualH1.direct + actualH1.indirect;
+  const peopleSame = sameH1.direct + sameH1.indirect;
+  const kpiCards = [
+    workbenchKpiCard(c.single, c.volume, actualH1.volume, sameH1.volume, "pcs", "higher", `${formatNumber(actualH1.volume)} / ${formatNumber(sameH1.volume)}`),
+    workbenchKpiCard(c.time, c.workdays, actualH1.workdays, sameH1.workdays, "days", "lower", `${formatMoney(actualH1.workdays)} / ${formatMoney(sameH1.workdays)}`),
+    workbenchKpiCard(c.people, c.headcount, peopleActual, peopleSame, "HC", "lower", `${formatMoney(peopleActual)} / ${formatMoney(peopleSame)}`),
+    workbenchKpiCard(c.efficiency, c.upph, actualH1.upph, sameH1.upph, "UPPH", "higher", `${formatMoney(actualH1.upph)} / ${formatMoney(sameH1.upph)}`),
+    `<div class="fwb-kpi-card fee"><span>${escapeHtml(c.fee)}</span><div><section><b>${escapeHtml(state.language === "en" ? "MFG rate" : c.rate)}</b><strong class="${workbenchDelta(actualH1.rate, sameH1.rate, "lower").tone}">${workbenchDelta(actualH1.rate, sameH1.rate, "lower").text}</strong><small>${formatPercent(actualH1.rate)} / ${formatPercent(sameH1.rate)}</small></section><section><b>${escapeHtml(state.language === "en" ? "Unit cost" : c.unit)}</b><strong class="${workbenchDelta(actualH1.unit, sameH1.unit, "lower").tone}">${workbenchDelta(actualH1.unit, sameH1.unit, "lower").text}</strong><small>${formatMoney(actualH1.unit)} / ${formatMoney(sameH1.unit)} €/pc</small></section></div></div>`,
+  ].join("");
   target.innerHTML = `<section class="factory-workbench">
     <header class="fwb-header"><div><span>${escapeHtml(c.period)}</span><h2>${escapeHtml(c.title)}</h2></div><em>${escapeHtml(c.source)}</em></header>
-    <div class="fwb-kpis"><div><span>${c.volume}</span><strong>${formatNumber(data.combined.volume)}</strong><small>pcs</small></div><div><span>${c.cost}</span><strong>${formatMoney(data.combined.manufacturingCost)}</strong><small>K€</small></div><div><span>${c.unit}</span><strong>${formatMoney(data.combined.unitCost)}</strong><small>€/pc</small></div><div><span>${c.headcount}</span><strong>${formatMoney(sum(Object.values(data.combined.headcountAverage)))}</strong><small>HC</small></div></div>
-    <section class="fwb-section"><div class="fwb-title"><h3>${c.monthly}</h3><span>${c.period}</span></div><div class="fwb-table-wrap"><table class="fwb-matrix"><thead><tr><th>${c.metric}</th><th>${c.factory}</th>${monthNames.map((month) => `<th>${month}</th>`).join("")}<th>${c.total}</th></tr></thead><tbody>${matrixRows}</tbody></table></div></section>
-    <section class="fwb-section"><div class="fwb-title"><h3>${c.category}</h3><span>${c.period}</span></div><div class="fwb-category-grid"><div class="fwb-donuts"><div><div class="fwb-donut" style="--donut:${workbenchDonutStyle(ckPositive)}"><b>CK</b><small>${formatMoney(ck.h1.manufacturingCost)} K€</small></div></div><div><div class="fwb-donut" style="--donut:${workbenchDonutStyle(dwPositive)}"><b>DW</b><small>${formatMoney(dw.h1.manufacturingCost)} K€</small></div></div></div><div class="fwb-rank"><div class="fwb-rank-head"><span>${c.metric}</span><span>CK ${c.share}</span><span>DW ${c.share}</span><span>${c.gap}</span></div>${ranking.map(([name, ckValue, dwValue]) => { const ckShare = ckValue > 0 ? ckValue / ckTotal : 0; const dwShare = dwValue > 0 ? dwValue / dwTotal : 0; return `<div><b>${escapeHtml(workbenchCategoryLabel(name))}</b><span>${formatPercent(ckShare)}</span><span>${formatPercent(dwShare)}</span><em class="${Math.abs(ckShare - dwShare) >= 0.03 ? "alert" : ""}">${((ckShare - dwShare) * 100).toFixed(1)}pp</em></div>`; }).join("")}</div></div></section>
-    <div class="fwb-two-col"><section class="fwb-section"><div class="fwb-title"><h3>${c.semi}</h3><span>K€ · ${c.period}</span></div><div class="fwb-bars">${semiRows.map(([labelText, key]) => `<div class="fwb-bar-row"><b>${labelText}</b><div><span>CK</span><i style="--size:${ck.h1.semiFixed[key] / semiMax * 100}%"></i><strong>${formatMoney(ck.h1.semiFixed[key])}</strong></div><div><span>DW</span><i class="dw" style="--size:${dw.h1.semiFixed[key] / semiMax * 100}%"></i><strong>${formatMoney(dw.h1.semiFixed[key])}</strong></div></div>`).join("")}</div></section>
-    <section class="fwb-section"><div class="fwb-title"><h3>${c.salary}</h3><span>${c.perCapita}</span></div><div class="fwb-bars">${salaryRows.map(([labelText, key]) => `<div class="fwb-bar-row"><b>${labelText}<small>${c.average}</small></b><div><span>CK</span><i style="--size:${ck.h1.perCapita[key] / salaryMax * 100}%"></i><strong>€${formatNumber(ck.h1.perCapita[key] * 1000)}</strong></div><div><span>DW</span><i class="dw" style="--size:${dw.h1.perCapita[key] / salaryMax * 100}%"></i><strong>€${formatNumber(dw.h1.perCapita[key] * 1000)}</strong></div></div>`).join("")}</div></section></div>
+    <div class="fwb-kpis">${kpiCards}</div>
+    <section class="fwb-section"><div class="fwb-title"><h3>${c.monthly}</h3><span>${c.period}</span></div><div class="fwb-metric-filters">${[["all",c.all],[c.single,c.single],[c.time,c.time],[c.people,c.people],[c.efficiency,c.efficiency],[c.fee,c.fee]].map(([value,labelText]) => `<button type="button" class="${state.workbenchGroup === value ? "active" : ""}" data-fwb-group="${value}">${escapeHtml(labelText)}</button>`).join("")}</div><div class="fwb-table-wrap"><table class="fwb-matrix"><thead><tr><th>${c.metric}</th><th>${c.combined}</th>${monthNames.map((month) => `<th>${month}</th>`).join("")}<th>${c.total}</th></tr></thead><tbody>${matrixRows}</tbody></table></div></section>
+    <section class="fwb-section"><div class="fwb-title"><h3>${c.category}</h3><span>${c.period}</span></div><div class="fwb-category-grid"><div class="fwb-donuts"><div>${workbenchDonutSvg("CK", ckPositive, ckTotal, ck.h1.manufacturingCost)}</div><div>${workbenchDonutSvg("DW", dwPositive, dwTotal, dw.h1.manufacturingCost)}</div></div><div class="fwb-rank"><div class="fwb-rank-head"><span>${c.metric}</span><span>CK ${c.share}</span><span>DW ${c.share}</span><span>${c.gap}</span></div>${ranking.map(([name, ckValue, dwValue]) => { const ckShare = ckValue > 0 ? ckValue / ckTotal : 0; const dwShare = dwValue > 0 ? dwValue / dwTotal : 0; return `<div><b>${escapeHtml(workbenchCategoryLabel(name))}</b><span>${formatPercent(ckShare)}</span><span>${formatPercent(dwShare)}</span><em class="${Math.abs(ckShare - dwShare) >= 0.03 ? "alert" : ""}">${((ckShare - dwShare) * 100).toFixed(1)}pp</em></div>`; }).join("")}</div></div></section>
+    <div class="fwb-two-col"><section class="fwb-section"><div class="fwb-title"><h3>${c.semi}</h3><span>CNY · ${c.cnyRate}</span></div><div class="fwb-bars">${semiRows.map(([labelText, key]) => `<div class="fwb-bar-row"><b>${labelText}<small>${c.cumulative}</small></b><div><span>CK</span><i style="--size:${semiMonthlyCny(ck.h1.semiFixed[key]) / semiMax * 100}%"></i><strong>${formatWorkbenchMonthlyCny(semiMonthlyCny(ck.h1.semiFixed[key]))}<small>${formatWorkbenchCumulativeCny(semiCumulativeCny(ck.h1.semiFixed[key]))}</small></strong></div><div><span>DW</span><i class="dw" style="--size:${semiMonthlyCny(dw.h1.semiFixed[key]) / semiMax * 100}%"></i><strong>${formatWorkbenchMonthlyCny(semiMonthlyCny(dw.h1.semiFixed[key]))}<small>${formatWorkbenchCumulativeCny(semiCumulativeCny(dw.h1.semiFixed[key]))}</small></strong></div></div>`).join("")}</div></section>
+    <section class="fwb-section"><div class="fwb-title"><h3>${c.salary}</h3><span>CNY · ${c.perPersonMonth}</span></div><div class="fwb-bars">${salaryRows.map(([labelText, key]) => `<div class="fwb-bar-row"><b>${labelText}<small>${c.average}</small></b><div><span>CK</span><i style="--size:${salaryMonthlyCny(ck.h1.perCapita[key]) / salaryMax * 100}%"></i><strong>¥${formatNumber(salaryMonthlyCny(ck.h1.perCapita[key]))}<small>${c.perPersonMonth}</small></strong></div><div><span>DW</span><i class="dw" style="--size:${salaryMonthlyCny(dw.h1.perCapita[key]) / salaryMax * 100}%"></i><strong>¥${formatNumber(salaryMonthlyCny(dw.h1.perCapita[key]))}<small>${c.perPersonMonth}</small></strong></div></div>`).join("")}</div></section></div>
     <section class="fwb-reserved"><strong>${c.future}</strong>${c.futureItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</section>
   </section>`;
 }
 
 function refreshProductNavigation() {
-  const labels = { dashboard: t("tabDashboard"), benchmark: workbenchCopy().tab, variance: t("tabVariance"), projects: t("tabProjects") };
+  const labels = { dashboard: t("tabDashboard"), variance: t("tabVariance"), projects: t("tabProjects") };
   for (const tab of document.querySelectorAll(".tab[data-tab]")) {
     if (labels[tab.dataset.tab]) tab.textContent = labels[tab.dataset.tab];
   }
@@ -5637,6 +5798,7 @@ function switchTab(name) {
   document.getElementById("benchmarkView").classList.toggle("active", name === "benchmark");
   document.getElementById("varianceView").classList.toggle("active", name === "variance");
   document.getElementById("projectsView").classList.toggle("active", name === "projects");
+  els.factoryWorkbenchNav?.classList.toggle("active", name === "benchmark");
   if (name === "variance") renderTable();
   if (name === "projects") {
     syncMonthSelectFromState();

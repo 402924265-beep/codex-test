@@ -1,6 +1,6 @@
 // Generated from the latest CK and DW three-sheet workbooks.
 export const FACTORY_WORKBENCH_DATA = {
-  "generatedAt": "2026-07-21T03:20:04.558Z",
+  "generatedAt": "2026-07-21T10:10:58.312Z",
   "period": "2026-01/2026-06",
   "units": {
     "dishwasher": {
@@ -34,6 +34,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 5.9088400000000005,
             "meal": 22.0758,
             "shuttle": 31.34574
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 48570,
+              "cost": 1702.48878577778,
+              "unit": 35.0460413781428,
+              "workdays": 22,
+              "direct": 218,
+              "indirect": 87,
+              "white": 25,
+              "upph": 1.35029190992494,
+              "rate": 0.14677651783117
+            },
+            "目标": {
+              "volume": 50463,
+              "cost": 1838.25562589263,
+              "unit": 36.4277911716036,
+              "workdays": 20,
+              "direct": 244,
+              "indirect": 85,
+              "white": 27,
+              "upph": 1.37877049180328,
+              "rate": 0.164089149421638
+            },
+            "26年": {
+              "volume": 47360,
+              "cost": 1778.21801081394,
+              "unit": 37.5468329986052,
+              "workdays": 20,
+              "direct": 237,
+              "indirect": 85,
+              "white": 25,
+              "upph": 1.33220815752461,
+              "rate": 0.16325744147038
+            }
           }
         },
         {
@@ -64,6 +99,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 52.37455,
             "meal": 34.1736,
             "shuttle": 37.12952
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 46039,
+              "cost": 1623.699562,
+              "unit": 35.45,
+              "workdays": 20,
+              "direct": 218,
+              "indirect": 85,
+              "white": 23,
+              "upph": 1.41,
+              "rate": 0.157358724760109
+            },
+            "目标": {
+              "volume": 50450,
+              "cost": 1852.39235597551,
+              "unit": 36.72,
+              "workdays": 20,
+              "direct": 244,
+              "indirect": 85,
+              "white": 27,
+              "upph": 1.38,
+              "rate": 0.165406765880375
+            },
+            "26年": {
+              "volume": 42593,
+              "cost": 1749.55222,
+              "unit": 41.0760505247341,
+              "workdays": 20,
+              "direct": 215,
+              "indirect": 82,
+              "white": 22,
+              "upph": 1.32,
+              "rate": 0.189290555413521
+            }
           }
         },
         {
@@ -94,6 +164,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 0,
             "meal": 0,
             "shuttle": 0
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 46330,
+              "cost": 1825.846172,
+              "unit": 39.4079541187388,
+              "workdays": 20,
+              "direct": 218,
+              "indirect": 94,
+              "white": 22,
+              "upph": 1.41681957186544,
+              "rate": 0.177614678532067
+            },
+            "目标": {
+              "volume": 50440,
+              "cost": 1892.6678110528,
+              "unit": 37.5252544443945,
+              "workdays": 20,
+              "direct": 244,
+              "indirect": 85,
+              "white": 27,
+              "upph": 10.3360655737705,
+              "rate": 0.168999755791584
+            },
+            "26年": {
+              "volume": 23002,
+              "cost": 1713,
+              "unit": 74.4717850621685,
+              "workdays": 20,
+              "direct": 135,
+              "indirect": 85,
+              "white": 27,
+              "upph": 1.1359012345679,
+              "rate": 0.35294684863587
+            }
           }
         },
         {
@@ -124,6 +229,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 0,
             "meal": 0,
             "shuttle": 0
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 49360,
+              "cost": 1591.59675947,
+              "unit": 32.2427072801491,
+              "workdays": 21,
+              "direct": 218,
+              "indirect": 93,
+              "white": 23,
+              "upph": 1.4376001164992,
+              "rate": 0.147301995800146
+            },
+            "目标": {
+              "volume": 48050,
+              "cost": 1849.66731083101,
+              "unit": 38.4946370620397,
+              "workdays": 19,
+              "direct": 244,
+              "indirect": 85,
+              "white": 27,
+              "upph": 1.3819384526891,
+              "rate": 0.173399266045224
+            },
+            "26年": {
+              "volume": 40893,
+              "cost": 900.77836,
+              "unit": 22.0276908028269,
+              "workdays": 21,
+              "direct": 222,
+              "indirect": 79,
+              "white": 25,
+              "upph": 1.16954096954097,
+              "rate": 0.101510095865562
+            }
           }
         },
         {
@@ -154,6 +294,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 6.299989999999999,
             "meal": 36.22479,
             "shuttle": 36.03755
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 53704,
+              "cost": 1866.98700931903,
+              "unit": 34.7643938872157,
+              "workdays": 21,
+              "direct": 226,
+              "indirect": 93,
+              "white": 23,
+              "upph": 1.06889585510275,
+              "rate": 0.157310254080048
+            },
+            "目标": {
+              "volume": 36788,
+              "cost": 1928.86884185175,
+              "unit": 52.4320115758332,
+              "workdays": 14,
+              "direct": 247,
+              "indirect": 85,
+              "white": 27,
+              "upph": 1.05530694205393,
+              "rate": 0.236180232323573
+            },
+            "26年": {
+              "volume": 33043,
+              "cost": 1826,
+              "unit": 55.2613261507732,
+              "workdays": 21,
+              "direct": 164,
+              "indirect": 75,
+              "white": 24.67,
+              "upph": 0.877810984923956,
+              "rate": 0.259442845778278
+            }
           }
         },
         {
@@ -184,6 +359,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 0.05626,
             "meal": 38.98403,
             "shuttle": 38.28815
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 29664,
+              "cost": 1737.90001,
+              "unit": 58.5861653856526,
+              "workdays": 21,
+              "direct": 226,
+              "indirect": 93,
+              "white": 23,
+              "upph": 0.590416480071653,
+              "rate": 0.26181483314229
+            },
+            "目标": {
+              "volume": 53265,
+              "cost": 1870.43255354125,
+              "unit": 35.1156022442739,
+              "workdays": 14,
+              "direct": 247,
+              "indirect": 85,
+              "white": 27,
+              "upph": 1.52796901893287,
+              "rate": 0.15817838848772
+            },
+            "26年": {
+              "volume": 53186,
+              "cost": 1438.58348098937,
+              "unit": 27.048160812796,
+              "workdays": 21,
+              "direct": 261,
+              "indirect": 82,
+              "white": 25,
+              "upph": 0.984515711046323,
+              "rate": null
+            }
           }
         }
       ],
@@ -1725,6 +1935,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 16.924210000000002,
             "meal": 37.2438,
             "shuttle": 41.08897
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 79712,
+              "cost": 2786.37243,
+              "unit": 34.9554951575672,
+              "workdays": 20,
+              "direct": 279,
+              "indirect": 170,
+              "white": 58,
+              "upph": 14.2853046594982,
+              "rate": 0.264251950709011
+            },
+            "目标": {
+              "volume": 116704,
+              "cost": 2628.64168769614,
+              "unit": 22.5240067837961,
+              "workdays": 25,
+              "direct": 286,
+              "indirect": 133,
+              "white": 34,
+              "upph": 16.3222377622378,
+              "rate": 0.186148816395009
+            },
+            "26年": {
+              "volume": 97611,
+              "cost": 2493.41061,
+              "unit": 25.5481477497413,
+              "workdays": 20,
+              "direct": 294,
+              "indirect": 127,
+              "white": 31,
+              "upph": 16.6005102040816,
+              "rate": 0.204354887051664
+            }
           }
         },
         {
@@ -1755,6 +2000,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 46.71759,
             "meal": 54.21067,
             "shuttle": 51.146209999999996
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 82105,
+              "cost": 2692.30781,
+              "unit": 32.7910335545947,
+              "workdays": 20,
+              "direct": 296,
+              "indirect": 181,
+              "white": 58,
+              "upph": 13.4648648648649,
+              "rate": 0.259176056928635
+            },
+            "目标": {
+              "volume": 116204,
+              "cost": 2650.37871511848,
+              "unit": 22.8079817830581,
+              "workdays": 20,
+              "direct": 317,
+              "indirect": 136,
+              "white": 34,
+              "upph": 18.3287066246057,
+              "rate": 0.188495717215356
+            },
+            "26年": {
+              "volume": 106294,
+              "cost": 2350.45499,
+              "unit": 22.1159330724218,
+              "workdays": 20,
+              "direct": 294,
+              "indirect": 127,
+              "white": 31,
+              "upph": 18.0772108843537,
+              "rate": 0.190627345073488
+            }
           }
         },
         {
@@ -1785,6 +2065,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 0.10772,
             "meal": 34.99875,
             "shuttle": 44.53437
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 92657,
+              "cost": 2979.4464,
+              "unit": 32.1556536473229,
+              "workdays": 20,
+              "direct": 279,
+              "indirect": 170,
+              "white": 58,
+              "upph": 16.6051971326165,
+              "rate": 0.25822688473753
+            },
+            "目标": {
+              "volume": 106704,
+              "cost": 2640.90328164571,
+              "unit": 24.7498058333868,
+              "workdays": 20,
+              "direct": 293,
+              "indirect": 127,
+              "white": 31,
+              "upph": 19.8300483503981,
+              "rate": 0.204543849862701
+            },
+            "26年": {
+              "volume": 107376,
+              "cost": 2592.02488,
+              "unit": 24.1397042169572,
+              "workdays": 23,
+              "direct": 299,
+              "indirect": 122,
+              "white": 31,
+              "upph": 15.6137850807038,
+              "rate": 0.206322258264592
+            }
           }
         },
         {
@@ -1815,6 +2130,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 0.35212,
             "meal": 61.50857,
             "shuttle": 55.48592
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 98687,
+              "cost": 2556.69212,
+              "unit": 25.9070811758388,
+              "workdays": 20,
+              "direct": 296,
+              "indirect": 182,
+              "white": 55,
+              "upph": 2.22268018018018,
+              "rate": 0.206457818830834
+            },
+            "目标": {
+              "volume": 104704,
+              "cost": 2463.98812901056,
+              "unit": 23.5328939583068,
+              "workdays": 21,
+              "direct": 258,
+              "indirect": 127,
+              "white": 34,
+              "upph": 2.57669496739264,
+              "rate": 0.194486726928156
+            },
+            "26年": {
+              "volume": 110370,
+              "cost": 2091.30381970365,
+              "unit": 18.9481183265711,
+              "workdays": 21,
+              "direct": 277,
+              "indirect": 113,
+              "white": 29,
+              "upph": 2.52982637098161,
+              "rate": 0.163962476987062
+            }
           }
         },
         {
@@ -1845,6 +2195,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 4.83122,
             "meal": 44.503,
             "shuttle": 42.97551
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 93353,
+              "cost": 2816.08827,
+              "unit": 30.1660179105117,
+              "workdays": 20,
+              "direct": 293,
+              "indirect": 178,
+              "white": 53,
+              "upph": 2.12407281001138,
+              "rate": 0.251387675464748
+            },
+            "目标": {
+              "volume": 71805,
+              "cost": 2562.05867813143,
+              "unit": 35.6807837634068,
+              "workdays": 14,
+              "direct": 257.93475536698,
+              "indirect": 127,
+              "white": 34,
+              "upph": 2.65128262972924,
+              "rate": 0.294882510441379
+            },
+            "26年": {
+              "volume": 67531,
+              "cost": 2105.32238,
+              "unit": 31.1756434822526,
+              "workdays": 14,
+              "direct": 265,
+              "indirect": 113,
+              "white": 28,
+              "upph": 2.42699011680144,
+              "rate": 0.266458491301304
+            }
           }
         },
         {
@@ -1875,6 +2260,41 @@ export const FACTORY_WORKBENCH_DATA = {
             "workwear": 0.50074,
             "meal": 41.09664,
             "shuttle": 44.682289999999995
+          },
+          "scenarios": {
+            "同期": {
+              "volume": 75092,
+              "cost": 2742.94486,
+              "unit": 36.5277907100623,
+              "workdays": 18,
+              "direct": 260,
+              "indirect": 148,
+              "white": 35,
+              "upph": 2.13937321937322,
+              "rate": 0.311609204546927
+            },
+            "目标": {
+              "volume": 110105,
+              "cost": 2548.97688290519,
+              "unit": 23.1504189901021,
+              "workdays": 22,
+              "direct": 265,
+              "indirect": 127,
+              "white": 28,
+              "upph": 2.51812654850391,
+              "rate": 0.191325776777703
+            },
+            "26年": {
+              "volume": 102272,
+              "cost": 2233.86588,
+              "unit": 21.8423994837297,
+              "workdays": 22,
+              "direct": 265,
+              "indirect": 127,
+              "white": 28,
+              "upph": 2.33898227558605,
+              "rate": 0.186687175074613
+            }
           }
         }
       ],

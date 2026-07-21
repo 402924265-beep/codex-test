@@ -9,7 +9,7 @@
       }
     </script>
     <title>Three-Table Manufacturing Cost Cockpit</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260721-factory-workbench-v1" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260721-factory-workbench-v3" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -29,7 +29,7 @@
       };
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260721-factory-workbench-v1"></script>
+    <script type="module" src="./src/app.js?v=20260721-factory-workbench-v3"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -64,6 +64,13 @@
           <button class="unit-nav-item" type="button" data-unit="dishwasher">
             <span class="unit-icon">DW</span>
             <span><strong data-i18n="dishwasher">洗碗机</strong><small data-i18n="dishwasherAppliance">洗碗机</small></span>
+          </button>
+        </div>
+        <div id="factoryWorkbenchNavSection" class="sidebar-section workspace-nav-section">
+          <span class="section-label" data-i18n="managementView">综合管理</span>
+          <button id="factoryWorkbenchNav" class="unit-nav-item workspace-nav-item" type="button">
+            <span class="unit-icon">BI</span>
+            <span><strong data-i18n="factoryWorkbenchNav">双厂工作台</strong><small data-i18n="factoryWorkbenchNavHint">CK + DW 综合分析</small></span>
           </button>
         </div>
         <div class="sidebar-section">
@@ -143,7 +150,6 @@
 
       <nav class="tabbar" aria-label="页面">
         <button class="tab active" data-tab="dashboard" type="button" data-i18n="tabDashboard">全年驾驶舱</button>
-        <button class="tab" data-tab="benchmark" type="button">双厂工作台</button>
         <button class="tab" data-tab="variance" type="button" data-i18n="tabVariance">月度差异</button>
         <button class="tab" data-tab="projects" type="button" data-i18n="tabProjects">项目因素</button>
       </nav>
