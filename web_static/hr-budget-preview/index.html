@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script>
       if (location.protocol === "file:") {
-        location.replace("http://127.0.0.1:8780/?hrbudget=20260713-v12");
+        location.replace("http://127.0.0.1:8780/?adminbudget=20260716-v1");
       }
     </script>
-    <title>洗碗机制造费三张表工作台</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260715-budget-status-v3" />
+    <title>Three-Table Manufacturing Cost Cockpit</title>
+    <link rel="stylesheet" href="./src/styles.css?v=20260721-factory-workbench-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -19,29 +19,30 @@
         window.DW_LOCAL_API_CONFIG = { baseUrl: "" };
       }
       window.DW_BUNDLED_FILES = {
-        forecast: "./input/01_Forecast_5plus7.xlsx",
-        forecastName: "Copy of 2026 monthly Renta DW _ May 1.xlsx",
+        forecast: "./input/01_DW_6plus6_Forecast.xlsx",
+        forecastName: "2026 MFG Variance Reporting_ DW_06.2026 6+6 FCST V1.xlsx",
         jiang: "./input/02_Domestic_Finance_5plus7.xlsx",
         jiangName: "2026 Manufacturing Cost Cumulative Domestic Finance 5+7.xlsx",
-        sap: "./input/03_Dishwasher_May_Actual.xlsx",
-        sapName: "Dishwasher May Actual Manufacturing Cost.xlsx",
-        language: "zh"
+        sap: "./input/03_Dishwasher_June_Actual.xlsx",
+        sapName: "2026 monthly Renta DW _ June.xlsx",
+        language: "en"
       };
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260715-budget-status-v3"></script>
+    <script type="module" src="./src/app.js?v=20260721-factory-workbench-v1"></script>
   </head>
   <body>
-    <section id="roleLogin" class="role-login" aria-label="选择演示角色">
+    <section id="roleLogin" class="role-login" aria-label="Select demo role">
       <div class="role-login-panel">
-        <div class="role-login-brand"><span>C</span><div><strong data-i18n="roleBrand">三张表制造费用经营驾驶舱</strong><small data-i18n="roleTestVersion">预算协同测试版</small></div></div>
-        <div class="role-login-copy"><span data-i18n="roleAccess">角色权限</span><h1 data-i18n="roleSelectTitle">选择你的工作角色</h1><p data-i18n="roleSelectHint">当前为内部测试版，无需密码。不同角色进入后只显示职责范围内的数据与操作。</p></div>
+        <div class="role-login-brand"><span>C</span><div><strong data-i18n="roleBrand">Three-Table Manufacturing Cost Cockpit</strong><small data-i18n="roleTestVersion">Budget Collaboration Preview</small></div></div>
+        <div class="role-login-copy"><span data-i18n="roleAccess">Role Access</span><h1 data-i18n="roleSelectTitle">Select your work role</h1><p data-i18n="roleSelectHint">No password is required in this internal preview. Each role only sees data and actions within its responsibility.</p></div>
         <div class="role-login-options">
-          <button type="button" class="active" data-login-role="finance"><b data-i18n="costRole">成本角色</b><span data-i18n="costRoleHint">查看经营驾驶舱、月度差异、全部预算科目和降费项目</span><em data-i18n="fullView">完整视图</em></button>
-          <button type="button" data-login-role="hr"><b data-i18n="hrRole">人力角色</b><span data-i18n="hrRoleHint">仅查看和校核人力预算参数、人力小科目及异常</span><em data-i18n="limitedView">受限视图</em></button>
+          <button type="button" class="active" data-login-role="finance"><b data-i18n="costRole">Cost Role</b><span data-i18n="costRoleHint">View the management cockpit, monthly variance, all budget accounts and cost-reduction projects</span><em data-i18n="fullView">Full view</em></button>
+          <button type="button" data-login-role="hr"><b data-i18n="hrRole">HR Role</b><span data-i18n="hrRoleHint">View and validate only HR budget parameters, HR accounts and exceptions</span><em data-i18n="limitedView">Limited view</em></button>
+          <button type="button" data-login-role="admin"><b data-i18n="adminRole">Administration</b><span data-i18n="adminRoleHint">Validate only administration budget standards, monthly amounts and change reasons</span><em data-i18n="limitedView">Limited view</em></button>
         </div>
-        <button id="enterWorkspace" class="role-login-enter" type="button" data-i18n="enterWorkspace">进入工作台</button>
-        <small class="role-login-note" data-i18n="roleSwitchHint">演示身份可在页面右上角随时切换</small>
+        <button id="enterWorkspace" class="role-login-enter" type="button" data-i18n="enterWorkspace">Enter workspace</button>
+        <small class="role-login-note" data-i18n="roleSwitchHint">The demo role can be switched from the upper-right corner</small>
       </div>
     </section>
     <div class="business-shell">
@@ -96,7 +97,7 @@
           <span data-i18n="language">语言</span>
           <select id="languageSelect">
             <option value="zh">中文</option>
-            <option value="en">English</option>
+            <option value="en" selected>English</option>
             <option value="tr">Türkçe</option>
           </select>
         </label>
@@ -128,6 +129,7 @@
           <select id="roleSelect">
             <option value="finance" data-i18n-option="financeAdmin">财务管理员</option>
             <option value="hr" data-i18n-option="hrHuman">HR 人力</option>
+            <option value="admin" data-i18n-option="adminDepartment">行政部门</option>
             <option value="procurement" data-i18n-option="procurementAdmin">行政/间接采购</option>
             <option value="leader" data-i18n-option="businessLeader">经营负责人</option>
             <option value="readonly" data-i18n-option="readonlyVisitor">只读访客</option>
@@ -141,6 +143,7 @@
 
       <nav class="tabbar" aria-label="页面">
         <button class="tab active" data-tab="dashboard" type="button" data-i18n="tabDashboard">全年驾驶舱</button>
+        <button class="tab" data-tab="benchmark" type="button">双厂工作台</button>
         <button class="tab" data-tab="variance" type="button" data-i18n="tabVariance">月度差异</button>
         <button class="tab" data-tab="projects" type="button" data-i18n="tabProjects">项目因素</button>
       </nav>
@@ -150,11 +153,11 @@
           <div class="panel-title">
             <div>
               <h2 data-i18n="dashboardTitle">全年数据驾驶舱</h2>
-              <p data-i18n="dashboardHint">内置 5+7 预测后，一屏查看 1-12 月产量、单台制造费、金额和关键大科目。</p>
+              <p data-i18n="dashboardHint">The 6+6 forecast shows Jan-Jun actuals and Jul-Dec forecast in one screen.</p>
             </div>
-            <span id="dashboardStatus">等待5+7预测文件</span>
+            <span id="dashboardStatus">Loading 6+6 forecast</span>
           </div>
-          <div id="annualSummary" class="smart-summary">内置5+7预测加载中...</div>
+          <div id="annualSummary" class="smart-summary">Loading the built-in 6+6 forecast...</div>
           <div id="dashboardCards" class="dashboard-cards cockpit-cards"></div>
           <div class="cockpit-grid">
             <section class="cockpit-card trend-card">
@@ -202,6 +205,10 @@
             </section>
           </div>
         </section>
+      </section>
+
+      <section id="benchmarkView" class="view">
+        <div id="factoryWorkbench"></div>
       </section>
 
       <section id="varianceView" class="view">
