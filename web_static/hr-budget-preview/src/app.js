@@ -44,6 +44,7 @@ import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
 import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260721-factory-workbench-v3";
+import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260722-v2";
 
 const VERSION = "20260717-june-6plus6-v1";
 
@@ -301,7 +302,9 @@ const i18n = {
     comingSoon: "即将开放",
     managementView: "综合管理",
     factoryWorkbenchNav: "双厂工作台",
-    factoryWorkbenchNavHint: "CK + DW 综合分析"
+    factoryWorkbenchNavHint: "CK + DW 综合分析",
+    forecast2030Nav: "25–30预测",
+    forecast2030NavHint: "制造费情景测算"
   },
   en: {
     appTitle: "Dishwasher MFG Cost Workbench",
@@ -529,7 +532,9 @@ const i18n = {
     comingSoon: "Coming soon",
     managementView: "Management",
     factoryWorkbenchNav: "Factory workbench",
-    factoryWorkbenchNavHint: "CK + DW analysis"
+    factoryWorkbenchNavHint: "CK + DW analysis",
+    forecast2030Nav: "2025–30 forecast",
+    forecast2030NavHint: "MFG cost scenarios"
   },
   tr: {
     appTitle: "Bulaşık Makinesi Üretim Gideri",
@@ -757,7 +762,9 @@ const i18n = {
     comingSoon: "Yakında",
     managementView: "Yönetim",
     factoryWorkbenchNav: "Fabrika çalışma alanı",
-    factoryWorkbenchNavHint: "CK + DW analizi"
+    factoryWorkbenchNavHint: "CK + DW analizi",
+    forecast2030Nav: "2025–30 tahmini",
+    forecast2030NavHint: "Üretim gideri senaryosu"
   }
 };
 
@@ -869,6 +876,7 @@ const els = {
   sidebarToggle: document.getElementById("sidebarToggle"),
   unitButtons: document.querySelectorAll("[data-unit]"),
   factoryWorkbenchNav: document.getElementById("factoryWorkbenchNav"),
+  forecast2030Nav: document.getElementById("forecast2030Nav"),
   unitName: document.getElementById("unitName"),
   unitSubtitle: document.getElementById("unitSubtitle"),
   unitSource: document.getElementById("unitSource"),
@@ -1400,6 +1408,8 @@ function bindEvents() {
     });
   }
   els.factoryWorkbenchNav?.addEventListener("click", () => switchTab("benchmark"));
+  els.forecast2030Nav?.addEventListener("click", () => switchTab("forecast2030"));
+  initForecast2030(document.getElementById("forecast2030Workbench"), () => state.language);
   document.getElementById("benchmarkView")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-fwb-group]");
     if (!button) return;
@@ -1546,6 +1556,7 @@ function renderAll() {
   renderTable();
   renderFactors();
   renderFactoryWorkbench();
+  renderForecast2030(state.language);
 }
 
 function baselineAsActual(source) {
@@ -5796,15 +5807,18 @@ function switchTab(name) {
   for (const tab of document.querySelectorAll(".tab")) tab.classList.toggle("active", tab.dataset.tab === name);
   document.getElementById("dashboardView").classList.toggle("active", name === "dashboard");
   document.getElementById("benchmarkView").classList.toggle("active", name === "benchmark");
+  document.getElementById("forecast2030View").classList.toggle("active", name === "forecast2030");
   document.getElementById("varianceView").classList.toggle("active", name === "variance");
   document.getElementById("projectsView").classList.toggle("active", name === "projects");
   els.factoryWorkbenchNav?.classList.toggle("active", name === "benchmark");
+  els.forecast2030Nav?.classList.toggle("active", name === "forecast2030");
   if (name === "variance") renderTable();
   if (name === "projects") {
     syncMonthSelectFromState();
     renderFactors();
   }
   if (name === "benchmark") renderFactoryWorkbench();
+  if (name === "forecast2030") renderForecast2030(state.language);
 }
 
 function applyLanguage(language) {

@@ -9,7 +9,7 @@
       }
     </script>
     <title>Three-Table Manufacturing Cost Cockpit</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260721-factory-workbench-v3" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260722-forecast-2030-v2" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -29,7 +29,7 @@
       };
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260721-factory-workbench-v3"></script>
+    <script type="module" src="./src/app.js?v=20260722-forecast-2030-v2"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -71,6 +71,10 @@
           <button id="factoryWorkbenchNav" class="unit-nav-item workspace-nav-item" type="button">
             <span class="unit-icon">BI</span>
             <span><strong data-i18n="factoryWorkbenchNav">双厂工作台</strong><small data-i18n="factoryWorkbenchNavHint">CK + DW 综合分析</small></span>
+          </button>
+          <button id="forecast2030Nav" class="unit-nav-item workspace-nav-item" type="button">
+            <span class="unit-icon">30</span>
+            <span><strong data-i18n="forecast2030Nav">25–30预测</strong><small data-i18n="forecast2030NavHint">制造费情景测算</small></span>
           </button>
         </div>
         <div class="sidebar-section">
@@ -215,6 +219,10 @@
 
       <section id="benchmarkView" class="view">
         <div id="factoryWorkbench"></div>
+      </section>
+
+      <section id="forecast2030View" class="view">
+        <div id="forecast2030Workbench"></div>
       </section>
 
       <section id="varianceView" class="view">

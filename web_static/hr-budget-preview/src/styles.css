@@ -20,6 +20,73 @@
 
 /* CK + DW factory benchmark */
 .factory-workbench { display: grid; gap: 14px; color: #102f49; }
+
+.f30-shell { display: grid; gap: 14px; color: #0a2b43; }
+.f30-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 18px 22px; background: #0b2d40; color: #fff; border-top: 3px solid #14a391; }
+.f30-head span { color: #58e0c5; font-size: 12px; font-weight: 700; }
+.f30-head h2 { margin: 4px 0; font-size: 24px; }
+.f30-head p { margin: 0; color: #c2d6df; }
+.f30-head > div:last-child { display: flex; align-items: center; gap: 8px; }
+.f30-head small { color: #b9cfd8; margin-right: 8px; }
+.f30-head button, .f30-title button { border: 1px solid #b8ced8; background: #fff; color: #17435a; border-radius: 5px; padding: 7px 11px; }
+.f30-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #c7d9e2; background: #fff; }
+.f30-kpis article { padding: 15px 18px; border-right: 1px solid #d5e2e8; }
+.f30-kpis article:last-child { border: 0; }
+.f30-kpis span, .f30-kpis small { display: block; color: #67808e; font-size: 12px; }
+.f30-kpis b { display: block; margin: 5px 0 2px; font-size: 25px; }
+.f30-kpis b.good, .f30-driver-list .good { color: #008874; }
+.f30-top-grid { display: grid; grid-template-columns: minmax(680px, 1fr) 340px; gap: 14px; align-items: start; }
+.f30-panel { min-width: 0; background: #fff; border: 1px solid #c7d9e2; }
+.f30-title { min-height: 50px; padding: 0 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d5e3e9; }
+.f30-title h3 { margin: 0; font-size: 16px; }
+.f30-title > span { color: #66808f; font-size: 12px; }
+.f30-phase-note { margin: 10px 14px 0; padding: 9px 11px; border-left: 3px solid #119c89; background: #eef8f5; color: #365d69; font-size: 12px; line-height: 1.45; }
+.f30-table-wrap { overflow: auto; }
+.f30-input-table, .f30-cost-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.f30-input-table th, .f30-input-table td, .f30-cost-table th, .f30-cost-table td { padding: 8px 9px; text-align: right; border-right: 1px solid #dbe6eb; border-bottom: 1px solid #dbe6eb; }
+.f30-input-table thead th, .f30-cost-table thead th { background: #e9f2f6; color: #3a5d70; font-size: 12px; }
+.f30-input-table th:first-child, .f30-cost-table th:first-child { text-align: left; width: 164px; }
+.f30-input-table th small { display: block; color: #7c929d; font-weight: 400; }
+.f30-input-table input { width: 86px; height: 33px; padding: 0 7px; text-align: right; border: 1px solid #9fd4c8; border-radius: 5px; background: #f1faf8; color: #063a36; }
+.f30-input-table td > em { display: block; color: #81949e; font-size: 10px; font-style: normal; }
+.f30-input-table select { margin-top: 3px; border: 0; color: #2a6374; font-size: 10px; background: transparent; }
+.f30-advanced { display: none; }
+.show-advanced .f30-advanced { display: table-row; }
+.f30-ai { border-top: 3px solid #129d89; }
+.f30-ai .f30-title span { padding: 5px 7px; border-radius: 4px; background: #e1f5f0; color: #087966; }
+.f30-ai-body { padding: 13px; }
+.f30-ai-body p { margin: 0 0 9px; color: #607b89; font-size: 12px; }
+.f30-ai textarea { width: 100%; height: 90px; resize: vertical; padding: 10px; border: 1px solid #b9cfd9; border-radius: 5px; color: #14384c; }
+.f30-ai-actions { display: grid; grid-template-columns: 36px 1fr; gap: 7px; margin-top: 7px; }
+.f30-ai-actions button, .f30-apply { height: 36px; border: 0; border-radius: 5px; background: #0b8b78; color: #fff; font-weight: 700; }
+.f30-ai-actions button:first-child { border: 1px solid #bdd0d9; background: #fff; color: #18475d; }
+.f30-parsed { margin-top: 10px; padding: 10px; border: 1px solid #b9ddd4; border-radius: 5px; background: #f2faf8; }
+.f30-parsed > div { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.f30-parsed span { padding: 4px 6px; border: 1px solid #a9d4ca; border-radius: 4px; background: #fff; font-size: 11px; }
+.f30-apply { width: 100%; margin-top: 9px; }
+.f30-apply:disabled { opacity: .4; }
+.f30-ai-body > small { display: block; margin-top: 9px; text-align: center; color: #637f8e; }
+.f30-results { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.f30-chart { height: 220px; padding: 24px 34px 10px; display: flex; align-items: flex-end; justify-content: space-around; border-bottom: 1px solid #d3e0e6; }
+.f30-chart-col { position: relative; width: 15%; display: flex; flex-direction: column; align-items: center; }
+.f30-chart-col > span { margin-top: 6px; font-size: 11px; }
+.f30-bar { width: 58px; min-height: 30px; display: flex; justify-content: center; padding-top: 7px; background: #168f80; color: #fff; }
+.f30-bar b { font-size: 10px; }
+.f30-unit-label { margin-bottom: 4px; color: #b66e00; font-size: 11px; font-weight: 700; }
+.f30-driver-list { padding: 15px; }
+.f30-driver-list > div { display: grid; grid-template-columns: 130px 1fr 74px; gap: 10px; align-items: center; margin: 11px 0; }
+.f30-driver-list i { height: 11px; background: #e5edf1; }
+.f30-driver-list em { display: block; height: 100%; background: #0d9a84; }
+.f30-driver-list em.bad { background: #da951e; }
+.f30-driver-list b { text-align: right; }
+.f30-driver-list .bad { color: #b54f3e; }
+.f30-cost-table th:first-child { width: 210px; }
+.f30-cost-table td { text-align: right; }
+.f30-cost-table td:nth-child(2) { text-align: center; }
+.f30-cost-table [class^="type-"] { display: inline-block; min-width: 48px; padding: 3px 5px; border-radius: 4px; background: #e4eef5; color: #275b75; font-size: 11px; text-align: center; }
+.f30-cost-table .type-people, .f30-cost-table .type-semi { background: #fff0d4; color: #8b5900; }
+.f30-cost-table .type-variable { background: #e1f4ee; color: #087761; }
+@media (max-width: 1100px) { .f30-top-grid, .f30-results { grid-template-columns: 1fr; } .f30-kpis { grid-template-columns: repeat(2, 1fr); } .f30-head { align-items: flex-start; flex-direction: column; } }
 .fwb-header { min-height: 86px; display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; background: #0d2b3d; border-top: 3px solid #10a58f; color: #fff; }
 .fwb-header span { display: block; color: #66d8c8; font-size: 12px; font-weight: 700; }
 .fwb-header h2 { margin: 5px 0 0; font-size: 24px; letter-spacing: 0; }
