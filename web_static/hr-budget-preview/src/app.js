@@ -44,7 +44,7 @@ import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
 import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260721-factory-workbench-v3";
-import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260722-v2";
+import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260722-v8";
 
 const VERSION = "20260717-june-6plus6-v1";
 
