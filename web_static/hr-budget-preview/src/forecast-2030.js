@@ -1,5 +1,5 @@
-import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260721-factory-workbench-v3";
-import { COOKING_UNIT } from "./cooking-data.js?v=20260722-ck-6plus6-v1";
+import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260816-july-actual-v1";
+import { COOKING_UNIT } from "./cooking-data.js?v=20260816-july-actual-v1";
 
 const YEARS = [2027, 2028, 2029, 2030];
 const STORE_KEY = "dw.forecast2030.v1";
@@ -539,7 +539,7 @@ export function renderForecast2030(language = "zh") {
   const impactMax = Math.max(1, ...impacts.map(([, value]) => Math.abs(value)));
   root.classList.toggle("show-advanced", modelState.advanced);
   root.innerHTML = `<section class="f30-shell">
-    <header class="f30-head"><div><span>${base.unit.toUpperCase()} · LONG RANGE PLAN</span><h2>${copy.title}</h2><p>${copy.sub}</p></div><div><div class="f30-unit-switch"><button data-f30-action="unit" data-f30-unit="ck" class="${modelState.activeUnit === "ck" ? "active" : ""}">CK 厨电</button><button data-f30-action="unit" data-f30-unit="dw" class="${modelState.activeUnit === "dw" ? "active" : ""}">DW 洗碗机</button></div><small>${modelState.activeUnit === "dw" ? copy.source : "CK 2026 · June actual + 6+6 forecast"}</small><button data-f30-action="save">${copy.save}</button><button data-f30-action="reset">${copy.reset}</button></div></header>
+    <header class="f30-head"><div><span>${base.unit.toUpperCase()} · LONG RANGE PLAN</span><h2>${copy.title}</h2><p>${copy.sub}</p></div><div><div class="f30-unit-switch"><button data-f30-action="unit" data-f30-unit="ck" class="${modelState.activeUnit === "ck" ? "active" : ""}">CK 厨电</button><button data-f30-action="unit" data-f30-unit="dw" class="${modelState.activeUnit === "dw" ? "active" : ""}">DW 洗碗机</button></div><small>${modelState.activeUnit === "dw" ? copy.source : "CK 2026 · July actual + approved 6+6 forecast"}</small><button data-f30-action="save">${copy.save}</button><button data-f30-action="reset">${copy.reset}</button></div></header>
     ${renderYearStrip(model, language)}
     <div class="f30-top-grid"><section class="f30-panel"><div class="f30-title"><h3>${copy.conditions}</h3><button data-f30-action="advanced">${copy.advanced}</button></div>${renderPhasePlan(language)}<div class="f30-table-wrap"><table class="f30-input-table"><thead><tr><th>${copy.conditions}</th><th>2026</th>${YEARS.map((year) => `<th>${year}</th>`).join("")}</tr></thead><tbody>
       ${inputRow(copy.volume, "volume", "pcs")}${inputRow(copy.efficiency, "efficiency", "%")}${inputRow(copy.wage, "wage", "%")}${inputRow(copy.fx, "fx", "TRY/EUR")}${inputRow(copy.price, "price", "%")}${inputRow(copy.energy, "energy", "%")}

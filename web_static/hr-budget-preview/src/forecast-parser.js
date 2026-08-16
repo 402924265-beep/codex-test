@@ -296,13 +296,15 @@ export function buildAnnualDashboardRows(forecast, options = {}) {
   const kpiHeadcount = getKpiHeadcount("DW");
   const directEmployeesSame = normalizeMonths(kpiHeadcount.direct.same);
   const directEmployeesBudget = normalizeMonths(kpiHeadcount.direct.budget);
-  const directEmployees26 = preferSeries(forecast.hc?.actualDirect, kpiHeadcount.direct.actual);
+  // HC 2026 is the governed headcount source.  Keep the legacy forecast file only
+  // as a fallback, so a refreshed HC table can replace all twelve months directly.
+  const directEmployees26 = preferSeries(kpiHeadcount.direct.actual, forecast.hc?.actualDirect);
   const indirectEmployeesSame = normalizeMonths(kpiHeadcount.indirect.same);
   const indirectEmployeesBudget = normalizeMonths(kpiHeadcount.indirect.budget);
-  const indirectEmployees26 = preferSeries(forecast.hc?.actualIndirect, kpiHeadcount.indirect.actual);
+  const indirectEmployees26 = preferSeries(kpiHeadcount.indirect.actual, forecast.hc?.actualIndirect);
   const whiteCollarSame = normalizeMonths(kpiHeadcount.white.same);
   const whiteCollarBudget = normalizeMonths(kpiHeadcount.white.budget);
-  const whiteCollar26 = preferSeries(forecast.hc?.actualFixed, kpiHeadcount.white.actual);
+  const whiteCollar26 = preferSeries(kpiHeadcount.white.actual, forecast.hc?.actualFixed);
   const hcSame = combineHeadcount(directEmployeesSame, indirectEmployeesSame);
   const hcBudget = combineHeadcount(directEmployeesBudget, indirectEmployeesBudget);
   const hcActual = combineHeadcount(directEmployees26, indirectEmployees26);

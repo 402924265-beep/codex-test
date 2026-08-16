@@ -166,6 +166,7 @@ export function extractActualFromWorkbook(workbook, month, xlsx) {
   const rentaSheetName = findSheetName(workbook, [
     "6+6 DW 2026",
     "4+8 DW 2026",
+    "DW 2026",
     "Renta CK TOTAL_2026",
     "Renta CK TOTAL_2025",
     "Renta CK TOTAL",

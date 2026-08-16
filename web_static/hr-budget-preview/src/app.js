@@ -43,8 +43,8 @@ import { COOKING_UNIT } from "./cooking-data.js?v=20260717-june-6plus6-v1";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
-import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260721-factory-workbench-v3";
-import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260722-v8";
+import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260816-july-actual-v1";
+import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260816-july-actual-v1";
 
 const VERSION = "20260717-june-6plus6-v1";
 
@@ -523,7 +523,7 @@ const i18n = {
     cookingSubtitle: "Cooking Manufacturing Cost Cockpit",
     dishwasherSubtitle: "Dishwasher Manufacturing Cost Cockpit",
     cookingSource: "Current: Cooking Factory · Same period, budget, actual, headcount and projects built in",
-    dishwasherSource: "Current: Dishwasher · 6+6 forecast, finance table and June actuals built in",
+    dishwasherSource: "Current: Dishwasher · approved 6+6 forecast, finance table and July actuals built in",
     cookingHeaderHint: "Combine same period, budget, actual, headcount and projects into an accrual-based operating view",
     roleAccess: "Role Access",
     supplyCostControl: "Supply Cost Control",
@@ -1057,9 +1057,9 @@ function applyCookingUnit() {
     impactType: cookingProjectImpactType(item)
   })));
   state.factorMonth = COOKING_UNIT.monthlyResult.month;
-  state.sapFileName = "Cooking 2026 CK Actual Cost June.xlsx";
-  state.forecastFileName = "2026 MFG Variance Reporting - CK-June V1 Shared.xlsx";
-  state.jiangFileName = "HC 2026 · CK 6+6 Forecast";
+  state.sapFileName = "Cooking 2026 CK Actual Cost July.xlsx";
+  state.forecastFileName = "2026 MFG Variance Reporting - CK-July Shared.xlsx";
+  state.jiangFileName = "HC 2026 · July actual + 6+6 forecast";
   state.metricScenario = "all";
   state.metricMonth = "all";
   state.metricStatus = "all";
