@@ -9,7 +9,7 @@
       }
     </script>
     <title>Three-Table Manufacturing Cost Cockpit</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260816-july-actual-v1" />
+    <link rel="stylesheet" href="./src/styles.css?v=20260821-embedded-july-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -18,18 +18,9 @@
       if (/^(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(location.hostname)) {
         window.DW_LOCAL_API_CONFIG = { baseUrl: "" };
       }
-      window.DW_BUNDLED_FILES = {
-        forecast: "./input/01_DW_6plus6_Forecast.xlsx",
-        forecastName: "2026 MFG Variance Reporting_ DW_06.2026 6+6 FCST V1.xlsx",
-        jiang: "./input/02_Domestic_Finance_5plus7.xlsx",
-        jiangName: "2026 Manufacturing Cost Cumulative Domestic Finance 5+7.xlsx",
-        sap: "./input/03_Dishwasher_July_Actual.xlsx",
-        sapName: "2026 monthly Renta DW _ July.xlsx",
-        language: "en"
-      };
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260816-july-actual-v1"></script>
+    <script type="module" src="./src/app.js?v=20260821-embedded-july-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -369,9 +360,9 @@
                   <th data-i18n="owner">责任人</th>
                   <th data-i18n="timing">到位时间</th>
                   <th data-i18n="plannedImpact">预计影响 K€</th>
-                  <th data-i18n="impact">实际月累差额 K€</th>
+                  <th>当月实际 K€</th>
+                  <th>累计实际 K€</th>
                   <th data-i18n="progress">进展</th>
-                  <th data-i18n="action">操作</th>
                 </tr>
               </thead>
               <tbody id="factorBody"></tbody>

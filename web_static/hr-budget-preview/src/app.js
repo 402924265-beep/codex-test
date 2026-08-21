@@ -40,13 +40,14 @@ import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 import { COOKING_UNIT } from "./cooking-data.js?v=20260717-june-6plus6-v1";
+import { DW_EMBEDDED_FILES, embeddedWorkbookFile } from "./dw-embedded-data.js?v=20260821-embedded-july-v1";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
 import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260816-july-actual-v1";
 import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260816-july-actual-v1";
 
-const VERSION = "20260717-june-6plus6-v1";
+const VERSION = "20260821-embedded-july-v1";
 
 const COOKING_HEADCOUNT_ROWS = [
   {
@@ -54,7 +55,7 @@ const COOKING_HEADCOUNT_ROWS = [
     rows: [
       { scenario: "同期", values: [279, 296, 293, 296, 293, 260, 247, 239, 248, 310, 310, 280] },
       { scenario: "预算", values: [286, 317, 317, 258, 258, 258, 258, 258, 295, 295, 343, 343] },
-      { scenario: "26年", values: [294, 300, 325, 277, 265, 265, 264, 264, 264, 275, 275, 275] }
+      { scenario: "26年", values: [294, 300, 325, 277, 265, 265, 266, 264, 264, 275, 275, 275] }
     ]
   },
   {
@@ -62,7 +63,7 @@ const COOKING_HEADCOUNT_ROWS = [
     rows: [
       { scenario: "同期", values: [170, 181, 180, 182, 178, 148, 126, 127, 120, 132, 134, 133] },
       { scenario: "预算", values: [133, 136, 136, 127, 127, 127, 127, 127, 133, 133, 142, 142] },
-      { scenario: "26年", values: [127, 126, 125, 113, 113, 114, 113, 113, 113, 121, 121, 121] }
+      { scenario: "26年", values: [127, 126, 125, 113, 113, 114, 114, 113, 113, 121, 121, 121] }
     ]
   },
   {
@@ -70,7 +71,7 @@ const COOKING_HEADCOUNT_ROWS = [
     rows: [
       { scenario: "同期", values: [58, 58, 56, 55, 53, 38, 35, 38, 33, 31, 31, 31] },
       { scenario: "预算", values: [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34] },
-      { scenario: "26年", values: [30.5, 31.17, 31.17, 27.67, 27.67, 27.67, 34, 34, 34, 34, 34, 34] }
+      { scenario: "26年", values: [30.5, 31.17, 31.17, 27.67, 27.67, 27.67, 27.67, 34, 34, 34, 34, 34] }
     ]
   }
 ];
@@ -915,7 +916,7 @@ async function bootstrap() {
   applyLanguage(els.languageSelect.value);
   recalcFactors();
   renderAll();
-  await loadBundledFiles();
+  await loadEmbeddedDwFiles();
   state.factors = normalizeFactorsForUi(clonePlain(FACTORY_WORKBENCH_DATA.units.dishwasher.projects));
   saveUnitSnapshot("dishwasher");
   if (state.activeUnit === "cooking") {
@@ -925,27 +926,17 @@ async function bootstrap() {
   }
 }
 
-async function loadBundledFiles() {
-  const config = globalThis.window?.DW_BUNDLED_FILES;
-  if (!config) return;
+async function loadEmbeddedDwFiles() {
   try {
-    const load = async (url, name, handler) => {
-      if (!url) return;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Unable to load bundled file: ${name}`);
-      const file = new File([await response.blob()], name, {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      });
+    const load = async (key, handler) => {
+      const record = DW_EMBEDDED_FILES.find((item) => item.key === key);
+      if (!record) throw new Error(`Missing embedded DW data: ${key}`);
+      const file = embeddedWorkbookFile(record);
       await handler({ target: { files: [file] } });
     };
-    await load(config.forecast, config.forecastName || "01_Forecast_5plus7.xlsx", handleForecastFileChange);
-    await load(config.jiang, config.jiangName || "02_Domestic_Finance_5plus7.xlsx", handleJiangFileChange);
-    await load(config.sap, config.sapName || "03_April_Actual.xlsx", handleSapFileChange);
-    if (config.language && i18n[config.language]) {
-      els.languageSelect.value = config.language;
-      applyLanguage(config.language);
-      renderAll();
-    }
+    await load("forecast", handleForecastFileChange);
+    await load("jiang", handleJiangFileChange);
+    await load("sap", handleSapFileChange);
     saveUnitSnapshot("dishwasher");
   } catch (error) {
     toast(error.message || String(error), true);
@@ -4166,6 +4157,7 @@ function formatWorkbenchCumulativeCny(value) {
 }
 
 function renderFactoryWorkbench() {
+  return renderUnifiedFactoryWorkbench();
   const target = document.getElementById("factoryWorkbench");
   if (!target) return;
   const c = workbenchCopy();
@@ -4227,6 +4219,124 @@ function renderFactoryWorkbench() {
     <section class="fwb-section"><div class="fwb-title"><h3>${c.salary}</h3><span>CNY · ${c.perPersonMonth}</span></div><div class="fwb-bars">${salaryRows.map(([labelText, key]) => `<div class="fwb-bar-row"><b>${labelText}<small>${c.average}</small></b><div><span>CK</span><i style="--size:${salaryMonthlyCny(ck.h1.perCapita[key]) / salaryMax * 100}%"></i><strong>¥${formatNumber(salaryMonthlyCny(ck.h1.perCapita[key]))}<small>${c.perPersonMonth}</small></strong></div><div><span>DW</span><i class="dw" style="--size:${salaryMonthlyCny(dw.h1.perCapita[key]) / salaryMax * 100}%"></i><strong>¥${formatNumber(salaryMonthlyCny(dw.h1.perCapita[key]))}<small>${c.perPersonMonth}</small></strong></div></div>`).join("")}</div></section></div>
     <section class="fwb-reserved"><strong>${c.future}</strong>${c.futureItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</section>
   </section>`;
+}
+
+function factoryRowsFor(unitId) {
+  if (state.activeUnit === unitId) return state.dashboardRows || [];
+  return unitSnapshots[unitId]?.dashboardRows || [];
+}
+
+function factoryRowValue(unitId, labelText, scenario, index) {
+  const row = factoryRowsFor(unitId).find((item) => item.label === labelText && item.scenario === scenario);
+  return Number(row?.values?.[index]);
+}
+
+function combinedFactoryMetric(metric, scenario, index) {
+  const number = (unitId, labelText) => factoryRowValue(unitId, labelText, scenario, index);
+  const ck = (labelText) => number("cooking", labelText);
+  const dw = (labelText) => number("dishwasher", labelText);
+  const add = (...values) => values.every(Number.isFinite) ? sum(values) : null;
+  const volume = add(ck("产量"), dw("产量"));
+  const cost = add(ck("制造费用金额"), dw("制造费用金额"));
+  const output = add(ck("产值"), dw("产值"));
+  if (metric === "产量") return volume;
+  if (metric === "制造费用金额") return cost;
+  if (metric === "直接员工" || metric === "间接员工" || metric === "白领") return add(ck(metric), dw(metric));
+  if (metric === "工作日") {
+    const direct = add(ck("直接员工"), dw("直接员工"));
+    const laborDays = Number.isFinite(ck("直接员工")) && Number.isFinite(ck("工作日")) && Number.isFinite(dw("直接员工")) && Number.isFinite(dw("工作日"))
+      ? ck("直接员工") * ck("工作日") + dw("直接员工") * dw("工作日") : null;
+    return direct && laborDays !== null ? laborDays / direct : null;
+  }
+  if (metric === "单台制造费") return volume ? cost * 1000 / volume : null;
+  if (metric === "制造费率") return output ? cost / output : null;
+  if (metric === "UPPH") {
+    const ckUpph = ck("UPPH");
+    const dwUpph = dw("UPPH");
+    const capacity = Number.isFinite(ckUpph) && ckUpph > 0 && Number.isFinite(dwUpph) && dwUpph > 0 ? ck("产量") / ckUpph + dw("产量") / dwUpph : null;
+    return capacity ? volume / capacity : null;
+  }
+  return null;
+}
+
+function combinedFactoryPeriod(metric, scenario, endIndex) {
+  const values = Array.from({ length: endIndex + 1 }, (_, index) => combinedFactoryMetric(metric, scenario, index));
+  if (["直接员工", "间接员工", "白领", "工作日"].includes(metric)) return averageFinite(values);
+  if (metric === "单台制造费") {
+    const cost = combinedFactoryPeriod("制造费用金额", scenario, endIndex);
+    const volume = combinedFactoryPeriod("产量", scenario, endIndex);
+    return volume ? cost * 1000 / volume : null;
+  }
+  if (metric === "制造费率") {
+    const cost = combinedFactoryPeriod("制造费用金额", scenario, endIndex);
+    const output = sum(Array.from({ length: endIndex + 1 }, (_, index) => {
+      const ck = factoryRowValue("cooking", "产值", scenario, index);
+      const dw = factoryRowValue("dishwasher", "产值", scenario, index);
+      return Number.isFinite(ck) && Number.isFinite(dw) ? ck + dw : 0;
+    }));
+    return output ? cost / output : null;
+  }
+  if (metric === "UPPH") {
+    const volume = combinedFactoryPeriod("产量", scenario, endIndex);
+    const capacity = sum(values.map((value, index) => value ? combinedFactoryMetric("产量", scenario, index) / value : 0));
+    return capacity ? volume / capacity : null;
+  }
+  return sum(values);
+}
+
+function renderUnifiedFactoryWorkbench() {
+  const target = document.getElementById("factoryWorkbench");
+  if (!target || !factoryRowsFor("cooking").length || !factoryRowsFor("dishwasher").length) return;
+  const labels = state.language === "zh" ? ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"] : MONTHS.map((item) => localizeMonthLabel(item.month - 1, state.language));
+  const actualCount = 7;
+  const scenarioRows = [["同期", "同期"], ["预算", "预算"], ["26年", "26年"]];
+  const metrics = [["单", "产量"], ["时", "工作日"], ["人", "直接员工"], ["人", "间接员工"], ["人", "白领"], ["效", "UPPH"], ["费", "制造费率"], ["费", "单台制造费"], ["费", "制造费用金额"]];
+  const selectedMonth = actualCount - 1;
+  const metricRows = (state.workbenchGroup === "all" ? metrics : metrics.filter(([group]) => group === state.workbenchGroup)).flatMap(([group, metric]) => scenarioRows.map(([scenario, display], scenarioIndex) => {
+    const cells = Array.from({ length: 12 }, (_, index) => {
+      const value = combinedFactoryMetric(metric, scenario, index);
+      const phase = index < actualCount ? "actual-month-cell" : "forecast-month-cell";
+      return `<td class="month-cell ${phase}" title="${escapeHtml(`${labels[index]} · ${metric} · ${display}`)}">${formatDashboardValue(value, metric === "制造费用金额" ? "K€" : metric === "制造费率" ? "%" : metric === "单台制造费" ? "€/台" : "")}</td>`;
+    }).join("");
+    const total = combinedFactoryPeriod(metric, scenario, 11);
+    return `<tr class="scenario-${scenarioIndex}"><th>${scenarioIndex === 0 ? `<span class="fwb-metric-cell"><span class="fwb-group-mark">${group}</span><b>${escapeHtml(metric)}</b></span>` : ""}</th><td><span class="fwb-scenario-tag s${scenarioIndex}">${display}</span></td>${cells}<td class="full-year-cell">${formatDashboardValue(total, metric === "制造费用金额" ? "K€" : metric === "制造费率" ? "%" : metric === "单台制造费" ? "€/台" : "")}</td></tr>`;
+  })).join("");
+  const stat = (metric, scope) => {
+    const index = scope === "month" ? selectedMonth : scope === "ytd" ? selectedMonth : 11;
+    return scope === "month" ? combinedFactoryMetric(metric, "26年", index) : combinedFactoryPeriod(metric, "26年", index);
+  };
+  const card = (title, scope) => `<div class="fwb-kpi-card"><span>${title}</span><b>产量</b><strong>${formatDashboardValue(stat("产量", scope), "")}</strong><small>单台制造费 ${formatDashboardValue(stat("单台制造费", scope), "€/台")} · 制造费率 ${formatDashboardValue(stat("制造费率", scope), "%")}</small></div>`;
+  const groups = [["all", "全部"], ["单", "单"], ["时", "时"], ["人", "人"], ["效", "效"], ["费", "费"]];
+  target.innerHTML = `<section class="factory-workbench fwb-unified"><header class="fwb-header"><div><span>2026 · 1-7月实际 / 8-12月预测</span><h2>CK + DW 双厂全年指标驾驶舱</h2></div></header><div class="fwb-kpis">${card("7月当月实际", "month")}${card("1-7月累计实际", "ytd")}${card("全年预测", "year")}</div><section class="fwb-section"><div class="fwb-title"><h3>双厂指标明细</h3><span>悬停数值可查看口径</span></div><div class="fwb-metric-filters">${groups.map(([value, labelText]) => `<button type="button" class="${state.workbenchGroup === value ? "active" : ""}" data-fwb-group="${value}">${labelText}</button>`).join("")}</div><div class="fwb-table-wrap"><table class="fwb-matrix dashboard-table"><thead><tr class="phase-header-row"><th colspan="2">指标</th><th colspan="7" class="phase-actual">1-7月实际</th><th colspan="5" class="phase-forecast">8-12月预测</th><th>全年</th></tr><tr><th>分组</th><th>口径</th>${labels.map((item) => `<th>${item}</th>`).join("")}<th>全年</th></tr></thead><tbody>${metricRows}</tbody></table></div></section>${renderFactoryCostMixActual()}</section>`;
+}
+
+function factoryCostMix(unitId) {
+  const unit = FACTORY_WORKBENCH_DATA.units[unitId];
+  const totals = new Map();
+  for (const month of (unit?.months || []).filter((item) => item.month >= 1 && item.month <= 7)) {
+    for (const [category, amount] of Object.entries(month.categories || {})) {
+      totals.set(category, (totals.get(category) || 0) + (Number(amount) || 0));
+    }
+  }
+  return Object.fromEntries(totals);
+}
+
+function renderFactoryCostMixActual() {
+  const ck = factoryCostMix("cooking");
+  const dw = factoryCostMix("dishwasher");
+  const categoryNames = [...new Set([...Object.keys(ck), ...Object.keys(dw)])];
+  const positiveTotal = (items) => sum(Object.values(items).filter((value) => value > 0));
+  const ckTotal = positiveTotal(ck) || 1;
+  const dwTotal = positiveTotal(dw) || 1;
+  const ckEntries = categoryNames.map((name) => [name, Math.max(0, ck[name] || 0)]);
+  const dwEntries = categoryNames.map((name) => [name, Math.max(0, dw[name] || 0)]);
+  const rank = categoryNames.map((name) => ({
+    name,
+    ck: Math.max(0, ck[name] || 0) / ckTotal,
+    dw: Math.max(0, dw[name] || 0) / dwTotal
+  })).sort((left, right) => Math.max(right.ck, right.dw) - Math.max(left.ck, left.dw));
+  const rowHtml = rank.map((item) => `<div><b>${escapeHtml(workbenchCategoryLabel(item.name))}</b><span>${formatPercent(item.ck)}</span><span>${formatPercent(item.dw)}</span><em class="${Math.abs(item.ck - item.dw) >= .03 ? "alert" : ""}">${((item.ck - item.dw) * 100).toFixed(1)}pp</em></div>`).join("");
+  return `<section class="fwb-section"><div class="fwb-title"><h3>制造费结构对比</h3><span>1-7月实际累计</span></div><div class="fwb-category-grid"><div class="fwb-donuts"><div>${workbenchDonutSvg("CK", ckEntries, ckTotal, sum(Object.values(ck)))}</div><div>${workbenchDonutSvg("DW", dwEntries, dwTotal, sum(Object.values(dw)))}</div></div><div class="fwb-rank"><div class="fwb-rank-head"><span>指标</span><span>CK占比</span><span>DW占比</span><span>差异</span></div>${rowHtml}</div></div></section>`;
 }
 
 function refreshProductNavigation() {
@@ -5466,8 +5576,13 @@ function handleChartClick(event) {
 
 function renderFactors() {
   recalcFactors();
-  if (els.projectSummary) els.projectSummary.innerHTML = buildLocalizedProjectSummaryText();
-  renderLocalizedProjectImpactCards();
+  if (state.activeUnit === "cooking") {
+    if (els.projectSummary) els.projectSummary.textContent = `7月更新：${state.factors.length}项因素与降费项目，默认展示当月、累计及全年口径。`;
+    renderCookingProjectCards();
+  } else {
+    if (els.projectSummary) els.projectSummary.innerHTML = buildLocalizedProjectSummaryText();
+    renderLocalizedProjectImpactCards();
+  }
   els.factorBody.innerHTML = state.factors.length
     ? state.factors.map((item, index) => factorRowHtml(item, index)).join("")
     : `<tr><td colspan="9" class="empty-cell">${t("emptyFactors")}</td></tr>`;
@@ -5477,19 +5592,41 @@ function factorRowHtml(item, index) {
   const display = (field) => state.activeUnit === "cooking"
     ? (item[field] ?? "")
     : localizeProjectField(item, field, state.language);
+  const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
+  const monthActual = Number(item.actualMonths?.[monthIndex]) || 0;
+  const ytdActual = sum((item.actualMonths || []).slice(0, monthIndex + 1));
   return `
     <tr data-index="${index}">
-      <td><input data-field="category" value="${escapeHtml(display("category"))}" /></td>
-      <td><textarea data-field="strategy">${escapeHtml(display("strategy"))}</textarea></td>
-      <td><textarea data-field="project">${escapeHtml(display("project"))}</textarea></td>
-      <td><input data-field="owner" value="${escapeHtml(display("owner"))}" /></td>
-      <td><input data-field="timing" value="${escapeHtml(display("timing"))}" /></td>
-      <td><input data-field="plannedImpact" value="${formatEditable(item.plannedImpact)}" /></td>
-      <td><input data-field="actualCumulative" value="${formatEditable(item.actualCumulative)}" /></td>
-      <td><textarea data-field="progress">${escapeHtml(display("progress"))}</textarea></td>
-      <td><button class="delete-btn" type="button" data-delete-index="${index}" title="${t("delete")}">×</button></td>
+      <td><span class="project-category">${escapeHtml(display("category"))}</span></td>
+      <td title="${escapeHtml(display("strategy"))}">${escapeHtml(shortText(display("strategy"), 30))}</td>
+      <td title="${escapeHtml(display("project"))}"><strong>${escapeHtml(shortText(display("project"), 48))}</strong></td>
+      <td>${escapeHtml(display("owner") || "—")}</td>
+      <td>${escapeHtml(display("timing") || "—")}</td>
+      <td>${formatMoney(item.plannedImpact)} K€</td>
+      <td>${formatMoney(monthActual)} K€</td>
+      <td>${formatMoney(ytdActual)} K€</td>
+      <td title="${escapeHtml(display("progress"))}">${escapeHtml(shortText(display("progress"), 34) || "—")}</td>
     </tr>
   `;
+}
+
+function renderCookingProjectCards() {
+  if (!els.projectImpactCards) return;
+  const monthIndex = Math.max(0, Math.min(11, state.factorMonth - 1));
+  const actual = (item, index) => Number(item.actualMonths?.[index]) || 0;
+  const planned = (item, index) => Number(item.budgetMonths?.[index]) || 0;
+  const projectItems = state.factors.filter((item) => item.impactType === "project");
+  const monthActual = sum(projectItems.map((item) => actual(item, monthIndex)));
+  const ytdActual = sum(projectItems.flatMap((item) => item.actualMonths?.slice(0, monthIndex + 1) || []));
+  const ytdPlan = sum(projectItems.flatMap((item) => item.budgetMonths?.slice(0, monthIndex + 1) || []));
+  const fullYearPlan = sum(projectItems.map((item) => item.plannedImpact));
+  const card = (title, value, tone = "good") => `<div class="impact-card ${tone}"><span>${escapeHtml(title)}</span><strong>${formatMoney(value)} K€</strong></div>`;
+  els.projectImpactCards.innerHTML = [
+    card(`${state.factorMonth}月项目实际`, monthActual, monthActual < 0 ? "bad" : "good"),
+    card(`1-${state.factorMonth}月累计实际`, ytdActual, ytdActual < 0 ? "bad" : "good"),
+    card(`1-${state.factorMonth}月累计预算`, ytdPlan, ytdPlan < 0 ? "bad" : "good"),
+    card("全年项目预算", fullYearPlan, fullYearPlan < 0 ? "bad" : "good")
+  ].join("");
 }
 
 
