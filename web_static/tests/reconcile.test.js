@@ -320,6 +320,7 @@ test("reconciliation sums duplicate 2026 account rows instead of overwriting the
 test("actual report filename determines the realized month cutoff", () => {
   assert.equal(inferActualMonthCountFromFileName("洗碗机5月实际制造费报表.xlsx"), 5);
   assert.equal(inferActualMonthCountFromFileName("2026 monthly Renta DW _APRIL ACT.xlsx"), 4);
+  assert.equal(inferActualMonthCountFromFileName("2026 monthly Renta DW _ July.xlsx"), 7);
   assert.equal(inferActualMonthCountFromFileName("2026 MFG Actual_05.2026.xlsx"), 5);
   assert.equal(inferActualMonthCountFromFileName("actual.xlsx", 4), 4);
 });

@@ -3,7 +3,7 @@ import {
   BUDGET_26_BY_MONTH,
   CATEGORY_ORDER
 } from "./baseline-data.js?v=20260612-duplicate-accounts-v23";
-import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260717-june-6plus6-v1";
+import { MONTHS, extractActualFromWorkbook, inferActualMonthCountFromFileName } from "./parser.js?v=20260821-dw-july-cutoff-v2";
 import { buildReconciliation } from "./reconcile.js?v=20260717-june-6plus6-v1";
 import { exportAnalysisWorkbook } from "./export.js?v=20260615-dynamic-month-v28";
 import { loadXlsx } from "./xlsx-loader.js?v=20260612-duplicate-accounts-v23";
@@ -40,7 +40,7 @@ import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts
 import { ACCOUNT_BUDGET_DW_BY_MONTH, ACCOUNT_FORECAST_DW_BY_MONTH } from "./account-plan-data.js?v=20260612-duplicate-accounts-v23";
 import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-labels-v31";
 import { COOKING_UNIT } from "./cooking-data.js?v=20260717-june-6plus6-v1";
-import { DW_EMBEDDED_FILES, embeddedWorkbookFile } from "./dw-embedded-data.js?v=20260821-embedded-july-v1";
+import { DW_EMBEDDED_FILES, embeddedWorkbookFile } from "./dw-embedded-data.js?v=20260821-dw-july-cutoff-v2";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
 import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
 import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
@@ -937,6 +937,10 @@ async function loadEmbeddedDwFiles() {
     await load("forecast", handleForecastFileChange);
     await load("jiang", handleJiangFileChange);
     await load("sap", handleSapFileChange);
+    const actualRecord = DW_EMBEDDED_FILES.find((item) => item.key === "actual");
+    state.actualMonthCount = inferActualMonthCountFromFileName(actualRecord?.name, state.actualMonthCount);
+    state.dashboardRows = buildDashboardRows();
+    renderAll();
     saveUnitSnapshot("dishwasher");
   } catch (error) {
     toast(error.message || String(error), true);
