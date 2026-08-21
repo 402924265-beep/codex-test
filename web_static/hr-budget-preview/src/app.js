@@ -936,7 +936,7 @@ async function loadEmbeddedDwFiles() {
     };
     await load("forecast", handleForecastFileChange);
     await load("jiang", handleJiangFileChange);
-    await load("sap", handleSapFileChange);
+    await load("actual", handleSapFileChange);
     const actualRecord = DW_EMBEDDED_FILES.find((item) => item.key === "actual");
     state.actualMonthCount = inferActualMonthCountFromFileName(actualRecord?.name, state.actualMonthCount);
     state.dashboardRows = buildDashboardRows();
