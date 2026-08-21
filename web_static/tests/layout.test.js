@@ -69,4 +69,6 @@ test("cooking and factory dashboards share real merged metric cells", async () =
   assert.match(css, /\.dashboard-table td\s*\{[\s\S]*text-align:\s*right/);
   assert.match(app, /await load\("actual", handleSapFileChange\)/);
   assert.doesNotMatch(app, /await load\("sap", handleSapFileChange\)/);
+  assert.doesNotMatch(app, /dashboardHint: "The 6\+6 forecast shows Jan-Jun actuals/);
+  assert.match(app, /dashboardHint: "The current view shows Jan-Jul actuals/);
 });
