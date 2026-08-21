@@ -66,4 +66,5 @@ test("cooking and factory dashboards share real merged metric cells", async () =
   assert.match(app, /factoryDashboardRows\(\)/);
   assert.match(app, /renderStandardMetricRows\(factoryDashboardVisibleRows\(\)/);
   assert.match(css, /\.dashboard-merged-cell/);
+  assert.match(css, /\.dashboard-table td\s*\{[\s\S]*text-align:\s*right/);
 });

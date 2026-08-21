@@ -2778,6 +2778,7 @@ td:nth-child(2) { text-align: left; }
 /* Keep the row-group labels, scenario chips and monthly values on one visual baseline. */
 .dashboard-table td {
   height: 42px;
+  text-align: right;
   vertical-align: middle;
 }
 
