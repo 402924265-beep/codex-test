@@ -139,9 +139,9 @@
 .fwb-header span { display: block; color: #66d8c8; font-size: 12px; font-weight: 700; }
 .fwb-header h2 { margin: 5px 0 0; font-size: 24px; letter-spacing: 0; }
 .fwb-header em { max-width: 420px; color: #c7d7df; font-size: 12px; font-style: normal; text-align: right; }
-.fwb-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 10px; background: #0d2638; }
+.fwb-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px; background: #0d2638; }
 .fwb-kpis > div { min-height: 112px; padding: 13px 14px; border: 1px solid #315268; background: #183247; }
-.fwb-kpis > div:last-child { border-right: 0; }
+.fwb-kpis > div:last-child { border-right: 1px solid #315268; }
 .fwb-kpis span, .fwb-kpis small, .fwb-kpis em { display: block; color: #83a7ba; font-size: 11px; font-style: normal; }
 .fwb-kpis b { display: block; margin-top: 3px; color: #eef8fb; font-size: 12px; }
 .fwb-kpis strong { display: inline-block; margin: 7px 6px 5px 0; color: #24dfb1; font-size: 24px; line-height: 1; }
@@ -2773,6 +2773,22 @@ td:nth-child(2) { text-align: left; }
 .dashboard-table th,
 .dashboard-table td {
   padding: 8px 6px;
+}
+
+/* Keep the row-group labels, scenario chips and monthly values on one visual baseline. */
+.dashboard-table td {
+  height: 42px;
+  vertical-align: middle;
+}
+
+.dashboard-table td.sticky-col-1,
+.dashboard-table td.sticky-col-3,
+.dashboard-table td.sticky-col-4 {
+  text-align: center;
+}
+
+.dashboard-table td.sticky-col-2 {
+  text-align: left;
 }
 
 .dashboard-table .phase-header-row th {
