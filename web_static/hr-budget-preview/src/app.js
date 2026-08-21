@@ -4292,22 +4292,25 @@ function renderUnifiedFactoryWorkbench() {
   const scenarioRows = [["同期", "同期"], ["预算", "预算"], ["26年", "26年"]];
   const metrics = [["单", "产量"], ["时", "工作日"], ["人", "直接员工"], ["人", "间接员工"], ["人", "白领"], ["效", "UPPH"], ["费", "制造费率"], ["费", "单台制造费"], ["费", "制造费用金额"]];
   const selectedMonth = actualCount - 1;
-  const metricRows = (state.workbenchGroup === "all" ? metrics : metrics.filter(([group]) => group === state.workbenchGroup)).flatMap(([group, metric]) => scenarioRows.map(([scenario, display], scenarioIndex) => {
+  const metricRows = (state.workbenchGroup === "all" ? metrics : metrics.filter(([group]) => group === state.workbenchGroup)).map(([group, metric]) => scenarioRows.map(([scenario, display], scenarioIndex) => {
     const cells = Array.from({ length: 12 }, (_, index) => {
       const value = combinedFactoryMetric(metric, scenario, index);
       const phase = index < actualCount ? "actual-month-cell" : "forecast-month-cell";
       return `<td class="month-cell ${phase}" title="${escapeHtml(`${labels[index]} · ${metric} · ${display}`)}">${formatDashboardValue(value, metric === "制造费用金额" ? "K€" : metric === "制造费率" ? "%" : metric === "单台制造费" ? "€/台" : "")}</td>`;
     }).join("");
     const total = combinedFactoryPeriod(metric, scenario, 11);
-    return `<tr class="scenario-${scenarioIndex}"><th>${scenarioIndex === 0 ? `<span class="fwb-metric-cell"><span class="fwb-group-mark">${group}</span><b>${escapeHtml(metric)}</b></span>` : ""}</th><td><span class="fwb-scenario-tag s${scenarioIndex}">${display}</span></td>${cells}<td class="full-year-cell">${formatDashboardValue(total, metric === "制造费用金额" ? "K€" : metric === "制造费率" ? "%" : metric === "单台制造费" ? "€/台" : "")}</td></tr>`;
-  })).join("");
+    const metricCell = scenarioIndex === 0
+      ? `<th rowspan="3"><span class="fwb-metric-cell"><span class="fwb-group-mark">${group}</span><b>${escapeHtml(metric)}</b></span></th>`
+      : "";
+    return `<tr class="scenario-${scenarioIndex}">${metricCell}<td><span class="fwb-scenario-tag s${scenarioIndex}">${display}</span></td>${cells}<td class="full-year-cell">${formatDashboardValue(total, metric === "制造费用金额" ? "K€" : metric === "制造费率" ? "%" : metric === "单台制造费" ? "€/台" : "")}</td></tr>`;
+  }).join("")).join("");
   const stat = (metric, scope) => {
     const index = scope === "month" ? selectedMonth : scope === "ytd" ? selectedMonth : 11;
     return scope === "month" ? combinedFactoryMetric(metric, "26年", index) : combinedFactoryPeriod(metric, "26年", index);
   };
   const card = (title, scope) => `<div class="fwb-kpi-card"><span>${title}</span><b>产量</b><strong>${formatDashboardValue(stat("产量", scope), "")}</strong><small>单台制造费 ${formatDashboardValue(stat("单台制造费", scope), "€/台")} · 制造费率 ${formatDashboardValue(stat("制造费率", scope), "%")}</small></div>`;
   const groups = [["all", "全部"], ["单", "单"], ["时", "时"], ["人", "人"], ["效", "效"], ["费", "费"]];
-  target.innerHTML = `<section class="factory-workbench fwb-unified"><header class="fwb-header"><div><span>2026 · 1-7月实际 / 8-12月预测</span><h2>CK + DW 双厂全年指标驾驶舱</h2></div></header><div class="fwb-kpis">${card("7月当月实际", "month")}${card("1-7月累计实际", "ytd")}${card("全年预测", "year")}</div><section class="fwb-section"><div class="fwb-title"><h3>双厂指标明细</h3><span>悬停数值可查看口径</span></div><div class="fwb-metric-filters">${groups.map(([value, labelText]) => `<button type="button" class="${state.workbenchGroup === value ? "active" : ""}" data-fwb-group="${value}">${labelText}</button>`).join("")}</div><div class="fwb-table-wrap"><table class="fwb-matrix dashboard-table"><thead><tr class="phase-header-row"><th colspan="2">指标</th><th colspan="7" class="phase-actual">1-7月实际</th><th colspan="5" class="phase-forecast">8-12月预测</th><th>全年</th></tr><tr><th>分组</th><th>口径</th>${labels.map((item) => `<th>${item}</th>`).join("")}<th>全年</th></tr></thead><tbody>${metricRows}</tbody></table></div></section>${renderFactoryCostMixActual()}</section>`;
+  target.innerHTML = `<section class="factory-workbench fwb-unified"><header class="fwb-header"><div><span>2026 · 1-7月实际 / 8-12月预测</span><h2>CK + DW 双厂全年指标驾驶舱</h2></div></header><div class="fwb-kpis">${card("7月当月实际", "month")}${card("1-7月累计实际", "ytd")}${card("全年预测", "year")}</div><section class="fwb-section"><div class="fwb-title"><h3>双厂指标明细</h3><span>悬停数值可查看口径</span></div><div class="fwb-metric-filters">${groups.map(([value, labelText]) => `<button type="button" class="${state.workbenchGroup === value ? "active" : ""}" data-fwb-group="${value}">${labelText}</button>`).join("")}</div><div class="fwb-table-wrap"><table class="fwb-matrix dashboard-table fwb-unified-matrix"><colgroup><col class="fwb-col-metric" /><col class="fwb-col-scenario" /><col class="fwb-col-month" span="12" /><col class="fwb-col-year" /></colgroup><thead><tr class="phase-header-row"><th colspan="2">指标</th><th colspan="7" class="phase-actual">1-7月实际</th><th colspan="5" class="phase-forecast">8-12月预测</th><th>全年</th></tr><tr><th>分组/指标</th><th>口径</th>${labels.map((item) => `<th>${item}</th>`).join("")}<th>全年</th></tr></thead><tbody>${metricRows}</tbody></table></div></section>${renderFactoryCostMixActual()}</section>`;
 }
 
 function factoryCostMix(unitId) {

@@ -3150,6 +3150,28 @@ tr.high td:first-child {
 .project-table th:nth-child(8) { width: 250px; }
 .project-table th:nth-child(9) { width: 78px; }
 
+.project-table { width: 100%; min-width: 1540px; table-layout: fixed; border-collapse: collapse; }
+.project-table th:nth-child(1) { width: 120px; }
+.project-table th:nth-child(2) { width: 210px; }
+.project-table th:nth-child(3) { width: 320px; }
+.project-table th:nth-child(4) { width: 110px; }
+.project-table th:nth-child(5) { width: 100px; }
+.project-table th:nth-child(6),
+.project-table th:nth-child(7),
+.project-table th:nth-child(8) { width: 130px; }
+.project-table th:nth-child(9) { width: 220px; }
+.project-table td { overflow: hidden; text-overflow: ellipsis; vertical-align: middle; white-space: nowrap; }
+.project-table td strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-category { display: inline-block; max-width: 100%; overflow: hidden; color: #173e59; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+
+.fwb-unified-matrix { min-width: 1840px; }
+.fwb-unified-matrix .fwb-col-metric { width: 250px; }
+.fwb-unified-matrix .fwb-col-scenario { width: 100px; }
+.fwb-unified-matrix .fwb-col-month { width: 112px; }
+.fwb-unified-matrix .fwb-col-year { width: 130px; }
+.fwb-unified-matrix tbody th[rowspan] { vertical-align: middle; }
+.fwb-unified-matrix .fwb-metric-cell { min-height: 82px; }
+
 .project-table input,
 .project-table textarea,
 .project-table select {
