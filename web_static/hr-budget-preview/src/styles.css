@@ -2727,6 +2727,10 @@ td:nth-child(2) { text-align: left; }
   background: #edf3f8;
 }
 .dashboard-table td.sticky-col { z-index: 4; }
+.dashboard-table .dashboard-merged-cell {
+  vertical-align: middle;
+  background: #fff;
+}
 .dashboard-table .sticky-col-1 { left: 0; }
 .dashboard-table .sticky-col-2 { left: 64px; }
 .dashboard-table .sticky-col-3 { left: 190px; }

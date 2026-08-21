@@ -56,3 +56,14 @@ test("dashboard charts avoid label overlap and heatmap includes annual column", 
   assert.match(app, /annualMetricValue/);
   assert.match(css, /repeat\(13/);
 });
+
+test("cooking and factory dashboards share real merged metric cells", async () => {
+  const app = await readFile(new URL("../hr-budget-preview/src/app.js", import.meta.url), "utf8");
+  const css = await readFile(new URL("../hr-budget-preview/src/styles.css", import.meta.url), "utf8");
+
+  assert.match(app, /function renderStandardMetricRows/);
+  assert.match(app, /rowspan="\$\{rowSpan\}"/);
+  assert.match(app, /factoryDashboardRows\(\)/);
+  assert.match(app, /renderStandardMetricRows\(factoryDashboardVisibleRows\(\)/);
+  assert.match(css, /\.dashboard-merged-cell/);
+});
