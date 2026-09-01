@@ -948,6 +948,7 @@ const els = {
   factoryWorkbenchNav: document.getElementById("factoryWorkbenchNav"),
   forecast2030Nav: document.getElementById("forecast2030Nav"),
   adminThreeBudgetNav: document.getElementById("adminThreeBudgetNav"),
+  adminThreeFrame: document.getElementById("adminThreeFrame"),
   unitName: document.getElementById("unitName"),
   unitSubtitle: document.getElementById("unitSubtitle"),
   unitSource: document.getElementById("unitSource"),
@@ -1530,9 +1531,12 @@ function bindEvents() {
   }
   els.factoryWorkbenchNav?.addEventListener("click", () => switchTab("benchmark"));
   els.forecast2030Nav?.addEventListener("click", () => switchTab("forecast2030"));
-  els.adminThreeBudgetNav?.addEventListener("click", () => {
-    sessionStorage.setItem("dwDemoRole", state.rollingRole);
-    window.location.assign(`./erpnext-dw-budget-demo.html?role=${encodeURIComponent(state.rollingRole)}`);
+  els.adminThreeBudgetNav?.addEventListener("click", () => openAdminThreeWorkspace(state.rollingRole));
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.source !== els.adminThreeFrame?.contentWindow) return;
+    if (event.data?.type !== "dw-three-height") return;
+    const height = Math.max(720, Math.min(12000, Number(event.data.height) || 0));
+    if (height) els.adminThreeFrame.style.height = `${height}px`;
   });
   initForecast2030(document.getElementById("forecast2030Workbench"), () => state.language);
   document.getElementById("benchmarkView")?.addEventListener("click", (event) => {
@@ -6128,12 +6132,25 @@ function initializeDemoRoleAccess() {
   els.roleLogin?.classList.remove("hidden");
 }
 
+function openAdminThreeWorkspace(role = state.rollingRole) {
+  const accessRole = role === "adminThree" ? "adminThree" : "finance";
+  sessionStorage.setItem("dwDemoRole", accessRole);
+  setSidebarCollapsed(true);
+  const url = `./erpnext-dw-budget-demo.html?embedded=1&role=${encodeURIComponent(accessRole)}&lang=${encodeURIComponent(state.language)}`;
+  if (els.adminThreeFrame?.getAttribute("src") !== url) els.adminThreeFrame?.setAttribute("src", url);
+  switchTab("adminThree");
+}
+
 function applyDemoRole(role, closeLogin = true) {
   if (role === "adminThree") {
     state.rollingRole = role;
     localStorage.setItem("dwRollingRole.v1", role);
     sessionStorage.setItem("dwDemoRole", role);
-    window.location.assign("./erpnext-dw-budget-demo.html?role=adminThree");
+    document.body.classList.remove("demo-role-hr", "demo-role-admin", "demo-role-attendance", "demo-role-employee-attendance", "demo-role-procurement-price", "demo-role-cost");
+    document.body.classList.add("demo-role-admin-three");
+    if (closeLogin) els.roleLogin?.classList.add("hidden");
+    setSidebarCollapsed(false);
+    openAdminThreeWorkspace(role);
     return;
   }
   const normalizedRole = ["hr", "admin", "attendance", "employeeAttendance", "procurementPrice"].includes(role) ? role : "finance";
@@ -6147,6 +6164,7 @@ function applyDemoRole(role, closeLogin = true) {
   document.body.classList.toggle("demo-role-employee-attendance", normalizedRole === "employeeAttendance");
   document.body.classList.toggle("demo-role-procurement-price", normalizedRole === "procurementPrice");
   document.body.classList.toggle("demo-role-cost", normalizedRole === "finance");
+  document.body.classList.remove("demo-role-admin-three");
   state.rollingSelectedCode = null;
   if (closeLogin) els.roleLogin?.classList.add("hidden");
   if (isScopedBudgetRole(normalizedRole)) {
@@ -8107,10 +8125,13 @@ function switchTab(name) {
   document.getElementById("dashboardView").classList.toggle("active", name === "dashboard");
   document.getElementById("benchmarkView").classList.toggle("active", name === "benchmark");
   document.getElementById("forecast2030View").classList.toggle("active", name === "forecast2030");
+  document.getElementById("adminThreeView")?.classList.toggle("active", name === "adminThree");
   document.getElementById("varianceView").classList.toggle("active", name === "variance");
   document.getElementById("projectsView").classList.toggle("active", name === "projects");
   els.factoryWorkbenchNav?.classList.toggle("active", name === "benchmark");
   els.forecast2030Nav?.classList.toggle("active", name === "forecast2030");
+  els.adminThreeBudgetNav?.classList.toggle("active", name === "adminThree");
+  document.body.classList.toggle("admin-three-open", name === "adminThree");
   if (name === "variance") renderTable();
   if (name === "projects") {
     syncMonthSelectFromState();
@@ -8145,6 +8166,9 @@ function applyLanguage(language) {
   els.sapStatus.textContent = state.resultByMonth.size ? `${t("importedSap")}: ${state.sapFileName}` : t("waitingSap");
   els.forecastStatus.textContent = state.forecast ? `${t("importedForecast")}: ${state.forecastFileName}` : t("waitingForecastPill");
   if (els.jiangStatus) els.jiangStatus.textContent = state.jiangyue ? `${t("importJiang")}: ${state.jiangFileName}` : t("importJiang");
+  if (els.adminThreeFrame?.contentWindow) {
+    els.adminThreeFrame.contentWindow.postMessage({ type: "dw-three-language", language }, window.location.origin);
+  }
 }
 
 function countOpenHighRows() {

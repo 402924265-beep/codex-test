@@ -47,7 +47,8 @@ test("DW rolling forecast separates Jan–Jul actual, administration forecast an
   assert.doesNotMatch(app, /const varianceCell=event\.target\.closest/);
   assert.match(app, /actualVarianceTitle:"滚动预测兑现差异"/);
   assert.doesNotMatch(app, /actualVarianceTitle:"1—7月执行差异"/);
-  assert.match(app, /const accessRole = new URLSearchParams/);
+  assert.match(app, /const query = new URLSearchParams/);
+  assert.match(app, /const accessRole = query\.get\("role"\)/);
   assert.match(app, /const canApprove=accessRole==="finance"/);
   assert.match(app, /if\(accessRole!=="finance"\)/);
   assert.match(app, /data-save-drivers/);

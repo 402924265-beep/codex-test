@@ -70,6 +70,10 @@ button:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible,
   border:0!important;
 }
 .shell{min-height:100vh;display:grid;grid-template-columns:148px minmax(0,1fr)}
+html.embedded body{background:#fff;background-image:none}
+html.embedded .shell{display:block;min-height:0}
+html.embedded .rail{display:none}
+html.embedded main{padding:14px 18px 40px}
 .rail{
   position:sticky;
   top:0;

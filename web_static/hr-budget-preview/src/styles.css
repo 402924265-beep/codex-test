@@ -729,6 +729,17 @@ button:disabled { background: #8795a1; cursor: not-allowed; }
 
 .view { display: none; }
 .view.active { display: grid; gap: 14px; }
+.admin-three-view.active { display: block; }
+.admin-three-view iframe { display: block; width: 100%; min-height: 720px; border: 0; background: #f4f7f5; }
+.admin-three-open .unit-ribbon,
+.admin-three-open .app-header,
+.admin-three-open .tabbar { display: none; }
+.admin-three-open .workspace { padding-top: 12px; }
+.demo-role-admin-three .top-strip { justify-content: flex-end; }
+.demo-role-admin-three .top-strip > :not(#switchRoleBtn),
+.demo-role-admin-three .business-sidebar > .sidebar-section:not(.workspace-nav-section),
+.demo-role-admin-three #factoryWorkbenchNav,
+.demo-role-admin-three #forecast2030Nav { display: none; }
 
 .panel { overflow: hidden; }
 

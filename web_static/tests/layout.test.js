@@ -126,7 +126,11 @@ test("role login requires independent passwords and exposes both attendance work
   assert.match(html, /data-login-role="procurementPrice"/);
   assert.match(html, /data-login-role="adminThree"/);
   assert.match(app, /ROLE_PASSWORDS = Object\.freeze\(\{ finance: "111", hr: "222", admin: "333", attendance: "444", employeeAttendance: "555", procurementPrice: "66", adminThree: "777" \}\)/);
-  assert.match(app, /erpnext-dw-budget-demo\.html\?role=adminThree/);
+  assert.match(html, /id="adminThreeView"[\s\S]*id="adminThreeFrame"/);
+  assert.match(app, /erpnext-dw-budget-demo\.html\?embedded=1&role=/);
+  assert.doesNotMatch(app, /window\.location\.assign\("\.\/erpnext-dw-budget-demo\.html/);
+  assert.match(app, /setSidebarCollapsed\(true\)/);
+  assert.match(app, /switchTab\("adminThree"\)/);
   assert.match(app, /state\.rollingRole === "attendance"[\s\S]*?renderAttendanceWorkspace\(\)/);
   assert.match(app, /state\.rollingRole === "employeeAttendance"[\s\S]*?renderEmployeeAttendanceWorkspace\(\)/);
 });

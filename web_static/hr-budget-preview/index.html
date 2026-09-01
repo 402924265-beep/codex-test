@@ -9,7 +9,7 @@
       }
     </script>
     <title>制造费三张表工作台</title>
-  <link rel="stylesheet" href="./src/styles.css?v=20260831-metric-highlight-v1" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260901-unified-three-account-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,7 +20,7 @@
       }
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-  <script type="module" src="./src/app.js?v=20260831-metric-highlight-v2"></script>
+  <script type="module" src="./src/app.js?v=20260901-unified-three-account-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -238,6 +238,10 @@
 
       <section id="forecast2030View" class="view">
         <div id="forecast2030Workbench"></div>
+      </section>
+
+      <section id="adminThreeView" class="view admin-three-view" aria-label="三科目滚动预测">
+        <iframe id="adminThreeFrame" title="三科目滚动预测" loading="eager"></iframe>
       </section>
 
       <section id="varianceView" class="view">
