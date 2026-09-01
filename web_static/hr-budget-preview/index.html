@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,8 +8,8 @@
         location.replace("http://127.0.0.1:8780/?adminbudget=20260716-v1");
       }
     </script>
-    <title>Three-Table Manufacturing Cost Cockpit</title>
-    <link rel="stylesheet" href="./src/styles.css?v=20260821-final-audit-v8" />
+    <title>制造费三张表工作台</title>
+  <link rel="stylesheet" href="./src/styles.css?v=20260831-metric-highlight-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,18 +20,35 @@
       }
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-    <script type="module" src="./src/app.js?v=20260821-final-audit-v8"></script>
+  <script type="module" src="./src/app.js?v=20260831-metric-highlight-v2"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
       <div class="role-login-panel">
         <div class="role-login-brand"><span>C</span><div><strong data-i18n="roleBrand">Three-Table Manufacturing Cost Cockpit</strong><small data-i18n="roleTestVersion">Budget Collaboration Preview</small></div></div>
-        <div class="role-login-copy"><span data-i18n="roleAccess">Role Access</span><h1 data-i18n="roleSelectTitle">Select your work role</h1><p data-i18n="roleSelectHint">No password is required in this internal preview. Each role only sees data and actions within its responsibility.</p></div>
+        <div class="role-login-copy"><span data-i18n="roleAccess">Role Access</span><h1 data-i18n="roleSelectTitle">Select your work role</h1><p data-i18n="roleSelectHint">Select a role and enter its independent password. Each role only sees data and actions within its responsibility.</p></div>
+        <label class="role-login-language">
+          <span data-i18n="language">语言</span>
+          <select id="roleLanguageSelect">
+            <option value="zh" selected>中文</option>
+            <option value="en">English</option>
+            <option value="tr">Türkçe</option>
+          </select>
+        </label>
         <div class="role-login-options">
-          <button type="button" class="active" data-login-role="finance"><b data-i18n="costRole">Cost Role</b><span data-i18n="costRoleHint">View the management cockpit, monthly variance, all budget accounts and cost-reduction projects</span><em data-i18n="fullView">Full view</em></button>
-          <button type="button" data-login-role="hr"><b data-i18n="hrRole">HR Role</b><span data-i18n="hrRoleHint">View and validate only HR budget parameters, HR accounts and exceptions</span><em data-i18n="limitedView">Limited view</em></button>
-          <button type="button" data-login-role="admin"><b data-i18n="adminRole">Administration</b><span data-i18n="adminRoleHint">Validate only administration budget standards, monthly amounts and change reasons</span><em data-i18n="limitedView">Limited view</em></button>
+          <button type="button" class="active" data-login-role="finance"><b data-i18n="costRole">Cost Role</b></button>
+          <button type="button" data-login-role="hr"><b data-i18n="hrRole">HR Role</b></button>
+          <button type="button" data-login-role="admin"><b data-i18n="adminRole">Administration</b></button>
+          <button type="button" data-login-role="attendance"><b data-i18n="attendanceRole">Administration Attendance</b></button>
+          <button type="button" data-login-role="employeeAttendance"><b data-i18n="employeeAttendanceRole">Employee Headcount Forecast</b></button>
+          <button type="button" data-login-role="procurementPrice"><b data-i18n="procurementPriceRole">Procurement Price Validation</b></button>
+          <button type="button" data-login-role="adminThree"><b data-i18n="adminThreeRole">Administration: Three Accounts</b></button>
         </div>
+        <label class="role-password-field">
+          <span data-i18n="rolePassword">Role password</span>
+          <input id="rolePassword" type="password" inputmode="numeric" autocomplete="current-password" maxlength="3" placeholder="•••" />
+          <small id="rolePasswordError" aria-live="polite"></small>
+        </label>
         <button id="enterWorkspace" class="role-login-enter" type="button" data-i18n="enterWorkspace">Enter workspace</button>
         <small class="role-login-note" data-i18n="roleSwitchHint">The demo role can be switched from the upper-right corner</small>
       </div>
@@ -67,6 +84,10 @@
             <span class="unit-icon">30</span>
             <span><strong data-i18n="forecast2030Nav">25–30预测</strong><small data-i18n="forecast2030NavHint">制造费情景测算</small></span>
           </button>
+          <button id="adminThreeBudgetNav" class="unit-nav-item workspace-nav-item" type="button">
+            <span class="unit-icon">3</span>
+            <span><strong data-i18n="adminThreeBudgetNav">三科目预算</strong><small data-i18n="adminThreeBudgetNavHint">行政预测与实际差异</small></span>
+          </button>
         </div>
         <div class="sidebar-section">
           <span class="section-label" data-i18n="overseasReserved">海外工厂预留</span>
@@ -98,8 +119,8 @@
         <label class="field compact">
           <span data-i18n="language">语言</span>
           <select id="languageSelect">
-            <option value="zh">中文</option>
-            <option value="en" selected>English</option>
+            <option value="zh" selected>中文</option>
+            <option value="en">English</option>
             <option value="tr">Türkçe</option>
           </select>
         </label>
@@ -132,7 +153,10 @@
             <option value="finance" data-i18n-option="financeAdmin">财务管理员</option>
             <option value="hr" data-i18n-option="hrHuman">HR 人力</option>
             <option value="admin" data-i18n-option="adminDepartment">行政部门</option>
-            <option value="procurement" data-i18n-option="procurementAdmin">行政/间接采购</option>
+            <option value="attendance" data-i18n-option="attendanceDepartment">行政出勤</option>
+            <option value="employeeAttendance" data-i18n-option="employeeAttendanceDepartment">员工出勤</option>
+            <option value="procurementPrice" data-i18n-option="procurementPriceRole">采购价格校核</option>
+            <option value="adminThree" data-i18n-option="adminThreeRole">行政三科目</option>
             <option value="leader" data-i18n-option="businessLeader">经营负责人</option>
             <option value="readonly" data-i18n-option="readonlyVisitor">只读访客</option>
           </select>
@@ -189,7 +213,7 @@
               </div>
               <div id="metricFilterBar" class="metric-filter-bar"></div>
               <div class="dashboard-table-wrap" id="dashboardTableWrap">
-                <table class="dashboard-table">
+                <table class="dashboard-table metric-highlight-table">
                   <colgroup>
                     <col class="dashboard-col-group" />
                     <col class="dashboard-col-indicator" />
@@ -257,7 +281,7 @@
                 <input id="analysisAuthor" type="text" placeholder="姓名" />
               </label>
               <button id="submitAnalysesBtn" type="button" data-i18n="submitAnalyses">提交原因</button>
-              <span id="analysisSaveStatus" class="status-pill muted">未提交</span>
+              <span id="analysisSaveStatus" class="status-pill muted" data-i18n="unsavedChanges">未保存</span>
             </div>
           </div>
           <section class="toolbar variance-toolbar" aria-label="筛选">
@@ -341,7 +365,7 @@
               </label>
               <button id="addIncreaseBtn" type="button" data-i18n="addIncrease">添加项目</button>
               <button id="saveFactorsBtn" type="button" data-i18n="submitProjects">提交项目</button>
-              <span id="factorSaveStatus" class="status-pill muted">未提交</span>
+              <span id="factorSaveStatus" class="status-pill muted" data-i18n="unsavedChanges">未保存</span>
             </div>
           </div>
           <div id="projectSummary" class="smart-summary smart-summary-project">???????????/?????????</div>

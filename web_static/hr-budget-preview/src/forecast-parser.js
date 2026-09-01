@@ -112,7 +112,8 @@ const DASHBOARD_TEXT = {
     "固定人工-白领": { en: "Fixed labor - white collar", tr: "Sabit işçilik - beyaz yaka" },
     "半固定-班车/工作服": { en: "Semifixed - shuttle/uniform", tr: "Yarı sabit - servis/üniforma" },
     "分摊费用": { en: "Allocation", tr: "Dağıtım" },
-    "其他制造费": { en: "Other manufacturing cost", tr: "Diğer üretim gideri" }
+    "其他制造费": { en: "Other manufacturing cost", tr: "Diğer üretim gideri" },
+    "总单台": { en: "Total unit cost", tr: "Toplam birim maliyet" }
   }
 };
 

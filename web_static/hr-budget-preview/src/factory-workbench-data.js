@@ -31,8 +31,8 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": 9.593899999999998
           },
           "semiFixed": {
-            "workwear": 5.9088400000000005,
-            "meal": 22.0758,
+            "workwear": 5.27735,
+            "meal": 22.04347,
             "shuttle": 31.34574
           },
           "scenarios": {
@@ -96,9 +96,9 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": 10.743440000000001
           },
           "semiFixed": {
-            "workwear": 52.37455,
-            "meal": 34.1736,
-            "shuttle": 37.12952
+            "workwear": 50.44541,
+            "meal": 33.45617,
+            "shuttle": 36.94771
           },
           "scenarios": {
             "同期": {
@@ -161,9 +161,9 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": 8.1665
           },
           "semiFixed": {
-            "workwear": 0,
-            "meal": 0,
-            "shuttle": 0
+            "workwear": 0.11913,
+            "meal": 17.30111,
+            "shuttle": 25.87161
           },
           "scenarios": {
             "同期": {
@@ -226,9 +226,9 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": 103.77395999999999
           },
           "semiFixed": {
-            "workwear": 0,
-            "meal": 0,
-            "shuttle": 0
+            "workwear": 0.35103,
+            "meal": 42.3881,
+            "shuttle": 40.55119
           },
           "scenarios": {
             "同期": {
@@ -291,9 +291,9 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": 23.742
           },
           "semiFixed": {
-            "workwear": 6.299989999999999,
-            "meal": 36.22479,
-            "shuttle": 36.03755
+            "workwear": 6.25963,
+            "meal": 35.37475,
+            "shuttle": 35.94637
           },
           "scenarios": {
             "同期": {
@@ -356,9 +356,9 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": 20.605330000000002
           },
           "semiFixed": {
-            "workwear": 0.05626,
-            "meal": 38.98403,
-            "shuttle": 38.28815
+            "workwear": 0,
+            "meal": 37.6714,
+            "shuttle": 38.19261
           },
           "scenarios": {
             "同期": {
@@ -421,9 +421,9 @@ export const FACTORY_WORKBENCH_DATA = {
             "生产耗用品": -365.91999999999996
           },
           "semiFixed": {
-            "workwear": 0.05626,
-            "meal": 38.98403,
-            "shuttle": 38.28815
+            "workwear": -0.96969,
+            "meal": 34.57257,
+            "shuttle": 37.50955
           },
           "scenarios": {
             "同期": {

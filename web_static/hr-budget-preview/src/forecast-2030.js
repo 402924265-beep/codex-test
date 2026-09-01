@@ -4,6 +4,7 @@ import { COOKING_UNIT } from "./cooking-data.js?v=20260816-july-actual-v1";
 const YEARS = [2027, 2028, 2029, 2030];
 const STORE_KEY = "dw.forecast2030.v1";
 const BASE_FX = 56.9918;
+const LEGACY_AI_EXAMPLE = "2027年产量30万台，直接员工125人，间接员工48人，白领13人，人工上涨8%，汇率60，提效5%";
 const DW_BASE = {
   unit: "dw",
   year: 2026,
@@ -84,7 +85,7 @@ const defaults = {
   },
   advanced: false,
   parsed: null,
-  aiMessage: "2027年产量30万台，直接员工125人，间接员工48人，白领13人，人工上涨8%，汇率60，提效5%"
+  aiMessage: ""
 };
 
 let root = null;
@@ -96,6 +97,47 @@ const COPY = {
   zh: { title: "2025–2030 制造费预测模型", sub: "按产量、人数、效率、工资、价格和汇率预测未来制造费用", source: "基线：25-30制造费预测.xlsx · DW 2026", conditions: "年度预测条件", people: "人员规划", direct: "直接员工", indirect: "间接员工", white: "白领", avg: "平均人数", suggested: "建议直接人数", manual: "手动", auto: "按提效", advanced: "高级条件", ai: "AI 预测助手", apiReady: "API 可连接", aiHint: "直接输入或说出条件，解析确认后再更新模型。", parse: "解析指令", apply: "确认并更新预测", recognized: "已识别", apiSettings: "API 设置与测试连接", total: "2030 总制造费", unit: "2030 单台制造费", peopleTotal: "2030 平均人数", avoid: "累计提效避免成本", trend: "制造费与单台趋势", impact: "2030 影响拆解", detail: "大科目预测结果", formula: "计算链路", fixed: "固定", semi: "半固定", variable: "变动", volume: "产量", efficiency: "直接效率提升", wage: "工资上涨", fx: "EUR/TRY", price: "一般价格上涨", energy: "能源价格上涨", depreciation: "折旧增减", allocation: "园区分摊比例", waste: "间接浪费系数", tempExit: "临时工退出人数", tempCost: "临时工每人月成本", tempMonths: "退出后节省月数", save: "保存情景", reset: "恢复原模型", actualPeople: "2026年1-6月实际平均", originalPlan: "2026全年模型基线", effectVolume: "产量/人数变化", effectWage: "工资上涨", effectPrice: "价格上涨", effectEnergy: "能源价格", effectFx: "汇率换算", effectFixed: "折旧/分摊" },
   en: { title: "2025–2030 Manufacturing Cost Forecast", sub: "Forecast by volume, headcount, efficiency, wages, prices and FX", source: "Baseline: 25-30 MFG forecast.xlsx · DW 2026", conditions: "Annual assumptions", people: "Headcount plan", direct: "Direct", indirect: "Indirect", white: "White collar", avg: "Average HC", suggested: "Suggested direct HC", manual: "Manual", auto: "Efficiency", advanced: "Advanced assumptions", ai: "AI Forecast Assistant", apiReady: "API ready", aiHint: "Type or speak assumptions. Review parsed values before applying.", parse: "Parse", apply: "Confirm and update", recognized: "Recognized", apiSettings: "API settings & connection test", total: "2030 total MFG cost", unit: "2030 unit cost", peopleTotal: "2030 average HC", avoid: "Efficiency cost avoided", trend: "Cost and unit-cost trend", impact: "2030 impact bridge", detail: "Category forecast", formula: "Calculation trace", fixed: "Fixed", semi: "Semi-fixed", variable: "Variable", volume: "Volume", efficiency: "Direct efficiency", wage: "Wage increase", fx: "EUR/TRY", price: "General inflation", energy: "Energy inflation", depreciation: "Depreciation change", allocation: "Park allocation", waste: "Indirect waste", tempExit: "Temporary workers exiting", tempCost: "Monthly cost per temp", tempMonths: "Saving months after exit", save: "Save scenario", reset: "Restore source model", actualPeople: "2026 Jan-Jun actual avg.", originalPlan: "2026 full-year model baseline", effectVolume: "Volume / HC", effectWage: "Wages", effectPrice: "Prices", effectEnergy: "Energy", effectFx: "FX conversion", effectFixed: "Depreciation / allocation" },
   tr: { title: "2025–2030 Üretim Gideri Tahmini", sub: "Hacim, çalışan, verimlilik, ücret, fiyat ve kur ile tahmin", source: "Baz: 25-30 üretim gideri tahmini.xlsx · DW 2026", conditions: "Yıllık varsayımlar", people: "Çalışan planı", direct: "Direkt", indirect: "Endirekt", white: "Beyaz yaka", avg: "Ortalama kişi", suggested: "Önerilen direkt kişi", manual: "Manuel", auto: "Verimlilik", advanced: "Gelişmiş varsayımlar", ai: "AI Tahmin Asistanı", apiReady: "API bağlanabilir", aiHint: "Koşulları yazın veya söyleyin; uygulamadan önce kontrol edin.", parse: "Komutu çöz", apply: "Onayla ve güncelle", recognized: "Algılandı", apiSettings: "API ayarı ve bağlantı testi", total: "2030 toplam üretim gideri", unit: "2030 birim gider", peopleTotal: "2030 ortalama çalışan", avoid: "Verimlilik tasarrufu", trend: "Gider ve birim gider eğilimi", impact: "2030 etki kırılımı", detail: "Gider grubu tahmini", formula: "Hesap izi", fixed: "Sabit", semi: "Yarı sabit", variable: "Değişken", volume: "Hacim", efficiency: "Direkt verimlilik", wage: "Ücret artışı", fx: "EUR/TRY", price: "Genel fiyat artışı", energy: "Enerji fiyat artışı", depreciation: "Amortisman değişimi", allocation: "Kampüs dağıtımı", waste: "Endirekt kayıp", tempExit: "Çıkan geçici çalışan", tempCost: "Kişi başı aylık geçici maliyet", tempMonths: "Çıkış sonrası tasarruf ayı", save: "Senaryoyu kaydet", reset: "Kaynak modeli geri yükle", actualPeople: "2026 Ocak-Haziran fiili ort.", originalPlan: "2026 tam yıl model bazı", effectVolume: "Hacim / çalışan", effectWage: "Ücret", effectPrice: "Fiyat", effectEnergy: "Enerji", effectFx: "Kur", effectFixed: "Amortisman / dağıtım" }
+};
+
+Object.assign(COPY.zh, { aiHint: "直接输入或说出条件，解析后可应用到当前情景。", apply: "应用当前情景" });
+Object.assign(COPY.en, { aiHint: "Type or speak assumptions. Review parsed values before applying them to the current scenario.", apply: "Apply current scenario" });
+Object.assign(COPY.tr, { aiHint: "Koşulları yazın veya söyleyin; mevcut senaryoya uygulamadan önce kontrol edin.", apply: "Mevcut senaryoyu uygula" });
+
+Object.assign(COPY.zh, {
+  longRangePlan: "长期规划", ckFactory: "CK 厨电", dwFactory: "DW 洗碗机", ckSource: "CK 2026 · 7月实际 + 已批准6+6预测",
+  category: "科目", type: "类型", monthUnit: "月", pieces: "台", headcountUnit: "人", personCostUnit: "K€/人",
+  unitCostUnit: "€/台", h1FullYear: "2026上半年 / 全年", voice: "语音", versus2026: "较2026", aiExample: LEGACY_AI_EXAMPLE
+});
+Object.assign(COPY.en, {
+  longRangePlan: "Long-range plan", ckFactory: "CK Cooking", dwFactory: "DW Dishwasher", ckSource: "CK 2026 · July actual + approved 6+6 forecast",
+  category: "Category", type: "Type", monthUnit: "months", pieces: "pcs", headcountUnit: "HC", personCostUnit: "K€/person",
+  unitCostUnit: "€/pc", h1FullYear: "2026 H1 / FY", voice: "Voice", versus2026: "vs 2026", aiExample: "2027 volume 300000, direct employees 125, indirect employees 48, white collar 13, wage increase 8%, EUR/TRY 60, efficiency 5%"
+});
+Object.assign(COPY.tr, {
+  longRangePlan: "Uzun vadeli plan", ckFactory: "CK Pişirme", dwFactory: "DW Bulaşık Makinesi", ckSource: "CK 2026 · Temmuz gerçekleşen + onaylı 6+6 tahmin",
+  category: "Kategori", type: "Tür", monthUnit: "ay", pieces: "adet", headcountUnit: "kişi", personCostUnit: "K€/kişi",
+  unitCostUnit: "€/adet", h1FullYear: "2026 İlk Yarı / Tam Yıl", voice: "Ses", versus2026: "2026'ya göre", aiExample: "2027 hacim 300000, direkt çalışan 125, endirekt çalışan 48, beyaz yaka 13, ücret artışı %8, EUR/TRY 60, verimlilik %5"
+});
+
+const COST_LABELS = {
+  zh: {
+    depreciation: { dw: "折旧", ck: "折旧（含FC）" }, allocation: { dw: "园区分摊", ck: "其他制造费/分摊" }, direct: "直接人工",
+    indirect: { dw: "间接人工", ck: "间接人工成本-辅助人员" }, white: { dw: "白领人工", ck: "固定人工-白领" }, operations: "运营费",
+    fixedEnergy: "固定能源费", peopleServices: "班车/工作服/工作餐", inventory: "存货跌价准备", scrap: { dw: "废料", ck: "可回收废料" },
+    consumables: "生产耗用品", reselling: "废品收入", variableEnergy: "变动能源费"
+  },
+  en: {
+    depreciation: { dw: "Depreciation", ck: "Depreciation (incl. FC)" }, allocation: { dw: "Park allocation", ck: "Other manufacturing cost / allocation" }, direct: "Direct labor",
+    indirect: { dw: "Indirect labor", ck: "Indirect labor cost - support staff" }, white: { dw: "White-collar labor", ck: "Fixed labor - white collar" }, operations: "Operating expense",
+    fixedEnergy: "Fixed energy cost", peopleServices: "Shuttle / workwear / meals", inventory: "Inventory impairment provision", scrap: { dw: "Scrap", ck: "Recyclable scrap" },
+    consumables: "Production consumables", reselling: "Scrap sales", variableEnergy: "Variable energy cost"
+  },
+  tr: {
+    depreciation: { dw: "Amortisman", ck: "Amortisman (FC dahil)" }, allocation: { dw: "Kampüs dağıtımı", ck: "Diğer üretim gideri / dağıtım" }, direct: "Direkt işçilik",
+    indirect: { dw: "Endirekt işçilik", ck: "Endirekt işçilik maliyeti - destek personeli" }, white: { dw: "Beyaz yaka işçiliği", ck: "Sabit işçilik - beyaz yaka" }, operations: "Operasyon gideri",
+    fixedEnergy: "Sabit enerji gideri", peopleServices: "Servis / iş kıyafeti / yemek", inventory: "Stok değer düşüklüğü karşılığı", scrap: { dw: "Hurda", ck: "Geri dönüştürülebilir hurda" },
+    consumables: "Üretim sarf malzemeleri", reselling: "Hurda satışı", variableEnergy: "Değişken enerji gideri"
+  }
 };
 
 const DETAIL_COPY = {
@@ -189,6 +231,7 @@ function loadState() {
       next.unitPlans.dw.assumptions = { ...next.unitPlans.dw.assumptions, ...stored.assumptions };
       next.unitPlans.dw.phase2027 = stored.phase2027 || next.unitPlans.dw.phase2027;
     }
+    if (next.aiMessage === LEGACY_AI_EXAMPLE) next.aiMessage = "";
     return next;
   }
   catch { return structuredClone(defaults); }
@@ -197,9 +240,19 @@ function loadState() {
 function c(language) { return COPY[language] || COPY.zh; }
 function activeBase() { return BASES[modelState.activeUnit] || DW_BASE; }
 function activePlan() { return modelState.unitPlans[modelState.activeUnit] || modelState.unitPlans.dw; }
-function n(value, digits = 0) { return Number(value || 0).toLocaleString("zh-CN", { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
-function pct(value) { return `${Number(value || 0).toFixed(1)}%`; }
+function numberLocale(language = getLanguage()) { return language === "tr" ? "tr-TR" : language === "en" ? "en-US" : "zh-CN"; }
+function n(value, digits = 0) { return Number(value || 0).toLocaleString(numberLocale(), { minimumFractionDigits: digits, maximumFractionDigits: digits }); }
+function pct(value) { return `${n(value, 1)}%`; }
 function safe(value) { return String(value ?? "").replace(/[&<>\"]/g, (x) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[x])); }
+
+function costLabel(row, language = getLanguage()) {
+  const label = COST_LABELS[language]?.[row.key] ?? COST_LABELS.zh[row.key];
+  return (typeof label === "object" ? label[activeBase().unit] : label) || row.name;
+}
+
+function monthRange(start, end, language) {
+  return language === "zh" ? `${start}–${end}月` : `${start}–${end} ${c(language).monthUnit}`;
+}
 
 function h1ActualPeople() {
   const unitKey = modelState.activeUnit === "ck" ? "cooking" : "dishwasher";
@@ -272,6 +325,7 @@ function impactGroups(model, language) {
 
 function traceFor(row, year, model, language) {
   const base = activeBase();
+  const copy = c(language);
   const assumptions = activePlan().assumptions;
   const locale = language === "zh" ? {
     source: "来源：2026内置基准",
@@ -316,29 +370,29 @@ function traceFor(row, year, model, language) {
     waste: "Waste factor",
     temp: "Temporary-labor saving"
   };
-  if (year === 2026) return `${row.name} · 2026\n${locale.source}\n${locale.result}: ${n(row.values[year], 2)} K€`;
+  if (year === 2026) return `${costLabel(row, language)} · 2026\n${locale.source}\n${locale.result}: ${n(row.values[year], 2)} K€`;
   const a = assumptions[year];
   const priorYear = year - 1;
   const priorFx = priorYear === 2026 ? BASE_FX : assumptions[priorYear].fx;
   const priorPeople = model.effectivePeople[priorYear];
   const people = model.effectivePeople[year];
   const priorVolume = priorYear === 2026 ? base.volume : assumptions[priorYear].volume;
-  const lines = [`${row.name} · ${year}`, `${locale.prior}: ${n(row.values[priorYear], 2)} K€`];
+  const lines = [`${costLabel(row, language)} · ${year}`, `${locale.prior}: ${n(row.values[priorYear], 2)} K€`];
   if (row.key === "depreciation") lines.push(`${locale.adjustment}: ${a.depreciation > 0 ? "+" : ""}${n(a.depreciation, 1)} K€`);
   else if (row.key === "allocation") lines.push(`${locale.ratio}: ${pct(a.allocation)}`);
   else if (["direct", "indirect", "white"].includes(row.key)) {
-    lines.push(`${locale.people}: ${n(priorPeople[row.key], 1)} → ${n(people[row.key], 1)} HC`);
+    lines.push(`${locale.people}: ${n(priorPeople[row.key], 1)} → ${n(people[row.key], 1)} ${copy.headcountUnit}`);
     lines.push(`${locale.wage}: ${a.wage > 0 ? "+" : ""}${pct(a.wage)} · ${locale.fx}: ${n(priorFx, 2)} → ${n(a.fx, 2)}`);
     if (row.key === "indirect" && a.indirectWaste) lines.push(`${locale.waste}: +${pct(a.indirectWaste)}`);
     if (row.key === "direct" && a.tempExit) lines.push(`${locale.temp}: ${n(a.tempExit, 1)} × ${n(a.tempMonthlyCost, 1)} × ${n(a.tempMonths, 1)} = ${n(a.tempExit * a.tempMonthlyCost * a.tempMonths, 1)} K€`);
   } else if (["operations", "peopleServices"].includes(row.key)) {
-    lines.push(`${locale.people}: ${n(Object.values(priorPeople).reduce((s, v) => s + v, 0), 1)} → ${n(Object.values(people).reduce((s, v) => s + v, 0), 1)} HC`);
+    lines.push(`${locale.people}: ${n(Object.values(priorPeople).reduce((s, v) => s + v, 0), 1)} → ${n(Object.values(people).reduce((s, v) => s + v, 0), 1)} ${copy.headcountUnit}`);
     lines.push(`${locale.price}: ${a.price > 0 ? "+" : ""}${pct(a.price)} · ${locale.fx}: ${n(priorFx, 2)} → ${n(a.fx, 2)}`);
   } else if (row.key === "fixedEnergy") {
-    lines.push(`${locale.people}: ${n(Object.values(priorPeople).reduce((s, v) => s + v, 0), 1)} → ${n(Object.values(people).reduce((s, v) => s + v, 0), 1)} HC`);
+    lines.push(`${locale.people}: ${n(Object.values(priorPeople).reduce((s, v) => s + v, 0), 1)} → ${n(Object.values(people).reduce((s, v) => s + v, 0), 1)} ${copy.headcountUnit}`);
     lines.push(`${locale.energy}: ${a.energy > 0 ? "+" : ""}${pct(a.energy)} · ${locale.fx}: ${n(priorFx, 2)} → ${n(a.fx, 2)}`);
   } else {
-    lines.push(`${locale.volume}: ${n(priorVolume)} → ${n(a.volume)} pcs`);
+    lines.push(`${locale.volume}: ${n(priorVolume)} → ${n(a.volume)} ${copy.pieces}`);
     lines.push(`${row.key === "variableEnergy" ? locale.energy : locale.price}: ${a[row.key === "variableEnergy" ? "energy" : "price"] > 0 ? "+" : ""}${pct(a[row.key === "variableEnergy" ? "energy" : "price"])} · ${locale.fx}: ${n(priorFx, 2)} → ${n(a.fx, 2)}`);
   }
   lines.push(`${locale.result}: ${n(row.values[year], 2)} K€`);
@@ -363,9 +417,10 @@ function inputRow(label, key, unit, advanced = false) {
 
 function renderPhasePlan(language) {
   const detail = DETAIL_COPY[language] || DETAIL_COPY.zh;
+  const copy = c(language);
   const phases = activePlan().phase2027;
   if (!phases.length) return "";
-  return `<section class="f30-phase-editor"><div class="f30-phase-heading"><div><b>${detail.phaseTitle}</b><span>${detail.phaseHint}</span></div><strong>${n(phases.reduce((sum, phase) => sum + Number(phase.volume || 0), 0))} pcs</strong></div><div class="f30-phase-track">${phases.map((phase, index) => {
+  return `<section class="f30-phase-editor"><div class="f30-phase-heading"><div><b>${detail.phaseTitle}</b><span>${detail.phaseHint}</span></div><strong>${n(phases.reduce((sum, phase) => sum + Number(phase.volume || 0), 0))} ${copy.pieces}</strong></div><div class="f30-phase-track">${phases.map((phase, index) => {
     const months = phase.end - phase.start + 1;
     const monthly = Number(phase.volume || 0) / months;
     const previous = phases[index - 1];
@@ -373,13 +428,14 @@ function renderPhasePlan(language) {
     const volumeDelta = previousMonthly == null ? null : monthly - previousMonthly;
     const shiftDelta = previous ? Number(phase.shifts) - Number(previous.shifts) : null;
     const deltaClass = volumeDelta == null || volumeDelta === 0 ? "neutral" : volumeDelta < 0 ? "good" : "bad";
-    return `<article class="f30-phase-card"><div class="f30-phase-index"><span>${phase.label}</span><b>${phase.start}-${phase.end}月</b></div><label>${detail.shifts}<div><input data-f30-phase="${index}" data-f30-phase-key="shifts" type="number" min="1" max="4" step="1" value="${phase.shifts}"><em>${shiftDelta == null ? detail.startsAt : `${shiftDelta > 0 ? "+" : ""}${shiftDelta}`}</em></div></label><label>${detail.phaseVolume}<div><input data-f30-phase="${index}" data-f30-phase-key="volume" type="number" min="0" step="1000" value="${phase.volume}"><em>pcs</em></div></label><div class="f30-phase-summary"><span>${detail.monthlyAverage}<b>${n(monthly)}</b></span><span class="${deltaClass}">${detail.adjustment}<b>${volumeDelta == null ? detail.startsAt : `${volumeDelta > 0 ? "+" : ""}${n(volumeDelta)}`}</b><small>${shiftDelta == null ? "" : `${shiftDelta > 0 ? "+" : ""}${shiftDelta} ${detail.shifts}`}</small></span></div></article>`;
+    return `<article class="f30-phase-card"><div class="f30-phase-index"><span>${phase.label}</span><b>${monthRange(phase.start, phase.end, language)}</b></div><label>${detail.shifts}<div><input data-f30-phase="${index}" data-f30-phase-key="shifts" type="number" min="1" max="4" step="1" value="${phase.shifts}"><em>${shiftDelta == null ? detail.startsAt : `${shiftDelta > 0 ? "+" : ""}${shiftDelta}`}</em></div></label><label>${detail.phaseVolume}<div><input data-f30-phase="${index}" data-f30-phase-key="volume" type="number" min="0" step="1000" value="${phase.volume}"><em>${copy.pieces}</em></div></label><div class="f30-phase-summary"><span>${detail.monthlyAverage}<b>${n(monthly)}</b></span><span class="${deltaClass}">${detail.adjustment}<b>${volumeDelta == null ? detail.startsAt : `${volumeDelta > 0 ? "+" : ""}${n(volumeDelta)}`}</b><small>${shiftDelta == null ? "" : `${shiftDelta > 0 ? "+" : ""}${shiftDelta} ${detail.shifts}`}</small></span></div></article>`;
   }).join("")}</div></section>`;
 }
 
 function peopleRow(label, key, actual, baseline) {
   const assumptions = activePlan().assumptions;
-  return `<tr><th>${label}<small>HC</small></th><td><span title="${c(getLanguage()).actualPeople}">${n(actual, 1)}</span><em>${n(baseline, 1)}</em></td>${YEARS.map((year) => `<td><input data-f30-year="${year}" data-f30-key="${key}" type="number" step="0.1" value="${Number(Number(assumptions[year][key]).toFixed(1))}"></td>`).join("")}</tr>`;
+  const copy = c(getLanguage());
+  return `<tr><th>${label}<small>${copy.headcountUnit}</small></th><td><span title="${copy.actualPeople}">${n(actual, 1)}</span><em>${n(baseline, 1)}</em></td>${YEARS.map((year) => `<td><input data-f30-year="${year}" data-f30-key="${key}" type="number" step="0.1" value="${Number(Number(assumptions[year][key]).toFixed(1))}"></td>`).join("")}</tr>`;
 }
 
 function renderTrend(model) {
@@ -390,30 +446,43 @@ function renderTrend(model) {
 
 function renderYearStrip(model, language) {
   const detail = DETAIL_COPY[language] || DETAIL_COPY.zh;
+  const copy = c(language);
   return `<section class="f30-year-strip">${[2026, ...YEARS].map((year, index) => {
     const people = year === 2026 ? activeBase().headcount : model.effectivePeople[year];
     const headcount = Object.values(people).reduce((sum, value) => sum + Number(value || 0), 0);
     const priorYear = year - 1;
     const change = index === 0 ? null : (model.totals[year] / model.totals[priorYear] - 1) * 100;
     const changeClass = change == null || Math.abs(change) < 0.05 ? "neutral" : change < 0 ? "good" : "bad";
-    return `<article class="${year === 2026 ? "baseline" : "forecast"}"><header><b>${year}</b><span>${year === 2026 ? detail.baseline : detail.forecast}</span></header><div class="f30-year-main"><small>${detail.totalCost}</small><strong>${n(model.totals[year], 1)}</strong><em>K€</em></div><dl><div><dt>${detail.unitCost}</dt><dd>${n(model.units[year], 2)} <small>€/pc</small></dd></div><div><dt>${detail.headcount}</dt><dd>${n(headcount, 1)} <small>HC</small></dd></div></dl><footer class="${changeClass}">${change == null ? detail.baseline : `${detail.versusPrior} ${change > 0 ? "+" : ""}${pct(change)}`}</footer></article>`;
+    return `<article class="${year === 2026 ? "baseline" : "forecast"}"><header><b>${year}</b><span>${year === 2026 ? detail.baseline : detail.forecast}</span></header><div class="f30-year-main"><small>${detail.totalCost}</small><strong>${n(model.totals[year], 1)}</strong><em>K€</em></div><dl><div><dt>${detail.unitCost}</dt><dd>${n(model.units[year], 2)} <small>${copy.unitCostUnit}</small></dd></div><div><dt>${detail.headcount}</dt><dd>${n(headcount, 1)} <small>${copy.headcountUnit}</small></dd></div></dl><footer class="${changeClass}">${change == null ? detail.baseline : `${detail.versusPrior} ${change > 0 ? "+" : ""}${pct(change)}`}</footer></article>`;
   }).join("")}</section>`;
 }
 
 function parseLocal(message) {
   const text = String(message || "");
-  const yearMatch = text.match(/20(2[7-9]|30)|\b(2[7-9]|30)年/);
-  const year = yearMatch ? Number(yearMatch[0].replace(/年/g, "").length === 2 ? `20${yearMatch[0].replace(/年/g, "")}` : yearMatch[0].replace(/年/g, "")) : 2027;
+  const yearMatch = text.match(/\b20(?:2[7-9]|30)\b|(?:^|\D)(?:2[7-9]|30)(?:年|\b)/);
+  const yearText = yearMatch?.[0].match(/\d+/)?.[0];
+  const year = yearText ? Number(yearText.length === 2 ? `20${yearText}` : yearText) : 2027;
   const updates = { year };
   const rules = [
-    ["volume", /产量\s*(\d+(?:\.\d+)?)\s*(万)?/], ["direct", /直接(?:员工|人工)?\s*(\d+(?:\.\d+)?)\s*人?/], ["indirect", /间接(?:员工|人工)?\s*(\d+(?:\.\d+)?)\s*人?/], ["white", /白领\s*(\d+(?:\.\d+)?)\s*人?/],
-    ["efficiency", /(?:提效|效率(?:提升)?)[^\d]*(\d+(?:\.\d+)?)\s*%/], ["wage", /(?:人工|工资)(?:上涨|增长|增加)?\s*(\d+(?:\.\d+)?)\s*%/], ["fx", /(?:汇率|EUR\/TRY)[^\d]*(\d+(?:\.\d+)?)/], ["price", /(?:价格|通胀)(?:上涨|增长|增加)?\s*(\d+(?:\.\d+)?)\s*%/], ["energy", /能源(?:价格)?(?:上涨|增长|增加)?\s*(\d+(?:\.\d+)?)\s*%/]
+    ["volume", /(?:产量|\bvolume\b|production\s+volume|\bhacim\b|üretim(?:\s+miktarı)?)[^\d-]*(-?\d+(?:[.,]\d+)?)\s*(万|k|thousand|m|million|bin|milyon)?/i],
+    ["direct", /(?:直接(?:员工|人工)?|\bdirect\b(?:\s+(?:employees?|headcount|hc|labor))?|\bdirekt\b(?:\s+(?:çalışan|personel|işçilik))?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["indirect", /(?:间接(?:员工|人工)?|\bindirect\b(?:\s+(?:employees?|headcount|hc|labor))?|\b(?:endirekt|dolaylı)\b(?:\s+(?:çalışan|personel|işçilik))?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["white", /(?:白领|white[ -]?collar(?:\s+(?:employees?|headcount|hc))?|beyaz\s+yaka(?:\s+(?:çalışan|personel))?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["efficiency", /(?:提效|效率(?:提升)?|efficiency(?:\s+(?:gain|improvement))?|verimlilik|verim(?:\s+artışı)?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["wage", /(?:(?:人工|工资)(?:上涨|增长|增加)?|(?:wage|salary)(?:\s+(?:increase|growth))?|(?:ücret|maaş)(?:\s+artışı)?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["fx", /(?:汇率|EUR\s*[\/_-]\s*TRY|exchange\s+rate|\bfx\b|\bkur\b)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["price", /(?:(?:价格|通胀)(?:上涨|增长|增加)?|(?:price|inflation)(?:\s+(?:increase|growth))?|(?:fiyat|enflasyon)(?:\s+artışı)?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i],
+    ["energy", /(?:能源(?:价格)?(?:上涨|增长|增加)?|energy(?:\s+(?:price|inflation|increase))?|enerji(?:\s+(?:fiyat|artışı))?)[^\d-]*(-?\d+(?:[.,]\d+)?)/i]
   ];
   for (const [key, regex] of rules) {
     const match = text.match(regex);
     if (!match) continue;
-    let value = Number(match[1]);
-    if (key === "volume" && match[2]) value *= 10000;
+    const raw = match[1];
+    let value = key === "volume" && /^-?\d{1,3}(?:[.,]\d{3})+$/.test(raw) ? Number(raw.replace(/[.,]/g, "")) : Number(raw.replace(",", "."));
+    const scale = String(match[2] || "").toLowerCase();
+    if (key === "volume" && scale === "万") value *= 10000;
+    if (key === "volume" && ["k", "thousand", "bin"].includes(scale)) value *= 1000;
+    if (key === "volume" && ["m", "million", "milyon"].includes(scale)) value *= 1000000;
     updates[key] = value;
   }
   if (updates.efficiency !== undefined && updates.direct === undefined) updates.peopleMode = "auto";
@@ -433,7 +502,7 @@ function parsedHtml(parsed, language) {
   if (!parsed) return "";
   const copy = c(language);
   const labels = { volume: copy.volume, direct: copy.direct, indirect: copy.indirect, white: copy.white, efficiency: copy.efficiency, wage: copy.wage, fx: copy.fx, price: copy.price, energy: copy.energy };
-  return `<div class="f30-parsed"><b>${copy.recognized} · ${parsed.year}</b><div>${Object.entries(parsed).filter(([key]) => !["year", "peopleMode"].includes(key)).map(([key, value]) => `<span>${labels[key] || key}: ${key === "volume" ? n(value) : value}${["efficiency", "wage", "price", "energy"].includes(key) ? "%" : ""}</span>`).join("")}</div></div>`;
+  return `<div class="f30-parsed"><b>${copy.recognized} · ${parsed.year}</b><div>${Object.entries(parsed).filter(([key]) => !["year", "peopleMode"].includes(key)).map(([key, value]) => `<span>${labels[key] || key}: ${key === "volume" ? n(value) : n(value, key === "fx" ? 2 : 1)}${["efficiency", "wage", "price", "energy"].includes(key) ? "%" : ""}</span>`).join("")}</div></div>`;
 }
 
 function syncDwPhaseVolume(targetTotal) {
@@ -534,20 +603,21 @@ export function renderForecast2030(language = "zh") {
   const model = calculate();
   const actual = h1ActualPeople();
   const typeLabel = { fixed: copy.fixed, people: copy.semi, semi: copy.semi, variable: copy.variable };
+  const factoryLabel = modelState.activeUnit === "ck" ? copy.ckFactory : copy.dwFactory;
   const detailCopy = DETAIL_COPY[language] || DETAIL_COPY.zh;
   const impacts = impactGroups(model, language);
   const impactMax = Math.max(1, ...impacts.map(([, value]) => Math.abs(value)));
   root.classList.toggle("show-advanced", modelState.advanced);
   root.innerHTML = `<section class="f30-shell">
-    <header class="f30-head"><div><span>${base.unit.toUpperCase()} · LONG RANGE PLAN</span><h2>${copy.title}</h2><p>${copy.sub}</p></div><div><div class="f30-unit-switch"><button data-f30-action="unit" data-f30-unit="ck" class="${modelState.activeUnit === "ck" ? "active" : ""}">CK 厨电</button><button data-f30-action="unit" data-f30-unit="dw" class="${modelState.activeUnit === "dw" ? "active" : ""}">DW 洗碗机</button></div><small>${modelState.activeUnit === "dw" ? copy.source : "CK 2026 · July actual + approved 6+6 forecast"}</small><button data-f30-action="save">${copy.save}</button><button data-f30-action="reset">${copy.reset}</button></div></header>
+    <header class="f30-head"><div><span>${factoryLabel} · ${copy.longRangePlan}</span><h2>${copy.title}</h2><p>${copy.sub}</p></div><div><div class="f30-unit-switch"><button data-f30-action="unit" data-f30-unit="ck" class="${modelState.activeUnit === "ck" ? "active" : ""}">${copy.ckFactory}</button><button data-f30-action="unit" data-f30-unit="dw" class="${modelState.activeUnit === "dw" ? "active" : ""}">${copy.dwFactory}</button></div><small>${modelState.activeUnit === "dw" ? copy.source : copy.ckSource}</small><button data-f30-action="save">${copy.save}</button><button data-f30-action="reset">${copy.reset}</button></div></header>
     ${renderYearStrip(model, language)}
     <div class="f30-top-grid"><section class="f30-panel"><div class="f30-title"><h3>${copy.conditions}</h3><button data-f30-action="advanced">${copy.advanced}</button></div>${renderPhasePlan(language)}<div class="f30-table-wrap"><table class="f30-input-table"><thead><tr><th>${copy.conditions}</th><th>2026</th>${YEARS.map((year) => `<th>${year}</th>`).join("")}</tr></thead><tbody>
-      ${inputRow(copy.volume, "volume", "pcs")}${inputRow(copy.efficiency, "efficiency", "%")}${inputRow(copy.wage, "wage", "%")}${inputRow(copy.fx, "fx", "TRY/EUR")}${inputRow(copy.price, "price", "%")}${inputRow(copy.energy, "energy", "%")}
-      ${inputRow(copy.depreciation, "depreciation", "K€", true)}${inputRow(copy.allocation, "allocation", "%", true)}${inputRow(copy.waste, "indirectWaste", "%", true)}${inputRow(copy.tempExit, "tempExit", "HC", true)}${inputRow(copy.tempCost, "tempMonthlyCost", "K€/HC", true)}${inputRow(copy.tempMonths, "tempMonths", "month", true)}
+      ${inputRow(copy.volume, "volume", copy.pieces)}${inputRow(copy.efficiency, "efficiency", "%")}${inputRow(copy.wage, "wage", "%")}${inputRow(copy.fx, "fx", "TRY/EUR")}${inputRow(copy.price, "price", "%")}${inputRow(copy.energy, "energy", "%")}
+      ${inputRow(copy.depreciation, "depreciation", "K€", true)}${inputRow(copy.allocation, "allocation", "%", true)}${inputRow(copy.waste, "indirectWaste", "%", true)}${inputRow(copy.tempExit, "tempExit", copy.headcountUnit, true)}${inputRow(copy.tempCost, "tempMonthlyCost", copy.personCostUnit, true)}${inputRow(copy.tempMonths, "tempMonths", copy.monthUnit, true)}
     </tbody></table></div></section>
-    <aside class="f30-panel f30-ai"><div class="f30-title"><h3>${copy.ai}</h3><span>${window.MFG_FORECAST_AI_CONFIG?.endpoint ? detailCopy.apiConnected : detailCopy.localParser}</span></div><div class="f30-ai-body"><p>${copy.aiHint}</p><textarea id="f30AiMessage">${safe(modelState.aiMessage)}</textarea><div class="f30-ai-actions"><button data-f30-action="mic" title="Voice">●</button><button data-f30-action="parse">${copy.parse}</button></div>${parsedHtml(modelState.parsed, language)}<button class="f30-apply" data-f30-action="apply" ${modelState.parsed ? "" : "disabled"}>${copy.apply}</button><small>${copy.apiSettings}</small></div></aside></div>
-    <section class="f30-panel f30-people"><div class="f30-title"><h3>${copy.people}</h3><span>${copy.actualPeople} / ${copy.originalPlan}</span></div><div class="f30-table-wrap"><table class="f30-input-table"><thead><tr><th>${copy.avg}</th><th>2026 H1 / FY</th>${YEARS.map((year) => `<th>${year}</th>`).join("")}</tr></thead><tbody>${peopleRow(copy.direct, "direct", actual.direct, base.headcount.direct)}${peopleRow(copy.indirect, "indirect", actual.indirect, base.headcount.indirect)}${peopleRow(copy.white, "white", actual.white, base.headcount.white)}<tr><th>${copy.suggested}<small>HC</small></th><td><span class="f30-baseline-value">${detailCopy.noChange}</span></td>${YEARS.map((year) => { const a = assumptions[year]; const suggested = base.headcount.direct * a.volume / base.volume / (1 + a.efficiency / 100); return `<td><b>${n(suggested, 1)}</b><select data-f30-mode="${year}"><option value="manual" ${a.peopleMode === "manual" ? "selected" : ""}>${copy.manual}</option><option value="auto" ${a.peopleMode === "auto" ? "selected" : ""}>${copy.auto}</option></select></td>`; }).join("")}</tr></tbody></table></div></section>
-    <div class="f30-results"><section class="f30-panel"><div class="f30-title"><h3>${copy.trend}</h3><span>K€ / €/pc</span></div>${renderTrend(model)}</section><section class="f30-panel"><div class="f30-title"><h3>${copy.impact}</h3><span>vs 2026 · K€</span></div><div class="f30-driver-list">${impacts.map(([label, value]) => `<div><span>${label}</span><i><em class="${value < 0 ? "good" : "bad"}" style="width:${Math.max(2, Math.abs(value) / impactMax * 100)}%"></em></i><b class="${value < 0 ? "good" : "bad"}">${value > 0 ? "+" : ""}${n(value)}</b></div>`).join("")}</div></section></div>
-    <section class="f30-panel"><div class="f30-title"><h3>${copy.detail}</h3><span>${copy.formula}</span></div><div class="f30-table-wrap"><table class="f30-cost-table"><thead><tr><th>Category</th><th>Type</th><th>2026</th>${YEARS.map((year) => `<th>${year}</th>`).join("")}<th>2030 %</th></tr></thead><tbody>${model.rows.map((row) => `<tr><th>${row.name}<span class="f30-info" title="${safe(traceFor(row, 2026, model, language))}">i</span></th><td><span class="type-${row.type}">${typeLabel[row.type]}</span></td><td class="f30-data-point" title="${safe(traceFor(row, 2026, model, language))}">${n(row.values[2026], 2)}</td>${YEARS.map((year) => `<td class="f30-data-point" title="${safe(traceFor(row, year, model, language))}">${n(row.values[year], 2)}</td>`).join("")}<td title="${safe(`${row.name} · 2030\n${pct(row.values[2030] / model.totals[2030] * 100)}`)}">${pct(row.values[2030] / model.totals[2030] * 100)}</td></tr>`).join("")}</tbody></table></div></section>
+    <aside class="f30-panel f30-ai"><div class="f30-title"><h3>${copy.ai}</h3><span>${window.MFG_FORECAST_AI_CONFIG?.endpoint ? detailCopy.apiConnected : detailCopy.localParser}</span></div><div class="f30-ai-body"><p>${copy.aiHint}</p><textarea id="f30AiMessage" placeholder="${safe(copy.aiExample)}">${safe(modelState.aiMessage)}</textarea><div class="f30-ai-actions"><button data-f30-action="mic" title="${safe(copy.voice)}">●</button><button data-f30-action="parse">${copy.parse}</button></div>${parsedHtml(modelState.parsed, language)}<button class="f30-apply" data-f30-action="apply" ${modelState.parsed ? "" : "disabled"}>${copy.apply}</button><small>${copy.apiSettings}</small></div></aside></div>
+    <section class="f30-panel f30-people"><div class="f30-title"><h3>${copy.people}</h3><span>${copy.actualPeople} / ${copy.originalPlan}</span></div><div class="f30-table-wrap"><table class="f30-input-table"><thead><tr><th>${copy.avg}</th><th>${copy.h1FullYear}</th>${YEARS.map((year) => `<th>${year}</th>`).join("")}</tr></thead><tbody>${peopleRow(copy.direct, "direct", actual.direct, base.headcount.direct)}${peopleRow(copy.indirect, "indirect", actual.indirect, base.headcount.indirect)}${peopleRow(copy.white, "white", actual.white, base.headcount.white)}<tr><th>${copy.suggested}<small>${copy.headcountUnit}</small></th><td><span class="f30-baseline-value">${detailCopy.noChange}</span></td>${YEARS.map((year) => { const a = assumptions[year]; const suggested = base.headcount.direct * a.volume / base.volume / (1 + a.efficiency / 100); return `<td><b>${n(suggested, 1)}</b><select data-f30-mode="${year}"><option value="manual" ${a.peopleMode === "manual" ? "selected" : ""}>${copy.manual}</option><option value="auto" ${a.peopleMode === "auto" ? "selected" : ""}>${copy.auto}</option></select></td>`; }).join("")}</tr></tbody></table></div></section>
+    <div class="f30-results"><section class="f30-panel"><div class="f30-title"><h3>${copy.trend}</h3><span>K€ / ${copy.unitCostUnit}</span></div>${renderTrend(model)}</section><section class="f30-panel"><div class="f30-title"><h3>${copy.impact}</h3><span>${copy.versus2026} · K€</span></div><div class="f30-driver-list">${impacts.map(([label, value]) => `<div><span>${label}</span><i><em class="${value < 0 ? "good" : "bad"}" style="width:${Math.max(2, Math.abs(value) / impactMax * 100)}%"></em></i><b class="${value < 0 ? "good" : "bad"}">${value > 0 ? "+" : ""}${n(value)}</b></div>`).join("")}</div></section></div>
+    <section class="f30-panel"><div class="f30-title"><h3>${copy.detail}</h3><span>${copy.formula}</span></div><div class="f30-table-wrap"><table class="f30-cost-table"><thead><tr><th>${copy.category}</th><th>${copy.type}</th><th>2026</th>${YEARS.map((year) => `<th>${year}</th>`).join("")}<th>2030 %</th></tr></thead><tbody>${model.rows.map((row) => `<tr><th>${costLabel(row, language)}<span class="f30-info" title="${safe(traceFor(row, 2026, model, language))}">i</span></th><td><span class="type-${row.type}">${typeLabel[row.type]}</span></td><td class="f30-data-point" title="${safe(traceFor(row, 2026, model, language))}">${n(row.values[2026], 2)}</td>${YEARS.map((year) => `<td class="f30-data-point" title="${safe(traceFor(row, year, model, language))}">${n(row.values[year], 2)}</td>`).join("")}<td title="${safe(`${costLabel(row, language)} · 2030\n${pct(row.values[2030] / model.totals[2030] * 100)}`)}">${pct(row.values[2030] / model.totals[2030] * 100)}</td></tr>`).join("")}</tbody></table></div></section>
   </section>`;
 }

@@ -33,7 +33,7 @@ import {
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260612-duplicate-accounts-v23";
+} from "./metrics.js?v=20260831-direction-v1";
 import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-dynamic-month-v28";
 import { PROJECT_SEEDS, localizeProjectField, localizeProjectText, projectImpactSummary, projectTextFields } from "./project-data.js?v=20260616-project-i18n-v33";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
@@ -2126,7 +2126,7 @@ function metricTooltip(row, index) {
   const budgetDiff = diffNullableLocal(actual, budget);
   const higherGood = row.direction === "higher";
   const optimized = Number.isFinite(yoy) ? (higherGood ? yoy >= 0 : yoy <= 0) : null;
-  const completion = targetCompletionRate(actual, budget);
+  const completion = targetCompletionRate(actual, budget, row.direction);
   return [
     `${annual ? t("fullYear") : localizeMonthLabel(index, state.language)} · ${localizeDashboardText("labels", row.label, state.language)}`,
     Number.isFinite(yoy) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}${formatYoyPercent(yoy, same)}</span>` : "",

@@ -53,9 +53,9 @@ export function annualUnitCost(costsKeur = [], volumes = []) {
   return cost !== null && isPositive(volume) ? cost * 1000 / volume : null;
 }
 
-export function targetCompletionRate(actual, budget) {
+export function targetCompletionRate(actual, budget, direction = "lower") {
   if (!Number.isFinite(actual) || !isPositive(budget)) return null;
-  return 2 - actual / budget;
+  return direction === "higher" ? actual / budget : 2 - actual / budget;
 }
 
 export function averageFinite(values = []) {

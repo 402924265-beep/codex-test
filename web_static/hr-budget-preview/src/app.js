@@ -16,7 +16,7 @@ import {
   localizeDashboardRow,
   localizeDashboardText,
   localizeMonthLabel
-} from "./forecast-parser.js?v=20260717-june-6plus6-v1";
+} from "./forecast-parser.js?v=20260831-i18n-v2";
 import {
   analysisKey,
   analysisReason,
@@ -33,7 +33,7 @@ import {
   annualUpph,
   averageFinite,
   targetCompletionRate
-} from "./metrics.js?v=20260612-duplicate-accounts-v23";
+} from "./metrics.js?v=20260831-metric-highlight-v1";
 import { buildKpiDefinitions, categoryComparisonHeaders } from "./presentation.js?v=20260615-dynamic-month-v28";
 import { PROJECT_SEEDS, localizeProjectField, localizeProjectText, projectImpactSummary, projectTextFields } from "./project-data.js?v=20260616-project-i18n-v33";
 import { categoryAlias } from "./category-alias.js?v=20260612-duplicate-accounts-v23";
@@ -42,10 +42,21 @@ import { localizeAccountLabel } from "./account-labels.js?v=20260615-account-lab
 import { COOKING_UNIT } from "./cooking-data.js?v=20260717-june-6plus6-v1";
 import { DW_EMBEDDED_FILES, embeddedWorkbookFile } from "./dw-embedded-data.js?v=20260821-dw-july-cutoff-v2";
 import { buildHrBudgetAccountSync } from "./hr-budget-sync.js?v=20260715-hr-sync-v2";
-import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260717-standards-v2";
-import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260717-standards-v2";
-import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260816-july-actual-v1";
-import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260816-july-actual-v1";
+import { ADMIN_BUDGET_DATA, ADMIN_BUDGET_MONTHS, ADMIN_DRIVER_MATRIX, adminCategoryMonthlyEur } from "./admin-budget-data.js?v=20260828-headcount-linkage-v1";
+import { buildAdminBudgetAccountSync } from "./admin-budget-sync.js?v=20260828-headcount-linkage-v1";
+import { ADMIN_ATTENDANCE_DATA } from "./admin-attendance-data.js?v=20260828-attendance-v1";
+import { EMPLOYEE_ATTENDANCE_DATA } from "./employee-attendance-data.js?v=20260828-employee-attendance-v1";
+import { calculateDwHeadcountBudget, DW_ADMIN_PARAMETER_DEFAULTS, DW_PROCUREMENT_PRICE_LINES } from "./admin-headcount-linkage.js?v=20260828-admin-parameters-v3";
+import { FACTORY_WORKBENCH_DATA } from "./factory-workbench-data.js?v=20260830-dw-admin-three-actual-v1";
+import { initForecast2030, renderForecast2030 } from "./forecast-2030.js?v=20260831-i18n-v2";
+import {
+  ATTENDANCE_HEADCOUNT_IMPORT_SCHEMA,
+  EMPLOYEE_HEADCOUNT_IMPORT_SCHEMA,
+  buildAttendanceHeadcountTemplateRows,
+  buildEmployeeHeadcountTemplateRows,
+  parseAttendanceHeadcountImportRows,
+  parseEmployeeHeadcountImportRows
+} from "./headcount-import.js?v=20260830-headcount-import-v1";
 
 const VERSION = "20260821-embedded-july-v1";
 
@@ -133,13 +144,13 @@ const i18n = {
     momVarianceAnalysis: "环比差异分析",
     yoyPercent: "同比%",
     momPercent: "环比%",
-    submitAnalyses: "提交原因",
-    submitProjects: "提交项目",
-    analysisSubmitted: "原因已提交到后台共享",
-    projectsSubmitted: "项目已提交到后台共享",
-    saving: "正在提交...",
-    submitFailed: "提交失败",
-    unsavedChanges: "未提交",
+    submitAnalyses: "保存并共享原因",
+    submitProjects: "保存项目",
+    analysisSubmitted: "原因已保存并共享",
+    projectsSubmitted: "项目已保存并共享",
+    saving: "正在保存...",
+    submitFailed: "保存失败",
+    unsavedChanges: "未保存",
     factorProjects: "26年降费项目",
     factorHint: "管理正式降费项目；月度差异原因在第二张表的小科目明细中填写。",
     factorMonth: "发生月份",
@@ -264,7 +275,7 @@ const i18n = {
     roleBrand: "三张表制造费用经营驾驶舱",
     roleTestVersion: "预算协同测试版",
     roleSelectTitle: "选择你的工作角色",
-    roleSelectHint: "当前为内部测试版，无需密码。不同角色进入后只显示职责范围内的数据与操作。",
+    roleSelectHint: "请选择角色并输入独立密码。进入后只显示该角色职责范围内的数据与操作。",
     costRole: "成本角色",
     costRoleHint: "查看经营驾驶舱、月度差异、全部预算科目和降费项目",
     hrRole: "人力角色",
@@ -272,10 +283,25 @@ const i18n = {
     adminRole: "行政部门",
     adminRoleHint: "仅校核行政预算标准、月度金额和变更原因",
     adminDepartment: "行政部门",
+    attendanceRole: "行政人员校核",
+    attendanceRoleHint: "仅校核当月各成本中心的外包与服务人员预算人数及变更原因",
+    attendanceDepartment: "行政出勤",
+    attendanceHeaderTitle: "行政人员数量校核",
+    attendanceHeaderHint: "按成本中心校核当月外包与服务人员数量",
+    employeeAttendanceRole: "员工人数预测",
+    employeeAttendanceRoleHint: "仅预测当月DW和CK按部门、线体的直接、间接、白领及共享人员数量",
+    procurementPriceRole: "采购价格校核",
+    adminThreeRole: "行政三科目",
+    adminThreeBudgetNav: "三科目预算",
+    adminThreeBudgetNavHint: "行政预测与实际差异",
+    employeeAttendanceDepartment: "员工出勤",
+    employeeAttendanceHeaderTitle: "员工人数预测",
+    employeeAttendanceHeaderHint: "按工厂、部门和线体预测当月人员数量",
+    rolePassword: "角色密码",
     fullView: "完整视图",
     limitedView: "受限视图",
     enterWorkspace: "进入工作台",
-    roleSwitchHint: "演示身份可在页面右上角随时切换",
+    roleSwitchHint: "可在页面右上角切换角色，切换时需重新输入密码",
     cockpitBrand: "制造费用经营驾驶舱",
     turkey: "土耳其",
     cookingFactory: "厨电工厂",
@@ -363,13 +389,13 @@ const i18n = {
     momVarianceAnalysis: "MoM variance",
     yoyPercent: "YoY %",
     momPercent: "MoM %",
-    submitAnalyses: "Submit reasons",
-    submitProjects: "Submit projects",
-    analysisSubmitted: "Reasons submitted to shared backend",
-    projectsSubmitted: "Projects submitted to shared backend",
-    saving: "Submitting...",
-    submitFailed: "Submit failed",
-    unsavedChanges: "Not submitted",
+    submitAnalyses: "Save and share reasons",
+    submitProjects: "Save projects",
+    analysisSubmitted: "Reasons saved and shared",
+    projectsSubmitted: "Projects saved and shared",
+    saving: "Saving...",
+    submitFailed: "Save failed",
+    unsavedChanges: "Not saved",
     factorProjects: "2026 Cost Reduction Projects",
     factorHint: "Manage formal projects here. Enter monthly variance reasons in Account Detail.",
     factorMonth: "Impact month",
@@ -494,7 +520,7 @@ const i18n = {
     roleBrand: "Three-Table Manufacturing Cost Cockpit",
     roleTestVersion: "Budget Collaboration Preview",
     roleSelectTitle: "Select your work role",
-    roleSelectHint: "No password is required in this internal preview. Each role only sees data and actions within its responsibility.",
+    roleSelectHint: "Select a role and enter its independent password. Each role only sees data and actions within its responsibility.",
     costRole: "Cost Controller",
     costRoleHint: "View the cockpit, monthly variance, all budget accounts and cost reduction projects",
     hrRole: "HR",
@@ -502,10 +528,25 @@ const i18n = {
     adminRole: "Administration",
     adminRoleHint: "Validate administration budget standards, monthly amounts and change reasons only",
     adminDepartment: "Administration",
+    attendanceRole: "Administration Headcount",
+    attendanceRoleHint: "Validate only the current month's outsourced and service headcount by cost center and change reasons",
+    attendanceDepartment: "Administration Attendance",
+    attendanceHeaderTitle: "Administration Headcount Validation",
+    attendanceHeaderHint: "Validate current-month outsourced and service headcount by cost center",
+    employeeAttendanceRole: "Employee Headcount Forecast",
+    employeeAttendanceRoleHint: "Forecast current-month direct, indirect, white-collar and shared headcount for DW and CK by department and line",
+    procurementPriceRole: "Procurement Price Validation",
+    adminThreeRole: "Administration: Three Accounts",
+    adminThreeBudgetNav: "Three-account budget",
+    adminThreeBudgetNavHint: "Administration forecast vs actual",
+    employeeAttendanceDepartment: "Employee Attendance",
+    employeeAttendanceHeaderTitle: "Employee Headcount Forecast",
+    employeeAttendanceHeaderHint: "Forecast current-month headcount by factory, department and production line",
+    rolePassword: "Role password",
     fullView: "Full view",
     limitedView: "Restricted view",
     enterWorkspace: "Enter workspace",
-    roleSwitchHint: "The demo role can be switched from the upper-right corner",
+    roleSwitchHint: "Switch roles from the upper-right corner; the role password is required again",
     cockpitBrand: "Manufacturing Cost Cockpit",
     turkey: "Türkiye",
     cookingFactory: "Cooking Factory",
@@ -541,7 +582,7 @@ const i18n = {
     appTitle: "Bulaşık Makinesi Üretim Gideri",
     appSubtitle: "Finans verisini yükle, üç analiz tablosunu üret",
     language: "Dil",
-    author: "Yazan",
+    author: "Hazırlayan",
     importForecast: "6+6 tahmin yükle",
     importJiang: "Jiang Yue tablosunu yükle",
     importSap: "SAP gerçekleşen yükle",
@@ -593,13 +634,13 @@ const i18n = {
     momVarianceAnalysis: "Aylık fark",
     yoyPercent: "YoY %",
     momPercent: "Aylık %",
-    submitAnalyses: "Nedenleri gönder",
-    submitProjects: "Projeleri gönder",
-    analysisSubmitted: "Nedenler paylaşılan arka uca gönderildi",
-    projectsSubmitted: "Projeler paylaşılan arka uca gönderildi",
-    saving: "Gönderiliyor...",
-    submitFailed: "Gönderme başarısız",
-    unsavedChanges: "Gönderilmedi",
+    submitAnalyses: "Nedenleri kaydet ve paylaş",
+    submitProjects: "Projeleri kaydet",
+    analysisSubmitted: "Nedenler kaydedildi ve paylaşıldı",
+    projectsSubmitted: "Projeler kaydedildi ve paylaşıldı",
+    saving: "Kaydediliyor...",
+    submitFailed: "Kaydetme başarısız",
+    unsavedChanges: "Kaydedilmedi",
     factorProjects: "2026 Maliyet Düşürme Projeleri",
     factorHint: "Resmi maliyet düşürme projelerini burada yönetin. Aylık fark nedenlerini hesap detayında girin.",
     factorMonth: "Etki ayı",
@@ -724,7 +765,7 @@ const i18n = {
     roleBrand: "Üç Tablolu Üretim Gideri Kokpiti",
     roleTestVersion: "Bütçe İş Birliği Önizlemesi",
     roleSelectTitle: "Çalışma rolünüzü seçin",
-    roleSelectHint: "Bu dahili önizlemede parola gerekmez. Her rol yalnızca kendi sorumluluğundaki veri ve işlemleri görür.",
+    roleSelectHint: "Rolü seçin ve bağımsız parolasını girin. Her rol yalnızca kendi sorumluluğundaki veri ve işlemleri görür.",
     costRole: "Maliyet Kontrol Rolü",
     costRoleHint: "Kokpit, aylık farklar, tüm bütçe hesapları ve maliyet düşürme projelerini görüntüler",
     hrRole: "İnsan Kaynakları",
@@ -732,6 +773,21 @@ const i18n = {
     adminRole: "İdari İşler",
     adminRoleHint: "Yalnızca idari bütçe standartlarını, aylık tutarları ve değişiklik nedenlerini doğrular",
     adminDepartment: "İdari İşler",
+    attendanceRole: "İdari İşler Personel Kontrolü",
+    attendanceRoleHint: "Cari ay dış kaynak ve hizmet personeli bütçesini maliyet merkezi bazında doğrular",
+    attendanceDepartment: "İdari İşler Personel Kontrolü",
+    attendanceHeaderTitle: "İdari İşler Personel Kontrolü",
+    attendanceHeaderHint: "Cari ay dış kaynak ve hizmet personelini maliyet merkezi bazında kontrol edin",
+    employeeAttendanceRole: "Çalışan Sayısı Tahmini",
+    employeeAttendanceRoleHint: "DW ve CK için cari ay doğrudan, dolaylı, beyaz yaka ve paylaşımlı personel sayısını bölüm ve hat bazında tahmin edin",
+    procurementPriceRole: "Satın Alma Fiyat Kontrolü",
+    adminThreeRole: "İdari Üç Hesap",
+    adminThreeBudgetNav: "Üç hesap bütçesi",
+    adminThreeBudgetNavHint: "İdari tahmin ve gerçekleşen farkı",
+    employeeAttendanceDepartment: "Çalışan Devamı",
+    employeeAttendanceHeaderTitle: "Çalışan Sayısı Tahmini",
+    employeeAttendanceHeaderHint: "Cari ay personel sayısını fabrika, bölüm ve üretim hattına göre tahmin edin",
+    rolePassword: "Rol parolası",
     fullView: "Tam görünüm",
     limitedView: "Kısıtlı görünüm",
     enterWorkspace: "Çalışma alanına gir",
@@ -782,7 +838,7 @@ const state = {
   factors: [],
   factorSummary: null,
   chartHitZones: [],
-  language: "en",
+  language: "zh",
   dashboardGroup: "all",
   dashboardBasis: "same",
   metricScenario: "all",
@@ -798,9 +854,17 @@ const state = {
   adminSelectedCategory: "canteen",
   adminSelectedAccount: "6666010314",
   adminBudgetView: "conditions",
+  procurementSelectedCategory: "canteen",
+  attendanceUnit: "dw",
+  employeeAttendanceFactory: "dw",
+  employeeAttendanceDepartment: "production",
   rollingTaskFilter: "all",
   rollingViewMode: "fill",
   workbenchGroup: "all",
+  workbenchIndicator: "all",
+  workbenchScenario: "all",
+  workbenchMonth: "all",
+  workbenchStatus: "all",
   rollingRole: localStorage.getItem("dwRollingRole.v1") || "finance",
   activeUnit: "cooking",
   sapFileName: "",
@@ -813,6 +877,8 @@ const unitSnapshots = {
   cooking: null
 };
 
+const ROLE_PASSWORDS = Object.freeze({ finance: "111", hr: "222", admin: "333", attendance: "444", employeeAttendance: "555", procurementPrice: "66", adminThree: "777" });
+
 const els = {
   sapFile: document.getElementById("sapFile"),
   forecastFile: document.getElementById("forecastFile"),
@@ -824,10 +890,13 @@ const els = {
   categoryFilter: document.getElementById("categoryFilter"),
   sortBy: document.getElementById("sortBy"),
   languageSelect: document.getElementById("languageSelect"),
+  roleLanguageSelect: document.getElementById("roleLanguageSelect"),
   userName: document.getElementById("userName"),
   saveMode: document.getElementById("saveMode"),
   roleSelect: document.getElementById("roleSelect"),
   roleLogin: document.getElementById("roleLogin"),
+  rolePassword: document.getElementById("rolePassword"),
+  rolePasswordError: document.getElementById("rolePasswordError"),
   enterWorkspace: document.getElementById("enterWorkspace"),
   switchRoleBtn: document.getElementById("switchRoleBtn"),
   analysisAuthor: document.getElementById("analysisAuthor"),
@@ -878,6 +947,7 @@ const els = {
   unitButtons: document.querySelectorAll("[data-unit]"),
   factoryWorkbenchNav: document.getElementById("factoryWorkbenchNav"),
   forecast2030Nav: document.getElementById("forecast2030Nav"),
+  adminThreeBudgetNav: document.getElementById("adminThreeBudgetNav"),
   unitName: document.getElementById("unitName"),
   unitSubtitle: document.getElementById("unitSubtitle"),
   unitSource: document.getElementById("unitSource"),
@@ -891,8 +961,9 @@ async function bootstrap() {
   setSidebarCollapsed(localStorage.getItem("dw.sidebarCollapsed") === "1");
   initializeDemoRoleAccess();
   installMetricHoverTooltip();
+  installMetricTableHighlight();
   applyLanguage(els.languageSelect.value);
-  els.saveMode.textContent = store.label;
+  els.saveMode.textContent = storeLabel();
   if (els.roleSelect) els.roleSelect.value = state.rollingRole;
   els.userName.value = store.getUser();
   if (els.analysisAuthor) els.analysisAuthor.value = els.userName.value;
@@ -947,8 +1018,20 @@ async function loadEmbeddedDwFiles() {
   }
 }
 
-function switchBusinessUnit(unitId) {
-  if (!unitId || unitId === state.activeUnit) return;
+function isScopedBudgetRole(role = state.rollingRole) {
+  return ["hr", "admin", "attendance", "employeeAttendance", "procurementPrice"].includes(role);
+}
+
+function switchBusinessUnit(unitId, { force = false } = {}) {
+  if (!unitId) return;
+  if (isScopedBudgetRole() && !force) return;
+  // 双厂工作台/情景预测是管理视图；从左侧业务单元返回时，必须先回到该单元的驾驶舱。
+  // 这一段要放在“同一单元直接返回”之前，否则当前已选中的厨电或洗碗机无法退出双厂工作台。
+  const managementViewOpen =
+    document.getElementById("benchmarkView")?.classList.contains("active") ||
+    document.getElementById("forecast2030View")?.classList.contains("active");
+  if (managementViewOpen) switchTab("dashboard");
+  if (unitId === state.activeUnit) return;
   saveUnitSnapshot(state.activeUnit);
   if (unitId === "dishwasher") {
     if (unitSnapshots.dishwasher) restoreUnitSnapshot("dishwasher");
@@ -1237,13 +1320,34 @@ function updateUnitChrome(unitId) {
   }
   const headerTitle = document.querySelector(".app-header h1");
   const headerSubtitle = document.querySelector(".app-header p");
+  const attendanceAccess = state.rollingRole === "attendance";
+  const employeeAttendanceAccess = state.rollingRole === "employeeAttendance";
+  const procurementPriceAccess = state.rollingRole === "procurementPrice";
   if (headerTitle) {
-    headerTitle.textContent = unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
+    headerTitle.textContent = procurementPriceAccess
+      ? procurementT("title")
+      : employeeAttendanceAccess
+      ? t("employeeAttendanceHeaderTitle")
+      : attendanceAccess
+      ? t("attendanceHeaderTitle")
+      : unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
   }
   if (headerSubtitle) {
-    headerSubtitle.textContent = unitId === "cooking" ? t("cookingHeaderHint") : t("appSubtitle");
+    headerSubtitle.textContent = procurementPriceAccess
+      ? procurementT("subtitle")
+      : employeeAttendanceAccess
+      ? t("employeeAttendanceHeaderHint")
+      : attendanceAccess
+      ? t("attendanceHeaderHint")
+      : unitId === "cooking" ? t("cookingHeaderHint") : t("appSubtitle");
   }
-  document.title = unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
+  document.title = procurementPriceAccess
+    ? procurementT("title")
+    : employeeAttendanceAccess
+    ? t("employeeAttendanceHeaderTitle")
+    : attendanceAccess
+    ? t("attendanceHeaderTitle")
+    : unitId === "cooking" ? t("cookingSubtitle") : t("dishwasherSubtitle");
 }
 
 function cookingProjectImpactType(item) {
@@ -1304,14 +1408,33 @@ function bindEvents() {
   for (const button of document.querySelectorAll("[data-login-role]")) {
     button.addEventListener("click", () => {
       for (const option of document.querySelectorAll("[data-login-role]")) option.classList.toggle("active", option === button);
+      if (els.rolePassword) els.rolePassword.value = "";
+      if (els.rolePasswordError) els.rolePasswordError.textContent = "";
+      els.rolePassword?.focus();
     });
   }
-  els.enterWorkspace?.addEventListener("click", () => {
+  const enterSelectedWorkspace = () => {
     const selected = document.querySelector("[data-login-role].active")?.dataset.loginRole || "finance";
+    if (els.rolePassword?.value !== ROLE_PASSWORDS[selected]) {
+      if (els.rolePasswordError) {
+        els.rolePasswordError.textContent = state.language === "zh" ? "密码不正确，请重新输入" : state.language === "tr" ? "Parola hatalı, tekrar deneyin" : "Incorrect password. Please try again.";
+      }
+      els.rolePassword?.focus();
+      els.rolePassword?.select();
+      return;
+    }
+    if (els.rolePasswordError) els.rolePasswordError.textContent = "";
+    if (els.rolePassword) els.rolePassword.value = "";
     applyDemoRole(selected, true);
+  };
+  els.enterWorkspace?.addEventListener("click", enterSelectedWorkspace);
+  els.rolePassword?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") enterSelectedWorkspace();
   });
   els.switchRoleBtn?.addEventListener("click", () => {
     els.roleLogin?.classList.remove("hidden");
+    if (els.rolePassword) els.rolePassword.value = "";
+    if (els.rolePasswordError) els.rolePasswordError.textContent = "";
   });
   els.sapFile.addEventListener("change", handleSapFileChange);
   els.forecastFile.addEventListener("change", handleForecastFileChange);
@@ -1361,16 +1484,19 @@ function bindEvents() {
     renderDashboard();
   });
   els.languageSelect.addEventListener("change", () => {
+    if (els.roleLanguageSelect) els.roleLanguageSelect.value = els.languageSelect.value;
     applyLanguage(els.languageSelect.value);
     updateUnitChrome(state.activeUnit);
     renderAll();
   });
+  els.roleLanguageSelect?.addEventListener("change", () => {
+    els.languageSelect.value = els.roleLanguageSelect.value;
+    applyLanguage(els.roleLanguageSelect.value);
+    updateUnitChrome(state.activeUnit);
+    renderAll();
+  });
   els.roleSelect?.addEventListener("change", () => {
-    state.rollingRole = els.roleSelect.value || "finance";
-    localStorage.setItem("dwRollingRole.v1", state.rollingRole);
-    state.rollingSelectedCode = null;
-    if (["hr", "admin"].includes(state.rollingRole)) state.rollingViewMode = "fill";
-    renderTable();
+    applyDemoRole(els.roleSelect.value || "finance", false);
   });
   els.userName.addEventListener("input", () => {
     store.setUser(els.userName.value.trim());
@@ -1404,11 +1530,22 @@ function bindEvents() {
   }
   els.factoryWorkbenchNav?.addEventListener("click", () => switchTab("benchmark"));
   els.forecast2030Nav?.addEventListener("click", () => switchTab("forecast2030"));
+  els.adminThreeBudgetNav?.addEventListener("click", () => {
+    sessionStorage.setItem("dwDemoRole", state.rollingRole);
+    window.location.assign(`./erpnext-dw-budget-demo.html?role=${encodeURIComponent(state.rollingRole)}`);
+  });
   initForecast2030(document.getElementById("forecast2030Workbench"), () => state.language);
   document.getElementById("benchmarkView")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-fwb-group]");
     if (!button) return;
     state.workbenchGroup = button.dataset.fwbGroup || "all";
+    renderFactoryWorkbench();
+  });
+  document.getElementById("benchmarkView")?.addEventListener("change", (event) => {
+    if (event.target.id === "fwbIndicatorFilter") state.workbenchIndicator = event.target.value;
+    if (event.target.id === "fwbScenarioFilter") state.workbenchScenario = event.target.value;
+    if (event.target.id === "fwbMonthFilter") state.workbenchMonth = event.target.value;
+    if (event.target.id === "fwbStatusFilter") state.workbenchStatus = event.target.value;
     renderFactoryWorkbench();
   });
   els.sidebarToggle?.addEventListener("click", () => {
@@ -1679,6 +1816,7 @@ function renderSummaryCards() {
 }
 
 function renderDashboard() {
+  clearMetricTableHighlight();
   const months = Array.from({ length: 12 }, (_, index) => localizeMonthLabel(index, state.language));
   const actualMonthCount = countActualMonths();
   els.dashboardHead.innerHTML = `
@@ -1688,7 +1826,7 @@ function renderDashboard() {
       <th colspan="${12 - actualMonthCount}" class="phase-forecast">${escapeHtml(`${actualMonthCount + 1}-12 ${t("forecastMonths")}`)}</th>
       <th class="phase-year">${escapeHtml(t("fullYear"))}</th>
     </tr>
-    <tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < actualMonthCount ? "actual-month-head" : "forecast-month-head"}">${escapeHtml(month)}</th>`).join("")}<th>${escapeHtml(t("fullYear"))}</th></tr>`;
+    <tr><th class="sticky-col sticky-col-1">${escapeHtml(t("group"))}</th><th class="sticky-col sticky-col-2">${escapeHtml(t("indicator"))}</th><th class="sticky-col sticky-col-3">${escapeHtml(t("scenario"))}</th><th class="sticky-col sticky-col-4">${escapeHtml(t("unit"))}</th>${months.map((month, index) => `<th class="${index < actualMonthCount ? "actual-month-head" : "forecast-month-head"}" tabindex="0" data-highlight-period-trigger data-highlight-period="${index}">${escapeHtml(month)}</th>`).join("")}<th tabindex="0" data-highlight-period-trigger data-highlight-period="year">${escapeHtml(t("fullYear"))}</th></tr>`;
   els.dashboardTableWrap.classList.toggle("collapsed", !state.dashboardTableOpen);
   els.toggleDashboardTable.textContent = t(state.dashboardTableOpen ? "hideDetail" : "showDetail");
   renderMetricFilters();
@@ -1724,26 +1862,31 @@ function renderStandardMetricRows(rows, { actualMonthCount, annualValue, tooltip
   if (!rows.length) return `<tr><td colspan="17" class="empty-cell">${escapeHtml(emptyText)}</td></tr>`;
   const spans = new Map();
   for (const row of rows) spans.set(row.label, (spans.get(row.label) || 0) + 1);
+  const actualByLabel = new Map(rows.filter((row) => row.scenario === "26年").map((row) => [row.label, row]));
   const rendered = new Set();
   return rows.map((row) => {
     const localized = localizeDashboardRow(row, state.language);
     const family = metricFamily(row.label);
     const rowSpan = spans.get(row.label) || 1;
+    const actualRow = actualByLabel.get(row.label) || row;
+    const metricName = localizeDashboardText("labels", row.label, state.language);
+    const annualDetail = tooltip(actualRow, null);
     const mergedCells = rendered.has(row.label) ? "" : `
       <td rowspan="${rowSpan}" class="sticky-col sticky-col-1 dashboard-merged-cell"><span class="group-chip">${escapeHtml(metricFamilyLabel(family))}</span></td>
-      <td rowspan="${rowSpan}" class="merged-label sticky-col sticky-col-2 dashboard-merged-cell">${escapeHtml(localized.label)}</td>`;
+      <td rowspan="${rowSpan}" class="merged-label sticky-col sticky-col-2 dashboard-merged-cell" tabindex="0" role="button" data-highlight-metric-trigger data-highlight-metric="${escapeHtml(row.label)}" data-highlight-period="year" data-highlight-detail="${escapeHtml(annualDetail)}" aria-label="${escapeHtml(`${metricName} · ${t("fullYear")}`)}">${escapeHtml(localized.label)}</td>`;
     const mergedUnit = rendered.has(row.label) ? "" : `<td rowspan="${rowSpan}" class="sticky-col sticky-col-4 dashboard-merged-cell">${escapeHtml(localized.unit)}</td>`;
     rendered.add(row.label);
     return `
-      <tr class="dashboard-row family-${family}">
+      <tr class="dashboard-row family-${family} scenario-row-${scenarioClass(row.scenario)}" data-highlight-metric="${escapeHtml(row.label)}">
         ${mergedCells}
         <td class="sticky-col sticky-col-3"><span class="scenario-chip ${scenarioClass(row.scenario)}">${escapeHtml(localized.scenario)}</span></td>
         ${mergedUnit}
         ${row.values.map((value, index) => {
           const phaseClass = index < actualMonthCount ? " actual-month-cell" : " forecast-month-cell";
-          return `<td class="month-cell ${heat(row, index)}${phaseClass}" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip(row, index))}">${formatDashboardValue(value, row.unit)}</td>`;
+          const detail = tooltip(actualRow, index);
+          return `<td class="month-cell ${heat(row, index)}${phaseClass}" tabindex="0" role="button" data-highlight-cell data-highlight-metric="${escapeHtml(row.label)}" data-highlight-period="${index}" data-highlight-detail="${escapeHtml(detail)}" aria-label="${escapeHtml(`${metricName} · ${localizeMonthLabel(index, state.language)}`)}">${formatDashboardValue(value, row.unit)}</td>`;
         }).join("")}
-        <td class="month-cell full-year-cell" tabindex="0" data-metric-tooltip="${escapeHtml(tooltip(row, null))}">${formatDashboardValue(annualValue(row), row.unit)}</td>
+        <td class="month-cell full-year-cell" tabindex="0" role="button" data-highlight-cell data-highlight-metric="${escapeHtml(row.label)}" data-highlight-period="year" data-highlight-detail="${escapeHtml(annualDetail)}" aria-label="${escapeHtml(`${metricName} · ${t("fullYear")}`)}">${formatDashboardValue(annualValue(row), row.unit)}</td>
       </tr>
     `;
   }).join("");
@@ -2429,12 +2572,13 @@ function metricTooltip(row, index) {
   const budgetDiff = diffNullableLocal(actual, budget);
   const higherGood = row.direction === "higher";
   const optimized = Number.isFinite(yoy) ? (higherGood ? yoy >= 0 : yoy <= 0) : null;
-  const completion = targetCompletionRate(actual, budget);
+  const completion = targetCompletionRate(actual, budget, row.direction);
   return [
-    `${annual ? t("fullYear") : localizeMonthLabel(index, state.language)} · ${localizeDashboardText("labels", row.label, state.language)}`,
+    `<b>${annual ? t("fullYear") : localizeMonthLabel(index, state.language)} · ${localizeDashboardText("labels", row.label, state.language)}</b>`,
+    Number.isFinite(actual) ? `<span>${t("actual26")}: ${formatDashboardValue(actual, row.unit)}</span>` : "",
     Number.isFinite(yoy) ? `<span class="${optimized ? "tooltip-good" : "tooltip-bad"}">${t("yoyVariance")} · ${t(optimized ? "better" : "worse")}: ${formatDashboardValue(Math.abs(yoy), row.unit)}${formatYoyPercent(yoy, same)}</span>` : "",
     Number.isFinite(budgetDiff) ? `<span class="${tooltipDiffClass(budgetDiff, row.direction)}">${t("budgetVariance")}: ${formatDashboardValue(budgetDiff, row.unit)}</span>` : "",
-    Number.isFinite(completion) ? `<span class="${completion >= 1 ? "tooltip-good" : "tooltip-bad"}">${t("targetCompletion")}: ${formatPercent(completion)}</span>` : ""
+    Number.isFinite(completion) ? `<strong class="${completionTone(completion)}">${t("targetCompletion")}: ${formatPercent(completion)}</strong>` : ""
   ].filter(Boolean).join("\n");
 }
 
@@ -2446,6 +2590,12 @@ function formatYoyPercent(diff, base) {
 function tooltipDiffClass(value, direction) {
   const good = direction === "higher" ? value >= 0 : value <= 0;
   return good ? "tooltip-good" : "tooltip-bad";
+}
+
+function completionTone(value) {
+  if (!Number.isFinite(value)) return "";
+  if (value >= 1) return "tooltip-good";
+  return value >= 0.95 ? "tooltip-warn" : "tooltip-bad";
 }
 
 function installMetricHoverTooltip() {
@@ -2484,6 +2634,87 @@ function positionMetricTooltip(tooltip, clientX, clientY, target) {
   const maxY = Math.max(8, window.innerHeight - tooltip.offsetHeight - 12);
   tooltip.style.left = `${Math.min(x, maxX)}px`;
   tooltip.style.top = `${Math.min(y, maxY)}px`;
+}
+
+let metricTableHighlightController = null;
+
+function clearMetricTableHighlight() {
+  metricTableHighlightController?.clear();
+}
+
+function installMetricTableHighlight() {
+  const card = document.createElement("div");
+  card.className = "metric-selection-card";
+  card.setAttribute("role", "status");
+  card.setAttribute("aria-live", "polite");
+  document.body.appendChild(card);
+
+  let table = null;
+  let trigger = null;
+
+  const clear = () => {
+    table?.querySelectorAll(".is-highlighted-group, .is-highlighted-column, .is-highlighted-cell, .is-highlighted-column-head")
+      .forEach((element) => element.classList.remove("is-highlighted-group", "is-highlighted-column", "is-highlighted-cell", "is-highlighted-column-head"));
+    table?.querySelectorAll('[aria-pressed="true"]').forEach((element) => element.setAttribute("aria-pressed", "false"));
+    card.classList.remove("visible");
+    card.innerHTML = "";
+    table = null;
+    trigger = null;
+  };
+
+  const position = () => {
+    if (!trigger?.isConnected || !card.classList.contains("visible")) return;
+    const rect = trigger.getBoundingClientRect();
+    const gap = 12;
+    let left = rect.right + gap;
+    if (left + card.offsetWidth > window.innerWidth - gap) left = rect.left - card.offsetWidth - gap;
+    const top = Math.min(Math.max(gap, rect.top), Math.max(gap, window.innerHeight - card.offsetHeight - gap));
+    card.style.left = `${Math.max(gap, left)}px`;
+    card.style.top = `${top}px`;
+  };
+
+  const select = (next) => {
+    if (next === trigger) {
+      position();
+      return;
+    }
+    clear();
+    table = next.closest(".metric-highlight-table");
+    if (!table) return;
+    trigger = next;
+    const metric = next.dataset.highlightMetric;
+    const period = next.dataset.highlightPeriod;
+    if (metric) table.querySelectorAll(`[data-highlight-metric="${CSS.escape(metric)}"]`).forEach((element) => {
+      if (element.matches("tr")) element.classList.add("is-highlighted-group");
+    });
+    if (period) {
+      table.querySelectorAll(`[data-highlight-period="${CSS.escape(period)}"]`).forEach((element) => element.classList.add("is-highlighted-column"));
+      table.querySelector(`[data-highlight-period-trigger][data-highlight-period="${CSS.escape(period)}"]`)?.classList.add("is-highlighted-column-head");
+    }
+    next.classList.add("is-highlighted-cell");
+    next.setAttribute("aria-pressed", "true");
+    if (next.dataset.highlightDetail) {
+      card.innerHTML = next.dataset.highlightDetail;
+      card.classList.add("visible");
+      position();
+    }
+  };
+
+  document.addEventListener("click", (event) => {
+    const next = event.target.closest?.("[data-highlight-cell], [data-highlight-metric-trigger], [data-highlight-period-trigger]");
+    if (next) select(next);
+    else if (!event.target.closest?.(".metric-selection-card")) clear();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") clear();
+    if ((event.key === "Enter" || event.key === " ") && event.target.matches?.("[data-highlight-cell], [data-highlight-metric-trigger], [data-highlight-period-trigger]")) {
+      event.preventDefault();
+      event.target.click();
+    }
+  });
+  window.addEventListener("resize", position);
+  document.addEventListener("scroll", position, true);
+  metricTableHighlightController = { clear };
 }
 
 function renderCategoryFilter() {
@@ -2542,7 +2773,15 @@ function buildCompactSummary(result, analyses, _factorSummary, forecast) {
 
 function renderTable() {
   const varianceView = document.getElementById("varianceView");
-  document.body.classList.toggle("rolling-fill-mode", !["hr", "admin"].includes(state.rollingRole) && state.rollingViewMode === "fill");
+  // A scoped workspace must always win over the generic variance renderer.
+  // This also protects the procurement page when a delayed dashboard refresh runs.
+  if (state.rollingRole === "procurementPrice") {
+    varianceView?.classList.remove("show-legacy-variance");
+    renderProcurementPriceWorkspace();
+    if (els.detailBody) els.detailBody.innerHTML = "";
+    return;
+  }
+  document.body.classList.toggle("rolling-fill-mode", !isScopedBudgetRole() && state.rollingViewMode === "fill");
   if (!state.result) {
     varianceView?.classList.remove("show-legacy-variance");
     els.rowCount.textContent = `0 ${t("rowCountSuffix")}`;
@@ -2556,7 +2795,7 @@ function renderTable() {
   const collapsedCount = state.result.unsplitCategories?.length || 0;
   const collapsedText = collapsedCount ? ` · ${t("collapsedCategoryCompare").replace("{count}", collapsedCount)}` : "";
   els.rowCount.textContent = `${rows.length} ${t("rowCountSuffix")}${collapsedText}`;
-  if (["hr", "admin"].includes(state.rollingRole)) {
+  if (isScopedBudgetRole()) {
     varianceView?.classList.remove("show-legacy-variance");
     renderRollingForecastWorkspace(rows);
     if (els.detailBody) els.detailBody.innerHTML = "";
@@ -2636,6 +2875,14 @@ const HR_BUDGET_SYNC_KEY = "dwHrBudgetSync.v1";
 const ADMIN_BUDGET_INPUT_KEY = "dwAdminBudgetInputs.v1";
 const ADMIN_BUDGET_AUDIT_KEY = "dwAdminBudgetAudit.v1";
 const ADMIN_BUDGET_SYNC_KEY = "dwAdminBudgetSync.v1";
+const ADMIN_HEADCOUNT_LINK_KEY = "dwAdminHeadcountLinkage.v1";
+const ADMIN_RULE_PARAMETER_KEY = "dwAdminRuleParameters.v1";
+const ADMIN_ATTENDANCE_INPUT_KEY = "dwAdminAttendanceInputs.v1";
+const ADMIN_ATTENDANCE_SAVED_KEY = "dwAdminAttendanceSaved.v1";
+const EMPLOYEE_ATTENDANCE_INPUT_KEY = "dwEmployeeAttendanceInputs.v1";
+const EMPLOYEE_ATTENDANCE_SAVED_KEY = "dwEmployeeAttendanceSaved.v1";
+const PROCUREMENT_PRICE_CHECK_KEY = "dwProcurementPriceChecks.v1";
+const PROCUREMENT_ATTACHMENT_DB = "dwProcurementPriceAttachments.v1";
 const HR_BUDGET_DEFAULTS = {
   reviewMonth: 6,
   reviewHeadcount: 374,
@@ -2644,67 +2891,67 @@ const HR_BUDGET_DEFAULTS = {
 const HR_I18N = {
   zh: {
     breadcrumb: "第二张表 / 月度差异分析 / 预算 / 人力费用", title: "DW 人力预算工作台", subtitle: "按 Excel 人员底表与参数自动计算，责任人负责填写变动、核对结果并处理异常。",
-    permission: "人力角色 · 仅显示人力预算", saveReview: "保存校核", submitBudget: "提交人力预算", mapping: "测试假设映射", mappingNote: "测试假设映射：将源表 {source} 数据作为 DW 洗碗机预算样例，不代表源文件真实业务归属。", realSource: "源文件真实数",
+    permission: "人力角色 · 仅显示人力预算", saveReview: "保存校核", submitBudget: "提交人力预算", withdrawBudget: "撤回提交", withdrawnBudget: "人力预算已撤回至草稿，数据仍保留", mapping: "测试假设映射", mappingNote: "测试假设映射：将源表 {source} 数据作为 DW 洗碗机预算样例，不代表源文件真实业务归属。", realSource: "源文件真实数",
     baseBudget: "基础数据与预算", exceptionReview: "异常校核", approvalRecords: "审批记录", headcountPlan: "人数计划", calendarHours: "工作日与工时", wagePolicy: "工资政策", adjustmentNotes: "调整说明",
-    inputTitle: "人力责任人填报区", inputHint: "灰字为 Excel 预算标准，绿色为校核值；偏离标准必须填写理由并留痕。", editable: "可编辑", resetExcel: "恢复Excel原值",
+    inputEyebrow: "人力填报", inputTitle: "人力责任人填报区", inputHint: "灰字为 Excel 预算标准，绿色为校核值；偏离标准必须填写理由并留痕。", editable: "可编辑", resetExcel: "恢复Excel原值",
     noUnsaved: "当前无未保存变更", recordedVariance: "已有 {count} 项已记录偏差，可在“审批记录”中追溯。", alignedStandard: "当前校核值与 Excel 预算标准一致。", aligned: "已对齐", pendingChanges: "{count} 项待保存变更", adjustmentReason: "调整理由", required: "必填", reasonPlaceholder: "说明调整原因、依据和影响月份",
     employeeCategory: "人员类别", annualAverage: "全年平均", direct: "直接蓝领", indirect: "间接蓝领", whiteCollar: "白领", checkedHeadcount: "校核在岗人数", standard: "标准", headcountRule: "预算标准取自 Excel 原值。新增、离职或编制调整只修改校核值，保存时必须说明依据。",
     calendarHeader: "日历与工时", owner: "责任人", workingDays: "工作日", realHours: "每日实际工时", paidHours: "每日计薪工时", hrCheck: "人力核对", calendarRule: "汇率属于财务参数，只展示不允许人力修改；工作日和工时由人力按月核对。",
     budgetStandard: "预算标准", variance: "偏差", backendRule: "后台展开规则", backendRuleText: "按生效日期把工资增长率应用到人员薪资基数，再计算奖金、社保和失业保险。", notesHint: "修改人数、日历或工资政策后，填写原因和影响月份。", notesPlaceholder: "例如：7月新增40名直接员工，9月工资增长参数调整……",
     baseResponsibility: "基础数据与责任分层", baseResponsibilityHint: "只把需要展示、填写和核对的数据放到前台。", excelBuiltIn: "Excel 内置数据", displayOnly: "只展示 · 不填写", monthlyReview: "责任人每月核对", sourceData: "源数据", pendingReview: "待校核",
     budgetYear: "预算年度", sourceOrg: "源数据组织", employeeRecords: "人员底表记录", sourceCurrency: "源币种", outputCurrency: "输出币种", year: "年", people: "人", day: "天", hour: "小时", systemDisplay: "系统展示", sourcePeriod: "源文件预算期间", mappedToDw: "测试时映射为 DW 洗碗机", boardRecords: "Board 人员记录数", boardCurrency: "Board 原始币种", managementCurrency: "网站统一管理口径",
-    juneHeadcount: "6月预算在岗人数", juneWorkday: "6月工作日", dailyReal: "每日实际工时", dailyPaid: "每日计薪工时", juneFx: "6月 EUR/TRY", needsCheck: "需核对", financeParameter: "财务参数", activeSummary: "由人员月度在岗标记汇总", tdWorkday: "Parameters · TD 工作日", fxFormula: "TRY 金额 ÷ 汇率 = EUR",
+    juneHeadcount: "6月预算在岗人数", juneWorkday: "6月工作日", dailyReal: "每日实际工时", dailyPaid: "每日计薪工时", juneFx: "6月 EUR/TRY", needsCheck: "需核对", financeParameter: "财务参数", activeSummary: "由人员月度在岗标记汇总", tdWorkday: "参数 · TD 工作日", parameterReal: "参数 · 实际工时", parameterPaid: "参数 · 计薪工时", fxFormula: "TRY 金额 ÷ 汇率 = EUR",
     ownerMustFill: "责任人需要填写", hrFill: "HR填写", personnelChange: "人员变动", personnelChangeText: "新增人员、离职月份、部门/岗位和 Direct / Indirect 属性", salaryPolicy: "薪资与政策", salaryPolicyText: "薪资基数、工资增长参数、奖金与福利资格", adjustmentRule: "仅在覆盖系统建议或异常超阈值时填写", backendCalc: "后台计算 · 无需填写", systemCalc: "系统计算", backendCalcText: "工资增长展开、工时汇总、社保与失业险、人员到科目汇总、TRY 转 EUR、财务模板输出。",
     resultTitle: "DW 人力预算结果（按小科目）", resultHint: "单位：EUR；当前为 Excel 基线结果。填报值已保存，正式规则接入后将在这里联动重算。", account: "小科目", annualBudget: "全年预算", dataStatus: "数据状态", sourceCalculated: "源表已计算", totalHrCost: "人力费用合计", converted: "已换算",
     formulaTrace: "公式追溯 · 工资（6月）", formulaPath: "Board 人员输入 → Parameters 政策参数 → Tower 按人计算 → For Finance 科目汇总 → EUR 换算", reviewNote: "校核说明", reviewPlaceholder: "仅在覆盖系统建议或发现源数据异常时填写原因和影响范围",
     missingSource: "待补底表", missingSourceHint: "源 Excel 没有独立标准的数据不进入自动预算，待责任部门补齐。", items: "项", workwear: "工作服", mealUnit: "餐补独立单价", adminProcurement: "行政/采购", hr: "人力", noIndependentStandard: "源表未发现独立标准", cashAidIncluded: "当前归入 Aid In Cash", workwearAction: "后续接入采购单价和发放周期", mealAction: "后续确认是否拆分为独立小科目",
     hrAccounts: "人力费用科目", manualReview: "需人工校核", currentReview: "当前需核对", exceptionText: "{accounts}受人员变动、政策或一次性事项影响，需要责任人确认。", reviewPrinciple: "校核原则", reviewPrincipleText: "源表结果保持不变，调整必须留下责任人、原因和影响月份", reviewPrincipleHint: "系统计算过程在后台执行，但支持按科目追溯到来源与汇率", reviewOpinion: "校核意见", reviewOpinionPlaceholder: "填写确认或调整原因",
     approvalProgress: "预算审批进度", excelLoaded: "Excel 数据载入", completed: "已完成", tdMapped: "TD 数据假设映射为 DW", hrReview: "人力校核", currentNode: "当前节点", hrReviewHint: "核对人数、工时和异常科目", costReview: "成本复核", pending: "待处理", budgetPublish: "预算发布", basisNote: "口径说明", monthlyFx: "换算：按月度 EUR/TRY",
-    adjustmentRecords: "预算调整记录", adjustmentRecordsHint: "每一项偏离预算标准的修改都记录责任人、时间、前后值和理由。", timeOwner: "时间 / 责任人", adjustmentItem: "调整项", period: "期间", before: "修改前", after: "修改后", operation: "操作", sameAsAbove: "同上", noRecords: "尚无预算调整记录。修改校核值并填写理由后，记录会显示在这里。", systemRecords: "系统记录", node: "节点", dataBasis: "数据口径", status: "状态", dataPreparation: "数据准备", load: "载入", businessMapping: "业务映射", assumedMapped: "{source} 假设映射为 DW", testVersion: "测试版", pendingConfirm: "待确认",
+    adjustmentRecords: "预算调整记录", adjustmentRecordsHint: "每一项偏离预算标准的修改都记录责任人、时间、前后值和理由。", timeOwner: "时间 / 责任人", adjustmentItem: "调整项", period: "期间", before: "修改前", after: "修改后", operation: "操作", sameAsAbove: "同上", noRecords: "尚无预算调整记录。修改校核值并填写理由后，记录会显示在这里。", budgetWorkflow: "预算工作流", wholeYear: "2026全年", notApplicable: "—", noBusinessChanges: "无预算数值变更", systemRecords: "系统记录", node: "节点", dataBasis: "数据口径", status: "状态", dataPreparation: "数据准备", load: "载入", businessMapping: "业务映射", assumedMapped: "{source} 假设映射为 DW", testVersion: "测试版", pendingConfirm: "待确认",
     wages: "工资", overtime: "加班费", bonus: "奖金", cashAid: "现金补助", socialSecurity: "社会保险", unemployment: "失业保险", rdIncentive: "研发激励抵减", incentive: "其他激励抵减", indemnity: "离职补偿", mbo: "绩效奖金（MBO）",
     restoredDraft: "已恢复为 Excel 预算标准，请填写理由后保存", reasonRequired: "有预算变更，必须先填写调整理由", submittedTrace: "人力预算已提交财务复核并留痕", savedTrace: "已保存 {count} 项变更并写入记录", noPendingSave: "当前没有待保存变更", saveAction: "保存校核", submitAction: "提交人力预算"
   },
   en: {
     breadcrumb: "Table 2 / Monthly Variance / Budget / HR Cost", title: "DW HR Budget Workspace", subtitle: "Calculations follow the Excel employee roster and parameters. Owners enter changes, validate results and resolve exceptions.",
-    permission: "HR role · HR budget only", saveReview: "Save validation", submitBudget: "Submit HR budget", mapping: "Test assumption mapping", mappingNote: "Test mapping: {source} data is used as the DW Dishwasher budget sample. This does not represent the source file's actual business ownership.", realSource: "Real source data",
+    permission: "HR role · HR budget only", saveReview: "Save validation", submitBudget: "Submit HR budget", withdrawBudget: "Withdraw submission", withdrawnBudget: "HR budget withdrawn to draft; data was kept", mapping: "Test assumption mapping", mappingNote: "Test mapping: {source} data is used as the DW Dishwasher budget sample. This does not represent the source file's actual business ownership.", realSource: "Real source data",
     baseBudget: "Base Data & Budget", exceptionReview: "Exception Review", approvalRecords: "Approval Records", headcountPlan: "Headcount Plan", calendarHours: "Workdays & Hours", wagePolicy: "Wage Policy", adjustmentNotes: "Adjustment Notes",
-    inputTitle: "HR Owner Input", inputHint: "Grey text is the Excel budget standard and green fields are validated values. Any deviation requires a reason and audit trail.", editable: "Editable", resetExcel: "Restore Excel values",
+    inputEyebrow: "HR input", inputTitle: "HR Owner Input", inputHint: "Grey text is the Excel budget standard and green fields are validated values. Any deviation requires a reason and audit trail.", editable: "Editable", resetExcel: "Restore Excel values",
     noUnsaved: "No unsaved changes", recordedVariance: "{count} recorded deviations can be traced in Approval Records.", alignedStandard: "Validated values match the Excel budget standard.", aligned: "Aligned", pendingChanges: "{count} changes pending", adjustmentReason: "Adjustment reason", required: "Required", reasonPlaceholder: "Describe the reason, evidence and affected months",
     employeeCategory: "Employee category", annualAverage: "Annual average", direct: "Direct blue collar", indirect: "Indirect blue collar", whiteCollar: "White collar", checkedHeadcount: "Validated headcount", standard: "Std.", headcountRule: "The budget standard comes from Excel. Change only the validated value for hires, leavers or staffing adjustments and provide evidence when saving.",
     calendarHeader: "Calendar & Hours", owner: "Owner", workingDays: "Working days", realHours: "Actual hours/day", paidHours: "Paid hours/day", hrCheck: "HR validation", calendarRule: "FX is a finance parameter and read-only for HR. HR validates workdays and hours monthly.",
     budgetStandard: "Budget standard", variance: "Variance", backendRule: "Backend expansion rule", backendRuleText: "Apply wage increase rates to employee salary bases by effective date, then calculate bonus, social security and unemployment insurance.", notesHint: "After changing headcount, calendar or wage policy, state the reason and affected months.", notesPlaceholder: "Example: 40 direct employees added in July; September wage increase parameter revised...",
     baseResponsibility: "Base Data & Responsibilities", baseResponsibilityHint: "Only data that must be viewed, entered or validated is shown here.", excelBuiltIn: "Excel built-in data", displayOnly: "Display only", monthlyReview: "Monthly owner validation", sourceData: "Source data", pendingReview: "Pending review",
     budgetYear: "Budget year", sourceOrg: "Source organization", employeeRecords: "Employee roster records", sourceCurrency: "Source currency", outputCurrency: "Output currency", year: "year", people: "people", day: "day", hour: "hour", systemDisplay: "System display", sourcePeriod: "Budget period in source file", mappedToDw: "Mapped to DW Dishwasher for testing", boardRecords: "Board employee record count", boardCurrency: "Original Board currency", managementCurrency: "Website management currency",
-    juneHeadcount: "June budget headcount", juneWorkday: "June working days", dailyReal: "Actual hours/day", dailyPaid: "Paid hours/day", juneFx: "June EUR/TRY", needsCheck: "Review", financeParameter: "Finance parameter", activeSummary: "Summed from monthly active flags", tdWorkday: "Parameters · TD working days", fxFormula: "TRY amount ÷ FX = EUR",
+    juneHeadcount: "June budget headcount", juneWorkday: "June working days", dailyReal: "Actual hours/day", dailyPaid: "Paid hours/day", juneFx: "June EUR/TRY", needsCheck: "Review", financeParameter: "Finance parameter", activeSummary: "Summed from monthly active flags", tdWorkday: "Parameters · TD working days", parameterReal: "Parameters · Actual hours", parameterPaid: "Parameters · Paid hours", fxFormula: "TRY amount ÷ FX = EUR",
     ownerMustFill: "Owner input required", hrFill: "HR input", personnelChange: "Personnel changes", personnelChangeText: "New hires, leaving month, department/position and Direct/Indirect attribute", salaryPolicy: "Salary & policy", salaryPolicyText: "Salary base, wage increase parameters, bonus and benefit eligibility", adjustmentRule: "Required only when overriding system advice or an exception threshold", backendCalc: "Backend calculation · No input", systemCalc: "System", backendCalcText: "Wage expansion, hour totals, social/unemployment insurance, employee-to-account allocation, TRY-to-EUR conversion and finance output.",
     resultTitle: "DW HR Budget Results by Account", resultHint: "Unit: EUR. These are the current Excel baseline results; saved inputs will recalculate here when the formal rules engine is connected.", account: "Account", annualBudget: "Annual budget", dataStatus: "Data status", sourceCalculated: "Source calculated", totalHrCost: "Total HR cost", converted: "Converted",
     formulaTrace: "Formula trace · Wages (June)", formulaPath: "Board employee input → Parameters policy → Tower person-level calculation → For Finance account summary → EUR conversion", reviewNote: "Validation note", reviewPlaceholder: "Required only when overriding system advice or identifying source-data issues",
     missingSource: "Missing Base Tables", missingSourceHint: "Items without an independent standard in the source Excel are excluded from automatic budgeting until the responsible team supplies them.", items: "items", workwear: "Workwear", mealUnit: "Separate meal allowance rate", adminProcurement: "Admin / Procurement", hr: "HR", noIndependentStandard: "No independent standard found", cashAidIncluded: "Currently included in Aid In Cash", workwearAction: "Connect procurement price and issue cycle", mealAction: "Confirm whether to split into a separate account",
     hrAccounts: "HR cost accounts", manualReview: "Manual review", currentReview: "Current review items", exceptionText: "{accounts} are affected by staffing, policy or one-off items and require owner confirmation.", reviewPrinciple: "Validation principle", reviewPrincipleText: "Keep source results unchanged; every adjustment must record owner, reason and affected months", reviewPrincipleHint: "Calculations run in the backend and remain traceable to source and FX", reviewOpinion: "Validation comment", reviewOpinionPlaceholder: "Enter confirmation or adjustment reason",
     approvalProgress: "Budget approval progress", excelLoaded: "Excel data loaded", completed: "Completed", tdMapped: "TD data assumed as DW", hrReview: "HR validation", currentNode: "Current step", hrReviewHint: "Validate headcount, hours and exception accounts", costReview: "Cost review", pending: "Pending", budgetPublish: "Budget release", basisNote: "Basis", monthlyFx: "Conversion: monthly EUR/TRY",
-    adjustmentRecords: "Budget Adjustment Records", adjustmentRecordsHint: "Every deviation from the budget standard records owner, time, before/after values and reason.", timeOwner: "Time / Owner", adjustmentItem: "Item", period: "Period", before: "Before", after: "After", operation: "Action", sameAsAbove: "Same as above", noRecords: "No budget adjustments yet. Change a validated value and enter a reason to create a record.", systemRecords: "System Records", node: "Step", dataBasis: "Data basis", status: "Status", dataPreparation: "Data preparation", load: "Load", businessMapping: "Business mapping", assumedMapped: "{source} assumed as DW", testVersion: "Preview", pendingConfirm: "Pending confirmation",
+    adjustmentRecords: "Budget Adjustment Records", adjustmentRecordsHint: "Every deviation from the budget standard records owner, time, before/after values and reason.", timeOwner: "Time / Owner", adjustmentItem: "Item", period: "Period", before: "Before", after: "After", operation: "Action", sameAsAbove: "Same as above", noRecords: "No budget adjustments yet. Change a validated value and enter a reason to create a record.", budgetWorkflow: "Budget workflow", wholeYear: "Full year 2026", notApplicable: "—", noBusinessChanges: "No budget-value changes", systemRecords: "System Records", node: "Step", dataBasis: "Data basis", status: "Status", dataPreparation: "Data preparation", load: "Load", businessMapping: "Business mapping", assumedMapped: "{source} assumed as DW", testVersion: "Preview", pendingConfirm: "Pending confirmation",
     wages: "Wages", overtime: "Overtime", bonus: "Bonus", cashAid: "Aid in Cash", socialSecurity: "Social Security", unemployment: "Unemployment Insurance", rdIncentive: "R&D Incentive Offset", incentive: "Other Incentive Offset", indemnity: "Indemnity", mbo: "Performance Bonus (MBO)",
     restoredDraft: "Restored to the Excel budget standard. Enter a reason and save.", reasonRequired: "A reason is required for budget changes", submittedTrace: "HR budget submitted for finance review with an audit trail", savedTrace: "Saved {count} changes to the audit trail", noPendingSave: "No pending changes", saveAction: "Save validation", submitAction: "Submit HR budget"
   },
   tr: {
     breadcrumb: "Tablo 2 / Aylık Fark / Bütçe / İK Gideri", title: "DW İK Bütçe Çalışma Alanı", subtitle: "Hesaplamalar Excel çalışan listesi ve parametrelerine dayanır. Sorumlular değişiklikleri girer, sonuçları doğrular ve istisnaları çözer.",
-    permission: "İK rolü · Yalnızca İK bütçesi", saveReview: "Doğrulamayı kaydet", submitBudget: "İK bütçesini gönder", mapping: "Test varsayımı eşlemesi", mappingNote: "Test eşlemesi: {source} verileri DW Bulaşık Makinesi bütçe örneği olarak kullanılır. Bu, kaynak dosyanın gerçek iş sahipliğini göstermez.", realSource: "Gerçek kaynak verisi",
+    permission: "İK rolü · Yalnızca İK bütçesi", saveReview: "Doğrulamayı kaydet", submitBudget: "İK bütçesini gönder", withdrawBudget: "Gönderimi geri çek", withdrawnBudget: "İK bütçesi taslağa geri çekildi; veriler korundu", mapping: "Test varsayımı eşlemesi", mappingNote: "Test eşlemesi: {source} verileri DW Bulaşık Makinesi bütçe örneği olarak kullanılır. Bu, kaynak dosyanın gerçek iş sahipliğini göstermez.", realSource: "Gerçek kaynak verisi",
     baseBudget: "Temel Veri ve Bütçe", exceptionReview: "İstisna Kontrolü", approvalRecords: "Onay Kayıtları", headcountPlan: "Çalışan Planı", calendarHours: "İş Günü ve Saat", wagePolicy: "Ücret Politikası", adjustmentNotes: "Değişiklik Açıklaması",
-    inputTitle: "İK Sorumlusu Girişi", inputHint: "Gri metin Excel bütçe standardını, yeşil alan doğrulanan değeri gösterir. Her sapma gerekçe ve denetim izi gerektirir.", editable: "Düzenlenebilir", resetExcel: "Excel değerlerini geri yükle",
+    inputEyebrow: "İK girişi", inputTitle: "İK Sorumlusu Girişi", inputHint: "Gri metin Excel bütçe standardını, yeşil alan doğrulanan değeri gösterir. Her sapma gerekçe ve denetim izi gerektirir.", editable: "Düzenlenebilir", resetExcel: "Excel değerlerini geri yükle",
     noUnsaved: "Kaydedilmemiş değişiklik yok", recordedVariance: "{count} kayıtlı sapma Onay Kayıtlarında izlenebilir.", alignedStandard: "Doğrulanan değerler Excel bütçe standardıyla uyumlu.", aligned: "Uyumlu", pendingChanges: "{count} değişiklik bekliyor", adjustmentReason: "Değişiklik gerekçesi", required: "Zorunlu", reasonPlaceholder: "Gerekçe, dayanak ve etkilenen ayları açıklayın",
     employeeCategory: "Çalışan kategorisi", annualAverage: "Yıllık ortalama", direct: "Direkt mavi yaka", indirect: "Endirekt mavi yaka", whiteCollar: "Beyaz yaka", checkedHeadcount: "Doğrulanan çalışan", standard: "Std.", headcountRule: "Bütçe standardı Excel'den gelir. İşe giriş, ayrılış veya kadro değişikliğinde yalnızca doğrulanan değeri değiştirin ve kayıtta dayanak belirtin.",
     calendarHeader: "Takvim ve Saat", owner: "Sorumlu", workingDays: "İş günü", realHours: "Gerçek saat/gün", paidHours: "Ücretli saat/gün", hrCheck: "İK doğrulaması", calendarRule: "Kur finans parametresidir ve İK için salt okunurdur. İş günü ve saatleri İK aylık doğrular.",
     budgetStandard: "Bütçe standardı", variance: "Sapma", backendRule: "Arka uç uygulama kuralı", backendRuleText: "Ücret artış oranlarını yürürlük tarihine göre çalışan ücret tabanına uygular; prim, sosyal güvenlik ve işsizlik sigortasını hesaplar.", notesHint: "Çalışan, takvim veya ücret politikası değişikliğinde gerekçe ve etkilenen ayları yazın.", notesPlaceholder: "Örnek: Temmuz'da 40 direkt çalışan eklendi; Eylül ücret artış parametresi güncellendi...",
     baseResponsibility: "Temel Veri ve Sorumluluklar", baseResponsibilityHint: "Yalnızca görüntülenmesi, girilmesi veya doğrulanması gereken veriler önde gösterilir.", excelBuiltIn: "Excel hazır verisi", displayOnly: "Yalnızca görüntüle", monthlyReview: "Aylık sorumlu doğrulaması", sourceData: "Kaynak veri", pendingReview: "Kontrol bekliyor",
     budgetYear: "Bütçe yılı", sourceOrg: "Kaynak organizasyon", employeeRecords: "Çalışan listesi kaydı", sourceCurrency: "Kaynak para birimi", outputCurrency: "Çıktı para birimi", year: "yıl", people: "kişi", day: "gün", hour: "saat", systemDisplay: "Sistem gösterimi", sourcePeriod: "Kaynak dosya bütçe dönemi", mappedToDw: "Test için DW Bulaşık Makinesine eşlendi", boardRecords: "Board çalışan kayıt sayısı", boardCurrency: "Board orijinal para birimi", managementCurrency: "Web yönetim para birimi",
-    juneHeadcount: "Haziran bütçe çalışanı", juneWorkday: "Haziran iş günü", dailyReal: "Gerçek saat/gün", dailyPaid: "Ücretli saat/gün", juneFx: "Haziran EUR/TRY", needsCheck: "Kontrol", financeParameter: "Finans parametresi", activeSummary: "Aylık aktif işaretlerinden toplam", tdWorkday: "Parameters · TD iş günü", fxFormula: "TRY tutarı ÷ kur = EUR",
+    juneHeadcount: "Haziran bütçe çalışanı", juneWorkday: "Haziran iş günü", dailyReal: "Gerçek saat/gün", dailyPaid: "Ücretli saat/gün", juneFx: "Haziran EUR/TRY", needsCheck: "Kontrol", financeParameter: "Finans parametresi", activeSummary: "Aylık aktif işaretlerinden toplam", tdWorkday: "Parametreler · TD iş günü", parameterReal: "Parametreler · Gerçek saat", parameterPaid: "Parametreler · Ücretli saat", fxFormula: "TRY tutarı ÷ kur = EUR",
     ownerMustFill: "Sorumlu girişi gerekli", hrFill: "İK girişi", personnelChange: "Personel değişikliği", personnelChangeText: "Yeni işe giriş, ayrılış ayı, bölüm/pozisyon ve Direct/Indirect özelliği", salaryPolicy: "Ücret ve politika", salaryPolicyText: "Ücret tabanı, ücret artış parametresi, prim ve yan hak uygunluğu", adjustmentRule: "Yalnızca sistem önerisi aşılırsa veya istisna eşiği geçilirse gereklidir", backendCalc: "Arka uç hesabı · Giriş yok", systemCalc: "Sistem", backendCalcText: "Ücret artışı, saat toplamı, sosyal/işsizlik sigortası, çalışan-hesap dağıtımı, TRY-EUR dönüşümü ve finans çıktısı.",
     resultTitle: "Hesap Bazında DW İK Bütçe Sonuçları", resultHint: "Birim: EUR. Bunlar mevcut Excel baz sonuçlarıdır; resmi kural motoru bağlandığında kayıtlı girişler burada yeniden hesaplanır.", account: "Hesap", annualBudget: "Yıllık bütçe", dataStatus: "Veri durumu", sourceCalculated: "Kaynak hesaplandı", totalHrCost: "Toplam İK gideri", converted: "Dönüştürüldü",
     formulaTrace: "Formül izi · Ücretler (Haziran)", formulaPath: "Board çalışan girişi → Parameters politika → Tower kişi bazlı hesap → For Finance hesap özeti → EUR dönüşümü", reviewNote: "Doğrulama notu", reviewPlaceholder: "Yalnızca sistem önerisi aşılırsa veya kaynak veri sorunu bulunursa doldurun",
     missingSource: "Eksik Temel Tablolar", missingSourceHint: "Kaynak Excel'de bağımsız standardı olmayan kalemler, sorumlu ekip tamamlayana kadar otomatik bütçeye girmez.", items: "kalem", workwear: "İş kıyafeti", mealUnit: "Ayrı yemek yardımı oranı", adminProcurement: "İdari / Satın Alma", hr: "İK", noIndependentStandard: "Bağımsız standart bulunamadı", cashAidIncluded: "Şu anda Aid In Cash içinde", workwearAction: "Satın alma fiyatı ve dağıtım periyodu bağlanacak", mealAction: "Ayrı hesaba bölünüp bölünmeyeceği doğrulanacak",
     hrAccounts: "İK gider hesapları", manualReview: "Manuel kontrol", currentReview: "Mevcut kontrol kalemleri", exceptionText: "{accounts} personel, politika veya tek seferlik kalemlerden etkilenir ve sorumlu onayı gerektirir.", reviewPrinciple: "Doğrulama ilkesi", reviewPrincipleText: "Kaynak sonuç değişmez; her düzeltmede sorumlu, gerekçe ve etkilenen ay kaydedilir", reviewPrincipleHint: "Hesap arka uçta çalışır ve kaynak ile kura kadar izlenebilir", reviewOpinion: "Doğrulama görüşü", reviewOpinionPlaceholder: "Onay veya değişiklik gerekçesini girin",
     approvalProgress: "Bütçe onay süreci", excelLoaded: "Excel verisi yüklendi", completed: "Tamamlandı", tdMapped: "TD verisi DW olarak varsayıldı", hrReview: "İK doğrulaması", currentNode: "Geçerli adım", hrReviewHint: "Çalışan, saat ve istisna hesaplarını doğrulayın", costReview: "Maliyet kontrolü", pending: "Bekliyor", budgetPublish: "Bütçe yayını", basisNote: "Esas", monthlyFx: "Dönüşüm: aylık EUR/TRY",
-    adjustmentRecords: "Bütçe Değişiklik Kayıtları", adjustmentRecordsHint: "Bütçe standardından her sapma; sorumlu, zaman, önce/sonra değeri ve gerekçeyle kaydedilir.", timeOwner: "Zaman / Sorumlu", adjustmentItem: "Kalem", period: "Dönem", before: "Önce", after: "Sonra", operation: "İşlem", sameAsAbove: "Yukarıdakiyle aynı", noRecords: "Henüz bütçe değişikliği yok. Kayıt oluşturmak için doğrulanan değeri değiştirip gerekçe girin.", systemRecords: "Sistem Kayıtları", node: "Adım", dataBasis: "Veri esası", status: "Durum", dataPreparation: "Veri hazırlığı", load: "Yükle", businessMapping: "İş eşlemesi", assumedMapped: "{source} DW olarak varsayıldı", testVersion: "Önizleme", pendingConfirm: "Onay bekliyor",
+    adjustmentRecords: "Bütçe Değişiklik Kayıtları", adjustmentRecordsHint: "Bütçe standardından her sapma; sorumlu, zaman, önce/sonra değeri ve gerekçeyle kaydedilir.", timeOwner: "Zaman / Sorumlu", adjustmentItem: "Kalem", period: "Dönem", before: "Önce", after: "Sonra", operation: "İşlem", sameAsAbove: "Yukarıdakiyle aynı", noRecords: "Henüz bütçe değişikliği yok. Kayıt oluşturmak için doğrulanan değeri değiştirip gerekçe girin.", budgetWorkflow: "Bütçe iş akışı", wholeYear: "2026 tam yıl", notApplicable: "—", noBusinessChanges: "Bütçe değeri değişikliği yok", systemRecords: "Sistem Kayıtları", node: "Adım", dataBasis: "Veri esası", status: "Durum", dataPreparation: "Veri hazırlığı", load: "Yükle", businessMapping: "İş eşlemesi", assumedMapped: "{source} DW olarak varsayıldı", testVersion: "Önizleme", pendingConfirm: "Onay bekliyor",
     wages: "Ücretler", overtime: "Fazla Mesai", bonus: "Prim", cashAid: "Nakdi Yardım", socialSecurity: "Sosyal Güvenlik", unemployment: "İşsizlik Sigortası", rdIncentive: "Ar-Ge Teşvik Mahsubu", incentive: "Diğer Teşvik Mahsubu", indemnity: "Kıdem Tazminatı", mbo: "Performans Primi (MBO)",
     restoredDraft: "Excel bütçe standardına dönüldü. Gerekçe girip kaydedin.", reasonRequired: "Bütçe değişiklikleri için gerekçe zorunludur", submittedTrace: "İK bütçesi denetim iziyle finans kontrolüne gönderildi", savedTrace: "{count} değişiklik denetim izine kaydedildi", noPendingSave: "Bekleyen değişiklik yok", saveAction: "Doğrulamayı kaydet", submitAction: "İK bütçesini gönder"
   }
@@ -2718,6 +2965,86 @@ let hrBudgetAudit = loadHrBudgetAudit();
 let adminBudgetInputs = loadAdminBudgetInputs();
 let adminBudgetSavedInputs = clonePlain(adminBudgetInputs);
 let adminBudgetAudit = loadAdminBudgetAudit();
+let adminHeadcountLinkage = loadAdminHeadcountLinkage();
+let adminRuleParameters = loadAdminRuleParameters();
+let attendanceInputs = loadAttendanceInputs();
+let attendanceSavedInputs = loadAttendanceSavedInputs();
+let employeeAttendanceInputs = loadEmployeeAttendanceInputs();
+let employeeAttendanceSavedInputs = loadEmployeeAttendanceSavedInputs();
+let attendanceImportPreview = null;
+let employeeAttendanceImportPreview = null;
+let procurementPriceChecks = loadProcurementPriceChecks();
+const procurementAttachmentFiles = new Map();
+
+function loadProcurementPriceChecks() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROCUREMENT_PRICE_CHECK_KEY) || "null");
+    return { checks: { ...(saved?.checks || {}) }, drafts: { ...(saved?.drafts || {}) } };
+  } catch {
+    return { checks: {}, drafts: {} };
+  }
+}
+
+function saveProcurementPriceChecks() {
+  localStorage.setItem(PROCUREMENT_PRICE_CHECK_KEY, JSON.stringify(procurementPriceChecks));
+}
+
+function procurementCheckKey(categoryId, lineId, monthIndex = employeeAttendanceMonthIndex()) {
+  return `${categoryId}.${lineId}.${monthIndex}`;
+}
+
+function procurementDraft(categoryId) {
+  return procurementPriceChecks.drafts[categoryId] || { values: {}, reason: "", attachment: null };
+}
+
+function procurementPriceCheck(categoryId, lineId, monthIndex = employeeAttendanceMonthIndex()) {
+  return procurementPriceChecks.checks[procurementCheckKey(categoryId, lineId, monthIndex)] || null;
+}
+
+function procurementPricesForMonth(monthIndex = employeeAttendanceMonthIndex()) {
+  const prices = {};
+  for (const [categoryId, lines] of Object.entries(DW_PROCUREMENT_PRICE_LINES)) {
+    for (const line of lines) {
+      const check = procurementPriceCheck(categoryId, line.id, monthIndex);
+      if (check && Number.isFinite(Number(check.value))) prices[line.id] = Number(check.value);
+    }
+  }
+  return prices;
+}
+
+function procurementAttachmentId(key) {
+  return `procurement-${key}`;
+}
+
+function putProcurementAttachment(id, file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !window.indexedDB) { resolve(); return; }
+    const open = indexedDB.open(PROCUREMENT_ATTACHMENT_DB, 1);
+    open.onupgradeneeded = () => open.result.createObjectStore("files");
+    open.onerror = () => reject(open.error || new Error("Unable to open attachment storage"));
+    open.onsuccess = () => {
+      const transaction = open.result.transaction("files", "readwrite");
+      transaction.objectStore("files").put(file, id);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error || new Error("Unable to save attachment"));
+    };
+  });
+}
+
+function deleteProcurementAttachment(id) {
+  return new Promise((resolve) => {
+    if (!window.indexedDB) { resolve(); return; }
+    const open = indexedDB.open(PROCUREMENT_ATTACHMENT_DB, 1);
+    open.onupgradeneeded = () => open.result.createObjectStore("files");
+    open.onerror = () => resolve();
+    open.onsuccess = () => {
+      const transaction = open.result.transaction("files", "readwrite");
+      transaction.objectStore("files").delete(id);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => resolve();
+    };
+  });
+}
 
 function hrT(key, values = {}) {
   let text = HR_I18N[state.language]?.[key] || HR_I18N.zh[key] || key;
@@ -2777,6 +3104,8 @@ const ROLLING_FORECAST_TEXT = {
     submitAll: "提交全部预测",
     saveCurrent: "保存当前科目",
     submitCurrent: "提交当前科目",
+    withdrawCurrent: "撤回当前科目",
+    withdrawAll: "撤回全部提交",
     fillMode: "填报版",
     varianceMode: "差异版",
     account: "科目",
@@ -2826,6 +3155,8 @@ const ROLLING_FORECAST_TEXT = {
     submittedToast: "滚动预测已提交",
     currentSaved: "当前科目草稿已保存",
     currentSubmitted: "当前科目已提交",
+    currentWithdrawn: "当前科目已撤回至草稿",
+    allWithdrawn: "已撤回全部提交，填报内容仍保留",
     missingOwnerHint: "请补责任人",
     warningHint: "超过上月20%",
     status: "状态",
@@ -2850,6 +3181,8 @@ const ROLLING_FORECAST_TEXT = {
     submitAll: "Submit All Forecasts",
     saveCurrent: "Save Current Account",
     submitCurrent: "Submit Current Account",
+    withdrawCurrent: "Withdraw Current Account",
+    withdrawAll: "Withdraw All Submissions",
     fillMode: "Input View",
     varianceMode: "Variance View",
     account: "Account",
@@ -2899,6 +3232,8 @@ const ROLLING_FORECAST_TEXT = {
     submittedToast: "Rolling forecast submitted",
     currentSaved: "Current account draft saved",
     currentSubmitted: "Current account submitted",
+    currentWithdrawn: "Current account withdrawn to draft",
+    allWithdrawn: "All submissions withdrawn; inputs were kept",
     missingOwnerHint: "Add owner",
     warningHint: "Over 20% vs previous month",
     status: "Status",
@@ -2923,6 +3258,8 @@ const ROLLING_FORECAST_TEXT = {
     submitAll: "Tüm Tahminleri Gönder",
     saveCurrent: "Seçili Hesabı Kaydet",
     submitCurrent: "Seçili Hesabı Gönder",
+    withdrawCurrent: "Seçili Hesabı Geri Çek",
+    withdrawAll: "Tüm Gönderimleri Geri Çek",
     fillMode: "Giriş Görünümü",
     varianceMode: "Fark Görünümü",
     account: "Hesap",
@@ -2972,6 +3309,8 @@ const ROLLING_FORECAST_TEXT = {
     submittedToast: "Dönen tahmin gönderildi",
     currentSaved: "Seçili hesap taslağı kaydedildi",
     currentSubmitted: "Seçili hesap gönderildi",
+    currentWithdrawn: "Seçili hesap taslağa geri çekildi",
+    allWithdrawn: "Tüm gönderimler geri çekildi; girişler korundu",
     missingOwnerHint: "Sorumlu ekle",
     warningHint: "Önceki aya göre %20 üzeri",
     status: "Durum",
@@ -2989,6 +3328,9 @@ function renderRollingForecastWorkspace(rows) {
   if (!els.forecastWorkspace) return;
   document.body.classList.toggle("hr-budget-mode", state.rollingRole === "hr");
   document.body.classList.toggle("admin-budget-mode", state.rollingRole === "admin");
+  document.body.classList.toggle("attendance-budget-mode", state.rollingRole === "attendance");
+  document.body.classList.toggle("employee-attendance-mode", state.rollingRole === "employeeAttendance");
+  document.body.classList.toggle("procurement-price-mode", state.rollingRole === "procurementPrice");
   refreshProductNavigation();
   if (state.rollingRole === "hr") {
     renderHrBudgetWorkspace();
@@ -2996,6 +3338,18 @@ function renderRollingForecastWorkspace(rows) {
   }
   if (state.rollingRole === "admin") {
     renderAdminBudgetWorkspace();
+    return;
+  }
+  if (state.rollingRole === "attendance") {
+    renderAttendanceWorkspace();
+    return;
+  }
+  if (state.rollingRole === "employeeAttendance") {
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  if (state.rollingRole === "procurementPrice") {
+    renderProcurementPriceWorkspace();
     return;
   }
   ensureHrBudgetBaselineSync();
@@ -3040,6 +3394,7 @@ function renderRollingForecastWorkspace(rows) {
             <button type="button" data-rf-view-mode="variance">${escapeHtml(rfCompactT("varianceView"))}</button>
           </div>
           <button type="button" class="ghost-button" data-rf-action="save-all" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfCompactT("save"))}</button>
+          ${roleMeta.some((item) => item.submitted) ? `<button type="button" class="ghost-button" data-rf-action="withdraw-all" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfCompactT("withdraw"))}</button>` : ""}
           <button type="button" data-rf-action="submit-all" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfCompactT("submit"))}</button>
         </div>
       </div>
@@ -3062,6 +3417,7 @@ function rfCompactT(key) {
       excelPending: "Excel基线（待预算）",
       save: "保存草稿",
       submit: "提交预算",
+      withdraw: "撤回提交",
       code: "科目编码",
       account: "科目名称",
       source: "来源",
@@ -3091,6 +3447,7 @@ function rfCompactT(key) {
       excelPending: "Excel baseline (pending)",
       save: "Save draft",
       submit: "Submit budget",
+      withdraw: "Withdraw submission",
       code: "Account",
       account: "Account name",
       source: "Source",
@@ -3120,6 +3477,7 @@ function rfCompactT(key) {
       excelPending: "Excel baz (bekliyor)",
       save: "Taslağı kaydet",
       submit: "Bütçeyi gönder",
+      withdraw: "Gönderimi geri çek",
       code: "Hesap",
       account: "Hesap adı",
       source: "Kaynak",
@@ -3250,38 +3608,41 @@ function rfCompactEditor(item) {
 function adminT(key) {
   const copy = {
     zh: {
-      title: "DW 行政预算工作台", subtitle: "按 Administration Budget R2 标准校核，变更必须填写原因。", permission: "行政角色 · 仅显示行政预算",
-      conditions: "预算条件", results: "预算结果", rules: "计算口径", audit: "变更记录", save: "保存责任人", submit: "提交行政预算",
-      categories: "预算科目", completed: "已完成预算", pending: "待补标准", annual: "DW全年预算", source: "源文件",
+      title: "DW 行政预测工作台", subtitle: "按行政预测标准校核，变更必须填写原因。", permission: "行政角色 · 仅显示行政预测",
+      conditions: "预算条件", results: "预算结果", rules: "计算口径", audit: "变更记录", save: "保存责任人", submit: "提交行政预算", withdraw: "撤回提交", withdrawn: "行政预算已撤回至草稿，数据仍保留",
+      categories: "预算科目", completed: "已完成预算", pending: "待补标准", annual: "DW全年预算", source: "源文件", sourceHint: "2026年行政预测基线",
       category: "科目", account: "三张表科目号", standard: "Excel标准", status: "状态", ready: "已预算", missing: "未完成",
       annualTotal: "全年", reason: "调整原因", reasonHint: "仅在修改Excel预算标准时填写原因和依据", formula: "计算逻辑", drivers: "需核对数据", allocation: "月度展开",
       changed: "已修改", unchanged: "与Excel一致", sourceUnit: "源表TRY，网站与第二张表统一为K€", noAudit: "暂无变更记录",
       reasonRequired: "修改预算标准后必须填写对应科目的调整原因", saved: "行政预算校核已保存并留痕", submitted: "行政预算已提交并同步到第二张表",
-      time: "时间", owner: "责任人", beforeAfter: "修改前 → 修改后", operation: "操作", pendingNote: "源表尚无DW预算结果，不同步到第二张表"
+      time: "时间", owner: "责任人", changeSource: "变更来源", changedFact: "变化事实", operation: "系统联动", pendingNote: "源表尚无DW预算结果，不同步到第二张表",
+      linkedBudgets: "已自动联动相关预算", employeeFact: "员工人数预测已保存", attendanceFact: "行政出勤人数已保存", procurementFact: "采购价格已校核", procurementRevokeFact: "采购价格已撤回", adminFact: "行政预算标准已调整", workflowFact: "行政预算工作流状态已变更", workflowPeriod: "2026全年", noBusinessChanges: "无预算数值变更"
       ,provider: "提供部门", system: "数据来源", frequency: "更新频率", condition: "预算条件", ownerPending: "待指定责任人", fixedFormula: "固定计算公式", resultReadonly: "系统计算结果，只读并同步到第二张表", responsibilitySaved: "责任人分工已保存"
       ,resultAccountName: "小科目名称", resultAccountCode: "小科目号", sourceCategories: "预算来源", sourceStandard: "按来源系统标准"
     },
     en: {
-      title: "DW Administration Budget", subtitle: "Validate Administration Budget R2 standards. Every override requires a reason.", permission: "Administration role · Administration budget only",
-      conditions: "Budget inputs", results: "Budget results", rules: "Calculation rules", audit: "Change log", save: "Save owners", submit: "Submit admin budget",
-      categories: "Budget items", completed: "Budgeted", pending: "Standard missing", annual: "DW annual budget", source: "Source file",
+      title: "DW Administration Forecast", subtitle: "Validate administration-forecast standards. Every override requires a reason.", permission: "Administration role · Administration forecast only",
+      conditions: "Budget inputs", results: "Budget results", rules: "Calculation rules", audit: "Change log", save: "Save owners", submit: "Submit admin budget", withdraw: "Withdraw submission", withdrawn: "Administration budget withdrawn to draft; data was kept",
+      categories: "Budget items", completed: "Budgeted", pending: "Standard missing", annual: "DW annual budget", source: "Source file", sourceHint: "2026 administration forecast baseline",
       category: "Item", account: "Account", standard: "Excel standard", status: "Status", ready: "Budgeted", missing: "Incomplete",
       annualTotal: "Annual", reason: "Change reason", reasonHint: "Required only when overriding the Excel budget standard", formula: "Formula", drivers: "Review inputs", allocation: "Monthly allocation",
       changed: "Changed", unchanged: "Matches Excel", sourceUnit: "Source in TRY; site and second table use K€", noAudit: "No changes recorded",
       reasonRequired: "Enter a reason for every changed budget item", saved: "Administration review saved with audit trail", submitted: "Administration budget submitted and synced to the second table",
-      time: "Time", owner: "Owner", beforeAfter: "Before → After", operation: "Action", pendingNote: "No DW result in source; excluded from second-table sync"
+      time: "Time", owner: "Owner", changeSource: "Change source", changedFact: "Changed fact", operation: "System linkage", pendingNote: "No DW result in source; excluded from second-table sync",
+      linkedBudgets: "Related budgets automatically updated", employeeFact: "Employee headcount forecast saved", attendanceFact: "Administration attendance headcount saved", procurementFact: "Procurement price validated", procurementRevokeFact: "Procurement price validation revoked", adminFact: "Administration budget standard adjusted", workflowFact: "Administration budget workflow status changed", workflowPeriod: "Full year 2026", noBusinessChanges: "No budget-value changes"
       ,provider: "Provider", system: "Data source", frequency: "Frequency", condition: "Budget input", ownerPending: "Assign owner", fixedFormula: "Fixed formula", resultReadonly: "System-calculated, read-only and synced to the second table", responsibilitySaved: "Responsibility owners saved"
       ,resultAccountName: "Account name", resultAccountCode: "Account code", sourceCategories: "Budget sources", sourceStandard: "Source-system standard"
     },
     tr: {
-      title: "DW İdari Bütçe", subtitle: "Administration Budget R2 standartlarını doğrulayın. Her değişiklik gerekçe gerektirir.", permission: "İdari rol · Yalnızca idari bütçe",
-      conditions: "Bütçe girdileri", results: "Bütçe sonuçları", rules: "Hesaplama kuralları", audit: "Değişiklik kaydı", save: "Sorumluları kaydet", submit: "İdari bütçeyi gönder",
-      categories: "Bütçe kalemleri", completed: "Bütçelendi", pending: "Standart eksik", annual: "DW yıllık bütçe", source: "Kaynak dosya",
+      title: "DW İdari Tahmin", subtitle: "İdari tahmin standartlarını doğrulayın. Her değişiklik gerekçe gerektirir.", permission: "İdari rol · Yalnızca idari tahmin",
+      conditions: "Bütçe girdileri", results: "Bütçe sonuçları", rules: "Hesaplama kuralları", audit: "Değişiklik kaydı", save: "Sorumluları kaydet", submit: "İdari bütçeyi gönder", withdraw: "Gönderimi geri çek", withdrawn: "İdari bütçe taslağa geri çekildi; veriler korundu",
+      categories: "Bütçe kalemleri", completed: "Bütçelendi", pending: "Standart eksik", annual: "DW yıllık bütçe", source: "Kaynak dosya", sourceHint: "2026 idari tahmin bazı",
       category: "Kalem", account: "Hesap", standard: "Excel standardı", status: "Durum", ready: "Bütçelendi", missing: "Eksik",
       annualTotal: "Yıllık", reason: "Değişiklik nedeni", reasonHint: "Yalnızca Excel bütçe standardı değiştirildiğinde zorunludur", formula: "Formül", drivers: "Kontrol verileri", allocation: "Aylık dağılım",
       changed: "Değişti", unchanged: "Excel ile aynı", sourceUnit: "Kaynak TRY; web ve ikinci tablo K€", noAudit: "Değişiklik kaydı yok",
       reasonRequired: "Değiştirilen her bütçe kalemi için gerekçe girin", saved: "İdari bütçe kontrolü denetim iziyle kaydedildi", submitted: "İdari bütçe ikinci tabloya gönderildi",
-      time: "Zaman", owner: "Sorumlu", beforeAfter: "Önce → Sonra", operation: "İşlem", pendingNote: "Kaynakta DW sonucu yok; ikinci tabloya aktarılmaz"
+      time: "Zaman", owner: "Sorumlu", changeSource: "Değişiklik kaynağı", changedFact: "Değişiklik", operation: "Sistem bağlantısı", pendingNote: "Kaynakta DW sonucu yok; ikinci tabloya aktarılmaz",
+      linkedBudgets: "İlgili bütçeler otomatik güncellendi", employeeFact: "Çalışan sayısı tahmini kaydedildi", attendanceFact: "İdari işler personel sayısı kaydedildi", procurementFact: "Satın alma fiyatı doğrulandı", procurementRevokeFact: "Satın alma fiyat doğrulaması geri alındı", adminFact: "İdari bütçe standardı değiştirildi", workflowFact: "İdari bütçe iş akışı durumu değişti", workflowPeriod: "2026 tam yıl", noBusinessChanges: "Bütçe değeri değişikliği yok"
       ,provider: "Sağlayan bölüm", system: "Veri kaynağı", frequency: "Sıklık", condition: "Bütçe girdisi", ownerPending: "Sorumlu ata", fixedFormula: "Sabit formül", resultReadonly: "Sistem hesabı salt okunur ve ikinci tabloya aktarılır", responsibilitySaved: "Sorumlular kaydedildi"
       ,resultAccountName: "Hesap adı", resultAccountCode: "Hesap kodu", sourceCategories: "Bütçe kaynakları", sourceStandard: "Kaynak sistem standardı"
     }
@@ -3301,6 +3662,24 @@ const ADMIN_FORMULA_TR = {
   fleetFuel: "Aylık kira x 12 + aylık yakıt litresi x yakıt fiyatı x 12; masraf merkezi bazında toplam", canteen: "(uygun çalışan x iş günü + Pazar mesaisi çalışanı x 5) x aylık yemek fiyatı", shuttle: "Katılım x iş günü x servis birim fiyatı; fiyat = hat maliyeti / (16 x hedef doluluk) x 2", hiring: "İşe alım kanal bazı x (1 + %30) + planlı açık pozisyon maliyeti", training: "Bölüm bazı x (1 + %30); seçili Ar-Ge gideri çalışan payı x eğitim havuzu x EUR/TRY", sodexo: "Uygun çalışan listesi x 250 iş günü x 455 TRY/gün", security: "Hizmet çalışanı x 2026 aylık fiyat x 12 x 1.1 + sabit yardım", cleaning: "Hizmet çalışanı x 2026 aylık fiyat x 12 x 1.1 + sabit yardım", flatRent: "Aylık kira x 12; ortak konut masraf merkezi bazında dağıtılır", otherSuppliers: "Hizmet çalışanı x 2026 aylık fiyat x 12; seçili kalemler x 1.1", doctorNurse: "Doktor/hemşire sayısı x aylık hizmet fiyatı x 12", uniforms: "Uygun çalışan x ürün fiyatı x dağıtım adedi x 1.2 + özel ekipman", socialAids: "İlk yarı çalışan x 8.000 TRY + ikinci yarı çalışan x 8.000 TRY", ramadanFood: "Uygun çalışan x gıda paketi fiyatı x 1.1", shoes: "Uygun çalışan x ayakkabı fiyatı x 2 dağıtım x 1.1", entertainment: "Etkinlik çalışanı/adedi x 2026 fiyatı + sabit şirket etkinlikleri", mobile: "2025 aylık gideri x 1.3 x 12; seçili kalemler x adet", rewards: "Ödül adedi x 2026 ödül fiyatı", waste: "[((7 aylık gerçekleşen / 7 x 12 + 7 aylık gerçekleşen) x bertaraf fiyatı) + nakliye] x 1.3", hiringHealth: "Planlı işe alım x (1.500 TRY x 1.3)", socialAudits: "2025 Sedex denetim gideri x 1.3", waterBottles: "Adet x (500 TRY x 1.3)", hrPrograms: "Sabit lisans adedi x EUR/TRY; diğer sistemler = 2025 gideri x 1.3", privateHealth: "Unvan/yakın türü çalışan adedi x 2026 primi + hayat sigortası", otherAdmin: "İlk 9 ay gerçekleşen / 9 x 12"
 };
 
+const ADMIN_HEADCOUNT_FORMULA_I18N = {
+  zh: {
+    canteen: "（用餐适用人数 + 1% Overtime）×工作日×餐费单价；已取消周日加班",
+    shuttle: "乘车适用人数×工作日×人均班车单价；单价=线路成本÷（16×72%）×2；已取消周日加班",
+    uniforms: "BC / WC / SUB按原Excel物品矩阵计算年度费用；仅固定100件外套×1.2；当前月=年度费用÷12"
+  },
+  en: {
+    canteen: "(eligible headcount + 1% overtime) × workdays × meal unit price; Sunday overtime excluded",
+    shuttle: "eligible riders × workdays × route cost / (16 × 72%) × 2; Sunday overtime excluded",
+    uniforms: "BC / WC / SUB use the original Excel issue matrix; only 100 fixed coats × 1.2; current month = annual result ÷ 12"
+  },
+  tr: {
+    canteen: "(uygun çalışan + %1 fazla mesai) × iş günü × yemek birim fiyatı; Pazar mesaisi hariç",
+    shuttle: "uygun servis yolcusu × iş günü × hat maliyeti / (16 × %72) × 2; Pazar mesaisi hariç",
+    uniforms: "BC / WC / SUB orijinal Excel dağıtım matrisini kullanır; yalnızca 100 sabit mont × 1,2; cari ay = yıllık sonuç ÷ 12"
+  }
+};
+
 const ADMIN_DRIVER_EN = { vehicleList:"Vehicle and allocation list",rentPrice:"Monthly rent",fuelQuota:"Monthly fuel quota",fuelPrice:"Fuel price",headcount:"Eligible headcount",workdays:"Workdays",sundayOt:"Sunday overtime headcount",mealPrice:"Meal unit price",routeCost:"Route cost",occupancy:"Target occupancy",channelBaseline:"Recruitment-channel baseline",vacancies:"Planned vacancies",increase:"Increase rate",trainingPlan:"Department training plan",trainingPrice:"Course/training-pool price",fx:"EUR/TRY rate",roster:"Eligible roster",annualDays:"Annual workdays",dailyPrice:"Daily rate",fte:"Service FTE",monthlyPrice:"Monthly service rate",allowance:"Fixed allowance",housingList:"Housing list",allocation:"Cost-center allocation",surcharge:"Surcharge factor",issueQty:"Issue quantity/frequency",itemPrice:"Item unit price",aidStandard:"Aid standard",tisRate:"TIS increase rate",packagePrice:"Food-package price",issueRule:"Issue rule",shoePrice:"Shoe unit price",activityPlan:"Activity plan and count",activityPrice:"Activity unit price",userCount:"User quantity",monthlyTariff:"Monthly tariff",rewardQty:"Reward quantities",rewardPrice:"Reward unit price",wasteQty:"Waste quantity",handlingPrice:"Disposal unit price",transportPrice:"Transport fee",actualBaseline:"Actual baseline",hiringQty:"Planned hires",checkPrice:"Health-check price",auditPlan:"Audit plan",auditPrice:"Audit fee",quantity:"Quantity",unitPrice:"Unit price",licenseQty:"Licence quantity",licensePrice:"Licence unit price",insuredRoster:"Insured roster and dependent type",premium:"2026 premium",lifeInsurance:"Life-insurance standard",actual9m:"First 9 months actual",scope:"Expense scope" };
 const ADMIN_DRIVER_TR = { vehicleList:"Araç ve dağılım listesi",rentPrice:"Aylık kira",fuelQuota:"Aylık yakıt limiti",fuelPrice:"Yakıt fiyatı",headcount:"Uygun çalışan sayısı",workdays:"İş günleri",sundayOt:"Pazar mesaisi çalışanı",mealPrice:"Yemek birim fiyatı",routeCost:"Hat maliyeti",occupancy:"Hedef doluluk",channelBaseline:"İşe alım kanal bazı",vacancies:"Planlı açık pozisyon",increase:"Artış oranı",trainingPlan:"Bölüm eğitim planı",trainingPrice:"Kurs/eğitim havuzu fiyatı",fx:"EUR/TRY kuru",roster:"Uygun çalışan listesi",annualDays:"Yıllık iş günü",dailyPrice:"Günlük fiyat",fte:"Hizmet çalışanı",monthlyPrice:"Aylık hizmet fiyatı",allowance:"Sabit yardım",housingList:"Konut listesi",allocation:"Masraf merkezi dağılımı",surcharge:"Ek katsayı",issueQty:"Dağıtım adedi/sıklığı",itemPrice:"Ürün birim fiyatı",aidStandard:"Yardım standardı",tisRate:"TİS artış oranı",packagePrice:"Gıda paketi fiyatı",issueRule:"Dağıtım kuralı",shoePrice:"Ayakkabı birim fiyatı",activityPlan:"Etkinlik planı ve adedi",activityPrice:"Etkinlik birim fiyatı",userCount:"Kullanıcı adedi",monthlyTariff:"Aylık tarife",rewardQty:"Ödül adetleri",rewardPrice:"Ödül birim fiyatı",wasteQty:"Atık miktarı",handlingPrice:"Bertaraf birim fiyatı",transportPrice:"Nakliye ücreti",actualBaseline:"Gerçekleşen baz",hiringQty:"Planlı işe alım",checkPrice:"Sağlık kontrolü fiyatı",auditPlan:"Denetim planı",auditPrice:"Denetim ücreti",quantity:"Miktar",unitPrice:"Birim fiyat",licenseQty:"Lisans adedi",licensePrice:"Lisans birim fiyatı",insuredRoster:"Sigortalı listesi ve yakın türü",premium:"2026 primi",lifeInsurance:"Hayat sigortası standardı",actual9m:"İlk 9 ay gerçekleşen",scope:"Gider kapsamı" };
 
@@ -3310,8 +3689,8 @@ const ADMIN_SYSTEM_I18N = {
 };
 
 const ADMIN_PROVIDER_I18N = {
-  en: { "行政部门":"Administration", "间接采购":"Indirect Procurement", "人力资源":"HR", "财务部门":"Finance", "EHS/生产部门":"EHS / Production", "人力资源/合规":"HR / Compliance", "间接采购/IT":"Indirect Procurement / IT" },
-  tr: { "行政部门":"İdari İşler", "间接采购":"Endirekt Satın Alma", "人力资源":"İnsan Kaynakları", "财务部门":"Finans", "EHS/生产部门":"EHS / Üretim", "人力资源/合规":"İK / Uygunluk", "间接采购/IT":"Endirekt Satın Alma / BT" }
+  en: { "行政部门":"Administration", "生产计划部门":"Production Planning", "间接采购":"Indirect Procurement", "人力资源":"HR", "财务部门":"Finance", "EHS/生产部门":"EHS / Production", "人力资源/合规":"HR / Compliance", "间接采购/IT":"Indirect Procurement / IT" },
+  tr: { "行政部门":"İdari İşler", "生产计划部门":"Üretim Planlama", "间接采购":"Endirekt Satın Alma", "人力资源":"İnsan Kaynakları", "财务部门":"Finans", "EHS/生产部门":"EHS / Üretim", "人力资源/合规":"İK / Uygunluk", "间接采购/IT":"Endirekt Satın Alma / BT" }
 };
 
 function adminCategoryLabel(category) {
@@ -3321,6 +3700,7 @@ function adminCategoryLabel(category) {
 }
 
 function adminFormula(category) {
+  if (["canteen", "shuttle", "uniforms"].includes(category.id)) return adminLinkedFormula(category.id, dwHeadcountBudgetSnapshot());
   if (state.language === "en") return ADMIN_FORMULA_EN[category.id] || category.formula;
   if (state.language === "tr") return ADMIN_FORMULA_TR[category.id] || category.formula;
   return category.formula;
@@ -3347,6 +3727,906 @@ function adminFrequency(value) {
   return value;
 }
 
+function attendanceT(key) {
+  const copy = {
+    zh: {
+      eyebrow: "行政人员 · 滚动校核", title: "月度人员数量校核", subtitle: "按成本中心校核外包与服务人员数量。",
+      permission: "行政人员校核权限", centers: "成本中心", currentMonth: "填报期间", scope: "当前成本中心", baselineTotal: "当月预算人数", changed: "未保存变更",
+      source: "数据来源", sourceAlias: "行政人员预算基线", sourceHint: "年初预算基线 · CANTEEN页", employeeType: "人员类别",
+      checked: "校核人数", baseline: "预算", difference: "差异", total: "合计", people: "人", reason: "修改原因", required: "修改后必填",
+      reasonPlaceholder: "说明人数变化原因、依据和影响部门", save: "保存全部变更", reset: "恢复Excel原值", noChanges: "当前校核值与Excel预算一致",
+      pending: "有 {count} 项人数变更待保存", saved: "人员校核已保存", reasonRequired: "人数有修改，请先填写修改原因", restored: "已恢复为Excel预算人数",
+      downloadTemplate: "下载行政人员模板", batchImport: "批量导入", previewTitle: "导入预览", previewReady: "识别到 {count} 个单元格变更", previewErrors: "发现 {count} 个问题，未导入任何数据", applyImport: "应用到填报区", cancelImport: "取消", importApplied: "批量数据已应用，请核对并填写修改原因后保存", importEmpty: "模板中没有可应用的数据", importFailed: "文件读取失败"
+    },
+    en: {
+      eyebrow: "Administration · Rolling validation", title: "Monthly Headcount Validation", subtitle: "Validate outsourced and service personnel by cost center.",
+      permission: "Administration headcount access", centers: "Cost centers", currentMonth: "Forecast period", scope: "Current cost center", baselineTotal: "Current-month budget", changed: "Unsaved changes",
+      source: "Data source", sourceAlias: "Administration headcount baseline", sourceHint: "Annual budget baseline · CANTEEN sheet", employeeType: "Personnel category",
+      checked: "Validated headcount", baseline: "Budget", difference: "Variance", total: "Total", people: "people", reason: "Change reason", required: "Required after a change",
+      reasonPlaceholder: "Explain the headcount change, evidence and affected department", save: "Save all changes", reset: "Restore Excel values", noChanges: "Validated values match the Excel budget",
+      pending: "{count} headcount changes are pending", saved: "Headcount validation saved", reasonRequired: "Enter a reason before saving headcount changes", restored: "Excel budget headcount restored",
+      downloadTemplate: "Download admin template", batchImport: "Batch import", previewTitle: "Import preview", previewReady: "{count} cell changes found", previewErrors: "{count} issues found; no data was imported", applyImport: "Apply to form", cancelImport: "Cancel", importApplied: "Batch data applied. Review it, enter a reason and save.", importEmpty: "No applicable values were found", importFailed: "Could not read the file"
+    },
+    tr: {
+      eyebrow: "İdari İşler · Dönemsel kontrol", title: "Aylık Personel Sayısı Kontrolü", subtitle: "Maliyet merkezine göre dış kaynak ve hizmet personelini kontrol edin.",
+      permission: "İdari işler personel kontrol yetkisi", centers: "Maliyet merkezleri", currentMonth: "Tahmin dönemi", scope: "Cari maliyet merkezi", baselineTotal: "Cari ay bütçesi", changed: "Kaydedilmemiş değişiklikler",
+      source: "Veri kaynağı", sourceAlias: "İdari personel bütçe bazı", sourceHint: "Yıllık bütçe bazı · CANTEEN sayfası", employeeType: "Kategori",
+      checked: "Onaylanan personel sayısı", baseline: "Bütçe", difference: "Fark", total: "Toplam", people: "kişi", reason: "Değişiklik gerekçesi", required: "Değişiklikte zorunlu",
+      reasonPlaceholder: "Değişikliklerin nedenini açıklayın", save: "Tüm değişiklikleri kaydet", reset: "Excel değerlerine dön", noChanges: "Kontrol değerleri Excel bütçesiyle aynı",
+      pending: "{count} değişiklik kaydedilmeyi bekliyor", saved: "Personel kontrolü kaydedildi", reasonRequired: "Kaydetmeden önce değişiklik gerekçesi girin", restored: "Excel bütçe değerleri geri yüklendi",
+      downloadTemplate: "İdari personel şablonunu indir", batchImport: "Toplu içe aktar", previewTitle: "İçe aktarma önizlemesi", previewReady: "{count} hücre değişikliği bulundu", previewErrors: "{count} sorun bulundu; veri aktarılmadı", applyImport: "Forma uygula", cancelImport: "İptal", importApplied: "Toplu veri uygulandı. Kontrol edin, gerekçe girin ve kaydedin.", importEmpty: "Uygulanabilir değer bulunamadı", importFailed: "Dosya okunamadı"
+    }
+  };
+  return copy[state.language]?.[key] || copy.zh[key] || key;
+}
+
+function attendanceMonthIndex() {
+  return Math.max(0, Math.min(11, new Date().getMonth()));
+}
+
+function editableForecastMonths() {
+  return Array.from({ length: 12 - attendanceMonthIndex() }, (_, offset) => attendanceMonthIndex() + offset);
+}
+
+function attendanceInputKey(unitId, categoryKey, monthIndex = attendanceMonthIndex()) {
+  return `${unitId}.${categoryKey}.${monthIndex}`;
+}
+
+function attendanceBaseline(unit, categoryKey, monthIndex = attendanceMonthIndex()) {
+  return Number(unit.entries?.[categoryKey]?.[monthIndex] || 0);
+}
+
+function attendanceValue(unit, categoryKey, monthIndex = attendanceMonthIndex()) {
+  const key = attendanceInputKey(unit.id, categoryKey, monthIndex);
+  const value = Number(attendanceInputs.values?.[key]);
+  return Number.isFinite(value) ? Math.max(0, Math.round(value)) : attendanceBaseline(unit, categoryKey, monthIndex);
+}
+
+function loadAttendanceInputs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ADMIN_ATTENDANCE_INPUT_KEY) || "null");
+    return { values: { ...(saved?.values || {}) }, reason: String(saved?.reason || "") };
+  } catch {
+    return { values: {}, reason: "" };
+  }
+}
+
+function loadAttendanceSavedInputs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ADMIN_ATTENDANCE_SAVED_KEY) || "null");
+    return { values: { ...(saved?.values || {}) }, reason: String(saved?.reason || "") };
+  } catch {
+    return { values: {}, reason: "" };
+  }
+}
+
+function saveAttendanceInputs() {
+  localStorage.setItem(ADMIN_ATTENDANCE_INPUT_KEY, JSON.stringify(attendanceInputs));
+}
+
+function attendanceChanges() {
+  const changes = [];
+  for (const group of Object.values(ADMIN_ATTENDANCE_DATA.groups)) {
+    for (const unit of group.units) {
+      for (const [categoryKey, labelZh, labelEn] of attendanceEditableCategories()) {
+        for (const monthIndex of editableForecastMonths()) {
+          const key = attendanceInputKey(unit.id, categoryKey, monthIndex);
+          const before = Number(attendanceSavedInputs.values?.[key]);
+          const savedValue = Number.isFinite(before) ? before : attendanceBaseline(unit, categoryKey, monthIndex);
+          const after = attendanceValue(unit, categoryKey, monthIndex);
+          if (Math.abs(after - savedValue) >= 0.0001) changes.push({ key, unit, categoryKey, labelZh, labelEn, monthIndex, before: savedValue, after });
+        }
+      }
+    }
+  }
+  return changes;
+}
+
+function attendanceAuditFactMeta(changes) {
+  return {
+    kind: "attendance",
+    changes: changes.map((change) => ({
+      unitId: change.unit.id,
+      unitLabel: change.unit.label || change.unit.id,
+      categoryKey: change.categoryKey,
+      categoryLabel: { zh: change.labelZh, en: change.labelEn },
+      monthIndex: change.monthIndex,
+      before: change.before,
+      after: change.after
+    }))
+  };
+}
+
+function attendanceUnits() {
+  return Object.values(ADMIN_ATTENDANCE_DATA.groups).flatMap((group) => group.units);
+}
+
+function attendanceEditableCategories() {
+  return ADMIN_ATTENDANCE_DATA.categories.filter(([categoryKey]) => !["direct", "indirect", "whiteCollar"].includes(categoryKey));
+}
+
+function attendanceCategoryLabel(category) {
+  if (state.language === "zh") return category[1];
+  const labels = {
+    en: { waste: "Waste management staff", canteen: "Canteen staff", cleaning: "Cleaning staff", security: "Security staff", drivers: "Drivers", suppliers: "Supplier personnel", trainees: "Interns", visitors: "Visitors" },
+    tr: { waste: "Atık yönetimi personeli", canteen: "Yemekhane personeli", cleaning: "Temizlik personeli", security: "Güvenlik personeli", drivers: "Şoförler", suppliers: "Tedarikçi personeli", trainees: "Stajyerler", visitors: "Ziyaretçiler" }
+  };
+  return labels[state.language]?.[category[0]] || category[2];
+}
+
+function attendanceUnitLabel(unit) {
+  const labels = {
+    zh: { "dw": "DW", "dw-rd": "DW研发", "procurement-dw": "采购DW", "ck2": "CK2", "ck-rd": "CK研发", "td": "TD（干衣机）", "td-rd": "干衣机研发", "procurement-ck": "采购CK", "procurement-td": "采购TD" },
+    en: { "dw": "DW", "dw-rd": "DW R&D", "procurement-dw": "PROCUREMENT DW", "ck2": "CK2", "ck-rd": "CK R&D", "td": "TD (Tumble Dryer)", "td-rd": "Tumble Dryer R&D", "procurement-ck": "PROCUREMENT CK", "procurement-td": "PROCUREMENT TD" },
+    tr: { "dw": "DW", "dw-rd": "DW Ar-Ge", "procurement-dw": "DW Satın Alma", "ck2": "CK2", "ck-rd": "CK Ar-Ge", "td": "TD (Kurutma Makinesi)", "td-rd": "Kurutma Makinesi Ar-Ge", "procurement-ck": "CK Satın Alma", "procurement-td": "TD Satın Alma" }
+  };
+  return labels[state.language]?.[unit.id] || unit.label;
+}
+
+function attendanceUnitType(unit) {
+  const type = unit.id.includes("procurement") ? "procurement" : unit.id.includes("rd") ? "rd" : "production";
+  const labels = {
+    zh: { production: "生产", rd: "研发", procurement: "采购" },
+    en: { production: "Production", rd: "Research & Development", procurement: "Procurement" },
+    tr: { production: "Üretim", rd: "Araştırma & Geliştirme", procurement: "Satın Alma" }
+  };
+  return labels[state.language]?.[type] || labels.en[type];
+}
+
+function attendanceMonthLabel(monthIndex) {
+  const months = {
+    en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    tr: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+  };
+  if (state.language === "zh") return `${ADMIN_ATTENDANCE_DATA.budgetYear}年${monthIndex + 1}月`;
+  return `${months[state.language]?.[monthIndex] || months.en[monthIndex]} ${ADMIN_ATTENDANCE_DATA.budgetYear}`;
+}
+
+function attendanceNumber(value) {
+  return Number(value).toLocaleString(state.language === "zh" ? "zh-CN" : state.language === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: 2 });
+}
+
+function headcountPeriodMarkup(year, months) {
+  const first = months[0] ?? 0;
+  const last = months.at(-1) ?? first;
+  const yearLabel = state.language === "zh" ? `${year}年` : String(year);
+  const rangeLabel = first === last
+    ? localizeMonthLabel(first, state.language)
+    : state.language === "zh"
+      ? `${first + 1}—${last + 1}月`
+      : `${localizeMonthLabel(first, state.language)}—${localizeMonthLabel(last, state.language)}`;
+  return `<span class="headcount-period"><b>${escapeHtml(yearLabel)}</b><small>${escapeHtml(rangeLabel)}</small></span>`;
+}
+
+function headcountImportErrorText(item) {
+  const messages = {
+    zh: {
+      MISSING_COLUMN: "缺少标准列", UNKNOWN_COLUMN: "存在非标准列", DUPLICATE_COLUMN: "列名重复", DUPLICATE_KEY: "编码组合重复",
+      INVALID_MONTH: "月份列不在2026年8—12月", UNKNOWN_CODE: "编码不存在", CODE_REQUIRED: "编码不能为空", FORMULA_NOT_ALLOWED: "不允许公式",
+      TEXT_NUMBER_NOT_ALLOWED: "数字必须为真正的数值单元格", NUMBER_REQUIRED: "必须填写数字", NON_FINITE_NUMBER: "数字无效", NEGATIVE_NUMBER: "人数不能为负数",
+      INTEGER_REQUIRED: "人数必须为整数", MAX_THREE_DECIMALS: "共享人员最多保留三位小数", ROWS_REQUIRED: "工作表内容无效", EMPTY_WORKBOOK: "工作簿没有可读取的工作表"
+    },
+    en: {
+      MISSING_COLUMN: "Required column is missing", UNKNOWN_COLUMN: "Unknown column", DUPLICATE_COLUMN: "Duplicate column", DUPLICATE_KEY: "Duplicate code combination",
+      INVALID_MONTH: "Month must be Aug–Dec 2026", UNKNOWN_CODE: "Unknown code", CODE_REQUIRED: "Code is required", FORMULA_NOT_ALLOWED: "Formulas are not allowed",
+      TEXT_NUMBER_NOT_ALLOWED: "Use a numeric cell, not text", NUMBER_REQUIRED: "A number is required", NON_FINITE_NUMBER: "Invalid number", NEGATIVE_NUMBER: "Headcount cannot be negative",
+      INTEGER_REQUIRED: "Headcount must be an integer", MAX_THREE_DECIMALS: "Shared FTE supports up to three decimals", ROWS_REQUIRED: "Invalid worksheet data", EMPTY_WORKBOOK: "The workbook has no readable worksheet"
+    },
+    tr: {
+      MISSING_COLUMN: "Zorunlu sütun eksik", UNKNOWN_COLUMN: "Bilinmeyen sütun", DUPLICATE_COLUMN: "Yinelenen sütun", DUPLICATE_KEY: "Kod birleşimi yineleniyor",
+      INVALID_MONTH: "Ay, Ağustos–Aralık 2026 olmalıdır", UNKNOWN_CODE: "Bilinmeyen kod", CODE_REQUIRED: "Kod zorunludur", FORMULA_NOT_ALLOWED: "Formül kullanılamaz",
+      TEXT_NUMBER_NOT_ALLOWED: "Metin değil sayısal hücre kullanın", NUMBER_REQUIRED: "Sayı gereklidir", NON_FINITE_NUMBER: "Geçersiz sayı", NEGATIVE_NUMBER: "Personel sayısı negatif olamaz",
+      INTEGER_REQUIRED: "Personel sayısı tam sayı olmalıdır", MAX_THREE_DECIMALS: "Paylaşımlı FTE en fazla üç ondalık destekler", ROWS_REQUIRED: "Geçersiz çalışma sayfası", EMPTY_WORKBOOK: "Çalışma kitabında okunabilir sayfa yok"
+    }
+  };
+  const prefix = item.row ? (state.language === "zh" ? `第${item.row}行` : state.language === "tr" ? `Satır ${item.row}` : `Row ${item.row}`) : "";
+  const column = item.column ? ` · ${item.column}` : "";
+  const message = messages[state.language]?.[item.code] || messages.zh[item.code] || item.code;
+  return `${prefix}${column}: ${message}`.replace(/^ · /, "").replace(/^: /, "");
+}
+
+function headcountImportPreviewMarkup(preview, translate, actionPrefix) {
+  if (!preview) return "";
+  const errors = preview.errors || [];
+  const changes = preview.changes || [];
+  const title = errors.length
+    ? translate("previewErrors").replace("{count}", errors.length)
+    : translate("previewReady").replace("{count}", changes.length);
+  const detail = errors.length
+    ? `<ul>${errors.slice(0, 8).map((item) => `<li>${escapeHtml(headcountImportErrorText(item))}</li>`).join("")}</ul>${errors.length > 8 ? `<small>+${errors.length - 8}</small>` : ""}`
+    : changes.length
+      ? `<div class="headcount-import-table-wrap"><table><thead><tr><th>${escapeHtml(state.language === "zh" ? "编码" : state.language === "tr" ? "Kod" : "Code")}</th><th>${escapeHtml(state.language === "zh" ? "月份" : state.language === "tr" ? "Ay" : "Month")}</th><th>${escapeHtml(state.language === "zh" ? "导入值" : state.language === "tr" ? "Değer" : "Value")}</th></tr></thead><tbody>${changes.slice(0, 10).map((item) => `<tr><td>${escapeHtml(item.key)}</td><td>${escapeHtml(item.month)}</td><td>${escapeHtml(String(item.value))}</td></tr>`).join("")}</tbody></table></div>${changes.length > 10 ? `<small>+${changes.length - 10}</small>` : ""}`
+      : `<p>${escapeHtml(translate("importEmpty"))}</p>`;
+  return `<section class="headcount-import-preview ${errors.length ? "headcount-import-error" : ""}"><header><div><span>${escapeHtml(translate("previewTitle"))}</span><b>${escapeHtml(preview.fileName || "")}</b></div><strong>${escapeHtml(title)}</strong></header>${detail}<footer><button type="button" class="secondary" data-${actionPrefix}-action="cancel-import">${escapeHtml(translate("cancelImport"))}</button>${!errors.length && changes.length ? `<button type="button" data-${actionPrefix}-action="apply-import">${escapeHtml(translate("applyImport"))}</button>` : ""}</footer></section>`;
+}
+
+function worksheetRowsWithFormulaCells(xlsx, worksheet, schemaDefinition) {
+  if (!worksheet?.["!ref"]) return { rows: [], errors: [{ row: 0, column: "", code: "ROWS_REQUIRED" }] };
+  const range = xlsx.utils.decode_range(worksheet["!ref"]);
+  const headers = [];
+  for (let column = range.s.c; column <= range.e.c; column += 1) {
+    const cell = worksheet[xlsx.utils.encode_cell({ r: range.s.r, c: column })];
+    headers.push({ column, name: String(cell?.v ?? "").trim() });
+  }
+  const errors = [];
+  for (const expected of schemaDefinition.columns) {
+    if (!headers.some((item) => item.name === expected)) errors.push({ row: 1, column: expected, code: "MISSING_COLUMN" });
+  }
+  const seen = new Set();
+  for (const header of headers.filter((item) => item.name)) {
+    if (seen.has(header.name)) errors.push({ row: 1, column: header.name, code: "DUPLICATE_COLUMN" });
+    seen.add(header.name);
+    if (!schemaDefinition.columns.includes(header.name)) errors.push({ row: 1, column: header.name, code: /^\d{4}-\d{1,2}$/.test(header.name) ? "INVALID_MONTH" : "UNKNOWN_COLUMN" });
+  }
+  const rows = [];
+  for (let rowIndex = range.s.r + 1; rowIndex <= range.e.r; rowIndex += 1) {
+    const row = { __rowNum__: rowIndex };
+    for (const header of headers.filter((item) => item.name)) {
+      const cell = worksheet[xlsx.utils.encode_cell({ r: rowIndex, c: header.column })];
+      row[header.name] = cell?.f ? { f: cell.f, v: cell.v } : (cell?.v ?? null);
+    }
+    rows.push(row);
+  }
+  return { rows, errors };
+}
+
+async function readHeadcountImport(file, schemaDefinition, parseRows, data) {
+  const xlsx = await loadXlsx();
+  const workbook = xlsx.read(await file.arrayBuffer(), { type: "array", cellFormula: true, cellText: false });
+  const sheetName = workbook.SheetNames?.[0];
+  if (!sheetName) return { fileName: file.name, errors: [{ row: 0, column: "", code: "EMPTY_WORKBOOK" }], changes: [] };
+  const extracted = worksheetRowsWithFormulaCells(xlsx, workbook.Sheets[sheetName], schemaDefinition);
+  if (extracted.errors.length) return { fileName: file.name, errors: extracted.errors, changes: [] };
+  return { fileName: file.name, ...parseRows(extracted.rows, data) };
+}
+
+async function downloadHeadcountTemplate(kind) {
+  const employee = kind === "employee";
+  const schemaDefinition = employee ? EMPLOYEE_HEADCOUNT_IMPORT_SCHEMA : ATTENDANCE_HEADCOUNT_IMPORT_SCHEMA;
+  const rows = employee ? buildEmployeeHeadcountTemplateRows(EMPLOYEE_ATTENDANCE_DATA) : buildAttendanceHeadcountTemplateRows(ADMIN_ATTENDANCE_DATA);
+  const xlsx = await loadXlsx();
+  const worksheet = xlsx.utils.json_to_sheet(rows, { header: schemaDefinition.columns });
+  worksheet["!cols"] = schemaDefinition.columns.map((column) => ({ wch: column.includes("code") ? 24 : 13 }));
+  const workbook = xlsx.utils.book_new();
+  xlsx.utils.book_append_sheet(workbook, worksheet, employee ? "Employee Headcount" : "Admin Attendance");
+  xlsx.writeFile(workbook, employee ? "employee-headcount-template-2026-08-12.xlsx" : "admin-attendance-template-2026-08-12.xlsx");
+}
+
+function employeeImportIsChange(change) {
+  const item = employeeAttendanceRows(change.factoryCode).find(({ department, item: row }) => department.id === change.departmentCode && row.id === change.lineCode)?.item;
+  return item ? Math.abs(employeeAttendanceValue(change.factoryCode, item, change.personnelTypeCode, change.monthIndex) - change.value) >= .0001 : true;
+}
+
+function attendanceImportIsChange(change) {
+  const unit = attendanceUnits().find((item) => item.id === change.costCenterCode);
+  return unit ? Math.abs(attendanceValue(unit, change.personnelTypeCode, change.monthIndex) - change.value) >= .0001 : true;
+}
+
+async function prepareEmployeeAttendanceImport(file) {
+  try {
+    employeeAttendanceImportPreview = await readHeadcountImport(file, EMPLOYEE_HEADCOUNT_IMPORT_SCHEMA, parseEmployeeHeadcountImportRows, EMPLOYEE_ATTENDANCE_DATA);
+    if (!employeeAttendanceImportPreview.errors.length) employeeAttendanceImportPreview.changes = employeeAttendanceImportPreview.changes.filter(employeeImportIsChange);
+  } catch (error) {
+    employeeAttendanceImportPreview = { fileName: file?.name || "", errors: [{ row: 0, column: "", code: "ROWS_REQUIRED", value: error?.message }], changes: [] };
+    toast(`${employeeAttendanceT("importFailed")}: ${error?.message || error}`, true);
+  }
+  renderEmployeeAttendanceWorkspace();
+}
+
+async function prepareAttendanceImport(file) {
+  try {
+    attendanceImportPreview = await readHeadcountImport(file, ATTENDANCE_HEADCOUNT_IMPORT_SCHEMA, parseAttendanceHeadcountImportRows, ADMIN_ATTENDANCE_DATA);
+    if (!attendanceImportPreview.errors.length) attendanceImportPreview.changes = attendanceImportPreview.changes.filter(attendanceImportIsChange);
+  } catch (error) {
+    attendanceImportPreview = { fileName: file?.name || "", errors: [{ row: 0, column: "", code: "ROWS_REQUIRED", value: error?.message }], changes: [] };
+    toast(`${attendanceT("importFailed")}: ${error?.message || error}`, true);
+  }
+  renderAttendanceWorkspace();
+}
+
+function renderAttendanceWorkspace() {
+  if (!els.forecastWorkspace) return;
+  const monthIndex = attendanceMonthIndex();
+  const units = attendanceUnits();
+  const unit = units.find((item) => item.id === state.attendanceUnit) || units[0];
+  const categories = attendanceEditableCategories();
+  const changes = attendanceChanges();
+  const unitChanges = changes.filter((item) => item.unit.id === unit.id);
+  const months = editableForecastMonths();
+  const baselineTotal = categories.reduce((sum, category) => sum + attendanceBaseline(unit, category[0], monthIndex), 0);
+  const unitLabel = attendanceUnitLabel(unit);
+  const unitButtons = units.map((item) => `<button type="button" class="${item.id === unit.id ? "active" : ""}" data-attendance-unit="${escapeHtml(item.id)}"><b>${escapeHtml(attendanceUnitLabel(item))}</b><small>${escapeHtml(attendanceUnitType(item))}</small></button>`).join("");
+  const rows = categories.map((category) => {
+    const categoryKey = category[0];
+    return `<tr><th>${escapeHtml(attendanceCategoryLabel(category))}</th>${months.map((entryMonth) => { const baseline = attendanceBaseline(unit, categoryKey, entryMonth); const value = attendanceValue(unit, categoryKey, entryMonth); const changed = Math.abs(value - baseline) >= .0001; return `<td class="${changed ? "changed" : ""}"><div class="aat-input-cell"><input aria-label="${escapeHtml(`${attendanceCategoryLabel(category)} ${attendanceMonthLabel(entryMonth)}`)}" type="number" min="0" step="1" data-attendance-input="${escapeHtml(unit.id)}|${escapeHtml(categoryKey)}|${entryMonth}" value="${escapeHtml(String(value))}" /><small>${escapeHtml(attendanceT("baseline"))} ${escapeHtml(attendanceNumber(baseline))}</small></div></td>`; }).join("")}</tr>`;
+  }).join("");
+  const monthlyTotals = months.map((entryMonth) => categories.reduce((sum, category) => sum + attendanceValue(unit, category[0], entryMonth), 0));
+  const pendingText = changes.length ? attendanceT("pending").replace("{count}", changes.length) : attendanceT("noChanges");
+  els.forecastWorkspace.innerHTML = `<section class="aat-shell">
+    <section class="aat-workbench">
+      <aside class="aat-center-nav"><h3>${escapeHtml(attendanceT("centers"))}</h3><nav>${unitButtons}</nav></aside>
+      <div class="aat-main">
+        <header class="aat-header"><div><span>${escapeHtml(attendanceT("eyebrow"))}</span><h3>${escapeHtml(attendanceT("title"))}</h3><p>${escapeHtml(attendanceT("subtitle"))}</p></div><div class="aat-source"><span>${escapeHtml(attendanceT("source"))}</span><b title="${escapeHtml(ADMIN_ATTENDANCE_DATA.sourceFile)}">${escapeHtml(attendanceT("sourceAlias"))}</b><small>${escapeHtml(attendanceT("sourceHint"))}</small><div class="headcount-file-actions"><button type="button" class="secondary" data-attendance-action="download-template">${escapeHtml(attendanceT("downloadTemplate"))}</button><label><input class="headcount-import-input" type="file" accept=".xlsx,.xls,.xlsm" data-attendance-import />${escapeHtml(attendanceT("batchImport"))}</label><button type="button" data-attendance-action="switch-role">${escapeHtml(t("switchRole"))}</button></div></div></header>
+        <section class="aat-summary"><div><span>${escapeHtml(attendanceT("currentMonth"))}</span><strong>${headcountPeriodMarkup(ADMIN_ATTENDANCE_DATA.budgetYear, months)}</strong></div><div><span>${escapeHtml(attendanceT("baselineTotal"))}</span><strong>${escapeHtml(attendanceNumber(baselineTotal))}</strong><small>${escapeHtml(attendanceT("people"))}</small></div><div class="${changes.length ? "warn" : "ok"}"><span>${escapeHtml(attendanceT("changed"))}</span><strong>${changes.length}</strong><small>${escapeHtml(unitLabel)}</small></div></section>
+        ${headcountImportPreviewMarkup(attendanceImportPreview, attendanceT, "attendance")}
+        <div class="aat-table-wrap"><table class="aat-table"><thead><tr><th>${escapeHtml(attendanceT("employeeType"))}</th>${months.map((entryMonth) => `<th>${escapeHtml(localizeMonthLabel(entryMonth, state.language))}</th>`).join("")}</tr></thead><tbody>${rows}</tbody><tfoot><tr><th>${escapeHtml(attendanceT("total"))}</th>${monthlyTotals.map((value) => `<td>${escapeHtml(attendanceNumber(value))}</td>`).join("")}</tr></tfoot></table></div>
+      </div>
+      <div class="aat-change-gate ${changes.length ? "pending" : "clear"}"><label><span>${escapeHtml(attendanceT("reason"))} <em>* ${escapeHtml(attendanceT("required"))}</em></span><textarea maxlength="500" data-attendance-reason placeholder="${escapeHtml(attendanceT("reasonPlaceholder"))}">${escapeHtml(attendanceInputs.reason || "")}</textarea></label><div class="aat-change-status"><b>${escapeHtml(pendingText)}</b><span>${unitChanges.length ? `${unitChanges.length} · ${escapeHtml(unitLabel)}` : escapeHtml(attendanceT("noChanges"))}</span></div><div class="aat-actions"><button type="button" class="secondary" data-attendance-action="reset">${escapeHtml(attendanceT("reset"))}</button><button type="button" data-attendance-action="save">${escapeHtml(attendanceT("save"))}</button></div></div>
+    </section>
+  </section>`;
+}
+
+function employeeAttendanceT(key) {
+  const copy = {
+    zh: {
+      eyebrow: "员工人数 · 滚动预测", title: "月度员工人数预测", subtitle: "按工厂、部门和线体预测直接、间接、白领及共享人员数量。",
+      factory: "工厂", departments: "部门", currentMonth: "预测期间", baselineTotal: "当月Excel预算人数", forecastTotal: "当月预测总人数", changed: "未保存变更",
+      source: "数据来源", sourceAlias: "员工人数年度预算", sourceHint: "当前Excel作为全年各月预算基准", line: "部门 / 线体", direct: "直接员工", indirect: "间接员工", white: "白领", shared: "共享人员", total: "合计", difference: "差异",
+      budget: "预算", people: "人", reason: "修改原因", required: "修改后必填", reasonPlaceholder: "说明人数变化原因、依据和影响部门", save: "保存全部变更", reset: "恢复Excel预算", noChanges: "当前预测值与Excel预算一致",
+      pending: "有 {count} 项人员变更待保存", saved: "员工人数预测已保存", reasonRequired: "人数有修改，请先填写修改原因", restored: "已恢复为Excel预算人数", sharedHint: "共享人员可按FTE比例填写，例如 0.33",
+      downloadTemplate: "下载员工人数模板", batchImport: "批量导入", previewTitle: "导入预览", previewReady: "识别到 {count} 个单元格变更", previewErrors: "发现 {count} 个问题，未导入任何数据", applyImport: "应用到填报区", cancelImport: "取消", importApplied: "批量数据已应用，请核对并填写修改原因后保存", importEmpty: "模板中没有可应用的数据", importFailed: "文件读取失败"
+    },
+    en: {
+      eyebrow: "Employee headcount · current-month forecast", title: "Monthly Employee Headcount Forecast", subtitle: "Forecast direct, indirect, white-collar and shared personnel by factory, department and line.",
+      factory: "Factory", departments: "Departments", currentMonth: "Forecast period", baselineTotal: "Current-month Excel budget", forecastTotal: "Current-month forecast", changed: "Unsaved changes",
+      source: "Data source", sourceAlias: "Employee annual headcount budget", sourceHint: "The current Excel files are the budget baseline for every month", line: "Department / line", direct: "Direct", indirect: "Indirect", white: "White collar", shared: "Shared FTE", total: "Total", difference: "Variance",
+      budget: "Budget", people: "people", reason: "Change reason", required: "Required after a change", reasonPlaceholder: "Explain the headcount change, evidence and affected department", save: "Save all changes", reset: "Restore Excel budget", noChanges: "Forecast values match the Excel budget",
+      pending: "{count} headcount changes are pending", saved: "Employee headcount forecast saved", reasonRequired: "Enter a reason before saving headcount changes", restored: "Excel budget headcount restored", sharedHint: "Shared personnel may be entered as FTE, for example 0.33",
+      downloadTemplate: "Download employee template", batchImport: "Batch import", previewTitle: "Import preview", previewReady: "{count} cell changes found", previewErrors: "{count} issues found; no data was imported", applyImport: "Apply to form", cancelImport: "Cancel", importApplied: "Batch data applied. Review it, enter a reason and save.", importEmpty: "No applicable values were found", importFailed: "Could not read the file"
+    },
+    tr: {
+      eyebrow: "Çalışan sayısı · cari ay tahmini", title: "Aylık Çalışan Sayısı Tahmini", subtitle: "Doğrudan, dolaylı, beyaz yaka ve paylaşımlı personeli fabrika, bölüm ve hat bazında tahmin edin.",
+      factory: "Fabrika", departments: "Bölümler", currentMonth: "Tahmin dönemi", baselineTotal: "Cari ay Excel bütçesi", forecastTotal: "Cari ay tahmini", changed: "Kaydedilmemiş değişiklikler",
+      source: "Veri kaynağı", sourceAlias: "Yıllık çalışan sayısı bütçesi", sourceHint: "Mevcut Excel dosyaları her ay için bütçe bazıdır", line: "Bölüm / hat", direct: "Doğrudan", indirect: "Dolaylı", white: "Beyaz yaka", shared: "Paylaşımlı FTE", total: "Toplam", difference: "Fark",
+      budget: "Bütçe", people: "kişi", reason: "Değişiklik gerekçesi", required: "Değişiklikte zorunlu", reasonPlaceholder: "Personel değişikliğinin nedenini, dayanağını ve etkilenen bölümü açıklayın", save: "Tüm değişiklikleri kaydet", reset: "Excel bütçesine dön", noChanges: "Tahmin değerleri Excel bütçesiyle aynı",
+      pending: "{count} personel değişikliği kaydedilmeyi bekliyor", saved: "Çalışan sayısı tahmini kaydedildi", reasonRequired: "Kaydetmeden önce değişiklik gerekçesi girin", restored: "Excel bütçe personel sayısı geri yüklendi", sharedHint: "Paylaşımlı personel FTE olarak girilebilir; örneğin 0,33",
+      downloadTemplate: "Çalışan şablonunu indir", batchImport: "Toplu içe aktar", previewTitle: "İçe aktarma önizlemesi", previewReady: "{count} hücre değişikliği bulundu", previewErrors: "{count} sorun bulundu; veri aktarılmadı", applyImport: "Forma uygula", cancelImport: "İptal", importApplied: "Toplu veri uygulandı. Kontrol edin, gerekçe girin ve kaydedin.", importEmpty: "Uygulanabilir değer bulunamadı", importFailed: "Dosya okunamadı"
+    }
+  };
+  return copy[state.language]?.[key] || copy.zh[key] || key;
+}
+
+function employeeAttendanceMonthIndex() {
+  return new Date().getMonth();
+}
+
+function employeeAttendanceMonthLabel(monthIndex = employeeAttendanceMonthIndex()) {
+  const months = {
+    en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    tr: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+  };
+  if (state.language === "zh") return `${EMPLOYEE_ATTENDANCE_DATA.budgetYear}年${monthIndex + 1}月`;
+  return `${months[state.language]?.[monthIndex] || months.en[monthIndex]} ${EMPLOYEE_ATTENDANCE_DATA.budgetYear}`;
+}
+
+function employeeAttendanceFactory(factoryId = state.employeeAttendanceFactory) {
+  return EMPLOYEE_ATTENDANCE_DATA.factories[factoryId] || EMPLOYEE_ATTENDANCE_DATA.factories.dw;
+}
+
+function employeeAttendanceLabel(item) {
+  return item?.label?.[state.language] || item?.label?.en || item?.id || "";
+}
+
+function employeeAttendanceInputKey(factoryId, rowId, field, monthIndex = employeeAttendanceMonthIndex()) {
+  return `${factoryId}.${rowId}.${field}.${monthIndex}`;
+}
+
+function employeeAttendanceValue(factoryId, item, field, monthIndex = employeeAttendanceMonthIndex()) {
+  const baseline = Number(item[field] || 0);
+  const raw = Number(employeeAttendanceInputs.values?.[employeeAttendanceInputKey(factoryId, item.id, field, monthIndex)]);
+  if (!Number.isFinite(raw)) return baseline;
+  return field === "shared" ? Math.max(0, Math.round(raw * 1000) / 1000) : Math.max(0, Math.round(raw));
+}
+
+function loadEmployeeAttendanceInputs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(EMPLOYEE_ATTENDANCE_INPUT_KEY) || "null");
+    return { values: { ...(saved?.values || {}) }, reason: String(saved?.reason || "") };
+  } catch {
+    return { values: {}, reason: "" };
+  }
+}
+
+function loadEmployeeAttendanceSavedInputs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(EMPLOYEE_ATTENDANCE_SAVED_KEY) || "null");
+    return { values: { ...(saved?.values || {}) }, reason: String(saved?.reason || "") };
+  } catch {
+    return { values: {}, reason: "" };
+  }
+}
+
+function saveEmployeeAttendanceInputs() {
+  localStorage.setItem(EMPLOYEE_ATTENDANCE_INPUT_KEY, JSON.stringify(employeeAttendanceInputs));
+}
+
+function employeeAttendanceNumber(value) {
+  return Number(value).toLocaleString(state.language === "zh" ? "zh-CN" : state.language === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: 3 });
+}
+
+function employeeAttendanceRows(factoryId) {
+  return employeeAttendanceFactory(factoryId).departments.flatMap((department) => department.rows.map((item) => ({ department, item })));
+}
+
+function employeeAttendanceTotal(factoryId, useForecast = false, monthIndex = employeeAttendanceMonthIndex()) {
+  return employeeAttendanceRows(factoryId).reduce((total, { item }) => {
+    for (const field of EMPLOYEE_ATTENDANCE_DATA.fields) {
+      total[field] += useForecast ? employeeAttendanceValue(factoryId, item, field, monthIndex) : Number(item[field] || 0);
+    }
+    total.total = total.direct + total.indirect + total.white + total.shared;
+    return total;
+  }, { direct: 0, indirect: 0, white: 0, shared: 0, total: 0 });
+}
+
+function employeeAttendanceChanges() {
+  const changes = [];
+  for (const [factoryId, factory] of Object.entries(EMPLOYEE_ATTENDANCE_DATA.factories)) {
+    for (const department of factory.departments) {
+      for (const item of department.rows) {
+        for (const field of EMPLOYEE_ATTENDANCE_DATA.fields) {
+          for (const monthIndex of editableForecastMonths()) {
+            const key = employeeAttendanceInputKey(factoryId, item.id, field, monthIndex);
+            const saved = Number(employeeAttendanceSavedInputs.values?.[key]);
+            const before = Number.isFinite(saved) ? saved : Number(item[field] || 0);
+            const after = employeeAttendanceValue(factoryId, item, field, monthIndex);
+            if (Math.abs(after - before) >= 0.0001) changes.push({ key, factoryId, department, item, field, monthIndex, before, after });
+          }
+        }
+      }
+    }
+  }
+  return changes;
+}
+
+function employeeAuditFactMeta(changes) {
+  return {
+    kind: "employee",
+    changes: changes.map((change) => ({
+      factoryId: change.factoryId,
+      factoryLabel: clonePlain(EMPLOYEE_ATTENDANCE_DATA.factories[change.factoryId]?.label),
+      departmentId: change.department.id,
+      departmentLabel: clonePlain(change.department.label),
+      lineId: change.item.id,
+      lineLabel: clonePlain(change.item.label),
+      field: change.field,
+      monthIndex: change.monthIndex,
+      before: change.before,
+      after: change.after
+    }))
+  };
+}
+
+function attendanceSavedValue(unit, categoryKey, monthIndex = attendanceMonthIndex()) {
+  const raw = Number(attendanceSavedInputs.values?.[attendanceInputKey(unit.id, categoryKey, monthIndex)]);
+  return Number.isFinite(raw) ? Math.max(0, Math.round(raw)) : attendanceBaseline(unit, categoryKey, monthIndex);
+}
+
+function employeeAttendanceSavedValue(factoryId, item, field, monthIndex = employeeAttendanceMonthIndex()) {
+  const raw = Number(employeeAttendanceSavedInputs.values?.[employeeAttendanceInputKey(factoryId, item.id, field, monthIndex)]);
+  if (!Number.isFinite(raw)) return Number(item[field] || 0);
+  return field === "shared" ? Math.max(0, Math.round(raw * 1000) / 1000) : Math.max(0, Math.round(raw));
+}
+
+function dwHeadcountBudgetSnapshot(monthIndex = employeeAttendanceMonthIndex()) {
+  const factory = employeeAttendanceFactory("dw");
+  const employee = employeeAttendanceRows("dw").reduce((total, { item }) => {
+    for (const field of EMPLOYEE_ATTENDANCE_DATA.fields) total[field] += employeeAttendanceSavedValue("dw", item, field, monthIndex);
+    return total;
+  }, { direct: 0, indirect: 0, white: 0, shared: 0 });
+  const dwUnit = ADMIN_ATTENDANCE_DATA.groups.dw.units.find((item) => item.id === "dw");
+  const service = Object.fromEntries(attendanceEditableCategories().map(([key]) => [key, attendanceSavedValue(dwUnit, key, monthIndex)]));
+  return calculateDwHeadcountBudget({
+    employee,
+    service,
+    monthIndex,
+    procurementPrices: procurementPricesForMonth(monthIndex),
+    adminParameters: adminRuleParametersForMonth(monthIndex, "saved")
+  });
+}
+
+function adminBudgetOverrides() {
+  return Object.fromEntries(ADMIN_BUDGET_DATA.categories.map((category) => [category.id, { months: adminBudgetInputs.months?.[category.id] || category.monthlyTry }]));
+}
+
+function adminLinkedTrace(categoryId, snapshot, language = state.language) {
+  const number = employeeAttendanceNumber;
+  const copy = {
+    zh: {
+      canteen: `DW已保存计费人数 ${number(snapshot.canteenHeadcount)} 人 × ${snapshot.workdays} 个工作日 × ${number(snapshot.mealPrice)} TRY/人天；不含周日加班；共享FTE待确认。`,
+      shuttle: `DW乘车适用人数 ${number(snapshot.shuttleHeadcount)} 人 × ${snapshot.workdays} 个工作日 × ${number(snapshot.shuttleRate)} TRY/人天；不含司机、供应商和访客；不含周日加班；共享FTE待确认。`,
+      uniforms: `DW年度工作服模型：BC ${number(snapshot.uniform.blue)}、WC ${number(snapshot.uniform.white)}、SUB ${number(snapshot.uniform.sub)}；当月分摊=年度计算÷${number(snapshot.parameters?.uniformAllocationDivisor || 12)}；共享FTE待确认。`
+    },
+    en: {
+      canteen: `DW saved billable headcount ${number(snapshot.canteenHeadcount)} people × ${snapshot.workdays} workdays × ${number(snapshot.mealPrice)} TRY/person-day; Sunday overtime excluded; shared FTE pending confirmation.`,
+      shuttle: `DW eligible riders ${number(snapshot.shuttleHeadcount)} people × ${snapshot.workdays} workdays × ${number(snapshot.shuttleRate)} TRY/person-day; drivers, suppliers and visitors excluded; Sunday overtime excluded; shared FTE pending confirmation.`,
+      uniforms: `DW annual workwear model: BC ${number(snapshot.uniform.blue)}, WC ${number(snapshot.uniform.white)}, SUB ${number(snapshot.uniform.sub)}; current-month allocation = annual calculation ÷ ${number(snapshot.parameters?.uniformAllocationDivisor || 12)}; shared FTE pending confirmation.`
+    },
+    tr: {
+      canteen: `DW kaydedilmiş faturalandırılabilir personel sayısı ${number(snapshot.canteenHeadcount)} kişi × ${snapshot.workdays} iş günü × ${number(snapshot.mealPrice)} TRY/kişi-gün; Pazar mesaisi hariç; paylaşımlı FTE onay bekliyor.`,
+      shuttle: `DW uygun servis yolcusu ${number(snapshot.shuttleHeadcount)} kişi × ${snapshot.workdays} iş günü × ${number(snapshot.shuttleRate)} TRY/kişi-gün; şoförler, tedarikçiler ve ziyaretçiler hariç; Pazar mesaisi hariç; paylaşımlı FTE onay bekliyor.`,
+      uniforms: `DW yıllık iş kıyafeti modeli: BC ${number(snapshot.uniform.blue)}, WC ${number(snapshot.uniform.white)}, SUB ${number(snapshot.uniform.sub)}; cari ay dağıtımı = yıllık hesaplama ÷ ${number(snapshot.parameters?.uniformAllocationDivisor || 12)}; paylaşımlı FTE onay bekliyor.`
+    }
+  };
+  return copy[language]?.[categoryId] || copy.zh[categoryId] || "";
+}
+
+function adminAuditCategoryId(item) {
+  if (item.categoryId) return item.categoryId;
+  const legacy = String(item.label || "").toLowerCase();
+  return ADMIN_BUDGET_DATA.categories.find((category) => [category.id, category.label, category.sourceLabel, ADMIN_CATEGORY_TR[category.id]].filter(Boolean).some((label) => legacy === String(label).toLowerCase()))?.id || "";
+}
+
+function adminAuditPeriodIndex(item) {
+  if (Number.isInteger(item.periodIndex)) return item.periodIndex;
+  const text = String(item.period || "");
+  const numeric = Number(text.match(/\d{1,2}/)?.[0]);
+  return Number.isFinite(numeric) && numeric >= 1 && numeric <= 12 ? numeric - 1 : new Date(item.timestamp).getMonth();
+}
+
+function adminAuditAction(item) {
+  if (item.sourceKind === "employee") return headcountLinkSource("employee");
+  if (item.sourceKind === "attendance") return headcountLinkSource("attendance");
+  if (item.sourceKind === "procurement") return headcountLinkSource("procurement");
+  if (item.sourceKind === "procurementRevoke") return headcountLinkSource("procurementRevoke");
+  const legacy = String(item.action || "");
+  if (/员工人数预测|employee forecast|çalışan sayısı tahmini/i.test(legacy)) return headcountLinkSource("employee");
+  if (/行政人员校核|administration headcount|idari personel/i.test(legacy)) return headcountLinkSource("attendance");
+  if (item.actionKey === "submit") return adminT("submit");
+  if (item.actionKey === "save") return adminT("save");
+  if (item.actionKey === "withdraw") return adminT("withdraw");
+  return legacy;
+}
+
+function adminAuditPeriodLabel(item) {
+  if (item.actionKey === "withdraw" || item.factMeta?.kind === "workflow") return adminT("workflowPeriod");
+  return localizeMonthLabel(adminAuditPeriodIndex(item), state.language);
+}
+
+function adminAuditSourceKind(item) {
+  if (["employee", "attendance", "procurement", "procurementRevoke"].includes(item.sourceKind)) return item.sourceKind;
+  if (item.priceCheckMeta) return item.priceCheckMeta.revoke ? "procurementRevoke" : "procurement";
+  const legacy = `${item.action || ""} ${item.reason || ""} ${item.actor || ""}`;
+  if (/员工人数预测|employee forecast|çalışan sayısı tahmini/i.test(legacy)) return "employee";
+  if (/行政人员校核|administration headcount|idari personel/i.test(legacy)) return "attendance";
+  if (/采购价格|procurement price|satın alma fiyat/i.test(legacy)) return /撤回|revok|geri al/i.test(legacy) ? "procurementRevoke" : "procurement";
+  return "admin";
+}
+
+function adminAuditGroupedRows() {
+  const rows = [];
+  const legacyGroups = new Map();
+  for (const item of adminBudgetAudit) {
+    const sourceKind = adminAuditSourceKind(item);
+    const isLegacyLinked = sourceKind !== "admin" && !item.factMeta;
+    if (!isLegacyLinked) {
+      rows.push({ ...item, historyItems: [item] });
+      continue;
+    }
+    const key = [item.timestamp, item.actor, item.reason, sourceKind].map((value) => String(value || "")).join("|");
+    const existing = legacyGroups.get(key);
+    if (existing) {
+      existing.historyItems.push(item);
+      continue;
+    }
+    const grouped = { ...item, sourceKind, historyItems: [item] };
+    legacyGroups.set(key, grouped);
+    rows.push(grouped);
+  }
+  return rows;
+}
+
+function adminAuditSourceLabel(item) {
+  const labels = {
+    zh: { employee: "员工人数预测", attendance: "行政出勤", procurement: "采购价格", procurementRevoke: "采购价格撤回", admin: "行政预算" },
+    en: { employee: "Employee headcount forecast", attendance: "Administration attendance", procurement: "Procurement price", procurementRevoke: "Procurement price revocation", admin: "Administration budget" },
+    tr: { employee: "Çalışan sayısı tahmini", attendance: "İdari işler personel kontrolü", procurement: "Satın alma fiyatı", procurementRevoke: "Satın alma fiyatı geri alma", admin: "İdari bütçe" }
+  };
+  const sourceKind = adminAuditSourceKind(item);
+  return labels[state.language]?.[sourceKind] || labels.zh[sourceKind];
+}
+
+function adminAuditLabel(label, fallback = "") {
+  if (label && typeof label === "object") return label[state.language] || label.en || label.zh || fallback;
+  return String(label || fallback);
+}
+
+function employeeAuditFact(change) {
+  const factory = EMPLOYEE_ATTENDANCE_DATA.factories[change.factoryId];
+  const department = factory?.departments?.find((item) => item.id === change.departmentId);
+  const line = department?.rows?.find((item) => item.id === change.lineId);
+  const labels = [
+    adminAuditLabel(factory?.label || change.factoryLabel, change.factoryId),
+    adminAuditLabel(department?.label || change.departmentLabel, change.departmentId),
+    adminAuditLabel(line?.label || change.lineLabel, change.lineId),
+    ({
+      direct: state.language === "tr" ? "DIR BC (direkt mavi yaka)" : state.language === "en" ? "DIR BC (direct blue collar)" : "DIR BC（直接蓝领）",
+      shared: state.language === "tr" ? "Shared (paylaşımlı FTE)" : state.language === "en" ? "Shared (shared FTE)" : "Shared（共享人员）",
+      indirect: state.language === "tr" ? "IND BC (endirekt mavi yaka)" : state.language === "en" ? "IND BC (indirect blue collar)" : "IND BC（间接蓝领）",
+      white: state.language === "tr" ? "WC (beyaz yaka)" : state.language === "en" ? "WC (white collar)" : "WC（白领）"
+    })[change.field] || employeeAttendanceT(change.field)
+  ].filter(Boolean);
+  return `${labels.join(" · ")}: ${employeeAttendanceNumber(change.before)} → ${employeeAttendanceNumber(change.after)} ${employeeAttendanceT("people")}`;
+}
+
+function attendanceAuditFact(change) {
+  const unit = attendanceUnits().find((item) => item.id === change.unitId);
+  const category = attendanceEditableCategories().find(([key]) => key === change.categoryKey);
+  const unitLabel = unit ? attendanceUnitLabel(unit) : adminAuditLabel(change.unitLabel, change.unitId);
+  const categoryLabel = category ? attendanceCategoryLabel(category) : adminAuditLabel(change.categoryLabel, change.categoryKey);
+  return `${unitLabel} · ${categoryLabel}: ${attendanceNumber(change.before)} → ${attendanceNumber(change.after)} ${attendanceT("people")}`;
+}
+
+function adminAuditFact(item) {
+  const meta = item.factMeta;
+  if (item.actionKey === "withdraw" || meta?.kind === "workflow") return adminT("workflowFact");
+  if (meta?.kind === "employee" && meta.changes?.length) return meta.changes.map(employeeAuditFact).join("; ");
+  if (meta?.kind === "attendance" && meta.changes?.length) return meta.changes.map(attendanceAuditFact).join("; ");
+  if ((meta?.kind === "procurement" || meta?.kind === "procurementRevoke") && item.priceCheckMeta) return procurementAuditTrace(item.priceCheckMeta);
+  if (meta?.kind === "adminRule" && meta.changes?.length) return meta.changes.map((change) => adminRuleAuditFact(change)).join("; ");
+  if (meta?.kind === "admin" && meta.changes?.length) {
+    return meta.changes.map((change) => {
+      const category = ADMIN_BUDGET_DATA.categories.find((entry) => entry.id === change.categoryId);
+      return `${category ? adminCategoryLabel(category) : change.categoryId} · ${localizeMonthLabel(change.periodIndex, state.language)} · ${adminT("adminFact")}`;
+    }).join("; ");
+  }
+  if (item.priceCheckMeta) return procurementAuditTrace(item.priceCheckMeta);
+  const sourceKind = adminAuditSourceKind(item);
+  if (sourceKind === "employee" && item.inputTraceMeta?.employee) {
+    const employee = item.inputTraceMeta.employee;
+    const alias = state.language === "tr"
+      ? ["DIR BC", "Shared", "IND BC", "WC"]
+      : ["DIR BC", "Shared", "IND BC", "WC"];
+    return `${alias[0]} ${employeeAttendanceNumber(employee.direct)}; ${alias[1]} ${employeeAttendanceNumber(employee.shared)}; ${alias[2]} ${employeeAttendanceNumber(employee.indirect)}; ${alias[3]} ${employeeAttendanceNumber(employee.white)}`;
+  }
+  if (sourceKind === "employee") return adminT("employeeFact");
+  if (sourceKind === "attendance") return adminT("attendanceFact");
+  if (sourceKind === "procurement") return adminT("procurementFact");
+  if (sourceKind === "procurementRevoke") return adminT("procurementRevokeFact");
+  const category = ADMIN_BUDGET_DATA.categories.find((entry) => entry.id === adminAuditCategoryId(item));
+  return `${category ? adminCategoryLabel(category) : item.label || adminT("title")} · ${localizeMonthLabel(adminAuditPeriodIndex(item), state.language)} · ${adminT("adminFact")}`;
+}
+
+function adminAuditImpact(item) {
+  return adminAuditSourceKind(item) === "admin" && item.factMeta?.kind !== "adminRule" ? adminAuditAction(item) : adminT("linkedBudgets");
+}
+
+function adminAuditActor(item) {
+  if (item.actorKey === "permission") return adminT("permission");
+  const legacy = String(item.actor || "");
+  if (/月度员工人数预测|monthly employee headcount forecast|aylık çalışan sayısı tahmini/i.test(legacy)) return employeeAttendanceT("title");
+  if (/行政人员校核权限|administration headcount access|idari işler personel kontrol yetkisi/i.test(legacy)) return attendanceT("permission");
+  if (/采购价格校核|procurement price validation|satın alma fiyat kontrolü/i.test(legacy)) return procurementT("title");
+  if (/行政角色|administration role|idari rol/i.test(legacy)) return adminT("permission");
+  return legacy;
+}
+
+function adminAuditReason(item) {
+  if (item.reasonKey) return adminT(item.reasonKey);
+  const value = String(item.reason || "");
+  const action = String(item.action || "");
+  // A missing reason used to be persisted as the generated operation text; translate that legacy fallback.
+  if (!value || value === action || /员工人数预测已保存后自动重算|行政人员校核已保存后自动重算|auto-recalculated after|otomatik hesaplandı/i.test(value)) return adminAuditAction(item);
+  return value;
+}
+
+function adminAuditTrace(item) {
+  const categoryId = adminAuditCategoryId(item);
+  if (item.priceCheckMeta) return procurementAuditTrace(item.priceCheckMeta);
+  if (item.inputTraceMeta && categoryId) return adminLinkedTrace(categoryId, item.inputTraceMeta, state.language);
+  // Existing local records were saved with an English trace. Keep their historic numbers while localizing the wording.
+  if (categoryId && item.inputTrace) {
+    const snapshot = dwHeadcountBudgetSnapshot(adminAuditPeriodIndex(item));
+    const trace = String(item.inputTrace);
+    if (categoryId === "canteen") {
+      const values = trace.match(/headcount\s+([\d.]+).*?×\s*([\d.]+)\s+workdays.*?×\s*([\d.]+)\s+TRY/i);
+      if (values) { snapshot.canteenHeadcount = Number(values[1]); snapshot.workdays = Number(values[2]); snapshot.mealPrice = Number(values[3]); }
+    } else if (categoryId === "shuttle") {
+      const values = trace.match(/riders\s+([\d.]+).*?×\s*([\d.]+)\s+workdays.*?×\s*([\d.]+)\s+TRY/i);
+      if (values) { snapshot.shuttleHeadcount = Number(values[1]); snapshot.workdays = Number(values[2]); snapshot.shuttleRate = Number(values[3]); }
+    } else if (categoryId === "uniforms") {
+      const values = trace.match(/BC\s+([\d.]+),\s*WC\s+([\d.]+),\s*SUB\s+([\d.]+)/i);
+      if (values) { snapshot.uniform.blue = Number(values[1]); snapshot.uniform.white = Number(values[2]); snapshot.uniform.sub = Number(values[3]); }
+    }
+    return adminLinkedTrace(categoryId, snapshot, state.language);
+  }
+  return item.inputTrace || "";
+}
+
+function procurementAuditTrace(meta) {
+  const lines = (meta.lines || []).map((line) => {
+    const source = Object.values(DW_PROCUREMENT_PRICE_LINES).flat().find((item) => item.id === line.lineId);
+    const label = source ? procurementLineLabel(source) : line.lineId;
+    return `${label}: ${formatMoney(line.before)} → ${formatMoney(line.after)} TRY`;
+  }).join("; ");
+  const attachment = meta.attachment?.name ? ` · ${procurementT("attachmentName")}: ${meta.attachment.name}` : "";
+  const prefix = meta.revoke ? (state.language === "tr" ? "Excel fiyatı geri yüklendi" : state.language === "en" ? "Excel price restored" : "已恢复Excel单价") : (state.language === "tr" ? "Satın alma fiyat kontrolü" : state.language === "en" ? "Procurement price validation" : "采购价格校核");
+  return `${prefix} · ${lines}${attachment}`;
+}
+
+function headcountLinkSource(kind) {
+  const labels = {
+    zh: { employee: "员工人数预测已保存后自动重算", attendance: "行政人员校核已保存后自动重算", procurement: "采购价格校核已保存后自动重算", procurementRevoke: "采购价格校核已撤回并恢复Excel价格" },
+    en: { employee: "Auto-recalculated after employee forecast was saved", attendance: "Auto-recalculated after administration headcount was saved", procurement: "Auto-recalculated after procurement price validation was saved", procurementRevoke: "Procurement price validation revoked; Excel price restored" },
+    tr: { employee: "Çalışan sayısı tahmini kaydedildikten sonra otomatik hesaplandı", attendance: "İdari personel kontrolü kaydedildikten sonra otomatik hesaplandı", procurement: "Satın alma fiyat kontrolü kaydedildikten sonra otomatik hesaplandı", procurementRevoke: "Satın alma fiyat kontrolü geri alındı; Excel fiyatı geri yüklendi" }
+  };
+  return labels[state.language]?.[kind] || labels.zh[kind];
+}
+
+function syncDwHeadcountBudget({ source, sourceKind, actor, reason, factMeta, priceCheckMeta, monthIndexes }) {
+  const activeMonths = [...new Set((monthIndexes || [employeeAttendanceMonthIndex()]).filter((month) => Number.isInteger(month) && month >= 0 && month < 12))];
+  const timestamp = new Date().toISOString();
+  const changes = [];
+  for (const monthIndex of activeMonths) {
+    const snapshot = dwHeadcountBudgetSnapshot(monthIndex);
+    const amounts = { canteen: snapshot.amounts.canteenTry, shuttle: snapshot.amounts.shuttleTry, uniforms: snapshot.amounts.uniformsTry };
+    for (const [categoryId, amount] of Object.entries(amounts)) {
+      const category = ADMIN_BUDGET_DATA.categories.find((item) => item.id === categoryId);
+      if (!category) continue;
+      const before = Number(adminBudgetInputs.months?.[categoryId]?.[monthIndex] || category.monthlyTry?.[monthIndex] || 0);
+      const after = Number(Number(amount).toFixed(6));
+      if (Math.abs(before - after) <= 0.01) continue;
+      adminBudgetInputs.months[categoryId][monthIndex] = after;
+      adminBudgetInputs.reasons[categoryId] = reason || source;
+      changes.push({ categoryId, monthIndex, before, after });
+    }
+    adminHeadcountLinkage.months[String(monthIndex)] = { mode: "saved", timestamp, source, actor, reason: reason || source };
+  }
+  const normalizedFactMeta = factMeta || { kind: sourceKind };
+  const hasSourceFact = Boolean(normalizedFactMeta?.changes?.length || priceCheckMeta?.lines?.length);
+  if (changes.length || hasSourceFact) {
+    adminBudgetAudit.unshift({
+      id: `linked-fact-${Date.now()}-${sourceKind}-${activeMonths.join("-")}`,
+      timestamp,
+      actor,
+      periodIndex: activeMonths[0] ?? employeeAttendanceMonthIndex(),
+      reason: reason || "",
+      sourceKind,
+      factMeta: normalizedFactMeta,
+      linkedCategoryIds: changes.map((change) => change.categoryId),
+      priceCheckMeta: sourceKind === "procurement" || sourceKind === "procurementRevoke" ? priceCheckMeta : undefined
+    });
+  }
+  if (!changes.length) {
+    if (hasSourceFact) adminBudgetAudit = adminBudgetAudit.slice(0, 200);
+    saveAdminBudgetState();
+    return changes;
+  }
+  adminBudgetAudit = adminBudgetAudit.slice(0, 200);
+  adminBudgetSavedInputs = clonePlain(adminBudgetInputs);
+  saveAdminBudgetState();
+  applyAdminBudgetSync(reason || source, "headcount-linkage");
+  return changes;
+}
+
+function renderEmployeeAttendanceWorkspace() {
+  if (!els.forecastWorkspace) return;
+  const factoryId = EMPLOYEE_ATTENDANCE_DATA.factories[state.employeeAttendanceFactory] ? state.employeeAttendanceFactory : "dw";
+  const factory = employeeAttendanceFactory(factoryId);
+  const department = factory.departments.find((item) => item.id === state.employeeAttendanceDepartment) || factory.departments[0];
+  const changes = employeeAttendanceChanges();
+  const departmentChanges = changes.filter((item) => item.factoryId === factoryId && item.department.id === department.id);
+  const months = editableForecastMonths();
+  const currentMonthIndex = employeeAttendanceMonthIndex();
+  const baseline = employeeAttendanceTotal(factoryId, false, currentMonthIndex);
+  const forecast = employeeAttendanceTotal(factoryId, true, currentMonthIndex);
+  const factoryButtons = Object.entries(EMPLOYEE_ATTENDANCE_DATA.factories).map(([id, item]) => `<button type="button" class="${id === factoryId ? "active" : ""}" data-employee-attendance-factory="${escapeHtml(id)}">${escapeHtml(employeeAttendanceLabel(item))}</button>`).join("");
+  const departmentButtons = factory.departments.map((item) => `<button type="button" class="${item.id === department.id ? "active" : ""}" data-employee-attendance-department="${escapeHtml(item.id)}"><b>${escapeHtml(employeeAttendanceLabel(item))}</b><small>${escapeHtml(employeeAttendanceNumber(item.rows.reduce((sum, rowItem) => sum + EMPLOYEE_ATTENDANCE_DATA.fields.reduce((fieldSum, field) => fieldSum + Number(rowItem[field] || 0), 0), 0)))} ${escapeHtml(employeeAttendanceT("people"))}</small></button>`).join("");
+  const inputCell = (item, field, monthIndex) => {
+    const baselineValue = Number(item[field] || 0);
+    const value = employeeAttendanceValue(factoryId, item, field, monthIndex);
+    const changed = Math.abs(value - baselineValue) >= 0.0001;
+    const step = field === "shared" ? "0.001" : "1";
+    const displayValue = field === "shared" ? Number(value.toFixed(3)) : value;
+    return `<td class="${changed ? "changed" : ""}"><div class="eat-input"><input aria-label="${escapeHtml(`${employeeAttendanceLabel(item)} ${employeeAttendanceT(field)} ${employeeAttendanceMonthLabel(monthIndex)}`)}" type="number" min="0" step="${step}" data-employee-attendance-input="${escapeHtml(factoryId)}|${escapeHtml(item.id)}|${escapeHtml(field)}|${monthIndex}" value="${escapeHtml(String(displayValue))}" /><small>${escapeHtml(employeeAttendanceT("budget"))} ${escapeHtml(employeeAttendanceNumber(baselineValue))}</small></div></td>`;
+  };
+  const rows = department.rows.flatMap((item) => EMPLOYEE_ATTENDANCE_DATA.fields.map((field) => `<tr><th>${escapeHtml(employeeAttendanceLabel(item))}<small>${escapeHtml(employeeAttendanceT(field))}</small></th>${months.map((entryMonth) => inputCell(item, field, entryMonth)).join("")}</tr>`)).join("");
+  const monthlyTotals = months.map((entryMonth) => department.rows.reduce((total, item) => total + EMPLOYEE_ATTENDANCE_DATA.fields.reduce((sum, field) => sum + employeeAttendanceValue(factoryId, item, field, entryMonth), 0), 0));
+  const pendingText = changes.length ? employeeAttendanceT("pending").replace("{count}", changes.length) : employeeAttendanceT("noChanges");
+  els.forecastWorkspace.innerHTML = `<section class="eat-shell"><section class="eat-workbench">
+    <header class="eat-header"><div><span>${escapeHtml(employeeAttendanceT("eyebrow"))}</span><h3>${escapeHtml(employeeAttendanceT("title"))}</h3><p>${escapeHtml(employeeAttendanceT("subtitle"))}</p></div><div class="eat-source"><span>${escapeHtml(employeeAttendanceT("source"))}</span><b title="${escapeHtml(`${factory.sourceFile} · ${factory.sourceSheet}`)}">${escapeHtml(employeeAttendanceT("sourceAlias"))}</b><small>${escapeHtml(employeeAttendanceT("sourceHint"))}</small><div class="headcount-file-actions"><button type="button" class="secondary" data-employee-attendance-action="download-template">${escapeHtml(employeeAttendanceT("downloadTemplate"))}</button><label><input class="headcount-import-input" type="file" accept=".xlsx,.xls,.xlsm" data-employee-attendance-import />${escapeHtml(employeeAttendanceT("batchImport"))}</label><button type="button" data-employee-attendance-action="switch-role">${escapeHtml(t("switchRole"))}</button></div></div></header>
+    <nav class="eat-factory-tabs" aria-label="${escapeHtml(employeeAttendanceT("factory"))}">${factoryButtons}</nav>
+    <section class="eat-summary"><div><span>${escapeHtml(employeeAttendanceT("currentMonth"))}</span><strong>${headcountPeriodMarkup(EMPLOYEE_ATTENDANCE_DATA.budgetYear, months)}</strong></div><div><span>${escapeHtml(employeeAttendanceT("baselineTotal"))}</span><strong>${escapeHtml(employeeAttendanceNumber(baseline.total))}</strong><small>${escapeHtml(employeeAttendanceT("people"))}</small></div><div><span>${escapeHtml(employeeAttendanceT("forecastTotal"))}</span><strong>${escapeHtml(employeeAttendanceNumber(forecast.total))}</strong><small>${escapeHtml(employeeAttendanceT("people"))}</small></div><div class="${changes.length ? "warn" : "ok"}"><span>${escapeHtml(employeeAttendanceT("changed"))}</span><strong>${changes.length}</strong><small>${escapeHtml(employeeAttendanceLabel(factory))}</small></div></section>
+    ${headcountImportPreviewMarkup(employeeAttendanceImportPreview, employeeAttendanceT, "employee-attendance")}
+    <div class="eat-body"><aside class="eat-department-nav"><h3>${escapeHtml(employeeAttendanceT("departments"))}</h3><nav>${departmentButtons}</nav></aside><main class="eat-main"><div class="eat-table-wrap"><table class="eat-table"><thead><tr><th>${escapeHtml(employeeAttendanceT("line"))}</th>${months.map((entryMonth) => `<th>${escapeHtml(localizeMonthLabel(entryMonth, state.language))}</th>`).join("")}</tr></thead><tbody>${rows}</tbody><tfoot><tr><th>${escapeHtml(employeeAttendanceT("total"))}</th>${monthlyTotals.map((value) => `<td>${escapeHtml(employeeAttendanceNumber(value))}</td>`).join("")}</tr></tfoot></table></div><p class="eat-shared-hint">${escapeHtml(employeeAttendanceT("sharedHint"))}</p></main></div>
+    <footer class="eat-change-gate ${changes.length ? "pending" : "clear"}"><label><span>${escapeHtml(employeeAttendanceT("reason"))} <em>* ${escapeHtml(employeeAttendanceT("required"))}</em></span><textarea maxlength="500" data-employee-attendance-reason placeholder="${escapeHtml(employeeAttendanceT("reasonPlaceholder"))}">${escapeHtml(employeeAttendanceInputs.reason || "")}</textarea></label><div class="eat-change-status"><b>${escapeHtml(pendingText)}</b><span>${departmentChanges.length ? `${departmentChanges.length} · ${escapeHtml(employeeAttendanceLabel(department))}` : escapeHtml(employeeAttendanceT("noChanges"))}</span></div><div class="eat-actions"><button type="button" class="secondary" data-employee-attendance-action="reset">${escapeHtml(employeeAttendanceT("reset"))}</button><button type="button" data-employee-attendance-action="save">${escapeHtml(employeeAttendanceT("save"))}</button></div></footer>
+  </section></section>`;
+}
+
+function procurementT(key) {
+  const copy = {
+    zh: {
+      eyebrow: "采购权限 · 当前月价格校核", title: "采购价格校核", subtitle: "仅核对工作餐、班车和工作服价格；人数、工作日、适用范围及公式均为只读。",
+      currentMonth: "当前月份", categories: "采购校核科目", baselineBudget: "行政预测金额", systemBudget: "当前系统预测", changedPrices: "已保存价格校核", source: "数据来源", sourceHint: "行政预测源文件",
+      canteen: "工作餐", shuttle: "班车", uniforms: "工作服", priceItem: "价格项目", coverage: "适用范围", quantity: "发放数量", excelPrice: "Excel预算单价", checkedPrice: "采购校核单价", status: "状态", unchanged: "与Excel一致", saved: "本月已保存", locked: "本月已校核；如需修改，请先撤回", expand: "展开价格明细", collapse: "收起价格明细",
+      reason: "价格调整原因", required: "修改时必填", reasonPlaceholder: "说明合同、发票或报价变化原因", attachment: "合同或发票", upload: "选择文件", noAttachment: "尚未上传", attachmentRequired: "修改价格时必须上传合同或发票", save: "保存本月价格校核", revoke: "撤回本月校核", revokeHint: "撤回后恢复Excel单价，并撤回预算联动缓存。", noChange: "价格未修改，无需保存", pending: "项价格待保存", guide: "填写说明", savedToast: "采购价格校核已保存并联动预算", revokedToast: "价格校核已撤回，Excel价格和预算缓存已恢复", reasonRequired: "修改价格后必须填写原因", attachmentName: "已上传附件", oneChange: "每项价格在当月只能保存一次", routeRate: "系统计算的人均班车单价", formula: "预算公式", currentOnly: "本版仅校核当前月份", people: "人", item: "件/组"
+    },
+    en: {
+      eyebrow: "Procurement access · Current-month price validation", title: "Procurement Price Validation", subtitle: "Validate canteen, shuttle and workwear prices only. Headcount, workdays, eligibility and formulas are read-only.",
+      currentMonth: "Current month", categories: "Procurement validation items", baselineBudget: "Administration forecast", systemBudget: "Current system forecast", changedPrices: "Saved price checks", source: "Data source", sourceHint: "Administration forecast source file",
+      canteen: "Canteen", shuttle: "Shuttle", uniforms: "Workwear", priceItem: "Price item", coverage: "Coverage", quantity: "Issue quantity", excelPrice: "Excel budget price", checkedPrice: "Validated price", status: "Status", unchanged: "Matches Excel", saved: "Saved this month", locked: "Already validated this month; revoke before changing", expand: "Expand price details", collapse: "Collapse price details",
+      reason: "Price change reason", required: "Required when changed", reasonPlaceholder: "Explain the contract, invoice or quotation change", attachment: "Contract or invoice", upload: "Choose file", noAttachment: "No file uploaded", attachmentRequired: "A contract or invoice is required when a price changes", save: "Save current-month price validation", revoke: "Revoke current-month validation", revokeHint: "Revoking restores the Excel price and its linked budget cache.", noChange: "No price changes to save", pending: "price changes pending", guide: "Entry guide", savedToast: "Procurement price validation saved and budget linked", revokedToast: "Price validation revoked; Excel price and budget cache restored", reasonRequired: "Enter a reason before saving changed prices", attachmentName: "Uploaded attachment", oneChange: "Each price can be saved once per month", routeRate: "System-calculated shuttle rate per person-day", formula: "Budget formula", currentOnly: "This version validates the current month only", people: "people", item: "items/groups"
+    },
+    tr: {
+      eyebrow: "Satın alma yetkisi · Cari ay fiyat kontrolü", title: "Satın Alma Fiyat Kontrolü", subtitle: "Yalnızca yemekhane, servis ve iş kıyafeti fiyatlarını kontrol edin. Çalışan sayısı, iş günü, uygunluk ve formüller salt okunurdur.",
+      currentMonth: "Cari ay", categories: "Satın alma kontrol kalemleri", baselineBudget: "İdari tahmin", systemBudget: "Geçerli sistem tahmini", changedPrices: "Kaydedilmiş fiyat kontrolleri", source: "Veri kaynağı", sourceHint: "İdari tahmin kaynak dosyası",
+      canteen: "Yemekhane", shuttle: "Servis", uniforms: "İş kıyafeti", priceItem: "Fiyat kalemi", coverage: "Kapsam", quantity: "Dağıtım adedi", excelPrice: "Excel bütçe fiyatı", checkedPrice: "Kontrol edilen fiyat", status: "Durum", unchanged: "Excel ile aynı", saved: "Bu ay kaydedildi", locked: "Bu ay zaten kontrol edildi; değiştirmek için geri alın", expand: "Fiyat detaylarını aç", collapse: "Fiyat detaylarını kapat",
+      reason: "Fiyat değişikliği gerekçesi", required: "Değişiklikte zorunlu", reasonPlaceholder: "Sözleşme, fatura veya teklif değişikliğini açıklayın", attachment: "Sözleşme veya fatura", upload: "Dosya seç", noAttachment: "Dosya yüklenmedi", attachmentRequired: "Fiyat değiştiğinde sözleşme veya fatura zorunludur", save: "Cari ay fiyat kontrolünü kaydet", revoke: "Cari ay kontrolünü geri al", revokeHint: "Geri alma Excel fiyatını ve bağlı bütçe önbelleğini geri yükler.", noChange: "Kaydedilecek fiyat değişikliği yok", pending: "fiyat değişikliği bekliyor", guide: "Giriş açıklaması", savedToast: "Satın alma fiyat kontrolü kaydedildi ve bütçe bağlandı", revokedToast: "Fiyat kontrolü geri alındı; Excel fiyatı ve bütçe önbelleği geri yüklendi", reasonRequired: "Değişen fiyatları kaydetmeden önce gerekçe girin", attachmentName: "Yüklenen ek", oneChange: "Her fiyat ayda yalnızca bir kez kaydedilebilir", routeRate: "Sistemin hesapladığı kişi-gün servis fiyatı", formula: "Bütçe formülü", currentOnly: "Bu sürüm yalnızca cari ayı kontrol eder", people: "kişi", item: "adet/grup"
+    }
+  };
+  return copy[state.language]?.[key] || copy.zh[key] || key;
+}
+
+function procurementLineLabel(line) {
+  const labels = {
+    zh: { mealUnitPrice: "餐费单价", routeDailyPrice: "班车线路日价", summerTshirt: "夏季T恤", summerTrousers: "夏季长裤", winterSweatshirt: "冬季卫衣", winterTrousers: "冬季长裤", removableSleeveFleece: "可拆袖抓绒", summerShoes: "夏季鞋", winterShoes: "冬季鞋", haierFleece: "Haier标识抓绒", safetyVest: "安全背心", innerwear: "保暖内衣", specialShoes: "特殊鞋", coat: "外套" },
+    tr: { mealUnitPrice: "Yemek birim fiyatı", routeDailyPrice: "Servis hat günlük fiyatı", summerTshirt: "Yazlık tişört", summerTrousers: "Yazlık pantolon", winterSweatshirt: "Kışlık sweatshirt", winterTrousers: "Kışlık pantolon", removableSleeveFleece: "Çıkarılabilir kollu polar", summerShoes: "Yazlık ayakkabı", winterShoes: "Kışlık ayakkabı", haierFleece: "Haier logolu polar", safetyVest: "İş güvenliği yeleği", innerwear: "İçlik", specialShoes: "Özel ayakkabı", coat: "Mont" }
+  };
+  return labels[state.language]?.[line.id] || line.label;
+}
+
+function procurementCoverage(line) {
+  const value = line.audience || "";
+  if (state.language === "zh") return value.replace("Fixed 50 sets", "固定50套").replace("Fixed 70 groups", "固定70组").replace("Fixed 100 coats", "固定100件外套");
+  if (state.language === "tr") return value.replace("Fixed 50 sets", "Sabit 50 takım").replace("Fixed 70 groups", "Sabit 70 grup").replace("Fixed 100 coats", "Sabit 100 mont");
+  return value;
+}
+
+function procurementBaselinePrice(line, monthIndex) {
+  return Array.isArray(line.baseline) ? Number(line.baseline[monthIndex]) : Number(line.baseline);
+}
+
+function procurementDraftValue(categoryId, line, monthIndex) {
+  const draft = procurementDraft(categoryId);
+  const saved = procurementPriceCheck(categoryId, line.id, monthIndex);
+  if (saved) return Number(saved.value);
+  const value = Number(draft.values?.[line.id]);
+  return Number.isFinite(value) ? value : procurementBaselinePrice(line, monthIndex);
+}
+
+function procurementCategoryAmount(categoryId, snapshot) {
+  return categoryId === "canteen" ? snapshot.amounts.canteenTry : categoryId === "shuttle" ? snapshot.amounts.shuttleTry : snapshot.amounts.uniformsTry;
+}
+
+function procurementCategoryChanges(categoryId, monthIndex) {
+  return (DW_PROCUREMENT_PRICE_LINES[categoryId] || []).filter((line) => {
+    if (procurementPriceCheck(categoryId, line.id, monthIndex)) return false;
+    return Math.abs(procurementDraftValue(categoryId, line, monthIndex) - procurementBaselinePrice(line, monthIndex)) > 0.000001;
+  });
+}
+
+function renderProcurementPriceWorkspace() {
+  if (!els.forecastWorkspace) return;
+  ensureDwHeadcountBudgetBaseline();
+  const monthIndex = employeeAttendanceMonthIndex();
+  const categoryId = ["canteen", "shuttle", "uniforms"].includes(state.procurementSelectedCategory) ? state.procurementSelectedCategory : "canteen";
+  const lines = DW_PROCUREMENT_PRICE_LINES[categoryId];
+  const snapshot = dwHeadcountBudgetSnapshot(monthIndex);
+  const category = ADMIN_BUDGET_DATA.categories.find((item) => item.id === categoryId);
+  const draft = procurementDraft(categoryId);
+  const changes = procurementCategoryChanges(categoryId, monthIndex);
+  const savedCount = lines.filter((line) => procurementPriceCheck(categoryId, line.id, monthIndex)).length;
+  const budgetAmount = procurementCategoryAmount(categoryId, snapshot);
+  const baseAmount = Number(category.monthlyTry[monthIndex] || 0);
+  const showLines = (items) => items.map((line) => {
+    const saved = procurementPriceCheck(categoryId, line.id, monthIndex);
+    const baseline = procurementBaselinePrice(line, monthIndex);
+    const value = procurementDraftValue(categoryId, line, monthIndex);
+    const isChanged = Math.abs(value - baseline) > 0.000001;
+    return `<tr class="${saved ? "locked" : isChanged ? "changed" : ""}"><td><b>${escapeHtml(procurementLineLabel(line))}</b>${saved?.attachment?.name ? `<small>${escapeHtml(procurementT("attachmentName"))}: ${escapeHtml(saved.attachment.name)}</small>` : ""}</td><td>${escapeHtml(procurementCoverage(line))}</td><td>${line.quantity ? escapeHtml(String(line.quantity)) : "—"}</td><td>${formatMoney(baseline)} TRY</td><td><input type="number" min="0" step="0.01" data-procurement-price="${categoryId}|${line.id}" value="${escapeHtml(String(value))}" ${saved ? "disabled" : ""} aria-label="${escapeHtml(procurementLineLabel(line))}" />${saved ? `<small>${escapeHtml(procurementT("locked"))}</small>` : ""}</td><td><span class="ppv-status ${saved ? "saved" : isChanged ? "changed" : ""}">${escapeHtml(saved ? procurementT("saved") : isChanged ? procurementT("pending") : procurementT("unchanged"))}</span>${saved ? `<button type="button" class="ppv-revoke" data-procurement-revoke="${categoryId}|${line.id}">${escapeHtml(procurementT("revoke"))}</button>` : ""}</td></tr>`;
+  }).join("");
+  const priceRows = categoryId === "uniforms"
+    ? `<details class="ppv-details"><summary>${escapeHtml(procurementT("expand"))} · ${lines.length} ${escapeHtml(procurementT("item"))}</summary><div class="ppv-table-wrap"><table class="ppv-table"><thead><tr><th>${escapeHtml(procurementT("priceItem"))}</th><th>${escapeHtml(procurementT("coverage"))}</th><th>${escapeHtml(procurementT("quantity"))}</th><th>${escapeHtml(procurementT("excelPrice"))}</th><th>${escapeHtml(procurementT("checkedPrice"))}</th><th>${escapeHtml(procurementT("status"))}</th></tr></thead><tbody>${showLines(lines)}</tbody></table></div></details>`
+    : `<div class="ppv-table-wrap"><table class="ppv-table"><thead><tr><th>${escapeHtml(procurementT("priceItem"))}</th><th>${escapeHtml(procurementT("coverage"))}</th><th>${escapeHtml(procurementT("quantity"))}</th><th>${escapeHtml(procurementT("excelPrice"))}</th><th>${escapeHtml(procurementT("checkedPrice"))}</th><th>${escapeHtml(procurementT("status"))}</th></tr></thead><tbody>${showLines(lines)}</tbody></table></div>`;
+  const formula = categoryId === "canteen" ? adminFormula(category) : categoryId === "shuttle" ? adminFormula(category) : adminFormula(category);
+  const derived = categoryId === "shuttle" ? `<p class="ppv-derived"><b>${escapeHtml(procurementT("routeRate"))}:</b> ${formatMoney(snapshot.shuttleRate)} TRY/${escapeHtml(state.language === "tr" ? "kişi-gün" : state.language === "en" ? "person-day" : "人天")}</p>` : "";
+  const pendingText = changes.length ? `${changes.length} ${procurementT("pending")}` : procurementT("noChange");
+  const categoryTabs = ["canteen", "shuttle", "uniforms"].map((id) => `<button type="button" data-procurement-category="${id}" class="${id === categoryId ? "active" : ""}">${escapeHtml(procurementT(id))}</button>`).join("");
+  const guide = `<details class="ppv-guide"><summary>${escapeHtml(procurementT("guide"))}</summary><div class="ppv-guide-panel"><ul><li>${escapeHtml(procurementT("subtitle"))}</li><li><b>${escapeHtml(procurementT("formula"))}:</b> ${escapeHtml(formula)}</li><li>${escapeHtml(procurementT("oneChange"))}</li><li>${escapeHtml(procurementT("attachmentRequired"))}</li><li>${escapeHtml(procurementT("revokeHint"))}</li></ul><p>${escapeHtml(procurementT("source"))}: ${escapeHtml(procurementT("sourceHint"))} · ${escapeHtml(procurementT("currentOnly"))}</p></div></details>`;
+  const changeFields = changes.length ? `<div class="ppv-change-fields"><label><span>${escapeHtml(procurementT("reason"))} <em>* ${escapeHtml(procurementT("required"))}</em></span><textarea maxlength="500" data-procurement-reason placeholder="${escapeHtml(procurementT("reasonPlaceholder"))}">${escapeHtml(draft.reason || "")}</textarea></label><label class="ppv-upload"><span>${escapeHtml(procurementT("attachment"))} <em>* ${escapeHtml(procurementT("required"))}</em></span><span class="ppv-file-row"><input type="file" data-procurement-attachment="${categoryId}" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx"/><span class="ppv-file-button">${escapeHtml(procurementT("upload"))}</span><b>${escapeHtml(draft.attachment?.name || procurementT("noAttachment"))}</b></span></label></div>` : "";
+  const changeGate = changes.length ? `<footer class="ppv-change-gate pending">${changeFields}<div class="ppv-save"><button type="button" data-procurement-action="save">${escapeHtml(procurementT("save"))}</button></div></footer>` : "";
+  els.forecastWorkspace.innerHTML = `<section class="ppv-shell"><header class="ppv-toolbar"><nav class="ppv-category-tabs" aria-label="${escapeHtml(procurementT("categories"))}">${categoryTabs}</nav><div class="ppv-toolbar-actions">${guide}<button type="button" data-procurement-action="switch-role">${escapeHtml(t("switchRole"))}</button></div></header><section class="ppv-summary"><div><span>${escapeHtml(procurementT("currentMonth"))}</span><strong>${headcountPeriodMarkup(2026, [monthIndex])}</strong></div><div><span>${escapeHtml(procurementT("baselineBudget"))}</span><strong>${formatMoney(baseAmount / ADMIN_BUDGET_DATA.eurTry / 1000)} K€</strong></div><div><span>${escapeHtml(procurementT("systemBudget"))}</span><strong>${formatMoney(budgetAmount / ADMIN_BUDGET_DATA.eurTry / 1000)} K€</strong></div><div><span>${escapeHtml(procurementT("changedPrices"))}</span><strong>${savedCount}</strong></div></section><section class="ppv-card"><header title="${escapeHtml(`${category.accountCode} · ${category.sourceLabel}`)}"><h3>${escapeHtml(procurementT(categoryId))}</h3><span class="ppv-card-status ${changes.length ? "pending" : savedCount ? "saved" : ""}">${escapeHtml(pendingText)}</span></header>${priceRows}${derived}${changeGate}</section></section>`;
+}
+
 function defaultAdminBudgetInputs() {
   return {
     months: Object.fromEntries(ADMIN_BUDGET_DATA.categories.map((item) => [item.id, [...item.monthlyTry]])),
@@ -3370,9 +4650,77 @@ function loadAdminBudgetAudit() {
   try { return JSON.parse(localStorage.getItem(ADMIN_BUDGET_AUDIT_KEY) || "[]"); } catch { return []; }
 }
 
+function loadAdminHeadcountLinkage() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ADMIN_HEADCOUNT_LINK_KEY) || "null");
+    return { months: { ...(saved?.months || {}) } };
+  } catch {
+    return { months: {} };
+  }
+}
+
+function defaultAdminRuleMonths() {
+  return Object.fromEntries(Array.from({ length: 12 }, (_, monthIndex) => [String(monthIndex), { ...DW_ADMIN_PARAMETER_DEFAULTS }]));
+}
+
+function normalizeAdminRuleMonths(source) {
+  const defaults = defaultAdminRuleMonths();
+  for (const monthIndex of Object.keys(defaults)) {
+    defaults[monthIndex] = { ...defaults[monthIndex], ...(source?.[monthIndex] || {}) };
+  }
+  return defaults;
+}
+
+function loadAdminRuleParameters() {
+  const defaults = defaultAdminRuleMonths();
+  try {
+    const stored = JSON.parse(localStorage.getItem(ADMIN_RULE_PARAMETER_KEY) || "null");
+    if (!stored) return { draft: clonePlain(defaults), saved: clonePlain(defaults), origins: {} };
+    const saved = normalizeAdminRuleMonths(stored.saved || stored.draft);
+    return { draft: normalizeAdminRuleMonths(stored.draft || saved), saved, origins: { ...(stored.origins || {}) } };
+  } catch {
+    return { draft: clonePlain(defaults), saved: clonePlain(defaults), origins: {} };
+  }
+}
+
+function saveAdminRuleParameters() {
+  localStorage.setItem(ADMIN_RULE_PARAMETER_KEY, JSON.stringify(adminRuleParameters));
+}
+
+function adminRuleParametersForMonth(monthIndex, mode = "saved") {
+  const index = String(Math.max(0, Math.min(11, Number(monthIndex) || 0)));
+  return { ...DW_ADMIN_PARAMETER_DEFAULTS, ...(adminRuleParameters?.[mode]?.[index] || {}) };
+}
+
 function saveAdminBudgetState() {
   localStorage.setItem(ADMIN_BUDGET_INPUT_KEY, JSON.stringify(adminBudgetInputs));
   localStorage.setItem(ADMIN_BUDGET_AUDIT_KEY, JSON.stringify(adminBudgetAudit));
+  localStorage.setItem(ADMIN_HEADCOUNT_LINK_KEY, JSON.stringify(adminHeadcountLinkage));
+  saveAdminRuleParameters();
+}
+
+function headcountLinkageState(monthIndex = employeeAttendanceMonthIndex()) {
+  return adminHeadcountLinkage.months?.[String(monthIndex)] || { mode: "baseline" };
+}
+
+function ensureDwHeadcountBudgetBaseline() {
+  const monthIndex = employeeAttendanceMonthIndex();
+  if (adminHeadcountLinkage.months?.[String(monthIndex)]) return false;
+  const snapshot = dwHeadcountBudgetSnapshot(monthIndex);
+  const amounts = { canteen: snapshot.amounts.canteenTry, shuttle: snapshot.amounts.shuttleTry, uniforms: snapshot.amounts.uniformsTry };
+  for (const [categoryId, amount] of Object.entries(amounts)) {
+    if (!adminBudgetInputs.months?.[categoryId]) continue;
+    adminBudgetInputs.months[categoryId][monthIndex] = Number(Number(amount).toFixed(6));
+  }
+  adminHeadcountLinkage.months[String(monthIndex)] = {
+    mode: "baseline",
+    timestamp: new Date().toISOString(),
+    source: "Annual budget baseline"
+  };
+  adminBudgetSavedInputs = clonePlain(adminBudgetInputs);
+  saveAdminBudgetState();
+  applyAdminBudgetSync("Annual budget baseline", "baseline");
+  return true;
 }
 
 function adminCategoryChanged(category) {
@@ -3386,15 +4734,17 @@ function adminPendingChanges() {
 }
 
 function adminMonthlyKeur(category, index) {
-  return Number(category.monthlyTry?.[index] || 0) / ADMIN_BUDGET_DATA.eurTry / 1000;
+  return Number(adminBudgetInputs.months?.[category.id]?.[index] ?? category.monthlyTry?.[index] ?? 0) / ADMIN_BUDGET_DATA.eurTry / 1000;
 }
 
 function adminAnnualKeur(category) {
-  return (category.monthlyTry || []).reduce((sum, value) => sum + Number(value || 0), 0) / ADMIN_BUDGET_DATA.eurTry / 1000;
+  const months = adminBudgetInputs.months?.[category.id] || category.monthlyTry || [];
+  return months.reduce((sum, value) => sum + Number(value || 0), 0) / ADMIN_BUDGET_DATA.eurTry / 1000;
 }
 
 function renderAdminBudgetWorkspace() {
   if (!els.forecastWorkspace) return;
+  ensureDwHeadcountBudgetBaseline();
   const ready = ADMIN_BUDGET_DATA.categories.filter((item) => item.ready);
   const pending = ADMIN_BUDGET_DATA.categories.filter((item) => !item.ready);
   const annual = ready.reduce((sum, item) => sum + adminAnnualKeur(item), 0);
@@ -3403,22 +4753,173 @@ function renderAdminBudgetWorkspace() {
   const content = state.adminBudgetView === "results" ? adminBudgetResults() : state.adminBudgetView === "audit" ? adminAuditView() : adminConditionView(selected);
   const versions = state.language === "en" ? ["2026 Budget", "6+6 Forecast", "Variance"] : state.language === "tr" ? ["2026 Bütçe", "6+6 Tahmin", "Fark"] : ["2026预算", "6+6预测", "差异版"];
   els.forecastWorkspace.innerHTML = `<div class="adb-shell">
-    <header class="adb-header"><div><span>${escapeHtml(adminT("permission"))}</span><h3>${escapeHtml(adminT("title"))}</h3><p>${escapeHtml(adminT("subtitle"))}</p></div><div class="adb-version-switch">${versions.map((label, index) => `<span class="${index === 1 ? "active" : ""}">${escapeHtml(label)}</span>`).join("")}</div><div class="adb-actions"><button type="button" class="ghost-button" data-admin-action="save">${escapeHtml(adminT("save"))}</button><button type="button" data-admin-action="submit">${escapeHtml(adminT("submit"))}</button></div></header>
+    <header class="adb-header"><div><span>${escapeHtml(adminT("permission"))}</span><h3>${escapeHtml(adminT("title"))}</h3><p>${escapeHtml(adminT("subtitle"))}</p></div><div class="adb-version-switch">${versions.map((label, index) => `<span class="${index === 1 ? "active" : ""}">${escapeHtml(label)}</span>`).join("")}</div><div class="adb-actions"><button type="button" class="ghost-button" data-admin-action="save">${escapeHtml(adminT("save"))}</button>${adminBudgetHasSubmission() ? `<button type="button" class="ghost-button" data-admin-action="withdraw">${escapeHtml(adminT("withdraw"))}</button>` : ""}<button type="button" data-admin-action="submit" ${adminBudgetHasSubmission() ? "disabled" : ""}>${escapeHtml(adminT("submit"))}</button></div></header>
     ${nav}
-    <section class="adb-kpis"><div><span>${escapeHtml(adminT("categories"))}</span><strong>${ADMIN_BUDGET_DATA.categories.length}</strong></div><div class="good"><span>${escapeHtml(adminT("completed"))}</span><strong>${ready.length}</strong></div><div class="warn"><span>${escapeHtml(adminT("pending"))}</span><strong>${pending.length}</strong></div><div><span>${escapeHtml(adminT("annual"))}</span><strong>€${formatMoney(annual)}K</strong></div><div><span>${escapeHtml(adminT("source"))}</span><strong>R2</strong><small>${escapeHtml(ADMIN_BUDGET_DATA.sourceFile)}</small></div></section>
+    <section class="adb-kpis"><div><span>${escapeHtml(adminT("categories"))}</span><strong>${ADMIN_BUDGET_DATA.categories.length}</strong></div><div class="good"><span>${escapeHtml(adminT("completed"))}</span><strong>${ready.length}</strong></div><div class="warn"><span>${escapeHtml(adminT("pending"))}</span><strong>${pending.length}</strong></div><div><span>${escapeHtml(adminT("annual"))}</span><strong>€${formatMoney(annual)}K</strong></div><div><span>${escapeHtml(adminT("source"))}</span><strong>${escapeHtml(adminT("sourceHint"))}</strong></div></section>
     ${content}
   </div>`;
 }
 
 function adminConditionView(selected) {
-  return `<section class="adb-condition-layout"><aside class="adb-category-list">${ADMIN_BUDGET_DATA.categories.map((category) => `<button type="button" class="${selected.id === category.id ? "active" : ""}" data-admin-select="${category.id}"><span><b>${escapeHtml(adminCategoryLabel(category))}</b><small>${escapeHtml(category.sourceLabel)}</small></span><em class="adb-status ${category.ready ? "ready" : "missing"}">${escapeHtml(category.ready ? adminT("ready") : adminT("missing"))}</em></button>`).join("")}</aside><section class="adb-condition-main">${adminSelectedPanel(selected)}${adminDriverTable(selected)}</section></section>`;
+  return `<section class="adb-condition-layout"><aside class="adb-category-list">${ADMIN_BUDGET_DATA.categories.map((category) => `<button type="button" class="${selected.id === category.id ? "active" : ""}" data-admin-select="${category.id}" title="${escapeHtml(category.sourceLabel)}"><span><b>${escapeHtml(adminCategoryLabel(category))}</b></span><em class="adb-status ${category.ready ? "ready" : "missing"}">${escapeHtml(category.ready ? adminT("ready") : adminT("missing"))}</em></button>`).join("")}</aside><section class="adb-condition-main">${adminSelectedPanel(selected)}${adminDriverTable(selected)}</section></section>`;
+}
+
+function adminHeadcountCopy() {
+  const copy = {
+    zh: { baseline: "年度预算基线", saved: "已保存操作", period: "当前期间", employee: "员工出勤预算人数", employeeTotal: "员工人数合计", direct: "DIR BC（直接蓝领）", sharedAlias: "Shared（共享人员）", indirect: "IND BC（间接蓝领）", whiteAlias: "WC（白领）", administration: "行政出勤预算人数", eligible: "用餐适用人数", riders: "乘车适用人数", overtime: "加班人数", billable: "计费人数", workdays: "工作日", unitPrice: "餐费单价", shuttleRate: "人均班车单价", result: "当月系统预算", blue: "BC（DIR BC + IND BC）", white: "WC（白领）", sub: "SUB（废弃物+食堂+清洁+安保）", shared: "Shared（共享人员）", production: "生产计划部门", administrationDept: "行政部门", system: "系统自动计算", employeeSource: "员工出勤", attendanceSource: "行政出勤", calendar: "系统日历", contract: "采购合同", pending: "待确认，不计入金额", monthly: "月度", sourceValue: "来源值 / 计算值", parameterTitle: "行政输入参数（保存后生效）", parameterHint: "当前月至12月一次展示；可直接修改当前月或后续月份。绿色表示未保存变更。", reason: "参数变更原因", reasonPlaceholder: "说明参数变化原因、依据和影响月份", noParameters: "本项暂无行政可填参数" },
+    en: { baseline: "Annual budget baseline", saved: "Saved operation", period: "Current period", employee: "Employee attendance budget HC", employeeTotal: "Total employee headcount", direct: "DIR BC (direct blue collar)", sharedAlias: "Shared (shared FTE)", indirect: "IND BC (indirect blue collar)", whiteAlias: "WC (white collar)", administration: "Administration attendance budget HC", eligible: "Eligible meal headcount", riders: "Eligible shuttle riders", overtime: "Overtime headcount", billable: "Billable headcount", workdays: "Workdays", unitPrice: "Meal unit price", shuttleRate: "Shuttle rate per person-day", result: "Current-month system budget", blue: "BC (DIR BC + IND BC)", white: "WC (white collar)", sub: "SUB (waste + canteen + cleaning + security)", shared: "Shared (shared FTE)", production: "Production Planning", administrationDept: "Administration", system: "System calculation", employeeSource: "Employee attendance", attendanceSource: "Administration attendance", calendar: "System calendar", contract: "Procurement contract", pending: "Pending confirmation; excluded from amount", monthly: "Monthly", sourceValue: "Source / calculated value", parameterTitle: "Administration inputs (effective after save)", parameterHint: "Current month through December is shown together. Edit the current or any future month directly; green cells are unsaved.", reason: "Parameter change reason", reasonPlaceholder: "State the reason, evidence and affected months", noParameters: "No administration input is required for this item" },
+    tr: { baseline: "Yıllık bütçe bazı", saved: "Kaydedilmiş işlem", period: "Cari dönem", employee: "Çalışan devam bütçe sayısı", employeeTotal: "Toplam çalışan sayısı", direct: "DIR BC (direkt mavi yaka)", sharedAlias: "Shared (paylaşımlı FTE)", indirect: "IND BC (endirekt mavi yaka)", whiteAlias: "WC (beyaz yaka)", administration: "İdari devam bütçe sayısı", eligible: "Uygun yemek personeli", riders: "Uygun servis yolcusu", overtime: "Fazla mesai personeli", billable: "Faturalandırılan personel", workdays: "İş günleri", unitPrice: "Yemek birim fiyatı", shuttleRate: "Kişi-gün servis fiyatı", result: "Cari ay sistem bütçesi", blue: "BC (DIR BC + IND BC)", white: "WC (beyaz yaka)", sub: "SUB (atık + yemekhane + temizlik + güvenlik)", shared: "Shared (paylaşımlı FTE)", production: "Üretim Planlama", administrationDept: "İdari İşler", system: "Sistem hesabı", employeeSource: "Çalışan devamı", attendanceSource: "İdari personel kontrolü", calendar: "Sistem takvimi", contract: "Satın alma sözleşmesi", pending: "Onay bekliyor; tutara dahil değil", monthly: "Aylık", sourceValue: "Kaynak / hesaplanan değer", parameterTitle: "İdari İşler girdileri (kayıttan sonra geçerli)", parameterHint: "Cari aydan Aralık ayına kadar tüm aylar birlikte gösterilir. Cari veya gelecek ayı doğrudan düzenleyin; yeşil hücreler kaydedilmemiştir.", reason: "Parametre değişiklik gerekçesi", reasonPlaceholder: "Gerekçe, dayanak ve etkilenen ayları belirtin", noParameters: "Bu kalem için İdari İşler girişi gerekmiyor" }
+  };
+  return copy[state.language] || copy.zh;
+}
+
+function adminRuleLabel(key) {
+  const labels = {
+    overtimeRate: { zh: "共用加班比例", en: "Shared overtime rate", tr: "Ortak fazla mesai oranı" },
+    shuttleTargetOccupancy: { zh: "目标满载率", en: "Target occupancy", tr: "Hedef doluluk oranı" },
+    shuttleCapacity: { zh: "车辆座位数", en: "Vehicle capacity", tr: "Araç kapasitesi" },
+    shuttleRoundTripFactor: { zh: "往返系数", en: "Round-trip factor", tr: "Gidiş-dönüş katsayısı" },
+    summerTshirtIssueQty: { zh: "夏季T恤发放数量", en: "Summer T-shirt issue qty", tr: "Yazlık tişört dağıtım adedi" },
+    summerTrousersIssueQty: { zh: "夏裤发放数量", en: "Summer trousers issue qty", tr: "Yazlık pantolon dağıtım adedi" },
+    winterSweatshirtIssueQty: { zh: "冬季卫衣发放数量", en: "Winter sweatshirt issue qty", tr: "Kışlık sweatshirt dağıtım adedi" },
+    winterTrousersIssueQty: { zh: "冬裤发放数量", en: "Winter trousers issue qty", tr: "Kışlık pantolon dağıtım adedi" },
+    removableSleeveFleeceIssueQty: { zh: "可拆袖抓绒发放数量", en: "Removable-sleeve fleece issue qty", tr: "Çıkarılabilir kollu polar dağıtım adedi" },
+    summerShoesIssueQty: { zh: "夏鞋发放数量", en: "Summer shoes issue qty", tr: "Yazlık ayakkabı dağıtım adedi" },
+    winterShoesIssueQty: { zh: "冬鞋发放数量", en: "Winter shoes issue qty", tr: "Kışlık ayakkabı dağıtım adedi" },
+    haierFleeceIssueQty: { zh: "Haier抓绒发放数量", en: "Haier fleece issue qty", tr: "Haier polar dağıtım adedi" },
+    safetyVestIssueQty: { zh: "安全背心发放数量", en: "Safety vest issue qty", tr: "İş güvenliği yeleği dağıtım adedi" },
+    fixedInnerwearQty: { zh: "保暖内衣固定数量", en: "Fixed innerwear qty", tr: "Sabit termal içlik adedi" },
+    fixedSpecialShoesQty: { zh: "特殊鞋固定组数", en: "Fixed special-shoe groups", tr: "Sabit özel ayakkabı grubu" },
+    specialShoesIssueQty: { zh: "每组特殊鞋发放数量", en: "Special shoes per group", tr: "Grup başına özel ayakkabı" },
+    fixedCoatsQty: { zh: "外套固定数量", en: "Fixed coat qty", tr: "Sabit mont adedi" },
+    uniformUplift: { zh: "外套系数", en: "Coat factor", tr: "Mont katsayısı" },
+    uniformAllocationDivisor: { zh: "年度分摊月数", en: "Annual allocation months", tr: "Yıllık dağıtım ayı" }
+  };
+  return labels[key]?.[state.language] || labels[key]?.en || key;
+}
+
+function adminRuleDefinitions(categoryId) {
+  const percentage = { unit: "%", scale: 100, step: 0.1, min: 0 };
+  const quantity = { unit: state.language === "tr" ? "adet" : state.language === "en" ? "qty" : "数量", scale: 1, step: 0.01, min: 0 };
+  if (categoryId === "canteen") return [{ key: "overtimeRate", ...percentage }];
+  if (categoryId === "shuttle") return [
+    { key: "overtimeRate", ...percentage },
+    { key: "shuttleTargetOccupancy", ...percentage },
+    { key: "shuttleCapacity", unit: state.language === "tr" ? "koltuk" : state.language === "en" ? "seats" : "座", scale: 1, step: 1, min: 1 },
+    { key: "shuttleRoundTripFactor", unit: "×", scale: 1, step: 0.1, min: 0 }
+  ];
+  if (categoryId !== "uniforms") return [];
+  return [
+    "summerTshirtIssueQty", "summerTrousersIssueQty", "winterSweatshirtIssueQty", "winterTrousersIssueQty", "removableSleeveFleeceIssueQty",
+    "summerShoesIssueQty", "winterShoesIssueQty", "haierFleeceIssueQty", "safetyVestIssueQty", "fixedInnerwearQty", "fixedSpecialShoesQty",
+    "specialShoesIssueQty", "fixedCoatsQty"
+  ].map((key) => ({ key, ...quantity })).concat([
+    { key: "uniformUplift", unit: "×", scale: 1, step: 0.1, min: 0 },
+    { key: "uniformAllocationDivisor", unit: state.language === "tr" ? "ay" : state.language === "en" ? "months" : "月", scale: 1, step: 1, min: 1 }
+  ]);
+}
+
+function adminRuleEditor(category) {
+  const definitions = adminRuleDefinitions(category.id);
+  if (!definitions.length) return `<p class="adb-result-note">${escapeHtml(adminHeadcountCopy().noParameters)}</p>`;
+  const copy = adminHeadcountCopy();
+  const currentMonth = employeeAttendanceMonthIndex();
+  const months = Array.from({ length: 12 - currentMonth }, (_, index) => currentMonth + index);
+  const rows = definitions.map((definition) => {
+    const cells = months.map((monthIndex) => {
+      const draft = Number(adminRuleParameters.draft[String(monthIndex)]?.[definition.key] ?? DW_ADMIN_PARAMETER_DEFAULTS[definition.key]);
+      const saved = Number(adminRuleParameters.saved[String(monthIndex)]?.[definition.key] ?? DW_ADMIN_PARAMETER_DEFAULTS[definition.key]);
+      const changed = Math.abs(draft - saved) > 0.000001;
+      const displayed = Number((draft * definition.scale).toFixed(4));
+      return `<td class="${changed ? "changed" : ""}"><div class="adb-parameter-input"><input type="number" min="${definition.min}" step="${definition.step}" value="${escapeHtml(String(displayed))}" data-admin-rule-input="${category.id}|${definition.key}|${monthIndex}|${definition.scale}" aria-label="${escapeHtml(`${adminRuleLabel(definition.key)} ${localizeMonthLabel(monthIndex, state.language)}`)}" /><span>${escapeHtml(definition.unit)}</span></div></td>`;
+    }).join("");
+    return `<tr><th><b>${escapeHtml(adminRuleLabel(definition.key))}</b>${definition.key === "overtimeRate" ? `<small>${escapeHtml(state.language === "tr" ? "Yemekhane ve servis için ortak" : state.language === "en" ? "Shared by canteen and shuttle" : "食堂与班车共用")}</small>` : ""}</th>${cells}</tr>`;
+  }).join("");
+  return `<section class="adb-parameter-card"><header><div><h5>${escapeHtml(copy.parameterTitle)}</h5><p>${escapeHtml(copy.parameterHint)}</p></div><span>${escapeHtml(currentMonth === months[0] ? localizeMonthLabel(currentMonth, state.language) : "")}</span></header><div class="adb-parameter-scroll"><table><thead><tr><th>${escapeHtml(state.language === "tr" ? "Parametre" : state.language === "en" ? "Parameter" : "参数")}</th>${months.map((monthIndex) => `<th>${escapeHtml(localizeMonthLabel(monthIndex, state.language))}<small>${monthIndex === currentMonth ? escapeHtml(state.language === "tr" ? "Cari" : state.language === "en" ? "Current" : "当前") : ""}</small></th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div><label class="adb-parameter-reason"><span>${escapeHtml(copy.reason)} <em>*</em></span><textarea maxlength="500" data-admin-reason="${category.id}" placeholder="${escapeHtml(copy.reasonPlaceholder)}">${escapeHtml(adminBudgetInputs.reasons?.[category.id] || "")}</textarea></label></section>`;
+}
+
+function adminHeadcountConditions(category) {
+  if (!["canteen", "shuttle", "uniforms"].includes(category.id)) return null;
+  const copy = adminHeadcountCopy();
+  const snapshot = dwHeadcountBudgetSnapshot();
+  const monthIndex = snapshot.monthIndex;
+  const employeeEligibleTotal = snapshot.employee.direct + snapshot.employee.indirect + snapshot.employee.white;
+  const employeeDisplayTotal = employeeEligibleTotal + snapshot.employee.shared;
+  const serviceTotal = Object.values(snapshot.service).reduce((sum, value) => sum + Number(value || 0), 0);
+  const shuttleService = snapshot.service.waste + snapshot.service.canteen + snapshot.service.cleaning + snapshot.service.security + snapshot.service.trainees;
+  const stateInfo = headcountLinkageState(monthIndex);
+  const stateLabel = stateInfo.mode === "saved" ? copy.saved : copy.baseline;
+  const people = (value) => `${employeeAttendanceNumber(value)} ${state.language === "zh" ? "人" : state.language === "tr" ? "kişi" : "people"}`;
+  const tryKeur = (value) => `${formatMoney(value)} TRY / ${formatMoney(value / ADMIN_BUDGET_DATA.eurTry / 1000)} K€`;
+  const row = (key, condition, value, provider, system) => ({ key, condition, value, provider, system, frequency: copy.monthly });
+  const employeeRows = [
+    row("directHeadcount", copy.direct, people(snapshot.employee.direct), copy.production, copy.employeeSource),
+    row("sharedHeadcount", copy.sharedAlias, `${people(snapshot.employee.shared)} · ${copy.pending}`, copy.production, copy.employeeSource),
+    row("indirectHeadcount", copy.indirect, people(snapshot.employee.indirect), copy.production, copy.employeeSource),
+    row("whiteHeadcount", copy.whiteAlias, people(snapshot.employee.white), copy.production, copy.employeeSource),
+    row("employeeHeadcount", copy.employeeTotal, `${people(employeeDisplayTotal)} = ${employeeAttendanceNumber(snapshot.employee.direct)} + ${employeeAttendanceNumber(snapshot.employee.shared)} + ${employeeAttendanceNumber(snapshot.employee.indirect)} + ${employeeAttendanceNumber(snapshot.employee.white)}`, copy.production, copy.employeeSource)
+  ];
+  const administrationRow = row("administrationHeadcount", copy.administration, `${people(serviceTotal)}`, copy.administrationDept, copy.attendanceSource);
+  const common = { monthIndex, stateLabel, copy, rows: [] };
+  if (category.id === "canteen") {
+    common.rows = [
+      ...employeeRows,
+      administrationRow,
+      row("eligibleHeadcount", copy.eligible, `${people(employeeEligibleTotal + serviceTotal)} = ${people(employeeEligibleTotal)} + ${people(serviceTotal)}`, copy.system, `${copy.employeeSource} + ${copy.attendanceSource}`),
+      row("overtime", copy.overtime, `${people(snapshot.overtime)} = ${employeeAttendanceNumber(employeeEligibleTotal + serviceTotal)} × ${employeeAttendanceNumber(snapshot.parameters.overtimeRate * 100)}%`, copy.administrationDept, copy.system),
+      row("billableHeadcount", copy.billable, `${people(snapshot.canteenHeadcount)}`, copy.system, copy.system),
+      row("workdays", copy.workdays, `${employeeAttendanceNumber(snapshot.workdays)} ${state.language === "zh" ? "天" : state.language === "tr" ? "gün" : "days"}`, copy.system, copy.calendar),
+      row("mealPrice", copy.unitPrice, `${employeeAttendanceNumber(snapshot.mealPrice)} TRY/${state.language === "zh" ? "人天" : state.language === "tr" ? "kişi-gün" : "person-day"}`, "间接采购", copy.contract),
+      row("systemBudget", copy.result, tryKeur(snapshot.amounts.canteenTry), copy.system, copy.system)
+    ];
+  } else if (category.id === "shuttle") {
+    common.rows = [
+      ...employeeRows,
+      row("administrationEligible", copy.administration, `${people(shuttleService)} (${state.language === "zh" ? "不含司机、供应商、访客" : state.language === "tr" ? "şoför, tedarikçi ve ziyaretçi hariç" : "drivers, suppliers and visitors excluded"})`, copy.administrationDept, copy.attendanceSource),
+      row("eligibleRiders", copy.riders, `${people(snapshot.shuttleHeadcount)} = ${people(employeeEligibleTotal + shuttleService)} + ${people(snapshot.overtime)}`, copy.system, `${copy.employeeSource} + ${copy.attendanceSource}`),
+      row("workdays", copy.workdays, `${employeeAttendanceNumber(snapshot.workdays)} ${state.language === "zh" ? "天" : state.language === "tr" ? "gün" : "days"}`, copy.system, copy.calendar),
+      row("shuttleRate", copy.shuttleRate, `${employeeAttendanceNumber(snapshot.shuttleRate)} TRY/${state.language === "zh" ? "人天" : state.language === "tr" ? "kişi-gün" : "person-day"}`, "间接采购", copy.contract),
+      row("systemBudget", copy.result, tryKeur(snapshot.amounts.shuttleTry), copy.system, copy.system)
+    ];
+  } else {
+    common.rows = [
+      row("uniformBlue", copy.blue, people(snapshot.uniform.blue), copy.production, copy.employeeSource),
+      row("uniformWhite", copy.white, people(snapshot.uniform.white), copy.production, copy.employeeSource),
+      row("uniformSub", copy.sub, people(snapshot.uniform.sub), copy.administrationDept, copy.attendanceSource),
+      row("shared", copy.shared, `${people(snapshot.employee.shared)} · ${copy.pending}`, copy.system, `${copy.employeeSource} + ${copy.attendanceSource}`),
+      row("systemBudget", copy.result, tryKeur(snapshot.amounts.uniformsTry), copy.system, copy.system)
+    ];
+  }
+  return common;
 }
 
 function adminSelectedPanel(category) {
-  return `<header class="adb-condition-head"><div><span>${escapeHtml(category.sourceLabel)}</span><h4>${escapeHtml(adminCategoryLabel(category))}</h4><b>${escapeHtml(category.accountCode)}</b></div><div><span>${escapeHtml(adminT("fixedFormula"))}</span><strong>${escapeHtml(adminFormula(category))}</strong><small>${escapeHtml(state.language === "zh" ? category.allocation : adminT("sourceStandard"))}</small></div></header>`;
+  const linked = adminHeadcountConditions(category);
+  const linkedMeta = linked ? `${adminHeadcountCopy().period}: ${localizeMonthLabel(linked.monthIndex, state.language)} · ${linked.stateLabel}` : state.language === "zh" ? category.allocation : adminT("sourceStandard");
+  const formula = linked ? adminLinkedFormula(category.id, dwHeadcountBudgetSnapshot(linked.monthIndex)) : adminFormula(category);
+  return `<header class="adb-condition-head"><div title="${escapeHtml(category.sourceLabel)}"><h4>${escapeHtml(adminCategoryLabel(category))}</h4><b>${escapeHtml(category.accountCode)}</b></div><div><span>${escapeHtml(adminT("fixedFormula"))}</span><strong>${escapeHtml(formula)}</strong><small class="adb-linked-meta">${escapeHtml(linkedMeta)}</small></div></header>`;
+}
+
+function adminLinkedFormula(categoryId, snapshot) {
+  const percentage = employeeAttendanceNumber(snapshot.parameters.overtimeRate * 100);
+  if (state.language === "tr") {
+    if (categoryId === "canteen") return `(uygun personel + ${percentage}% ortak fazla mesai) × iş günü × yemek birim fiyatı; Pazar mesaisi hariç`;
+    if (categoryId === "shuttle") return `uygun yolcu × iş günü × güzergâh maliyeti ÷ (${employeeAttendanceNumber(snapshot.parameters.shuttleCapacity)} × ${employeeAttendanceNumber(snapshot.parameters.shuttleTargetOccupancy * 100)}%) × ${employeeAttendanceNumber(snapshot.parameters.shuttleRoundTripFactor)}; Pazar mesaisi hariç`;
+    return `BC / WC / SUB × ürün fiyatı × dağıtım miktarı + sabit ekipman; aylık dağıtım = yıllık hesap ÷ ${employeeAttendanceNumber(snapshot.parameters.uniformAllocationDivisor)}`;
+  }
+  if (state.language === "en") {
+    if (categoryId === "canteen") return `(eligible headcount + ${percentage}% shared overtime) × workdays × meal unit price; Sunday overtime excluded`;
+    if (categoryId === "shuttle") return `eligible riders × workdays × route cost ÷ (${employeeAttendanceNumber(snapshot.parameters.shuttleCapacity)} × ${employeeAttendanceNumber(snapshot.parameters.shuttleTargetOccupancy * 100)}%) × ${employeeAttendanceNumber(snapshot.parameters.shuttleRoundTripFactor)}; Sunday overtime excluded`;
+    return `BC / WC / SUB × item price × issue quantity + fixed equipment; monthly allocation = annual calculation ÷ ${employeeAttendanceNumber(snapshot.parameters.uniformAllocationDivisor)}`;
+  }
+  if (categoryId === "canteen") return `（适用人数 + ${percentage}%共用加班）×工作日×餐费单价；不含周日加班`;
+  if (categoryId === "shuttle") return `乘车适用人数×工作日×线路成本÷（${employeeAttendanceNumber(snapshot.parameters.shuttleCapacity)}座×${employeeAttendanceNumber(snapshot.parameters.shuttleTargetOccupancy * 100)}%）×${employeeAttendanceNumber(snapshot.parameters.shuttleRoundTripFactor)}；不含周日加班`;
+  return `BC / WC / SUB×物品单价×发放数量 + 固定装备；月度分摊=年度计算÷${employeeAttendanceNumber(snapshot.parameters.uniformAllocationDivisor)}`;
 }
 
 function adminDriverTable(category) {
+  const linked = adminHeadcountConditions(category);
+  if (linked) return `<div class="adb-linked-stack"><div class="adb-driver-table adb-linked-driver-table"><table><thead><tr><th>${escapeHtml(adminT("condition"))}</th><th>${escapeHtml(linked.copy.sourceValue)}</th><th>${escapeHtml(adminT("provider"))}</th><th>${escapeHtml(adminT("owner"))}</th><th>${escapeHtml(adminT("system"))}</th><th>${escapeHtml(adminT("frequency"))}</th></tr></thead><tbody>${linked.rows.map((item) => `<tr><td><b>${escapeHtml(item.condition)}</b></td><td class="adb-link-value">${escapeHtml(item.value)}</td><td><span class="adb-provider">${escapeHtml(adminProvider(item.provider))}</span></td><td><input data-admin-owner="${category.id}.${item.key}" value="${escapeHtml(adminBudgetInputs.owners?.[category.id]?.[item.key] || "")}" placeholder="${escapeHtml(adminT("ownerPending"))}" /></td><td>${escapeHtml(item.system)}</td><td>${escapeHtml(item.frequency)}</td></tr>`).join("")}</tbody></table><p class="adb-result-note">${escapeHtml(adminT("resultReadonly"))}</p></div>${adminRuleEditor(category)}</div>`;
   const drivers = ADMIN_DRIVER_MATRIX[category.id] || [];
   return `<div class="adb-driver-table"><table><thead><tr><th>${escapeHtml(adminT("condition"))}</th><th>${escapeHtml(adminT("standard"))}</th><th>${escapeHtml(adminT("provider"))}</th><th>${escapeHtml(adminT("owner"))}</th><th>${escapeHtml(adminT("system"))}</th><th>${escapeHtml(adminT("frequency"))}</th></tr></thead><tbody>${drivers.map((item) => `<tr><td><b>${escapeHtml(adminDriverLabel(item))}</b></td><td>${escapeHtml(state.language === "zh" ? item.standard : adminT("sourceStandard"))}</td><td><span class="adb-provider">${escapeHtml(adminProvider(item.provider))}</span></td><td><input data-admin-owner="${category.id}.${item.key}" value="${escapeHtml(adminBudgetInputs.owners?.[category.id]?.[item.key] || "")}" placeholder="${escapeHtml(adminT("ownerPending"))}" /></td><td>${escapeHtml(adminDriverSystem(item))}</td><td>${escapeHtml(adminFrequency(item.frequency))}</td></tr>`).join("")}</tbody></table>${category.ready ? `<p class="adb-result-note">${escapeHtml(adminT("resultReadonly"))}</p>` : `<p class="adb-pending-note">${escapeHtml(adminT("pendingNote"))}</p>`}</div>`;
 }
@@ -3462,7 +4963,24 @@ function adminBudgetAccountDetail(account) {
   const reviewedLabel = state.language === "en" ? "Standard reviewed" : state.language === "tr" ? "Standart kontrol edildi" : "标准已校核";
   const reasonLabel = state.language === "en" ? "Change reason: contract or policy update" : state.language === "tr" ? "Değişiklik nedeni: sözleşme veya politika güncellemesi" : "调整原因：合同或政策标准更新";
   const recordLabel = state.language === "en" ? "Change record retained" : state.language === "tr" ? "Değişiklik kaydı saklandı" : "变更记录：已保留责任人和时间";
-  return `<div class="adb-account-detail"><div class="adb-account-formula"><span>${escapeHtml(account.code)} · ${escapeHtml(sourceLabel)}</span><h4>${escapeHtml(account.label)}${escapeHtml(standardLabel)}</h4><b>${escapeHtml(primary ? adminFormula(primary) : adminT("sourceStandard"))}</b><small>${escapeHtml(account.sources.join(" / "))}</small></div><div class="adb-account-drivers">${standards.map((item) => `<span class="${item.value === pendingValue ? "pending" : ""}"><small>${escapeHtml(adminDriverLabel(item))} · ${escapeHtml(adminProvider(item.provider))}</small><b>${escapeHtml(item.value)}${item.unit ? ` <em>${escapeHtml(adminStandardUnit(item))}</em>` : ""}</b></span>`).join("")}</div><div class="adb-review-card"><strong>${escapeHtml(primary?.standards ? reviewedLabel : pendingValue)}</strong><span>${escapeHtml(primary?.standards ? reasonLabel : adminT("pendingNote"))}</span><small>${escapeHtml(recordLabel)}</small></div></div>`;
+  return `<div class="adb-account-detail"><div class="adb-account-formula"><span>${escapeHtml(account.code)} · ${escapeHtml(sourceLabel)}</span><h4>${escapeHtml(account.label)}${escapeHtml(standardLabel)}</h4><b>${escapeHtml(primary ? adminFormula(primary) : adminT("sourceStandard"))}</b><small>${escapeHtml(account.sources.join(" / "))}</small></div><div class="adb-account-drivers">${standards.map((item) => `<span class="${item.value === pendingValue ? "pending" : ""}"><small>${escapeHtml(adminDriverLabel(item))} · ${escapeHtml(adminProvider(item.provider))}</small><b>${escapeHtml(adminStandardValue(item))}${item.unit ? ` <em>${escapeHtml(adminStandardUnit(item))}</em>` : ""}</b></span>`).join("")}</div><div class="adb-review-card"><strong>${escapeHtml(primary?.standards ? reviewedLabel : pendingValue)}</strong><span>${escapeHtml(primary?.standards ? reasonLabel : adminT("pendingNote"))}</span><small>${escapeHtml(recordLabel)}</small></div></div>`;
+}
+
+function adminStandardValue(item) {
+  if (state.language === "zh") return item.value;
+  const values = {
+    en: {
+      "DW已保存员工预测 + DW已保存行政出勤": "Saved DW employee forecast + saved DW admin attendance",
+      "BC=直接+间接；WC=白领；SUB=废弃物+食堂+清洁+安保；共享人员待定": "BC = direct + indirect; WC = white collar; SUB = waste + canteen + cleaning + security; shared staff pending",
+      "仅固定100件外套×1.2": "Only the fixed 100 coats × 1.2"
+    },
+    tr: {
+      "DW已保存员工预测 + DW已保存行政出勤": "Kaydedilmiş DW çalışan tahmini + kaydedilmiş DW idari devam verisi",
+      "BC=直接+间接；WC=白领；SUB=废弃物+食堂+清洁+安保；共享人员待定": "BC = direkt + endirekt; WC = beyaz yaka; SUB = atık + yemekhane + temizlik + güvenlik; ortak personel beklemede",
+      "仅固定100件外套×1.2": "Yalnızca sabit 100 mont × 1,2"
+    }
+  };
+  return values[state.language]?.[item.value] || item.value;
 }
 
 function adminStandardUnit(item) {
@@ -3475,7 +4993,7 @@ function adminStandardUnit(item) {
 }
 
 function adminBudgetResultAccounts() {
-  const output = buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, {}, Array.from({ length: 12 }, (_, index) => index + 1));
+  const output = buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, adminBudgetOverrides(), Array.from({ length: 12 }, (_, index) => index + 1));
   return Object.entries(output).map(([code, entry]) => {
     const row = rollingRowForCode(code);
     const rawLabel = row ? (state.activeUnit === "cooking" && state.language === "zh" && row.descCn ? row.descCn : localizeAccountLabel(code, row.descEn, state.language)) : localizeAccountLabel(code, "", state.language);
@@ -3486,11 +5004,84 @@ function adminBudgetResultAccounts() {
 }
 
 function adminRulesView() {
-  return `<section class="adb-rules"><table><thead><tr><th>${escapeHtml(adminT("category"))}</th><th>${escapeHtml(adminT("formula"))}</th><th>${escapeHtml(adminT("drivers"))}</th><th>${escapeHtml(adminT("allocation"))}</th><th>${escapeHtml(adminT("status"))}</th></tr></thead><tbody>${ADMIN_BUDGET_DATA.categories.map((item) => `<tr><td><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.sourceLabel)}</small></td><td>${escapeHtml(item.formula)}</td><td>${escapeHtml(item.drivers)}</td><td>${escapeHtml(item.allocation)}</td><td><span class="adb-status ${item.ready ? "ready" : "missing"}">${escapeHtml(item.ready ? adminT("ready") : adminT("missing"))}</span></td></tr>`).join("")}</tbody></table></section>`;
+  const generic = state.language === "en" ? "Source-system standard" : state.language === "tr" ? "Kaynak sistem standardı" : "源表标准";
+  return `<section class="adb-rules"><table><thead><tr><th>${escapeHtml(adminT("category"))}</th><th>${escapeHtml(adminT("formula"))}</th><th>${escapeHtml(adminT("drivers"))}</th><th>${escapeHtml(adminT("allocation"))}</th><th>${escapeHtml(adminT("status"))}</th></tr></thead><tbody>${ADMIN_BUDGET_DATA.categories.map((item) => `<tr><td title="${escapeHtml(item.sourceLabel)}"><b>${escapeHtml(adminCategoryLabel(item))}</b></td><td>${escapeHtml(adminFormula(item))}</td><td>${escapeHtml(state.language === "zh" ? item.drivers : generic)}</td><td>${escapeHtml(state.language === "zh" ? item.allocation : generic)}</td><td><span class="adb-status ${item.ready ? "ready" : "missing"}">${escapeHtml(item.ready ? adminT("ready") : adminT("missing"))}</span></td></tr>`).join("")}</tbody></table></section>`;
 }
 
 function adminAuditView() {
-  return `<section class="adb-audit"><table><thead><tr><th>${escapeHtml(adminT("time"))}</th><th>${escapeHtml(adminT("owner"))}</th><th>${escapeHtml(adminT("category"))}</th><th>${escapeHtml(adminT("beforeAfter"))}</th><th>${escapeHtml(adminT("reason"))}</th><th>${escapeHtml(adminT("operation"))}</th></tr></thead><tbody>${adminBudgetAudit.map((item) => `<tr><td>${escapeHtml(new Date(item.timestamp).toLocaleString())}</td><td>${escapeHtml(item.actor)}</td><td>${escapeHtml(item.label)}<small>${escapeHtml(item.period)}</small></td><td>${formatMoney(item.before / ADMIN_BUDGET_DATA.eurTry / 1000)} → ${formatMoney(item.after / ADMIN_BUDGET_DATA.eurTry / 1000)} K€</td><td>${escapeHtml(item.reason)}</td><td>${escapeHtml(item.action)}</td></tr>`).join("") || `<tr><td colspan="6" class="empty-cell">${escapeHtml(adminT("noAudit"))}</td></tr>`}</tbody></table></section>`;
+  const locale = state.language === "zh" ? "zh-CN" : state.language === "tr" ? "tr-TR" : "en-GB";
+  const rows = adminAuditGroupedRows();
+  return `<section class="adb-audit"><table><thead><tr><th>${escapeHtml(adminT("time"))}</th><th>${escapeHtml(adminT("owner"))}</th><th>${escapeHtml(adminT("changeSource"))}</th><th>${escapeHtml(adminT("changedFact"))}</th><th>${escapeHtml(adminT("reason"))}</th><th>${escapeHtml(adminT("operation"))}</th></tr></thead><tbody>${rows.map((item) => `<tr><td>${escapeHtml(new Date(item.timestamp).toLocaleString(locale))}</td><td>${escapeHtml(adminAuditActor(item))}</td><td><b>${escapeHtml(adminAuditSourceLabel(item))}</b><small>${escapeHtml(adminAuditPeriodLabel(item))}</small></td><td class="adb-audit-fact">${escapeHtml(adminAuditFact(item))}</td><td>${escapeHtml(adminAuditReason(item))}</td><td>${escapeHtml(adminAuditImpact(item))}</td></tr>`).join("") || `<tr><td colspan="6" class="empty-cell">${escapeHtml(adminT("noAudit"))}</td></tr>`}</tbody></table></section>`;
+}
+
+function adminRuleCategoryForKey(key) {
+  if (key === "overtimeRate") return "canteen";
+  if (key.startsWith("shuttle")) return "shuttle";
+  return "uniforms";
+}
+
+function adminRuleAffectedCategories(key) {
+  if (key === "overtimeRate") return ["canteen", "shuttle"];
+  if (key.startsWith("shuttle")) return ["shuttle"];
+  return ["uniforms"];
+}
+
+function adminRuleChanges() {
+  const changes = [];
+  const currentMonth = employeeAttendanceMonthIndex();
+  for (let monthIndex = currentMonth; monthIndex < 12; monthIndex += 1) {
+    const draft = adminRuleParametersForMonth(monthIndex, "draft");
+    const saved = adminRuleParametersForMonth(monthIndex, "saved");
+    for (const key of Object.keys(DW_ADMIN_PARAMETER_DEFAULTS)) {
+      const before = Number(saved[key]);
+      const after = Number(draft[key]);
+      if (Math.abs(before - after) <= 0.000001) continue;
+      const originKey = `${monthIndex}|${key}`;
+      changes.push({
+        categoryId: adminRuleParameters.origins?.[originKey] || adminRuleCategoryForKey(key),
+        monthIndex,
+        key,
+        before,
+        after
+      });
+    }
+  }
+  return changes;
+}
+
+function adminRuleAuditFact(change) {
+  const definition = ["canteen", "shuttle", "uniforms"].flatMap(adminRuleDefinitions).find((item) => item.key === change.key) || { scale: 1, unit: "" };
+  const before = Number((Number(change.before) * definition.scale).toFixed(4));
+  const after = Number((Number(change.after) * definition.scale).toFixed(4));
+  return `${localizeMonthLabel(change.monthIndex, state.language)} · ${adminRuleLabel(change.key)}: ${employeeAttendanceNumber(before)} → ${employeeAttendanceNumber(after)} ${definition.unit}`.trim();
+}
+
+function applyAdminRuleBudgetChanges(ruleChanges) {
+  const recalculated = [];
+  const affected = new Map();
+  for (const change of ruleChanges) {
+    const monthSet = affected.get(change.monthIndex) || new Set();
+    adminRuleAffectedCategories(change.key).forEach((categoryId) => monthSet.add(categoryId));
+    affected.set(change.monthIndex, monthSet);
+  }
+  for (const [monthIndex, categoryIds] of affected.entries()) {
+    const snapshot = dwHeadcountBudgetSnapshot(monthIndex);
+    const amounts = { canteen: snapshot.amounts.canteenTry, shuttle: snapshot.amounts.shuttleTry, uniforms: snapshot.amounts.uniformsTry };
+    for (const categoryId of categoryIds) {
+      const category = ADMIN_BUDGET_DATA.categories.find((item) => item.id === categoryId);
+      if (!category || !adminBudgetInputs.months?.[categoryId]) continue;
+      const before = Number(adminBudgetInputs.months[categoryId][monthIndex] ?? category.monthlyTry?.[monthIndex] ?? 0);
+      const after = Number(Number(amounts[categoryId]).toFixed(6));
+      adminBudgetInputs.months[categoryId][monthIndex] = after;
+      recalculated.push({ categoryId, monthIndex, before, after });
+    }
+    adminHeadcountLinkage.months[String(monthIndex)] = {
+      mode: "saved",
+      timestamp: new Date().toISOString(),
+      source: "Administration parameters"
+    };
+  }
+  return recalculated;
 }
 
 function adminBudgetChanges() {
@@ -3506,7 +5097,7 @@ function adminBudgetChanges() {
 }
 
 function applyAdminBudgetSync(reason = "Excel baseline", action = "baseline") {
-  const output = buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, {});
+  const output = buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, adminBudgetOverrides());
   const timestamp = new Date().toISOString();
   const actor = els.userName?.value.trim() || (action === "baseline" ? "Excel" : adminT("permission"));
   for (const [code, entry] of Object.entries(output)) {
@@ -3516,13 +5107,31 @@ function applyAdminBudgetSync(reason = "Excel baseline", action = "baseline") {
     }
     state.rollingForecastDrafts[code] = accountDraft;
     if (action === "submit") state.rollingForecastSubmitted[code] = timestamp;
+    else if (action !== "baseline") delete state.rollingForecastSubmitted[code];
   }
   localStorage.setItem(ADMIN_BUDGET_SYNC_KEY, JSON.stringify({ version: VERSION, timestamp, actor, reason, action, mappedCodes: Object.keys(output).length }));
   localStorage.setItem(ROLLING_FORECAST_DRAFT_KEY, JSON.stringify(state.rollingForecastDrafts));
   localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
 }
 
+function adminBudgetMappedCodes() {
+  return Object.keys(buildAdminBudgetAccountSync(ADMIN_BUDGET_DATA, adminBudgetOverrides()));
+}
+
+function adminBudgetHasSubmission() {
+  return adminBudgetMappedCodes().some((code) => Boolean(state.rollingForecastSubmitted[code]));
+}
+
+function withdrawAdminBudgetSubmission() {
+  const timestamp = new Date().toISOString();
+  const actor = els.userName?.value.trim() || "";
+  for (const code of adminBudgetMappedCodes()) delete state.rollingForecastSubmitted[code];
+  localStorage.setItem(ADMIN_BUDGET_SYNC_KEY, JSON.stringify({ version: VERSION, timestamp, actor, actorKey: actor ? "" : "permission", reasonKey: "withdrawn", action: "withdraw", mappedCodes: adminBudgetMappedCodes().length }));
+  localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
+}
+
 function ensureAdminBudgetBaselineSync() {
+  ensureDwHeadcountBudgetBaseline();
   let meta = null;
   try { meta = JSON.parse(localStorage.getItem(ADMIN_BUDGET_SYNC_KEY) || "null"); } catch { meta = null; }
   const hasAmount = Object.values(state.rollingForecastDrafts || {}).some((account) => Object.values(account || {}).some((month) => Number.isFinite(Number(month?.adminBudgetAmount))));
@@ -3630,11 +5239,28 @@ function applyHrBudgetSync(reason = "", action = "baseline") {
     }
     state.rollingForecastDrafts[code] = accountDraft;
     if (action === "submit") state.rollingForecastSubmitted[code] = timestamp;
+    else if (action !== "baseline") delete state.rollingForecastSubmitted[code];
   }
   localStorage.setItem(HR_BUDGET_SYNC_KEY, JSON.stringify(meta));
   localStorage.setItem(ROLLING_FORECAST_DRAFT_KEY, JSON.stringify(state.rollingForecastDrafts));
   localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
   return meta;
+}
+
+function hrBudgetMappedCodes() {
+  return Object.keys(buildHrBudgetAccountSync(hrBudgetData()));
+}
+
+function hrBudgetHasSubmission() {
+  return hrBudgetMappedCodes().some((code) => Boolean(state.rollingForecastSubmitted[code]));
+}
+
+function withdrawHrBudgetSubmission() {
+  const timestamp = new Date().toISOString();
+  const actor = els.userName?.value.trim() || "";
+  for (const code of hrBudgetMappedCodes()) delete state.rollingForecastSubmitted[code];
+  localStorage.setItem(HR_BUDGET_SYNC_KEY, JSON.stringify({ version: VERSION, timestamp, actor, actorKey: actor ? "" : "hrRole", reason: "withdraw", reasonKey: "withdrawnBudget", action: "withdraw", mappedCodes: hrBudgetMappedCodes().length }));
+  localStorage.setItem(ROLLING_FORECAST_SUBMIT_KEY, JSON.stringify(state.rollingForecastSubmitted));
 }
 
 function ensureHrBudgetBaselineSync() {
@@ -3806,7 +5432,7 @@ function hrBudgetData() {
 }
 
 function formatHrEur(value, digits = 0) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(localeForLanguage(), {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits
   }).format(Number(value || 0));
@@ -3839,7 +5465,8 @@ function renderHrBudgetWorkspace() {
         <div class="hrb-header-actions">
           <span class="hrb-permission">${hrT("permission")}</span>
           <button type="button" class="ghost-button" data-hr-action="save">${hrT("saveReview")}</button>
-          <button type="button" data-hr-action="submit">${hrT("submitBudget")}</button>
+          ${hrBudgetHasSubmission() ? `<button type="button" class="ghost-button" data-hr-action="withdraw">${hrT("withdrawBudget")}</button>` : ""}
+          <button type="button" data-hr-action="submit" ${hrBudgetHasSubmission() ? "disabled" : ""}>${hrT("submitBudget")}</button>
         </div>
       </header>
       <div class="hrb-source-banner">
@@ -3872,7 +5499,7 @@ function hrBudgetInputWorkbench(data) {
   const standardChanges = hrBudgetChanges(defaultHrBudgetInputs(), hrBudgetInputs);
   return `<section class="hrb-input-workbench">
     <div class="hrb-input-header">
-      <div><span>HR INPUT</span><h4>${hrT("inputTitle")}</h4><p>${hrT("inputHint")}</p></div>
+      <div><span>${hrT("inputEyebrow")}</span><h4>${hrT("inputTitle")}</h4><p>${hrT("inputHint")}</p></div>
       <div class="hrb-input-actions"><span class="hrb-tag editable">${hrT("editable")}</span><button type="button" class="ghost-button" data-hr-input-action="reset">${hrT("resetExcel")}</button><button type="button" data-hr-action="save">${hrT("saveReview")}</button></div>
     </div>
     <div class="hrb-input-tabs">${views.map(([key, label]) => `<button type="button" class="${hrBudgetInputView === key ? "active" : ""}" data-hr-input-view="${key}">${label}</button>`).join("")}</div>
@@ -3891,9 +5518,9 @@ function hrBudgetChangeGate(pendingChanges, standardChanges) {
 
 function hrBudgetHeadcountInputs(data) {
   const rows = [
-    ["direct", hrT("direct"), "BC Direct"],
-    ["indirect", hrT("indirect"), "BC Indirect"],
-    ["whiteCollar", hrT("whiteCollar"), "White Collar"]
+    ["direct", hrT("direct"), "DIR BC"],
+    ["indirect", hrT("indirect"), "IND BC"],
+    ["whiteCollar", hrT("whiteCollar"), "WC"]
   ];
   const totals = Array.from({ length: 12 }, (_, index) => rows.reduce((sum, [key]) => sum + Number(hrBudgetInputs.headcount[key]?.[index] || 0), 0));
   return `<div class="hrb-input-table-wrap"><table class="hrb-input-table"><thead><tr><th>${hrT("employeeCategory")}</th>${data.months.map((_, index) => `<th>${escapeHtml(hrMonth(index))}</th>`).join("")}<th>${hrT("annualAverage")}</th></tr></thead><tbody>${rows.map(([key, label, source]) => `<tr><th><b>${label}</b><small>${source}</small></th>${data.months.map((_, index) => {
@@ -3938,8 +5565,8 @@ function hrBudgetDriverView(data, total) {
   const reviewRows = [
     [hrT("juneHeadcount"), data.activeHeadcount?.[reviewIndex], hrT("people"), hrT("needsCheck"), hrT("activeSummary")],
     [hrT("juneWorkday"), data.workingDays?.[reviewIndex], hrT("day"), hrT("needsCheck"), hrT("tdWorkday")],
-    [hrT("dailyReal"), Number(data.realHoursPerDay?.[reviewIndex] || 0).toFixed(2), hrT("hour"), hrT("needsCheck"), "Parameters · Real"],
-    [hrT("dailyPaid"), Number(data.paidHoursPerDay?.[reviewIndex] || 0).toFixed(2), hrT("hour"), hrT("needsCheck"), "Parameters · Paid"],
+    [hrT("dailyReal"), Number(data.realHoursPerDay?.[reviewIndex] || 0).toFixed(2), hrT("hour"), hrT("needsCheck"), hrT("parameterReal")],
+    [hrT("dailyPaid"), Number(data.paidHoursPerDay?.[reviewIndex] || 0).toFixed(2), hrT("hour"), hrT("needsCheck"), hrT("parameterPaid")],
     [hrT("juneFx"), Number(data.eurTry?.[reviewIndex] || 0).toFixed(4), "", hrT("financeParameter"), hrT("fxFormula")]
   ];
   return `
@@ -3986,7 +5613,7 @@ function hrBudgetResultTable(data) {
   const totalMonths = Array.from({ length: 12 }, (_, index) => accounts.reduce((sum, account) => sum + Number(account.monthly?.[index] || 0), 0));
   return `<div class="hrb-result-wrap"><table class="hrb-result-table"><thead><tr><th>${hrT("account")}</th>${(data.months || []).map((_, index) => `<th class="budget">${escapeHtml(hrMonth(index))}</th>`).join("")}<th>${hrT("annualBudget")}</th><th>${hrT("dataStatus")}</th></tr></thead><tbody>${accounts.map((account) => {
     const pending = ["overtime", "cashAid", "indemnity"].includes(account.key);
-    return `<tr><th><span>${escapeHtml(hrAccountLabel(account))}</span><small>${escapeHtml(account.sourceLabel)}</small></th>${account.monthly.map((value) => `<td>${value < 0 ? "-" : ""}€${formatHrEur(Math.abs(value))}</td>`).join("")}<td><strong>${account.annual < 0 ? "-" : ""}€${formatHrEur(Math.abs(account.annual))}</strong></td><td><span class="hrb-status ${pending ? "pending" : "ok"}">${pending ? hrT("needsCheck") : hrT("sourceCalculated")}</span></td></tr>`;
+    return `<tr><th title="${escapeHtml(account.sourceLabel)}"><span>${escapeHtml(hrAccountLabel(account))}</span></th>${account.monthly.map((value) => `<td>${value < 0 ? "-" : ""}€${formatHrEur(Math.abs(value))}</td>`).join("")}<td><strong>${account.annual < 0 ? "-" : ""}€${formatHrEur(Math.abs(account.annual))}</strong></td><td><span class="hrb-status ${pending ? "pending" : "ok"}">${pending ? hrT("needsCheck") : hrT("sourceCalculated")}</span></td></tr>`;
   }).join("")}<tr class="hrb-total-row"><th>${hrT("totalHrCost")}</th>${totalMonths.map((value) => `<td><strong>€${formatHrEur(value)}</strong></td>`).join("")}<td><strong>€${formatHrEur(totalMonths.reduce((sum, value) => sum + value, 0))}</strong></td><td><span class="hrb-status ok">${hrT("converted")}</span></td></tr></tbody></table></div>`;
 }
 
@@ -4013,10 +5640,37 @@ function hrBudgetExceptionView(data, total) {
   return `<div class="hrb-exception-layout"><section class="hrb-exception-main"><div class="hrb-summary-strip"><div><span>${hrT("hrAccounts")}</span><strong>${data.accounts.length}</strong></div><div><span>${hrT("sourceCalculated")}</span><strong class="good">${data.accounts.length - pending.length}</strong></div><div><span>${hrT("manualReview")}</span><strong class="warn">${pending.length}</strong></div><div><span>${hrT("annualBudget")}</span><strong>€${formatHrEur(total)}</strong><small>EUR</small></div></div>${hrBudgetResultTable(data)}<div class="hrb-exception-detail"><div><h4>${hrT("currentReview")}</h4><p>${escapeHtml(hrT("exceptionText", { accounts: accountNames }))}</p></div><div class="hrb-calc-box"><span>${hrT("reviewPrinciple")}</span><strong>${hrT("reviewPrincipleText")}</strong><small>${hrT("reviewPrincipleHint")}</small></div><label class="grow"><span>${hrT("reviewOpinion")}</span><input placeholder="${escapeHtml(hrT("reviewOpinionPlaceholder"))}" /></label></div></section><aside class="hrb-approval"><h4>${hrT("approvalProgress")}</h4><ol><li class="done"><b>${hrT("excelLoaded")}</b><span>${hrT("completed")}</span><small>${hrT("tdMapped")}</small></li><li class="current"><b>${hrT("hrReview")}</b><span>${hrT("currentNode")}</span><small>${hrT("hrReviewHint")}</small></li><li><b>${hrT("costReview")}</b><span>${hrT("pending")}</span></li><li><b>${hrT("budgetPublish")}</b><span>${hrT("pending")}</span></li></ol><h4>${hrT("basisNote")}</h4><p>${hrT("sourceCurrency")}: TRY</p><p>${hrT("outputCurrency")}: EUR</p><p>${hrT("monthlyFx")}</p></aside></div>`;
 }
 
+function hrAuditActionLabel(record) {
+  if (record.actionKey === "withdraw") return hrT("withdrawBudget");
+  if (record.actionKey === "submit" || record.action === "提交人力预算") return hrT("submitAction");
+  return hrT("saveAction");
+}
+
+function hrAuditReasonLabel(record) {
+  if (record.reasonKey) return hrT(record.reasonKey);
+  return String(record.reason || hrT("noBusinessChanges"));
+}
+
+function hrAuditActorLabel(record) {
+  return record.actorKey === "hrRole" || !record.actor ? t("hrRole") : record.actor;
+}
+
+function hrBudgetAuditRow(item, data, locale) {
+  const workflow = item.workflow;
+  const unavailable = escapeHtml(hrT("notApplicable"));
+  const before = workflow ? unavailable : `${formatHrEur(item.before, 2)} ${escapeHtml(hrUnitLabel(item.unit))}`;
+  const after = workflow ? unavailable : `<strong>${formatHrEur(item.after, 2)} ${escapeHtml(hrUnitLabel(item.unit))}</strong>`;
+  return `<tr><td>${item.first ? `<b>${escapeHtml(new Date(item.record.timestamp).toLocaleString(locale, { hour12: false }))}</b><small>${escapeHtml(hrAuditActorLabel(item.record))}</small>` : ""}</td><td>${escapeHtml(workflow ? hrT("budgetWorkflow") : hrChangeLabel(item))}</td><td>${escapeHtml(workflow ? hrT("wholeYear") : hrChangePeriod(item, data))}</td><td>${before}</td><td>${after}</td><td>${item.first ? escapeHtml(hrAuditReasonLabel(item.record)) : `<span class="hrb-audit-same">${hrT("sameAsAbove")}</span>`}</td><td>${item.first ? escapeHtml(hrAuditActionLabel(item.record)) : ""}</td></tr>`;
+}
+
 function hrBudgetAuditView(data) {
-  const records = hrBudgetAudit.flatMap((record) => (record.changes || []).map((change, index) => ({ ...change, record, first: index === 0 })));
-  const locale = state.language === "tr" ? "tr-TR" : state.language === "en" ? "en-US" : "zh-CN";
-  return `<div class="hrb-audit-view"><section><div class="hrb-audit-heading"><div><h4>${hrT("adjustmentRecords")}</h4><p>${hrT("adjustmentRecordsHint")}</p></div><strong>${records.length} ${hrT("items")}</strong></div><div class="hrb-audit-table-wrap"><table><thead><tr><th>${hrT("timeOwner")}</th><th>${hrT("adjustmentItem")}</th><th>${hrT("period")}</th><th>${hrT("before")}</th><th>${hrT("after")}</th><th>${hrT("adjustmentReason")}</th><th>${hrT("operation")}</th></tr></thead><tbody>${records.map((item) => `<tr><td>${item.first ? `<b>${escapeHtml(new Date(item.record.timestamp).toLocaleString(locale, { hour12: false }))}</b><small>${escapeHtml(item.record.actor)}</small>` : ""}</td><td>${escapeHtml(hrChangeLabel(item))}</td><td>${escapeHtml(hrChangePeriod(item, data))}</td><td>${formatHrEur(item.before, 2)} ${escapeHtml(hrUnitLabel(item.unit))}</td><td><strong>${formatHrEur(item.after, 2)} ${escapeHtml(hrUnitLabel(item.unit))}</strong></td><td>${item.first ? escapeHtml(item.record.reason) : `<span class="hrb-audit-same">${hrT("sameAsAbove")}</span>`}</td><td>${item.first ? escapeHtml(item.record.action === "提交人力预算" ? hrT("submitAction") : hrT("saveAction")) : ""}</td></tr>`).join("") || `<tr><td colspan="7" class="hrb-audit-empty">${hrT("noRecords")}</td></tr>`}</tbody></table></div></section><section><h4>${hrT("systemRecords")}</h4><table><thead><tr><th>${hrT("period")}</th><th>${hrT("node")}</th><th>${hrT("operation")}</th><th>${hrT("dataBasis")}</th><th>${hrT("status")}</th></tr></thead><tbody><tr><td>2026-07-13</td><td>${hrT("dataPreparation")}</td><td>${hrT("load")} ${escapeHtml(data.sourceFile)}</td><td>TRY → EUR</td><td><span class="hrb-status ok">${hrT("completed")}</span></td></tr><tr><td>2026-07-13</td><td>${hrT("businessMapping")}</td><td>${escapeHtml(hrT("assumedMapped", { source: data.sourceOrganization }))}</td><td>${hrT("testVersion")}</td><td><span class="hrb-status pending">${hrT("pendingConfirm")}</span></td></tr></tbody></table></section></div>`;
+  const records = hrBudgetAudit.flatMap((record) => {
+    const changes = record.changes || [];
+    return changes.length ? changes.map((change, index) => ({ ...change, record, first: index === 0 })) : [{ record, first: true, workflow: true }];
+  });
+  const locale = localeForLanguage();
+  const rows = records.map((item) => hrBudgetAuditRow(item, data, locale)).join("") || `<tr><td colspan="7" class="hrb-audit-empty">${hrT("noRecords")}</td></tr>`;
+  return `<div class="hrb-audit-view"><section><div class="hrb-audit-heading"><div><h4>${hrT("adjustmentRecords")}</h4><p>${hrT("adjustmentRecordsHint")}</p></div><strong>${records.length} ${hrT("items")}</strong></div><div class="hrb-audit-table-wrap"><table><thead><tr><th>${hrT("timeOwner")}</th><th>${hrT("adjustmentItem")}</th><th>${hrT("period")}</th><th>${hrT("before")}</th><th>${hrT("after")}</th><th>${hrT("adjustmentReason")}</th><th>${hrT("operation")}</th></tr></thead><tbody>${rows}</tbody></table></div></section><section><h4>${hrT("systemRecords")}</h4><table><thead><tr><th>${hrT("period")}</th><th>${hrT("node")}</th><th>${hrT("operation")}</th><th>${hrT("dataBasis")}</th><th>${hrT("status")}</th></tr></thead><tbody><tr><td>2026-07-13</td><td>${hrT("dataPreparation")}</td><td>${hrT("load")} ${escapeHtml(data.sourceFile)}</td><td>TRY → EUR</td><td><span class="hrb-status ok">${hrT("completed")}</span></td></tr><tr><td>2026-07-13</td><td>${hrT("businessMapping")}</td><td>${escapeHtml(hrT("assumedMapped", { source: data.sourceOrganization }))}</td><td>${hrT("testVersion")}</td><td><span class="hrb-status pending">${hrT("pendingConfirm")}</span></td></tr></tbody></table></section></div>`;
 }
 
 function workbenchCopy() {
@@ -4099,7 +5753,7 @@ function workbenchScenarioLabel(scenario, c) {
 function formatWorkbenchMetric(value, key) {
   if (!Number.isFinite(value)) return "--";
   if (key === "volume") return formatNumber(value);
-  if (["direct", "indirect", "white"].includes(key)) return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 1 });
+  if (["direct", "indirect", "white"].includes(key)) return Number(value).toLocaleString(localeForLanguage(), { maximumFractionDigits: 1 });
   if (key === "rate") return formatPercent(value);
   return formatMoney(value);
 }
@@ -4112,7 +5766,8 @@ function workbenchTooltip(labelText, unit, actual, same, target, c) {
   const yoy = Number.isFinite(actual) && Number.isFinite(same) ? actual - same : null;
   const budget = Number.isFinite(actual) && Number.isFinite(target) ? actual - target : null;
   const completion = Number.isFinite(actual) && Number.isFinite(target) && target !== 0 ? actual / target : null;
-  return `<span class="fwb-hover-card"><b>${escapeHtml(labelText)}</b><span>${escapeHtml(c.current)}: ${escapeHtml(formatWorkbenchMetric(actual, unit))}</span><em>${escapeHtml(c.yoy)}: ${escapeHtml(formatWorkbenchMetric(yoy, unit))}</em><em>${escapeHtml(c.budgetGap)}: ${escapeHtml(formatWorkbenchMetric(budget, unit))}</em><strong>${escapeHtml(c.completion)}: ${escapeHtml(formatPercent(completion))}</strong></span>`;
+  const html = `<b>${escapeHtml(labelText)}</b><span>${escapeHtml(c.current)}: ${escapeHtml(formatWorkbenchMetric(actual, unit))}</span><span>${escapeHtml(c.yoy)}: ${escapeHtml(formatWorkbenchMetric(yoy, unit))}</span><span>${escapeHtml(c.budgetGap)}: ${escapeHtml(formatWorkbenchMetric(budget, unit))}</span><strong>${escapeHtml(c.completion)}: ${escapeHtml(formatPercent(completion))}</strong>`;
+  return `tabindex="0" data-metric-tooltip="${escapeHtml(html)}"`;
 }
 
 function workbenchDonutSvg(factory, entries, total, displayTotal = total) {
@@ -4196,10 +5851,10 @@ function renderFactoryWorkbench() {
     const sameValues = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, "同期")[key]);
     const targetValues = Array.from({ length: 6 }, (_, index) => combinedWorkbenchMonth(data, index, "目标")[key]);
     const cells = values.map((value, index) => scenario === "26年"
-      ? `<td><span class="fwb-tip-cell">${formatWorkbenchMetric(value, key)}${workbenchTooltip(`${monthNames[index]} · ${labelText}`, key, actualValues[index], sameValues[index], targetValues[index], c)}</span></td>`
+      ? `<td><span class="fwb-tip-cell" ${workbenchTooltip(`${monthNames[index]} · ${labelText}`, key, actualValues[index], sameValues[index], targetValues[index], c)}>${formatWorkbenchMetric(value, key)}</span></td>`
       : `<td title="${escapeHtml(`${monthNames[index]} · ${labelText} · ${workbenchScenarioLabel(scenario, c)}: ${formatWorkbenchMetric(value, key)}`)}">${formatWorkbenchMetric(value, key)}</td>`).join("");
     const totalCell = scenario === "26年"
-      ? `<span class="fwb-tip-cell"><strong>${formatWorkbenchMetric(total, key)}</strong>${workbenchTooltip(`${c.total} · ${labelText}`, key, total, h1ByScenario["同期"][key], h1ByScenario["目标"][key], c)}</span>`
+      ? `<span class="fwb-tip-cell" ${workbenchTooltip(`${c.total} · ${labelText}`, key, total, h1ByScenario["同期"][key], h1ByScenario["目标"][key], c)}><strong>${formatWorkbenchMetric(total, key)}</strong></span>`
       : `<strong>${formatWorkbenchMetric(total, key)}</strong>`;
     return `<tr class="scenario-${scenarioIndex}"><th>${scenarioIndex === 0 ? `<span class="fwb-metric-cell"><span class="fwb-group-mark">${escapeHtml(group)}</span><span><b>${escapeHtml(labelText)}</b><small>${escapeHtml(workbenchMetricUnit(key))}</small></span></span>` : ""}</th><td><span class="fwb-scenario-tag s${scenarioIndex}">${escapeHtml(workbenchScenarioLabel(scenario, c))}</span></td>${cells}<td>${totalCell}</td></tr>`;
   })).join("");
@@ -4328,23 +5983,97 @@ function factoryDashboardRows() {
   }));
 }
 
-function factoryDashboardVisibleRows() {
-  const familyByWorkbenchGroup = { 单: "unit", 时: "time", 人: "people", 效: "efficiency", 费: "cost" };
-  const selectedFamily = familyByWorkbenchGroup[state.workbenchGroup];
-  const rows = factoryDashboardRows();
-  return selectedFamily ? rows.filter((row) => metricFamily(row.label) === selectedFamily) : rows;
+function factoryDashboardVisibleRows(rows = factoryDashboardRows()) {
+  const monthIndex = state.workbenchMonth === "all" ? null : Number(state.workbenchMonth);
+  return rows.filter((row) => {
+    if (state.workbenchGroup !== "all" && metricFamily(row.label) !== state.workbenchGroup) return false;
+    if (state.workbenchIndicator !== "all" && row.label !== state.workbenchIndicator) return false;
+    if (state.workbenchScenario !== "all" && row.scenario !== state.workbenchScenario) return false;
+    if (state.workbenchStatus !== "all" && metricRowStatus(row, monthIndex) !== state.workbenchStatus) return false;
+    return true;
+  });
+}
+
+function renderFactoryMetricFilters() {
+  const groups = [
+    ["all", t("all")],
+    ["unit", t("groupUnit")],
+    ["time", t("groupTime")],
+    ["people", t("groupPeople")],
+    ["efficiency", t("groupEfficiency")],
+    ["cost", t("groupCost")]
+  ];
+  const indicators = [...new Set(factoryDashboardRows().map((row) => row.label))]
+    .filter((labelText) => state.workbenchGroup === "all" || metricFamily(labelText) === state.workbenchGroup);
+  const months = Array.from({ length: 12 }, (_, index) => `<option value="${index}" ${state.workbenchMonth === String(index) ? "selected" : ""}>${escapeHtml(localizeMonthLabel(index, state.language))}</option>`).join("");
+  return `
+    <div class="metric-filter-bar">
+      <div class="segment-control">${groups.map(([value, labelText]) => `<button type="button" class="${state.workbenchGroup === value ? "active" : ""}" data-fwb-group="${value}">${escapeHtml(labelText)}</button>`).join("")}</div>
+      <select id="fwbIndicatorFilter" aria-label="${escapeHtml(t("allIndicators"))}"><option value="all">${escapeHtml(t("allIndicators"))}</option>${indicators.map((item) => `<option value="${escapeHtml(item)}" ${state.workbenchIndicator === item ? "selected" : ""}>${escapeHtml(localizeDashboardText("labels", item, state.language))}</option>`).join("")}</select>
+      <select id="fwbScenarioFilter" aria-label="${escapeHtml(t("allScenarios"))}">
+        <option value="all" ${state.workbenchScenario === "all" ? "selected" : ""}>${escapeHtml(t("allScenarios"))}</option>
+        <option value="同期" ${state.workbenchScenario === "同期" ? "selected" : ""}>${escapeHtml(t("same25"))}</option>
+        <option value="预算" ${state.workbenchScenario === "预算" ? "selected" : ""}>${escapeHtml(t("budget26"))}</option>
+        <option value="26年" ${state.workbenchScenario === "26年" ? "selected" : ""}>${escapeHtml(t("actual26"))}</option>
+      </select>
+      <select id="fwbMonthFilter" aria-label="${escapeHtml(t("fullYear"))}"><option value="all" ${state.workbenchMonth === "all" ? "selected" : ""}>${escapeHtml(t("fullYear"))}</option>${months}</select>
+      <select id="fwbStatusFilter" aria-label="${escapeHtml(t("allStatus"))}">
+        <option value="all" ${state.workbenchStatus === "all" ? "selected" : ""}>${escapeHtml(t("allStatus"))}</option>
+        <option value="bad" ${state.workbenchStatus === "bad" ? "selected" : ""}>${escapeHtml(t("worse"))}</option>
+        <option value="good" ${state.workbenchStatus === "good" ? "selected" : ""}>${escapeHtml(t("better"))}</option>
+      </select>
+    </div>`;
+}
+
+function unifiedWorkbenchCopy() {
+  const copy = {
+    zh: { period: "2026 · 1—7月实际 / 8—12月预测", title: "CK + DW 双厂全年指标驾驶舱", volume: "产量", unitCost: "单台制造费", rate: "制造费率", monthActual: "7月当月实际", ytdActual: "1—7月累计实际", fullForecast: "全年预测", detail: "双厂指标明细", hover: "点击数值进入高亮并查看差异", basis: "口径", actual: "1—7月实际", forecast: "8—12月预测", fullYear: "全年", group: "分组", indicator: "指标", scenario: "口径", unit: "单位", mix: "制造费结构对比", cumulative: "1—7月实际累计", share: "占比", gap: "差异" },
+    en: { period: "2026 · Jan–Jul actual / Aug–Dec forecast", title: "CK + DW Full-year KPI Cockpit", volume: "Volume", unitCost: "Unit manufacturing cost", rate: "Manufacturing cost rate", monthActual: "July actual", ytdActual: "Jan–Jul actual", fullForecast: "Full-year forecast", detail: "Combined-factory KPI detail", hover: "Click a value to highlight and view variances", basis: "Basis", actual: "Jan–Jul actual", forecast: "Aug–Dec forecast", fullYear: "Full year", group: "Group", indicator: "Indicator", scenario: "Scenario", unit: "Unit", mix: "Manufacturing cost mix", cumulative: "Jan–Jul actual cumulative", share: "share", gap: "Gap" },
+    tr: { period: "2026 · Oca–Tem gerçekleşen / Ağu–Ara tahmin", title: "CK + DW Yıllık KPI Kokpiti", volume: "Üretim", unitCost: "Birim üretim gideri", rate: "Üretim gider oranı", monthActual: "Temmuz gerçekleşeni", ytdActual: "Oca–Tem gerçekleşen", fullForecast: "Yıllık tahmin", detail: "İki fabrika KPI detayı", hover: "Vurgulamak ve farkları görmek için bir değere tıklayın", basis: "Esas", actual: "Oca–Tem gerçekleşen", forecast: "Ağu–Ara tahmin", fullYear: "Tam yıl", group: "Grup", indicator: "Gösterge", scenario: "Senaryo", unit: "Birim", mix: "Üretim gideri dağılımı", cumulative: "Oca–Tem gerçekleşen kümülatif", share: "pay", gap: "Fark" }
+  };
+  return copy[state.language] || copy.zh;
+}
+
+function unifiedWorkbenchScenario(scenario) {
+  if (scenario === "同期") return t("same25");
+  if (scenario === "预算") return t("budget26");
+  return t("actual26");
+}
+
+function factoryMetricTooltip(row, index, rows, labels, copy) {
+  const valueFor = (scenario) => {
+    const item = rows.find((candidate) => candidate.label === row.label && candidate.scenario === scenario);
+    return index === null ? item?.annual : item?.values?.[index];
+  };
+  const actual = valueFor("26年");
+  const same = valueFor("同期");
+  const budget = valueFor("预算");
+  const yoy = diffNullableLocal(actual, same);
+  const budgetDiff = diffNullableLocal(actual, budget);
+  const completion = targetCompletionRate(actual, budget, row.direction);
+  const title = `${index === null ? copy.fullYear : labels[index]} · ${localizeDashboardText("labels", row.label, state.language)}`;
+  return [
+    `<b>${escapeHtml(title)}</b>`,
+    Number.isFinite(actual) ? `<span>${t("actual26")}: ${formatDashboardValue(actual, row.unit)}</span>` : "",
+    Number.isFinite(yoy) ? `<span class="${tooltipDiffClass(yoy, row.direction)}">${t("yoyVariance")}: ${formatDashboardValue(yoy, row.unit)}${formatYoyPercent(yoy, same)}</span>` : "",
+    Number.isFinite(budgetDiff) ? `<span class="${tooltipDiffClass(budgetDiff, row.direction)}">${t("budgetVariance")}: ${formatDashboardValue(budgetDiff, row.unit)}</span>` : "",
+    Number.isFinite(completion) ? `<strong class="${completionTone(completion)}">${t("targetCompletion")}: ${formatPercent(completion)}</strong>` : ""
+  ].filter(Boolean).join("\n");
 }
 
 function renderUnifiedFactoryWorkbench() {
+  clearMetricTableHighlight();
   const target = document.getElementById("factoryWorkbench");
   if (!target || !factoryRowsFor("cooking").length || !factoryRowsFor("dishwasher").length) return;
+  const copy = unifiedWorkbenchCopy();
   const labels = state.language === "zh" ? ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"] : MONTHS.map((item) => localizeMonthLabel(item.month - 1, state.language));
   const actualCount = 7;
   const selectedMonth = actualCount - 1;
-  const metricRows = renderStandardMetricRows(factoryDashboardVisibleRows(), {
+  const dashboardRows = factoryDashboardRows();
+  const metricRows = renderStandardMetricRows(factoryDashboardVisibleRows(dashboardRows), {
     actualMonthCount: actualCount,
     annualValue: (row) => row.annual,
-    tooltip: (row, index) => `${index === null ? "全年" : labels[index]} · ${row.label} · ${row.scenario}`,
+    tooltip: (row, index) => factoryMetricTooltip(row, index, dashboardRows, labels, copy),
     heat: () => "heat-neutral",
     emptyText: t("noMatchingAccounts")
   });
@@ -4352,9 +6081,8 @@ function renderUnifiedFactoryWorkbench() {
     const index = scope === "month" ? selectedMonth : scope === "ytd" ? selectedMonth : 11;
     return scope === "month" ? combinedFactoryMetric(metric, "26年", index) : combinedFactoryPeriod(metric, "26年", index);
   };
-  const card = (title, scope) => `<div class="fwb-kpi-card"><span>${title}</span><b>产量</b><strong>${formatDashboardValue(stat("产量", scope), "")}</strong><small>单台制造费 ${formatDashboardValue(stat("单台制造费", scope), "€/台")} · 制造费率 ${formatDashboardValue(stat("制造费率", scope), "%")}</small></div>`;
-  const groups = [["all", "全部"], ["单", "单"], ["时", "时"], ["人", "人"], ["效", "效"], ["费", "费"]];
-  target.innerHTML = `<section class="factory-workbench fwb-unified"><header class="fwb-header"><div><span>2026 · 1-7月实际 / 8-12月预测</span><h2>CK + DW 双厂全年指标驾驶舱</h2></div></header><div class="fwb-kpis">${card("7月当月实际", "month")}${card("1-7月累计实际", "ytd")}${card("全年预测", "year")}</div><section class="fwb-section"><div class="fwb-title"><h3>双厂指标明细</h3><span>悬停数值可查看口径</span></div><div class="fwb-metric-filters">${groups.map(([value, labelText]) => `<button type="button" class="${state.workbenchGroup === value ? "active" : ""}" data-fwb-group="${value}">${labelText}</button>`).join("")}</div><div class="fwb-table-wrap"><table class="dashboard-table"><colgroup><col class="dashboard-col-group" /><col class="dashboard-col-indicator" /><col class="dashboard-col-scenario" /><col class="dashboard-col-unit" /><col class="dashboard-col-month" span="13" /></colgroup><thead><tr class="phase-header-row"><th colspan="4" class="phase-corner">口径</th><th colspan="7" class="phase-actual">1-7月实际</th><th colspan="5" class="phase-forecast">8-12月预测</th><th class="phase-year">全年</th></tr><tr><th class="sticky-col sticky-col-1">分组</th><th class="sticky-col sticky-col-2">指标</th><th class="sticky-col sticky-col-3">口径</th><th class="sticky-col sticky-col-4">单位</th>${labels.map((item, index) => `<th class="${index < actualCount ? "actual-month-head" : "forecast-month-head"}">${item}</th>`).join("")}<th>全年</th></tr></thead><tbody>${metricRows}</tbody></table></div></section>${renderFactoryCostMixActual()}</section>`;
+  const card = (title, scope) => `<div class="fwb-kpi-card"><span>${escapeHtml(title)}</span><b>${escapeHtml(copy.volume)}</b><strong>${formatDashboardValue(stat("产量", scope), "")}</strong><small>${escapeHtml(copy.unitCost)} ${formatDashboardValue(stat("单台制造费", scope), "€/台")} · ${escapeHtml(copy.rate)} ${formatDashboardValue(stat("制造费率", scope), "%")}</small></div>`;
+  target.innerHTML = `<section class="factory-workbench fwb-unified"><header class="fwb-header"><div><span>${escapeHtml(copy.period)}</span><h2>${escapeHtml(copy.title)}</h2></div></header><div class="fwb-kpis">${card(copy.monthActual, "month")}${card(copy.ytdActual, "ytd")}${card(copy.fullForecast, "year")}</div><section class="cockpit-card detail-card fwb-detail-card"><div class="cockpit-title"><h3>${escapeHtml(copy.detail)}</h3><span>${escapeHtml(copy.hover)}</span></div>${renderFactoryMetricFilters()}<div class="dashboard-table-wrap fwb-table-wrap"><table class="dashboard-table metric-highlight-table"><colgroup><col class="dashboard-col-group" /><col class="dashboard-col-indicator" /><col class="dashboard-col-scenario" /><col class="dashboard-col-unit" /><col class="dashboard-col-month" span="13" /></colgroup><thead><tr class="phase-header-row"><th colspan="4" class="phase-corner">${escapeHtml(copy.basis)}</th><th colspan="7" class="phase-actual">${escapeHtml(copy.actual)}</th><th colspan="5" class="phase-forecast">${escapeHtml(copy.forecast)}</th><th class="phase-year">${escapeHtml(copy.fullYear)}</th></tr><tr><th class="sticky-col sticky-col-1">${escapeHtml(copy.group)}</th><th class="sticky-col sticky-col-2">${escapeHtml(copy.indicator)}</th><th class="sticky-col sticky-col-3">${escapeHtml(copy.scenario)}</th><th class="sticky-col sticky-col-4">${escapeHtml(copy.unit)}</th>${labels.map((item, index) => `<th class="${index < actualCount ? "actual-month-head" : "forecast-month-head"}" tabindex="0" data-highlight-period-trigger data-highlight-period="${index}">${item}</th>`).join("")}<th tabindex="0" data-highlight-period-trigger data-highlight-period="year">${escapeHtml(copy.fullYear)}</th></tr></thead><tbody>${metricRows}</tbody></table></div></section>${renderFactoryCostMixActual(copy)}</section>`;
 }
 
 function factoryCostMix(unitId) {
@@ -4368,7 +6096,7 @@ function factoryCostMix(unitId) {
   return Object.fromEntries(totals);
 }
 
-function renderFactoryCostMixActual() {
+function renderFactoryCostMixActual(copy = unifiedWorkbenchCopy()) {
   const ck = factoryCostMix("cooking");
   const dw = factoryCostMix("dishwasher");
   const categoryNames = [...new Set([...Object.keys(ck), ...Object.keys(dw)])];
@@ -4383,7 +6111,7 @@ function renderFactoryCostMixActual() {
     dw: Math.max(0, dw[name] || 0) / dwTotal
   })).sort((left, right) => Math.max(right.ck, right.dw) - Math.max(left.ck, left.dw));
   const rowHtml = rank.map((item) => `<div><b>${escapeHtml(workbenchCategoryLabel(item.name))}</b><span>${formatPercent(item.ck)}</span><span>${formatPercent(item.dw)}</span><em class="${Math.abs(item.ck - item.dw) >= .03 ? "alert" : ""}">${((item.ck - item.dw) * 100).toFixed(1)}pp</em></div>`).join("");
-  return `<section class="fwb-section"><div class="fwb-title"><h3>制造费结构对比</h3><span>1-7月实际累计</span></div><div class="fwb-category-grid"><div class="fwb-donuts"><div>${workbenchDonutSvg("CK", ckEntries, ckTotal, sum(Object.values(ck)))}</div><div>${workbenchDonutSvg("DW", dwEntries, dwTotal, sum(Object.values(dw)))}</div></div><div class="fwb-rank"><div class="fwb-rank-head"><span>指标</span><span>CK占比</span><span>DW占比</span><span>差异</span></div>${rowHtml}</div></div></section>`;
+  return `<section class="fwb-section"><div class="fwb-title"><h3>${escapeHtml(copy.mix)}</h3><span>${escapeHtml(copy.cumulative)}</span></div><div class="fwb-category-grid"><div class="fwb-donuts"><div>${workbenchDonutSvg("CK", ckEntries, ckTotal, sum(Object.values(ck)))}</div><div>${workbenchDonutSvg("DW", dwEntries, dwTotal, sum(Object.values(dw)))}</div></div><div class="fwb-rank"><div class="fwb-rank-head"><span>${escapeHtml(copy.indicator)}</span><span>CK ${escapeHtml(copy.share)}</span><span>DW ${escapeHtml(copy.share)}</span><span>${escapeHtml(copy.gap)}</span></div>${rowHtml}</div></div></section>`;
 }
 
 function refreshProductNavigation() {
@@ -4394,30 +6122,35 @@ function refreshProductNavigation() {
 }
 
 function initializeDemoRoleAccess() {
-  const savedRole = sessionStorage.getItem("dwDemoRole");
   for (const option of Array.from(els.roleSelect?.options || [])) {
-    if (!['finance', 'hr', 'admin'].includes(option.value)) option.remove();
+    if (!["finance", "hr", "admin", "attendance", "employeeAttendance", "procurementPrice"].includes(option.value)) option.remove();
   }
-  if (["finance", "hr", "admin"].includes(savedRole)) {
-    applyDemoRole(savedRole, true);
-  } else {
-    els.roleLogin?.classList.remove("hidden");
-  }
+  els.roleLogin?.classList.remove("hidden");
 }
 
 function applyDemoRole(role, closeLogin = true) {
-  const normalizedRole = ["hr", "admin"].includes(role) ? role : "finance";
+  if (role === "adminThree") {
+    state.rollingRole = role;
+    localStorage.setItem("dwRollingRole.v1", role);
+    sessionStorage.setItem("dwDemoRole", role);
+    window.location.assign("./erpnext-dw-budget-demo.html?role=adminThree");
+    return;
+  }
+  const normalizedRole = ["hr", "admin", "attendance", "employeeAttendance", "procurementPrice"].includes(role) ? role : "finance";
   state.rollingRole = normalizedRole;
   localStorage.setItem("dwRollingRole.v1", normalizedRole);
   sessionStorage.setItem("dwDemoRole", normalizedRole);
   if (els.roleSelect) els.roleSelect.value = normalizedRole;
   document.body.classList.toggle("demo-role-hr", normalizedRole === "hr");
   document.body.classList.toggle("demo-role-admin", normalizedRole === "admin");
+  document.body.classList.toggle("demo-role-attendance", normalizedRole === "attendance");
+  document.body.classList.toggle("demo-role-employee-attendance", normalizedRole === "employeeAttendance");
+  document.body.classList.toggle("demo-role-procurement-price", normalizedRole === "procurementPrice");
   document.body.classList.toggle("demo-role-cost", normalizedRole === "finance");
   state.rollingSelectedCode = null;
   if (closeLogin) els.roleLogin?.classList.add("hidden");
-  if (["hr", "admin"].includes(normalizedRole)) {
-    if (state.activeUnit !== "dishwasher") switchBusinessUnit("dishwasher");
+  if (isScopedBudgetRole(normalizedRole)) {
+    if (state.activeUnit !== "dishwasher") switchBusinessUnit("dishwasher", { force: true });
     setSidebarCollapsed(true);
     state.rollingViewMode = "fill";
     switchTab("variance");
@@ -4425,6 +6158,7 @@ function applyDemoRole(role, closeLogin = true) {
     setSidebarCollapsed(false);
     switchTab("dashboard");
   }
+  updateUnitChrome(state.activeUnit);
   renderAll();
 }
 
@@ -4524,7 +6258,8 @@ function rfEditor(item) {
       </div>
       <div class="rf-actions">
         <button type="button" class="ghost-button" data-rf-action="save-current" ${rollingCanSave() ? "" : "disabled"}>${escapeHtml(rfT("saveCurrent"))}</button>
-        <button type="button" data-rf-action="submit-current" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfT("submitCurrent"))}</button>
+        ${item.submitted ? `<button type="button" class="ghost-button" data-rf-action="withdraw-current" ${rollingCanSubmit() ? "" : "disabled"}>${escapeHtml(rfT("withdrawCurrent"))}</button>` : ""}
+        <button type="button" data-rf-action="submit-current" ${rollingCanSubmit() && !item.submitted ? "" : "disabled"}>${escapeHtml(rfT("submitCurrent"))}</button>
       </div>
     </div>
   `;
@@ -4948,6 +6683,203 @@ function rollingRowText(row) {
 }
 
 async function handleRollingForecastClick(event) {
+  const procurementCategory = event.target.closest("[data-procurement-category]")?.dataset.procurementCategory;
+  if (procurementCategory && DW_PROCUREMENT_PRICE_LINES[procurementCategory]) {
+    state.procurementSelectedCategory = procurementCategory;
+    renderProcurementPriceWorkspace();
+    return;
+  }
+  const procurementRevoke = event.target.closest("[data-procurement-revoke]")?.dataset.procurementRevoke;
+  if (procurementRevoke) {
+    const [categoryId, lineId] = procurementRevoke.split("|");
+    const monthIndex = employeeAttendanceMonthIndex();
+    const key = procurementCheckKey(categoryId, lineId, monthIndex);
+    const saved = procurementPriceChecks.checks[key];
+    if (!saved) return;
+    delete procurementPriceChecks.checks[key];
+    await deleteProcurementAttachment(saved.attachmentId || procurementAttachmentId(key));
+    saveProcurementPriceChecks();
+    const line = (DW_PROCUREMENT_PRICE_LINES[categoryId] || []).find((item) => item.id === lineId);
+    syncDwHeadcountBudget({ source: headcountLinkSource("procurementRevoke"), sourceKind: "procurementRevoke", actor: els.userName?.value.trim() || procurementT("title"), reason: saved.reason || "", priceCheckMeta: { revoke: true, lines: [{ lineId, before: Number(saved.value), after: procurementBaselinePrice(line, monthIndex) }] } });
+    toast(procurementT("revokedToast"));
+    renderProcurementPriceWorkspace();
+    return;
+  }
+  const procurementAction = event.target.closest("[data-procurement-action]")?.dataset.procurementAction;
+  if (procurementAction === "switch-role") {
+    els.roleLogin?.classList.remove("hidden");
+    if (els.rolePassword) els.rolePassword.value = "";
+    if (els.rolePasswordError) els.rolePasswordError.textContent = "";
+    return;
+  }
+  if (procurementAction === "save") {
+    const categoryId = state.procurementSelectedCategory;
+    const monthIndex = employeeAttendanceMonthIndex();
+    const changes = procurementCategoryChanges(categoryId, monthIndex);
+    const draft = procurementDraft(categoryId);
+    const file = procurementAttachmentFiles.get(categoryId);
+    if (!changes.length) {
+      toast(procurementT("noChange"), true);
+      return;
+    }
+    if (!String(draft.reason || "").trim()) {
+      toast(procurementT("reasonRequired"), true);
+      els.forecastWorkspace?.querySelector("[data-procurement-reason]")?.focus();
+      return;
+    }
+    if (!file) {
+      toast(procurementT("attachmentRequired"), true);
+      els.forecastWorkspace?.querySelector("[data-procurement-attachment]")?.focus();
+      return;
+    }
+    const actor = els.userName?.value.trim() || procurementT("title");
+    const timestamp = new Date().toISOString();
+    const priceLines = [];
+    for (const line of changes) {
+      const key = procurementCheckKey(categoryId, line.id, monthIndex);
+      const attachmentId = procurementAttachmentId(key);
+      await putProcurementAttachment(attachmentId, file);
+      const value = procurementDraftValue(categoryId, line, monthIndex);
+      procurementPriceChecks.checks[key] = {
+        value,
+        reason: String(draft.reason || "").trim(),
+        actor,
+        timestamp,
+        attachmentId,
+        attachment: { name: file.name, type: file.type || "", size: Number(file.size || 0) }
+      };
+      priceLines.push({ lineId: line.id, before: procurementBaselinePrice(line, monthIndex), after: value });
+    }
+    delete procurementPriceChecks.drafts[categoryId];
+    procurementAttachmentFiles.delete(categoryId);
+    saveProcurementPriceChecks();
+    syncDwHeadcountBudget({ source: headcountLinkSource("procurement"), sourceKind: "procurement", actor, reason: String(draft.reason || "").trim(), priceCheckMeta: { lines: priceLines, attachment: { name: file.name } } });
+    toast(procurementT("savedToast"));
+    renderProcurementPriceWorkspace();
+    return;
+  }
+  const employeeFactory = event.target.closest("[data-employee-attendance-factory]")?.dataset.employeeAttendanceFactory;
+  if (employeeFactory && EMPLOYEE_ATTENDANCE_DATA.factories[employeeFactory]) {
+    state.employeeAttendanceFactory = employeeFactory;
+    state.employeeAttendanceDepartment = EMPLOYEE_ATTENDANCE_DATA.factories[employeeFactory].departments[0]?.id || "production";
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  const employeeDepartment = event.target.closest("[data-employee-attendance-department]")?.dataset.employeeAttendanceDepartment;
+  if (employeeDepartment && employeeAttendanceFactory().departments.some((item) => item.id === employeeDepartment)) {
+    state.employeeAttendanceDepartment = employeeDepartment;
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  const employeeAction = event.target.closest("[data-employee-attendance-action]")?.dataset.employeeAttendanceAction;
+  if (employeeAction === "download-template") {
+    try { await downloadHeadcountTemplate("employee"); }
+    catch (error) { toast(`${employeeAttendanceT("importFailed")}: ${error?.message || error}`, true); }
+    return;
+  }
+  if (employeeAction === "cancel-import") {
+    employeeAttendanceImportPreview = null;
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  if (employeeAction === "apply-import" && employeeAttendanceImportPreview?.changes?.length) {
+    for (const change of employeeAttendanceImportPreview.changes) employeeAttendanceInputs.values[change.key] = change.value;
+    employeeAttendanceImportPreview = null;
+    saveEmployeeAttendanceInputs();
+    toast(employeeAttendanceT("importApplied"));
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  if (employeeAction === "switch-role") {
+    els.roleLogin?.classList.remove("hidden");
+    if (els.rolePassword) els.rolePassword.value = "";
+    if (els.rolePasswordError) els.rolePasswordError.textContent = "";
+    return;
+  }
+  if (employeeAction === "reset") {
+    const factoryId = state.employeeAttendanceFactory;
+    const department = employeeAttendanceFactory(factoryId).departments.find((item) => item.id === state.employeeAttendanceDepartment);
+    for (const item of department?.rows || []) {
+      for (const field of EMPLOYEE_ATTENDANCE_DATA.fields) for (const monthIndex of editableForecastMonths()) delete employeeAttendanceInputs.values[employeeAttendanceInputKey(factoryId, item.id, field, monthIndex)];
+    }
+    saveEmployeeAttendanceInputs();
+    toast(employeeAttendanceT("restored"));
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  if (employeeAction === "save") {
+    const changes = employeeAttendanceChanges();
+    if (changes.length && !String(employeeAttendanceInputs.reason || "").trim()) {
+      toast(employeeAttendanceT("reasonRequired"), true);
+      renderEmployeeAttendanceWorkspace();
+      els.forecastWorkspace?.querySelector("[data-employee-attendance-reason]")?.focus();
+      return;
+    }
+    saveEmployeeAttendanceInputs();
+    employeeAttendanceSavedInputs = clonePlain(employeeAttendanceInputs);
+    const months = [...new Set(changes.map((change) => change.monthIndex))];
+    localStorage.setItem(EMPLOYEE_ATTENDANCE_SAVED_KEY, JSON.stringify({ timestamp: new Date().toISOString(), actor: els.userName?.value.trim() || employeeAttendanceT("title"), months: months.map((monthIndex) => monthIndex + 1), reason: employeeAttendanceInputs.reason, values: employeeAttendanceInputs.values, changes }));
+    syncDwHeadcountBudget({ source: headcountLinkSource("employee"), sourceKind: "employee", actor: els.userName?.value.trim() || employeeAttendanceT("title"), reason: employeeAttendanceInputs.reason, factMeta: employeeAuditFactMeta(changes), monthIndexes: months });
+    toast(employeeAttendanceT("saved"));
+    renderEmployeeAttendanceWorkspace();
+    return;
+  }
+  const attendanceUnit = event.target.closest("[data-attendance-unit]")?.dataset.attendanceUnit;
+  if (attendanceUnit && attendanceUnits().some((unit) => unit.id === attendanceUnit)) {
+    state.attendanceUnit = attendanceUnit;
+    renderAttendanceWorkspace();
+    return;
+  }
+  const attendanceAction = event.target.closest("[data-attendance-action]")?.dataset.attendanceAction;
+  if (attendanceAction === "download-template") {
+    try { await downloadHeadcountTemplate("attendance"); }
+    catch (error) { toast(`${attendanceT("importFailed")}: ${error?.message || error}`, true); }
+    return;
+  }
+  if (attendanceAction === "cancel-import") {
+    attendanceImportPreview = null;
+    renderAttendanceWorkspace();
+    return;
+  }
+  if (attendanceAction === "apply-import" && attendanceImportPreview?.changes?.length) {
+    for (const change of attendanceImportPreview.changes) attendanceInputs.values[change.key] = change.value;
+    attendanceImportPreview = null;
+    saveAttendanceInputs();
+    toast(attendanceT("importApplied"));
+    renderAttendanceWorkspace();
+    return;
+  }
+  if (attendanceAction === "switch-role") {
+    els.roleLogin?.classList.remove("hidden");
+    if (els.rolePassword) els.rolePassword.value = "";
+    if (els.rolePasswordError) els.rolePasswordError.textContent = "";
+    return;
+  }
+  if (attendanceAction === "reset") {
+    const unit = attendanceUnits().find((item) => item.id === state.attendanceUnit) || attendanceUnits()[0];
+    for (const [categoryKey] of attendanceEditableCategories()) for (const monthIndex of editableForecastMonths()) delete attendanceInputs.values[attendanceInputKey(unit.id, categoryKey, monthIndex)];
+    saveAttendanceInputs();
+    toast(attendanceT("restored"));
+    renderAttendanceWorkspace();
+    return;
+  }
+  if (attendanceAction === "save") {
+    const changes = attendanceChanges();
+    if (changes.length && !String(attendanceInputs.reason || "").trim()) {
+      toast(attendanceT("reasonRequired"), true);
+      renderAttendanceWorkspace();
+      els.forecastWorkspace?.querySelector("[data-attendance-reason]")?.focus();
+      return;
+    }
+    saveAttendanceInputs();
+    attendanceSavedInputs = clonePlain(attendanceInputs);
+    const months = [...new Set(changes.map((change) => change.monthIndex))];
+    localStorage.setItem(ADMIN_ATTENDANCE_SAVED_KEY, JSON.stringify({ timestamp: new Date().toISOString(), actor: els.userName?.value.trim() || attendanceT("permission"), months: months.map((monthIndex) => monthIndex + 1), reason: attendanceInputs.reason, values: attendanceInputs.values, changes }));
+    syncDwHeadcountBudget({ source: headcountLinkSource("attendance"), sourceKind: "attendance", actor: els.userName?.value.trim() || attendanceT("permission"), reason: attendanceInputs.reason, factMeta: attendanceAuditFactMeta(changes), monthIndexes: months });
+    toast(attendanceT("saved"));
+    renderAttendanceWorkspace();
+    return;
+  }
   const adminView = event.target.closest("[data-admin-view]")?.dataset.adminView;
   if (adminView) {
     state.adminBudgetView = ["conditions", "results", "audit"].includes(adminView) ? adminView : "conditions";
@@ -4968,25 +6900,75 @@ async function handleRollingForecastClick(event) {
     return;
   }
   const adminAction = event.target.closest("[data-admin-action]")?.dataset.adminAction;
+  if (adminAction === "withdraw") {
+    withdrawAdminBudgetSubmission();
+    const actor = els.userName?.value.trim() || "";
+    adminBudgetAudit.unshift({ id: `admin-withdraw-${Date.now()}`, timestamp: new Date().toISOString(), actor, actorKey: actor ? "" : "permission", reasonKey: "withdrawn", actionKey: "withdraw", sourceKind: "admin", factMeta: { kind: "workflow" } });
+    adminBudgetAudit = adminBudgetAudit.slice(0, 200);
+    saveAdminBudgetState();
+    await saveRollingForecastDrafts();
+    state.adminBudgetView = "audit";
+    toast(adminT("withdrawn"));
+    renderAdminBudgetWorkspace();
+    return;
+  }
   if (adminAction) {
     const changes = adminBudgetChanges();
-    const missingReason = changes.find(({ category }) => !String(adminBudgetInputs.reasons?.[category.id] || "").trim());
+    const ruleChanges = adminRuleChanges();
+    const missingReason = changes.find(({ category }) => !String(adminBudgetInputs.reasons?.[category.id] || "").trim())
+      || ruleChanges.find((change) => !String(adminBudgetInputs.reasons?.[change.categoryId] || "").trim());
     if (missingReason) {
-      state.adminSelectedCategory = missingReason.category.id;
+      state.adminSelectedCategory = missingReason.category?.id || missingReason.categoryId;
       state.adminBudgetView = "conditions";
       toast(adminT("reasonRequired"), true);
       renderAdminBudgetWorkspace();
       return;
     }
     const timestamp = new Date().toISOString();
-    const actor = els.userName?.value.trim() || adminT("permission");
-    for (const change of changes) {
-      adminBudgetAudit.unshift({ id: `admin-${Date.now()}-${change.category.id}-${change.index}`, timestamp, actor, label: change.category.label, period: localizeMonthLabel(change.index, state.language), before: change.before, after: change.after, reason: adminBudgetInputs.reasons[change.category.id], action: adminAction === "submit" ? adminT("submit") : adminT("save") });
-    }
+    const actor = els.userName?.value.trim() || "";
+    const actorKey = actor ? "" : "permission";
+    if (ruleChanges.length) {
+      adminRuleParameters.saved = clonePlain(adminRuleParameters.draft);
+      applyAdminRuleBudgetChanges(ruleChanges);
+      adminBudgetAudit.unshift({
+        id: `admin-rule-${Date.now()}`,
+        timestamp,
+        actor,
+        actorKey,
+        periodIndex: ruleChanges[0].monthIndex,
+        reason: [...new Set(ruleChanges.map((change) => adminBudgetInputs.reasons[change.categoryId]).filter(Boolean))].join("; "),
+        actionKey: adminAction === "submit" ? "submit" : "save",
+        sourceKind: "admin",
+        factMeta: { kind: "adminRule", changes: ruleChanges.map(({ categoryId, monthIndex, key, before, after }) => ({ categoryId, monthIndex, key, before, after })) }
+      });
+    } else if (changes.length) adminBudgetAudit.unshift({
+      id: `admin-fact-${Date.now()}`,
+      timestamp,
+      actor,
+      actorKey,
+      periodIndex: changes[0].index,
+      reason: [...new Set(changes.map((change) => adminBudgetInputs.reasons[change.category.id]).filter(Boolean))].join("; "),
+      actionKey: adminAction === "submit" ? "submit" : "save",
+      factMeta: { kind: "admin", changes: changes.map((change) => ({ categoryId: change.category.id, periodIndex: change.index })) }
+    });
+    else if (adminAction === "submit") adminBudgetAudit.unshift({
+      id: `admin-workflow-${Date.now()}`,
+      timestamp,
+      actor,
+      actorKey,
+      reasonKey: "noBusinessChanges",
+      actionKey: "submit",
+      sourceKind: "admin",
+      factMeta: { kind: "workflow" }
+    });
     adminBudgetAudit = adminBudgetAudit.slice(0, 200);
-    saveAdminBudgetState();
     adminBudgetSavedInputs = clonePlain(adminBudgetInputs);
-    applyAdminBudgetSync(changes.map((item) => adminBudgetInputs.reasons[item.category.id]).filter(Boolean).join("; ") || "Excel baseline", adminAction);
+    saveAdminBudgetState();
+    const saveReasons = [
+      ...changes.map((item) => adminBudgetInputs.reasons[item.category.id]),
+      ...ruleChanges.map((item) => adminBudgetInputs.reasons[item.categoryId])
+    ].filter(Boolean);
+    applyAdminBudgetSync([...new Set(saveReasons)].join("; ") || "Excel baseline", adminAction);
     await saveRollingForecastDrafts();
     if (adminAction === "submit") state.adminBudgetView = "audit";
     toast(adminAction === "submit" ? adminT("submitted") : adminT("responsibilitySaved"));
@@ -5016,6 +6998,18 @@ async function handleRollingForecastClick(event) {
     return;
   }
   const hrAction = event.target.closest("[data-hr-action]")?.dataset.hrAction;
+  if (hrAction === "withdraw") {
+    withdrawHrBudgetSubmission();
+    const actor = els.userName?.value.trim() || "";
+    hrBudgetAudit.unshift({ id: `hr-withdraw-${Date.now()}`, timestamp: new Date().toISOString(), actor, actorKey: actor ? "" : "hrRole", reasonKey: "withdrawnBudget", actionKey: "withdraw", changes: [] });
+    hrBudgetAudit = hrBudgetAudit.slice(0, 100);
+    saveHrBudgetAudit();
+    await saveRollingForecastDrafts();
+    hrBudgetView = "audit";
+    toast(hrT("withdrawnBudget"));
+    renderHrBudgetWorkspace();
+    return;
+  }
   if (hrAction) {
     const changes = hrBudgetChanges(hrBudgetSavedInputs, hrBudgetInputs);
     const reason = String(hrBudgetInputs.notes || "").trim();
@@ -5024,17 +7018,22 @@ async function handleRollingForecastClick(event) {
       renderHrBudgetWorkspace();
       return;
     }
-    if (changes.length) {
+    if (changes.length || hrAction === "submit") {
+      const actor = els.userName?.value.trim() || "";
       hrBudgetAudit.unshift({
         id: `hr-${Date.now()}`,
         timestamp: new Date().toISOString(),
-        actor: els.userName?.value.trim() || t("hrRole"),
+        actor,
+        actorKey: actor ? "" : "hrRole",
         reason,
-        action: hrAction === "submit" ? "提交人力预算" : "保存校核",
+        reasonKey: reason ? "" : "noBusinessChanges",
+        actionKey: hrAction === "submit" ? "submit" : "save",
         changes
       });
       hrBudgetAudit = hrBudgetAudit.slice(0, 100);
       saveHrBudgetAudit();
+    }
+    if (changes.length) {
       hrBudgetInputs.notes = "";
       saveHrBudgetInputs();
       hrBudgetSavedInputs = cloneHrBudgetInputs(hrBudgetInputs);
@@ -5072,7 +7071,7 @@ async function handleRollingForecastClick(event) {
   }
   const action = event.target.closest("[data-rf-action]")?.dataset.rfAction;
   if (!action) return;
-  if ((action.includes("save") && !rollingCanSave()) || (action.includes("submit") && !rollingCanSubmit())) {
+  if ((action.includes("save") && !rollingCanSave()) || ((action.includes("submit") || action.includes("withdraw")) && !rollingCanSubmit())) {
     toast(rollingRoleScope(), true);
     return;
   }
@@ -5084,6 +7083,22 @@ async function handleRollingForecastClick(event) {
   if (action === "save-current") {
     await saveRollingForecastDrafts();
     toast(rfT("currentSaved"));
+    return;
+  }
+  if (action === "withdraw-current") {
+    if (state.rollingSelectedCode) delete state.rollingForecastSubmitted[state.rollingSelectedCode];
+    state.rollingViewMode = "fill";
+    await saveRollingForecastDrafts();
+    toast(rfT("currentWithdrawn"));
+    renderTable();
+    return;
+  }
+  if (action === "withdraw-all") {
+    for (const row of (state.result?.rows || []).filter(rollingRoleCanView)) if (row.code) delete state.rollingForecastSubmitted[row.code];
+    state.rollingViewMode = "fill";
+    await saveRollingForecastDrafts();
+    toast(rfT("allWithdrawn"));
+    renderTable();
     return;
   }
   if (action === "submit-current") {
@@ -5106,6 +7121,105 @@ async function handleRollingForecastClick(event) {
 }
 
 function handleRollingForecastInput(event) {
+  const procurementPrice = event.target.closest("[data-procurement-price]");
+  if (procurementPrice) {
+    const [categoryId, lineId] = procurementPrice.dataset.procurementPrice.split("|");
+    const line = (DW_PROCUREMENT_PRICE_LINES[categoryId] || []).find((item) => item.id === lineId);
+    const value = Number(procurementPrice.value);
+    if (line && Number.isFinite(value) && value >= 0 && !procurementPriceCheck(categoryId, lineId)) {
+      procurementPriceChecks.drafts[categoryId] = { ...procurementDraft(categoryId), values: { ...procurementDraft(categoryId).values, [lineId]: value } };
+      saveProcurementPriceChecks();
+      if (event.type === "change") renderProcurementPriceWorkspace();
+    }
+    return;
+  }
+  const procurementReason = event.target.closest("[data-procurement-reason]");
+  if (procurementReason) {
+    const categoryId = state.procurementSelectedCategory;
+    procurementPriceChecks.drafts[categoryId] = { ...procurementDraft(categoryId), reason: procurementReason.value };
+    saveProcurementPriceChecks();
+    return;
+  }
+  const procurementAttachment = event.target.closest("[data-procurement-attachment]");
+  if (procurementAttachment) {
+    const categoryId = procurementAttachment.dataset.procurementAttachment;
+    const file = procurementAttachment.files?.[0];
+    if (file) {
+      procurementAttachmentFiles.set(categoryId, file);
+      procurementPriceChecks.drafts[categoryId] = { ...procurementDraft(categoryId), attachment: { name: file.name, type: file.type || "", size: Number(file.size || 0) } };
+      saveProcurementPriceChecks();
+      if (event.type === "change") renderProcurementPriceWorkspace();
+    }
+    return;
+  }
+  const employeeImport = event.target.closest("[data-employee-attendance-import]");
+  if (employeeImport) {
+    const file = employeeImport.files?.[0];
+    if (file && event.type === "change") void prepareEmployeeAttendanceImport(file);
+    return;
+  }
+  const attendanceImport = event.target.closest("[data-attendance-import]");
+  if (attendanceImport) {
+    const file = attendanceImport.files?.[0];
+    if (file && event.type === "change") void prepareAttendanceImport(file);
+    return;
+  }
+  const employeeInput = event.target.closest("[data-employee-attendance-input]");
+  if (employeeInput) {
+    const [factoryId, rowId, field, monthText] = employeeInput.dataset.employeeAttendanceInput.split("|");
+    const monthIndex = Number(monthText);
+    const item = employeeAttendanceRows(factoryId).find((entry) => entry.item.id === rowId)?.item;
+    const rawValue = Number(employeeInput.value);
+    if (item && EMPLOYEE_ATTENDANCE_DATA.fields.includes(field) && Number.isFinite(rawValue) && Number.isInteger(monthIndex)) {
+      const value = field === "shared" ? Math.max(0, Math.round(rawValue * 1000) / 1000) : Math.max(0, Math.round(rawValue));
+      employeeInput.value = String(value);
+      employeeAttendanceInputs.values[employeeAttendanceInputKey(factoryId, rowId, field, monthIndex)] = value;
+      saveEmployeeAttendanceInputs();
+      if (event.type === "change") renderEmployeeAttendanceWorkspace();
+    }
+    return;
+  }
+  const employeeReason = event.target.closest("[data-employee-attendance-reason]");
+  if (employeeReason) {
+    employeeAttendanceInputs.reason = employeeReason.value;
+    saveEmployeeAttendanceInputs();
+    return;
+  }
+  const attendanceInput = event.target.closest("[data-attendance-input]");
+  if (attendanceInput) {
+    const [unitId, categoryKey, monthText] = attendanceInput.dataset.attendanceInput.split("|");
+    const monthIndex = Number(monthText);
+    const rawValue = Number(attendanceInput.value);
+    if (Number.isFinite(rawValue) && Number.isInteger(monthIndex)) {
+      const value = Math.max(0, Math.round(rawValue));
+      attendanceInput.value = String(value);
+      attendanceInputs.values[attendanceInputKey(unitId, categoryKey, monthIndex)] = value;
+      saveAttendanceInputs();
+      if (event.type === "change") renderAttendanceWorkspace();
+    }
+    return;
+  }
+  const attendanceReason = event.target.closest("[data-attendance-reason]");
+  if (attendanceReason) {
+    attendanceInputs.reason = attendanceReason.value;
+    saveAttendanceInputs();
+    return;
+  }
+  const adminRuleInput = event.target.closest("[data-admin-rule-input]");
+  if (adminRuleInput) {
+    const [categoryId, key, monthText, scaleText] = adminRuleInput.dataset.adminRuleInput.split("|");
+    const monthIndex = Number(monthText);
+    const scale = Number(scaleText) || 1;
+    const displayed = Number(adminRuleInput.value);
+    if (Number.isFinite(displayed) && Number.isInteger(monthIndex) && monthIndex >= employeeAttendanceMonthIndex() && monthIndex < 12 && key in DW_ADMIN_PARAMETER_DEFAULTS) {
+      const value = Math.max(0, displayed / scale);
+      adminRuleParameters.draft[String(monthIndex)] = { ...adminRuleParametersForMonth(monthIndex, "draft"), [key]: value };
+      adminRuleParameters.origins[`${monthIndex}|${key}`] = categoryId;
+      saveAdminRuleParameters();
+      if (event.type === "change") renderAdminBudgetWorkspace();
+    }
+    return;
+  }
   const adminOwner = event.target.closest("[data-admin-owner]");
   if (adminOwner) {
     const [categoryId, driverKey] = adminOwner.dataset.adminOwner.split(".");
@@ -5988,6 +8102,7 @@ function recalcFactors() {
 }
 
 function switchTab(name) {
+  if (isScopedBudgetRole() && name !== "variance") name = "variance";
   for (const tab of document.querySelectorAll(".tab")) tab.classList.toggle("active", tab.dataset.tab === name);
   document.getElementById("dashboardView").classList.toggle("active", name === "dashboard");
   document.getElementById("benchmarkView").classList.toggle("active", name === "benchmark");
@@ -6007,6 +8122,12 @@ function switchTab(name) {
 
 function applyLanguage(language) {
   state.language = language;
+  if (els.toast) {
+    els.toast.classList.remove("show");
+    els.toast.textContent = "";
+  }
+  if (els.languageSelect && els.languageSelect.value !== language) els.languageSelect.value = language;
+  if (els.roleLanguageSelect && els.roleLanguageSelect.value !== language) els.roleLanguageSelect.value = language;
   document.documentElement.lang = language === "zh" ? "zh-CN" : language;
   document.title = t("appTitle");
   for (const node of document.querySelectorAll("[data-i18n]")) {
@@ -6052,38 +8173,42 @@ function normalizeImpact(value) {
   return Math.abs(number) > 1000 ? Math.abs(number / 1000) : Math.abs(number);
 }
 
+function localeForLanguage(language = state.language) {
+  return language === "tr" ? "tr-TR" : language === "en" ? "en-US" : "zh-CN";
+}
+
 function formatMoney(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
-  return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number(value).toLocaleString(localeForLanguage(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatUnit(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
-  return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number(value).toLocaleString(localeForLanguage(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatNumber(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
-  return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+  return Number(value).toLocaleString(localeForLanguage(), { maximumFractionDigits: 0 });
 }
 
 function formatPercent(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
-  return `${(Number(value) * 100).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  return `${(Number(value) * 100).toLocaleString(localeForLanguage(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
 }
 
 function formatPlain(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
-  return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 2 });
+  return Number(value).toLocaleString(localeForLanguage(), { maximumFractionDigits: 2 });
 }
 
 function formatDashboardValue(value, unit) {
   if (value === null || value === undefined || Number.isNaN(value)) return "--";
   if (unit === "%") {
-    return `${(Number(value) * 100).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+    return `${(Number(value) * 100).toLocaleString(localeForLanguage(), { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
   }
   const digits = unit === "台" || unit === "人" ? 0 : 2;
-  return Number(value).toLocaleString("zh-CN", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return Number(value).toLocaleString(localeForLanguage(), { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
 function formatEditable(value) {
@@ -6153,7 +8278,12 @@ function updateLanguageOptions() {
 }
 
 function storeLabel() {
-  return store.label === "本机保存" ? t("localStore") : store.label;
+  const labels = {
+    zh: { local: "本机保存", lan: "局域网共享", shared: "后台共享" },
+    en: { local: "Local save", lan: "LAN shared", shared: "Backend shared" },
+    tr: { local: "Yerel kayıt", lan: "Yerel ağ paylaşımı", shared: "Arka uç paylaşımı" }
+  };
+  return labels[state.language]?.[store.mode] || labels.zh[store.mode] || store.label;
 }
 
 function toast(message, isError = false) {

@@ -33,6 +33,8 @@ test("annual unit cost uses total cost divided by total volume instead of Decemb
   assert.equal(annualUnitCost([100, 200], [10000, 5000]), 300 * 1000 / 15000);
 });
 
-test("target completion follows the three-sheet formula 2 minus actual over budget", () => {
+test("target completion follows each metric direction", () => {
   assert.equal(targetCompletionRate(22.05, 30.27), 2 - 22.05 / 30.27);
+  assert.equal(targetCompletionRate(120, 100, "higher"), 1.2);
+  assert.equal(targetCompletionRate(80, 100, "lower"), 1.2);
 });
