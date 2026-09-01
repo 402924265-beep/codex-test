@@ -9,7 +9,7 @@
       }
     </script>
     <title>制造费三张表工作台</title>
-  <link rel="stylesheet" href="./src/styles.css?v=20260901-unified-three-account-v1" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260901-role-gate-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,13 +20,13 @@
       }
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-  <script type="module" src="./src/app.js?v=20260901-unified-three-account-v1"></script>
+  <script type="module" src="./src/app.js?v=20260901-role-gate-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
       <div class="role-login-panel">
-        <div class="role-login-brand"><span>C</span><div><strong data-i18n="roleBrand">Three-Table Manufacturing Cost Cockpit</strong><small data-i18n="roleTestVersion">Budget Collaboration Preview</small></div></div>
-        <div class="role-login-copy"><span data-i18n="roleAccess">Role Access</span><h1 data-i18n="roleSelectTitle">Select your work role</h1><p data-i18n="roleSelectHint">Select a role and enter its independent password. Each role only sees data and actions within its responsibility.</p></div>
+        <div class="role-login-brand"><span>C</span><div><strong data-i18n="roleBrand">制造费三张表工作台</strong><small data-i18n="roleTestVersion">预算协同预览版</small></div></div>
+        <div class="role-login-copy"><span data-i18n="roleAccess">角色权限</span><h1 data-i18n="roleSelectTitle">选择工作角色</h1><p data-i18n="roleSelectHint">选择角色并输入该角色的独立密码。每个角色只能查看和处理职责范围内的数据。</p></div>
         <label class="role-login-language">
           <span data-i18n="language">语言</span>
           <select id="roleLanguageSelect">
@@ -36,23 +36,50 @@
           </select>
         </label>
         <div class="role-login-options">
-          <button type="button" class="active" data-login-role="finance"><b data-i18n="costRole">Cost Role</b></button>
-          <button type="button" data-login-role="hr"><b data-i18n="hrRole">HR Role</b></button>
-          <button type="button" data-login-role="admin"><b data-i18n="adminRole">Administration</b></button>
-          <button type="button" data-login-role="attendance"><b data-i18n="attendanceRole">Administration Attendance</b></button>
-          <button type="button" data-login-role="employeeAttendance"><b data-i18n="employeeAttendanceRole">Employee Headcount Forecast</b></button>
-          <button type="button" data-login-role="procurementPrice"><b data-i18n="procurementPriceRole">Procurement Price Validation</b></button>
-          <button type="button" data-login-role="adminThree"><b data-i18n="adminThreeRole">Administration: Three Accounts</b></button>
+          <button type="button" class="active" data-login-role="finance" aria-pressed="true"><b data-i18n="costRole">成本角色</b></button>
+          <button type="button" data-login-role="hr" aria-pressed="false"><b data-i18n="hrRole">HR 角色</b></button>
+          <button type="button" data-login-role="admin" aria-pressed="false"><b data-i18n="adminRole">行政部门</b></button>
+          <button type="button" data-login-role="attendance" aria-pressed="false"><b data-i18n="attendanceRole">行政出勤</b></button>
+          <button type="button" data-login-role="employeeAttendance" aria-pressed="false"><b data-i18n="employeeAttendanceRole">员工人数预测</b></button>
+          <button type="button" data-login-role="procurementPrice" aria-pressed="false"><b data-i18n="procurementPriceRole">采购价格校核</b></button>
+          <button type="button" data-login-role="adminThree" aria-pressed="false"><b data-i18n="adminThreeRole">行政三科目</b></button>
         </div>
         <label class="role-password-field">
-          <span data-i18n="rolePassword">Role password</span>
+          <span data-i18n="rolePassword">角色密码</span>
           <input id="rolePassword" type="password" inputmode="numeric" autocomplete="current-password" maxlength="3" placeholder="•••" />
           <small id="rolePasswordError" aria-live="polite"></small>
         </label>
-        <button id="enterWorkspace" class="role-login-enter" type="button" data-i18n="enterWorkspace">Enter workspace</button>
-        <small class="role-login-note" data-i18n="roleSwitchHint">The demo role can be switched from the upper-right corner</small>
+        <button id="enterWorkspace" class="role-login-enter" type="button" data-i18n="enterWorkspace" aria-busy="true" disabled>正在加载工作台…</button>
+        <small class="role-login-note" data-i18n="roleSwitchHint">进入后可从右上角切换角色</small>
       </div>
     </section>
+    <script>
+      (() => {
+        const login = document.getElementById("roleLogin");
+        const password = document.getElementById("rolePassword");
+        const error = document.getElementById("rolePasswordError");
+        if (!login) return;
+        window.DW_ROLE_GATE_BOUND = true;
+        login.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-login-role]");
+          if (!button) return;
+          for (const option of login.querySelectorAll("[data-login-role]")) {
+            const active = option === button;
+            option.classList.toggle("active", active);
+            option.setAttribute("aria-pressed", active ? "true" : "false");
+          }
+          if (password) password.value = "";
+          if (error) error.textContent = "";
+          password?.focus();
+        });
+        window.setTimeout(() => {
+          const enter = document.getElementById("enterWorkspace");
+          if (!enter?.disabled) return;
+          enter.textContent = "加载较慢，请刷新页面";
+          if (error) error.textContent = "工作台资源尚未加载完成，请刷新后重试。";
+        }, 8000);
+      })();
+    </script>
     <div class="business-shell">
       <aside class="business-sidebar" aria-label="业务单元导航">
         <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="收起业务导航" title="收起/展开业务导航">☰</button>

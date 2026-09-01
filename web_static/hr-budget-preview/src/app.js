@@ -964,6 +964,10 @@ async function bootstrap() {
   installMetricHoverTooltip();
   installMetricTableHighlight();
   applyLanguage(els.languageSelect.value);
+  if (els.enterWorkspace) {
+    els.enterWorkspace.disabled = false;
+    els.enterWorkspace.removeAttribute("aria-busy");
+  }
   els.saveMode.textContent = storeLabel();
   if (els.roleSelect) els.roleSelect.value = state.rollingRole;
   els.userName.value = store.getUser();
@@ -1406,13 +1410,19 @@ function clonePlain(value) {
 }
 
 function bindEvents() {
-  for (const button of document.querySelectorAll("[data-login-role]")) {
-    button.addEventListener("click", () => {
-      for (const option of document.querySelectorAll("[data-login-role]")) option.classList.toggle("active", option === button);
-      if (els.rolePassword) els.rolePassword.value = "";
-      if (els.rolePasswordError) els.rolePasswordError.textContent = "";
-      els.rolePassword?.focus();
-    });
+  if (!window.DW_ROLE_GATE_BOUND) {
+    for (const button of document.querySelectorAll("[data-login-role]")) {
+      button.addEventListener("click", () => {
+        for (const option of document.querySelectorAll("[data-login-role]")) {
+          const active = option === button;
+          option.classList.toggle("active", active);
+          option.setAttribute("aria-pressed", active ? "true" : "false");
+        }
+        if (els.rolePassword) els.rolePassword.value = "";
+        if (els.rolePasswordError) els.rolePasswordError.textContent = "";
+        els.rolePassword?.focus();
+      });
+    }
   }
   const enterSelectedWorkspace = () => {
     const selected = document.querySelector("[data-login-role].active")?.dataset.loginRole || "finance";

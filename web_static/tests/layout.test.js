@@ -125,6 +125,10 @@ test("role login requires independent passwords and exposes both attendance work
   assert.match(html, /id="rolePassword" type="password"/);
   assert.match(html, /data-login-role="procurementPrice"/);
   assert.match(html, /data-login-role="adminThree"/);
+  assert.match(html, /window\.DW_ROLE_GATE_BOUND = true/);
+  assert.match(html, /aria-busy="true" disabled>正在加载工作台/);
+  assert.match(app, /if \(!window\.DW_ROLE_GATE_BOUND\)/);
+  assert.match(app, /els\.enterWorkspace\.disabled = false/);
   assert.match(app, /ROLE_PASSWORDS = Object\.freeze\(\{ finance: "111", hr: "222", admin: "333", attendance: "444", employeeAttendance: "555", procurementPrice: "66", adminThree: "777" \}\)/);
   assert.match(html, /id="adminThreeView"[\s\S]*id="adminThreeFrame"/);
   assert.match(app, /erpnext-dw-budget-demo\.html\?embedded=1&role=/);
