@@ -82,12 +82,16 @@ test("DW realization matrix compares 3+9 through 6+6 with the corresponding actu
   assert.doesNotMatch(app, /COMPARISON_COPY/);
 });
 
-test("DW workflow v3 migrates v2, enforces role ownership and resets confirmations without clearing inputs", async () => {
+test("DW workflow reads department submissions, gates on production and preserves reversible approval", async () => {
   const app = await readFile(new URL("../hr-budget-preview/src/erpnext-budget-demo.js", import.meta.url), "utf8");
   const readWorkflow = functionSource(app, "readWorkflow");
   const resetWorkflow = functionSource(app, "resetWorkflow");
   const addWorkflowEvent = functionSource(app, "addWorkflowEvent");
   const saveEditableDrivers = functionSource(app, "saveEditableDrivers");
+  const productionSubmission = functionSource(app, "productionSubmission");
+  const administrationSubmission = functionSource(app, "administrationSubmission");
+  const procurementSubmission = functionSource(app, "procurementSubmission");
+  const renderApproval = functionSource(app, "renderApproval");
 
   assert.match(app, /workflow:"dwRollingForecastWorkflow\.v3"/);
   assert.match(app, /workflowLegacy:"dwRollingForecastWorkflow\.v2"/);
@@ -95,7 +99,17 @@ test("DW workflow v3 migrates v2, enforces role ownership and resets confirmatio
   assert.match(readWorkflow, /readJson\(STORAGE\.workflowLegacy,null\)/);
   assert.match(readWorkflow, /localStorage\.setItem\(STORAGE\.workflow,JSON\.stringify\(migrated\)\)/);
 
-  assert.match(app, /if\(accessRole!=="adminThree"\|\|state\.workflow\.status!=="draft"/);
+  assert.match(app, /function submissionReady\(\)\{ return Boolean\(productionSubmission\(\)\); \}/);
+  assert.match(productionSubmission, /readJson\(STORAGE\.employee,null\)/);
+  assert.match(productionSubmission, /saved\.changes/);
+  assert.match(administrationSubmission, /STORAGE\.attendance/);
+  assert.match(administrationSubmission, /STORAGE\.rules/);
+  assert.match(administrationSubmission, /STORAGE\.adminAudit/);
+  assert.match(procurementSubmission, /STORAGE\.procurement/);
+  assert.match(procurementSubmission, /latest\.timestamp/);
+  assert.match(renderApproval, /departmentSubmissionCard\("production",production,true\)/);
+  assert.doesNotMatch(app, /data-confirm=/);
+  assert.match(app, /if\(state\.workflow\.status!=="draft"\|\|!submissionReady\(\)\)/);
   assert.match(app, /if\(accessRole!=="adminThree"\)\{ toast\(t\("adminOnly"\)\)/);
   assert.match(app, /if\(accessRole!=="finance"\)\{ toast\(t\("financeOnly"\)\)/);
   assert.match(app, /data-action="withdraw"/);
