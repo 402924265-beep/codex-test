@@ -140,8 +140,10 @@ test("DW redesign keeps one unit note, three complete locales and variance-first
   assert.match(css, /NotoSansSC-Variable\.ttf/);
   assert.match(css, /html\[lang="zh-CN"\] \.rail button span/);
   assert.match(css, /html\.embedded \.rail\{display:none\}/);
-  assert.match(css, /html\.embedded \.tabs\{[^}]*display:flex/);
-  assert.match(app, /\[\["forecast",t\("forecast"\)\],\["inputs",t\("inputs"\)\],\["variance",t\("variance"\)\],\["approval",t\("approval"\)\],\["execution",t\("execution"\)\]\]/);
+  assert.doesNotMatch(css, /html\.embedded \.tabs\{[^}]*display:flex/);
+  assert.match(app, /const VIEW_IDS = \["forecast", "inputs", "variance", "approval", "execution"\]/);
+  assert.match(app, /type:"dw-three-state"/);
+  assert.match(app, /type==="dw-three-view"/);
   assert.match(html, /THESIS: A factory SPC control room for cost variance/);
   assert.match(html, /id="varianceHover"/);
 });

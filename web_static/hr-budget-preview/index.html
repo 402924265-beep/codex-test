@@ -9,7 +9,7 @@
       }
     </script>
     <title>制造费三张表工作台</title>
-  <link rel="stylesheet" href="./src/styles.css?v=20260901-role-gate-v1" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260902-three-left-nav-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,7 +20,7 @@
       }
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-  <script type="module" src="./src/app.js?v=20260901-role-gate-v1"></script>
+  <script type="module" src="./src/app.js?v=20260902-three-left-nav-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -115,6 +115,13 @@
             <span class="unit-icon">3</span>
             <span><strong data-i18n="adminThreeBudgetNav">三科目预算</strong><small data-i18n="adminThreeBudgetNavHint">行政预测与实际差异</small></span>
           </button>
+          <nav id="adminThreeSubnav" class="admin-three-subnav" aria-label="三科目页面">
+            <button type="button" class="active" data-admin-three-view="forecast" aria-label="滚动预测" aria-current="page"><span>滚动预测</span></button>
+            <button type="button" data-admin-three-view="inputs" aria-label="部门输入" aria-current="false"><span>部门输入</span></button>
+            <button type="button" data-admin-three-view="variance" aria-label="差异分析" aria-current="false"><span>差异分析</span></button>
+            <button type="button" data-admin-three-view="approval" aria-label="预测审批" aria-current="false"><span>预测审批</span></button>
+            <button type="button" data-admin-three-view="execution" aria-label="实际执行" aria-current="false"><span>实际执行</span></button>
+          </nav>
         </div>
         <div class="sidebar-section">
           <span class="section-label" data-i18n="overseasReserved">海外工厂预留</span>

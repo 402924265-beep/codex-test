@@ -133,7 +133,9 @@ test("role login requires independent passwords and exposes both attendance work
   assert.match(html, /id="adminThreeView"[\s\S]*id="adminThreeFrame"/);
   assert.match(app, /erpnext-dw-budget-demo\.html\?embedded=1&role=/);
   assert.doesNotMatch(app, /window\.location\.assign\("\.\/erpnext-dw-budget-demo\.html/);
-  assert.match(app, /setSidebarCollapsed\(true\)/);
+  assert.match(html, /id="adminThreeSubnav"[\s\S]*data-admin-three-view="forecast"[\s\S]*data-admin-three-view="execution"/);
+  assert.match(app, /postMessage\(\{ type: "dw-three-view", view:/);
+  assert.match(app, /function openAdminThreeWorkspace[\s\S]*setSidebarCollapsed\(false\)/);
   assert.match(app, /switchTab\("adminThree"\)/);
   assert.match(app, /state\.rollingRole === "attendance"[\s\S]*?renderAttendanceWorkspace\(\)/);
   assert.match(app, /state\.rollingRole === "employeeAttendance"[\s\S]*?renderEmployeeAttendanceWorkspace\(\)/);

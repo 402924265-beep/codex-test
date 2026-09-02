@@ -948,6 +948,7 @@ const els = {
   factoryWorkbenchNav: document.getElementById("factoryWorkbenchNav"),
   forecast2030Nav: document.getElementById("forecast2030Nav"),
   adminThreeBudgetNav: document.getElementById("adminThreeBudgetNav"),
+  adminThreeSubnav: document.getElementById("adminThreeSubnav"),
   adminThreeFrame: document.getElementById("adminThreeFrame"),
   unitName: document.getElementById("unitName"),
   unitSubtitle: document.getElementById("unitSubtitle"),
@@ -1542,11 +1543,19 @@ function bindEvents() {
   els.factoryWorkbenchNav?.addEventListener("click", () => switchTab("benchmark"));
   els.forecast2030Nav?.addEventListener("click", () => switchTab("forecast2030"));
   els.adminThreeBudgetNav?.addEventListener("click", () => openAdminThreeWorkspace(state.rollingRole));
+  els.adminThreeSubnav?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-admin-three-view]");
+    if (!button || button.disabled) return;
+    updateAdminThreeSubnav(button.dataset.adminThreeView);
+    els.adminThreeFrame?.contentWindow?.postMessage({ type: "dw-three-view", view: button.dataset.adminThreeView }, window.location.origin);
+  });
   window.addEventListener("message", (event) => {
     if (event.origin !== window.location.origin || event.source !== els.adminThreeFrame?.contentWindow) return;
-    if (event.data?.type !== "dw-three-height") return;
-    const height = Math.max(720, Math.min(12000, Number(event.data.height) || 0));
-    if (height) els.adminThreeFrame.style.height = `${height}px`;
+    if (event.data?.type === "dw-three-height" || event.data?.type === "dw-three-state") {
+      const height = Math.max(720, Math.min(12000, Number(event.data.height) || 0));
+      if (height) els.adminThreeFrame.style.height = `${height}px`;
+    }
+    if (event.data?.type === "dw-three-state") updateAdminThreeSubnav(event.data.view, event.data.views, event.data.version === "r2", event.data.navigation);
   });
   initForecast2030(document.getElementById("forecast2030Workbench"), () => state.language);
   document.getElementById("benchmarkView")?.addEventListener("click", (event) => {
@@ -6142,12 +6151,29 @@ function initializeDemoRoleAccess() {
   els.roleLogin?.classList.remove("hidden");
 }
 
+function updateAdminThreeSubnav(view = "forecast", views = [], locked = false, navigationLabel = "") {
+  if (navigationLabel) els.adminThreeSubnav?.setAttribute("aria-label", navigationLabel);
+  const labels = new Map(Array.isArray(views) ? views.map((item) => [item.id, item.label]) : []);
+  for (const button of els.adminThreeSubnav?.querySelectorAll("[data-admin-three-view]") || []) {
+    const active = button.dataset.adminThreeView === view;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-current", active ? "page" : "false");
+    button.disabled = locked && button.dataset.adminThreeView !== "forecast";
+    const label = labels.get(button.dataset.adminThreeView);
+    if (label) {
+      button.querySelector("span").textContent = label;
+      button.setAttribute("aria-label", label);
+    }
+  }
+}
+
 function openAdminThreeWorkspace(role = state.rollingRole) {
   const accessRole = role === "adminThree" ? "adminThree" : "finance";
   sessionStorage.setItem("dwDemoRole", accessRole);
-  setSidebarCollapsed(true);
+  setSidebarCollapsed(false);
   const url = `./erpnext-dw-budget-demo.html?embedded=1&role=${encodeURIComponent(accessRole)}&lang=${encodeURIComponent(state.language)}`;
   if (els.adminThreeFrame?.getAttribute("src") !== url) els.adminThreeFrame?.setAttribute("src", url);
+  updateAdminThreeSubnav();
   switchTab("adminThree");
 }
 

@@ -366,6 +366,12 @@ table { font-variant-numeric: tabular-nums; }
 .workspace-nav-section { padding-top: 14px; border-top: 1px solid rgba(199, 222, 233, .15); }
 .workspace-nav-item .unit-icon { background: #a97816; color: #fff; }
 .workspace-nav-item.active .unit-icon { background: #0d8f7a; }
+.admin-three-subnav { display: none; gap: 4px; margin: -2px 0 10px 22px; padding: 2px 0 2px 12px; border-left: 1px solid rgba(199, 222, 233, .22); }
+.admin-three-open .admin-three-subnav { display: grid; }
+.admin-three-subnav button { min-height: 44px; padding: 8px 11px; border: 0; border-radius: 8px; background: transparent; color: #b8cbd6; font-weight: 700; text-align: left; }
+.admin-three-subnav button:hover:not(:disabled) { background: rgba(255,255,255,.09); color: #fff; }
+.admin-three-subnav button.active { background: rgba(255,255,255,.14); color: #fff; }
+.admin-three-subnav button:disabled { opacity: .4; cursor: not-allowed; }
 
 .section-label {
   display: block;
@@ -464,6 +470,8 @@ table { font-variant-numeric: tabular-nums; }
   justify-content: center;
   padding: 7px;
 }
+
+.business-shell.sidebar-collapsed .admin-three-subnav { display: none; }
 
 .business-main {
   min-width: 0;
@@ -4514,6 +4522,26 @@ tr.high td:first-child {
   .section-label,
   .unit-nav-item span:not(.unit-icon) { display: none; }
   .unit-nav-item { min-height: 48px; justify-content: center; padding: 6px; }
+  .admin-three-open .admin-three-subnav,
+  .admin-three-open .business-shell.sidebar-collapsed .admin-three-subnav {
+    display: grid !important;
+    gap: 5px;
+    margin: 0 0 10px;
+    padding: 0;
+    border: 0;
+  }
+  .admin-three-subnav button {
+    min-height: 42px;
+    padding: 5px 2px;
+    text-align: center;
+  }
+  .admin-three-subnav button span { display: none; }
+  .admin-three-subnav button::before { font-size: 11px; letter-spacing: .02em; }
+  .admin-three-subnav button[data-admin-three-view="forecast"]::before { content: "RF"; }
+  .admin-three-subnav button[data-admin-three-view="inputs"]::before { content: "IN"; }
+  .admin-three-subnav button[data-admin-three-view="variance"]::before { content: "VA"; }
+  .admin-three-subnav button[data-admin-three-view="approval"]::before { content: "AP"; }
+  .admin-three-subnav button[data-admin-three-view="execution"]::before { content: "EX"; }
   .unit-ribbon { display: none; }
   .app-header { padding: 14px; }
   .app-header h1 { font-size: 21px; }
