@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>if(new URLSearchParams(location.search).get("embedded")==="1")document.documentElement.classList.add("embedded");</script>
   <title>DW Rolling Forecast</title>
-  <link rel="stylesheet" href="./src/erpnext-budget-demo.css?v=20260902-approval-records-v1" />
+  <link rel="stylesheet" href="./src/erpnext-budget-demo.css?v=20260902-variance-split-v1" />
 </head>
 <body>
   <!--
     THESIS: A factory SPC control room for cost variance; it refuses the equal-weight KPI card wall that hides what changed.
     OWN-WORLD: Pale engineering-grid ground, deep petrol navigation, enamel-white work surfaces, teal favorable states, brick adverse states, ochre pending states.
-    STORY: Cost owners see rolling-forecast realization variance first, then the full-year administration-forecast variance, ranked account impacts, drivers, approval, and execution.
-    FIRST VIEWPORT: A compact tool row above the 3+9 through 6+6 realization matrix, followed by the annual control band and ranked three-account impact queue.
+    STORY: Cost owners review the rolling forecast first, then compare actuals with both rolling versions and the administration forecast on one variance page.
+    FIRST VIEWPORT: A compact rolling forecast ledger; the variance page groups 3+9 through 6+6 realization and the annual administration-forecast comparison.
     FORM: SPC anomaly-control room, grounded candidate 1 and user-selected Impeccable pick, seed 3c71c9e3.
     FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
   -->
@@ -45,6 +45,6 @@
   </div>
   <div id="varianceHover" class="variance-hover" role="tooltip" hidden></div>
   <div id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="./src/erpnext-budget-demo.js?v=20260902-approval-records-v1"></script>
+  <script type="module" src="./src/erpnext-budget-demo.js?v=20260902-variance-split-v1"></script>
 </body>
 </html>

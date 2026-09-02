@@ -41,11 +41,11 @@ test("DW rolling forecast separates Jan–Jul actual, administration forecast an
   assert.match(app, /t\("workdays"\),row\.workdays/);
   assert.match(app, /aria-current=/);
   assert.match(app, /dwRollingForecastWorkflow\.v2/);
-  assert.match(app, /function renderActualVarianceMatrix\(\)/);
+  assert.match(app, /function rollingVarianceMatrixMarkup\(\)/);
   assert.match(app, /data-variance-tip=/);
-  assert.match(app, /const showOverview=state\.view==="forecast"/);
+  assert.match(app, /const showBaseline=state\.version==="r2"&&state\.view==="forecast"/);
   assert.doesNotMatch(app, /const varianceCell=event\.target\.closest/);
-  assert.match(app, /actualVarianceTitle:"滚动预测兑现差异"/);
+  assert.match(app, /actualVarianceTitle:"实际较滚动预测"/);
   assert.doesNotMatch(app, /actualVarianceTitle:"1—7月执行差异"/);
   assert.match(app, /const query = new URLSearchParams/);
   assert.match(app, /const accessRole = query\.get\("role"\)/);
@@ -82,15 +82,13 @@ test("DW realization matrix compares 3+9 through 6+6 with the corresponding actu
   assert.doesNotMatch(app, /COMPARISON_COPY/);
 });
 
-test("DW workflow reads department submissions, gates on production and preserves reversible approval", async () => {
+test("DW workflow gates on the production save and keeps approval concise and reversible", async () => {
   const app = await readFile(new URL("../hr-budget-preview/src/erpnext-budget-demo.js", import.meta.url), "utf8");
   const readWorkflow = functionSource(app, "readWorkflow");
   const resetWorkflow = functionSource(app, "resetWorkflow");
   const addWorkflowEvent = functionSource(app, "addWorkflowEvent");
   const saveEditableDrivers = functionSource(app, "saveEditableDrivers");
   const productionSubmission = functionSource(app, "productionSubmission");
-  const administrationSubmission = functionSource(app, "administrationSubmission");
-  const procurementSubmission = functionSource(app, "procurementSubmission");
   const renderApproval = functionSource(app, "renderApproval");
 
   assert.match(app, /workflow:"dwRollingForecastWorkflow\.v3"/);
@@ -101,13 +99,10 @@ test("DW workflow reads department submissions, gates on production and preserve
 
   assert.match(app, /function submissionReady\(\)\{ return Boolean\(productionSubmission\(\)\); \}/);
   assert.match(productionSubmission, /readJson\(STORAGE\.employee,null\)/);
-  assert.match(productionSubmission, /saved\.changes/);
-  assert.match(administrationSubmission, /STORAGE\.attendance/);
-  assert.match(administrationSubmission, /STORAGE\.rules/);
-  assert.match(administrationSubmission, /STORAGE\.adminAudit/);
-  assert.match(procurementSubmission, /STORAGE\.procurement/);
-  assert.match(procurementSubmission, /latest\.timestamp/);
-  assert.match(renderApproval, /departmentSubmissionCard\("production",production,true\)/);
+  assert.match(productionSubmission, /saved\?\.timestamp\?saved:null/);
+  assert.match(renderApproval, /displayStatus=current==="draft"\?"pending":current/);
+  assert.doesNotMatch(renderApproval, /departmentSubmissionCard|department-records|productionWait|approvalHint/);
+  assert.doesNotMatch(app, /function (administrationSubmission|procurementSubmission|departmentSubmissionCard|submissionItems)\(/);
   assert.doesNotMatch(app, /data-confirm=/);
   assert.match(app, /if\(state\.workflow\.status!=="draft"\|\|!submissionReady\(\)\)/);
   assert.match(app, /if\(accessRole!=="adminThree"\)\{ toast\(t\("adminOnly"\)\)/);
@@ -142,11 +137,13 @@ test("DW redesign keeps one unit note, three complete locales and variance-first
   assert.match(app, /zh:\{ varianceOverview:/);
   assert.match(app, /en:\{ varianceOverview:/);
   assert.match(app, /tr:\{ varianceOverview:/);
-  assert.match(app, /impactRanking/);
+  assert.match(app, /function compactVarianceOverviewMarkup\(\)/);
+  assert.match(app, /rollingVarianceMatrixMarkup\(\).*compactVarianceOverviewMarkup\(\)/s);
   assert.match(app, /data-tooltip=/);
-  assert.match(app, /data-impact-account=/);
+  assert.doesNotMatch(app, /data-impact-account=/);
   assert.match(app, /executionFirstPeriod/);
-  assert.match(css, /\.variance-marker/);
+  assert.match(css, /\.variance-kpis/);
+  assert.doesNotMatch(css, /\.variance-marker|\.department-records|\.department-submission/);
   assert.match(css, /\.actual-variance-table\{table-layout:fixed\}/);
   assert.match(css, /\.forecast-ledger\{table-layout:fixed/);
   assert.match(css, /\.variance-hover\{position:fixed/);
