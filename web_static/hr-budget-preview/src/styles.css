@@ -4745,3 +4745,11 @@ summary:focus-visible,
   .headcount-import-preview,
   .headcount-import-error { margin-inline: 12px; }
 }
+
+.trained-assistant-launcher { position: fixed; right: 24px; bottom: 24px; z-index: 80; min-height: 48px; padding: 0 18px; border: 1px solid #0e5cae; border-radius: 14px; background: #0a3a73; color: #fff; box-shadow: 0 12px 28px rgba(8,49,95,.24); font: inherit; font-weight: 800; cursor: pointer; }
+.trained-assistant-dialog { width: min(920px, calc(100vw - 64px)); height: calc(100vh - 48px); max-width: none; max-height: none; margin: 24px 24px 24px auto; padding: 0; overflow: hidden; border: 0; border-radius: 16px; box-shadow: -18px 0 44px rgba(8,49,95,.24); }
+.trained-assistant-dialog::backdrop { background: rgba(7,28,51,.28); }
+.trained-assistant-dialog iframe { width: 100%; height: 100%; border: 0; }
+.trained-assistant-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 38px; height: 38px; padding: 0; border: 1px solid rgba(255,255,255,.28); border-radius: 10px; background: rgba(10,58,115,.9); color: #fff; font: 700 24px/1 sans-serif; cursor: pointer; }
+.role-login:not(.hidden) ~ .trained-assistant-launcher { display: none; }
+@media (max-width: 760px) { .trained-assistant-launcher { right: 12px; bottom: 14px; }.trained-assistant-dialog { width: 100vw; height: 100vh; margin: 0; border-radius: 0; } }

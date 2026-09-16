@@ -9,7 +9,7 @@
       }
     </script>
     <title>制造费三张表工作台</title>
-  <link rel="stylesheet" href="./src/styles.css?v=20260902-three-left-nav-v1" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260916-trained-assistant-v1" />
     <script>
       window.DW_SUPABASE_CONFIG = {
         url: "https://cchkpgqqeixhjhbcbesv.supabase.co",
@@ -20,7 +20,7 @@
       }
     </script>
     <script src="./src/hr-budget-real-data.js?v=20260713-dw-input-v1"></script>
-  <script type="module" src="./src/app.js?v=20260902-three-left-nav-v1"></script>
+  <script type="module" src="./src/app.js?v=20260916-trained-assistant-v1"></script>
   </head>
   <body>
     <section id="roleLogin" class="role-login" aria-label="Select demo role">
@@ -436,6 +436,23 @@
       </div>
     </div>
 
+    <button id="trainedAssistantLauncher" class="trained-assistant-launcher" type="button" aria-haspopup="dialog" aria-controls="trainedAssistantDialog">✨ <span>智能指标问答</span></button>
+    <dialog id="trainedAssistantDialog" class="trained-assistant-dialog" aria-label="智能指标问答">
+      <iframe title="DeepSeek成本知识问答" data-src="https://mfg-cost-workbench-lixiang.netlify.app/mfg-cost-workbench/?embed=assistant"></iframe>
+      <button id="trainedAssistantClose" class="trained-assistant-close" type="button" aria-label="关闭智能指标问答">×</button>
+    </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
+    <script>
+      (() => {
+        const launcher = document.getElementById("trainedAssistantLauncher");
+        const dialog = document.getElementById("trainedAssistantDialog");
+        const frame = dialog?.querySelector("iframe");
+        launcher?.addEventListener("click", () => {
+          if (!frame.src) frame.src = frame.dataset.src;
+          dialog.showModal();
+        });
+        document.getElementById("trainedAssistantClose")?.addEventListener("click", () => dialog.close());
+      })();
+    </script>
   </body>
 </html>

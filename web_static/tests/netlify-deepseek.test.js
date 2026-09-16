@@ -31,3 +31,11 @@ test("comparison questions use verified YoY and MoM business rules", () => {
   assert.match(knowledge, /单月问题没有指定基准时，必须同时回答同比和环比/);
   assert.match(knowledge, /主要观察因素/);
 });
+
+test("the original workbench opens the shared trained assistant", () => {
+  const page = readFileSync(new URL("../hr-budget-preview/index.html", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../hr-budget-preview/src/styles.css", import.meta.url), "utf8");
+  assert.match(page, /trainedAssistantLauncher/);
+  assert.match(page, /mfg-cost-workbench-lixiang\.netlify\.app\/mfg-cost-workbench\/\?embed=assistant/);
+  assert.match(styles, /\.trained-assistant-dialog/);
+});
