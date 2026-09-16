@@ -53,6 +53,19 @@ npm run test:web
 
 发布为静态网站时，把 `web_static` 作为静态网站根目录即可。
 
+## 公开制造费用工作台与智能问答
+
+公开入口位于 `web_static/mfg-cost-workbench/index.html`。页面无需账号或密码，访问后直接以只读身份进入费用总览；所有访问者都可以打开右下角智能指标问答。
+
+DeepSeek API Key不进入网页或GitHub仓库。Netlify函数 `netlify/functions/deepseek.cjs` 通过同源 `/api/deepseek` 代理问答，部署站点时必须在Netlify环境变量中配置：
+
+```text
+DEEPSEEK_API_KEY=你的DeepSeek API Key
+DEEPSEEK_MODEL=deepseek-flash
+```
+
+`DEEPSEEK_MODEL`可省略，默认使用`deepseek-flash`。公开访问意味着任何人都可以消耗该API额度，应同时在DeepSeek账户侧设置可接受的余额或调用上限。
+
 ## 局域网版本
 
 打包：

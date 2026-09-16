@@ -1,9 +1,26 @@
 [build]
   publish = "web_static"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  included_files = ["netlify/functions/deepseek-cost-knowledge.md"]
+
+[[redirects]]
+  from = "/api/deepseek/status"
+  to = "/.netlify/functions/deepseek?status=1"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/deepseek"
+  to = "/.netlify/functions/deepseek"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "no-referrer"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=(), microphone=(self), geolocation=()"
