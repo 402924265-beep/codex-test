@@ -448,7 +448,10 @@
         const dialog = document.getElementById("trainedAssistantDialog");
         const frame = dialog?.querySelector("iframe");
         launcher?.addEventListener("click", () => {
-          if (!frame.src) frame.src = frame.dataset.src;
+          const unit = document.querySelector(".unit-nav-item.active[data-unit]")?.dataset.unit;
+          const factory = unit === "cooking" ? "ck" : unit === "dishwasher" ? "dw" : "combined";
+          const source = `${frame.dataset.src}&factory=${factory}`;
+          if (frame.getAttribute("src") !== source) frame.src = source;
           dialog.showModal();
         });
         document.getElementById("trainedAssistantClose")?.addEventListener("click", () => dialog.close());

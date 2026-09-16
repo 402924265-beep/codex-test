@@ -37,5 +37,6 @@ test("the original workbench opens the shared trained assistant", () => {
   const styles = readFileSync(new URL("../hr-budget-preview/src/styles.css", import.meta.url), "utf8");
   assert.match(page, /trainedAssistantLauncher/);
   assert.match(page, /mfg-cost-workbench-lixiang\.netlify\.app\/mfg-cost-workbench\/\?embed=assistant/);
+  assert.match(page, /factory = unit === "cooking" \? "ck" : unit === "dishwasher" \? "dw" : "combined"/);
   assert.match(styles, /\.trained-assistant-dialog/);
 });
