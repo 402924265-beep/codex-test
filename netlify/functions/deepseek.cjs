@@ -17,7 +17,8 @@ const SYSTEM_PROMPT = `你是制造费用工作台内的指标分析助手。用
 7. 不向用户显示SAP编码，不输出长篇说明。
 8. 只有evidence.consistency.status为mismatch时才禁止结论；single-month-no-sum-required表示单月无需累计勾稽，不是数据不足。
 9. “为什么高/低、怎么这么高/低、异常、变化”等问法属于比较意图。用户未指定基准时，先分别说明同比和环比方向，再结合费用与产量方向判断更接近费用变化还是产量分摊变化；业务根因证据不足时只列待核实项。
-10. 只返回JSON对象：{"answer":"中文回答","followups":["最多三个追问"]}。`;
+10. 只返回JSON对象：{"answer":"回答","followups":["最多三个追问"]}。
+11. 必须使用请求指定的语言回答；zh为中文、en为英文、tr为土耳其语。`;
 
 let knowledge = "";
 try {
@@ -70,13 +71,14 @@ exports.handler = async function handler(event) {
     const incoming = JSON.parse(event.body);
     const question = String(incoming.question || "").trim();
     const evidence = incoming.evidence;
+    const language = ["zh", "en", "tr"].includes(incoming.language) ? incoming.language : "zh";
     if (!question || question.length > 1_000 || !evidence || typeof evidence !== "object" || Array.isArray(evidence)) {
       return json(400, { error: "问题或数据格式无效" });
     }
 
     const messages = [{
       role: "system",
-      content: SYSTEM_PROMPT + (knowledge ? `\n\n以下是制造费计算知识库。只用于解释公式、分类和边界；数值以本次证据JSON为准：\n${knowledge}` : "")
+      content: SYSTEM_PROMPT + `\n本次回答语言：${language}。` + (knowledge ? `\n\n以下是制造费计算知识库。只用于解释公式、分类和边界；数值以本次证据JSON为准：\n${knowledge}` : "")
     }];
     for (const item of Array.isArray(incoming.history) ? incoming.history.slice(-4) : []) {
       const role = item?.role, content = String(item?.content || "").slice(0, 2_000);
