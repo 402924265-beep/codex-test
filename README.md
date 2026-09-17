@@ -55,7 +55,7 @@ npm run test:web
 
 ## 公开制造费用工作台与智能问答
 
-公开入口位于 `web_static/mfg-cost-workbench/index.html`。页面无需账号或密码，访问后直接以只读身份进入费用总览；所有访问者都可以打开右下角智能指标问答。
+公开入口位于 `web_static/mfg-cost-workbench/index.html`。普通访问先显示演示账号与权限登录页；登录后按生产、行政、采购、成本审核、财务编制和管理查看六种岗位权限显示页面。成本岗位在滚动预测页可以建立预测批次，所有已登录账号都可以打开右下角智能指标问答；嵌入式问答不重复显示登录页。
 
 DeepSeek API Key不进入网页或GitHub仓库。Netlify函数 `netlify/functions/deepseek.cjs` 通过同源 `/api/deepseek` 代理问答，部署站点时必须在Netlify环境变量中配置：
 
