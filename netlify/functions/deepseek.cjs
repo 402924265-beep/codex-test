@@ -19,6 +19,7 @@ const SYSTEM_PROMPT = `你是制造费用工作台内的指标分析助手。用
 9. “为什么高/低、怎么这么高/低、异常、变化”等问法属于比较意图。用户未指定基准时，先分别说明同比和环比方向，再结合费用与产量方向判断更接近费用变化还是产量分摊变化；业务根因证据不足时只列待核实项。
 10. 只返回JSON对象：{"answer":"回答","followups":["最多三个追问"]}。
 11. 必须使用请求指定的语言回答；zh为中文、en为英文、tr为土耳其语。`;
+const INTENT_PROMPT = `你只负责把制造费用口语问题解析为查询条件，不计算、不回答、不猜数字。只输出JSON对象，字段为metric（指标或科目名称，不明确时空字符串）、factory（dw、ck、combined或null）、separate（布尔值）、year（25、26或null）、month（1到12或null）、periods（monthly、cumulative组成的数组）。洗碗机=DW，厨电=CK；“两厂分别”用combined且separate=true，“两厂合计”用combined且separate=false。制造费、单台制造费均对应“制造费用”；工资和人工不能擅自合并成一个科目。用户没说出的条件用null或空数组，不要从示例臆造。只解析用户本轮问题；上一轮上下文可用于“那同比呢”等追问。`;
 
 let knowledge = "";
 try {
@@ -72,6 +73,32 @@ exports.handler = async function handler(event) {
     const question = String(incoming.question || "").trim();
     const evidence = incoming.evidence;
     const language = ["zh", "en", "tr"].includes(incoming.language) ? incoming.language : "zh";
+    if (incoming.mode === "intent") {
+      if (!question || question.length > 1_000) return json(400, { error: "问题格式无效" });
+      const previous = incoming.context && typeof incoming.context === "object" ? {
+        subject: String(incoming.context.subject || "").slice(0, 100),
+        factory: ["dw", "ck", "combined"].includes(incoming.context.factory) ? incoming.context.factory : null,
+        year: ["25", "26"].includes(incoming.context.year) ? incoming.context.year : null,
+        month: Number.isInteger(incoming.context.month) && incoming.context.month >= 1 && incoming.context.month <= 12 ? incoming.context.month : null,
+        dual: incoming.context.dual === true
+      } : null;
+      const response = await fetch(`${BASE_URL}/chat/completions`, {
+        method: "POST", headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: INTENT_PROMPT }, { role: "user", content: `上一轮已确认条件：${JSON.stringify(previous)}\n本轮问题：${question}\n请严格输出JSON。` }], response_format: { type: "json_object" }, temperature: 0, max_tokens: 300, stream: false })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) return json(502, { error: `DeepSeek语义识别失败（${response.status}）` });
+      const parsed = parseModelContent(result?.choices?.[0]?.message?.content);
+      const intent = {
+        metric: String(parsed.metric || "").slice(0, 100),
+        factory: ["dw", "ck", "combined"].includes(parsed.factory) ? parsed.factory : null,
+        separate: parsed.separate === true,
+        year: ["25", "26"].includes(String(parsed.year)) ? String(parsed.year) : null,
+        month: Number.isInteger(parsed.month) && parsed.month >= 1 && parsed.month <= 12 ? parsed.month : null,
+        periods: Array.isArray(parsed.periods) ? parsed.periods.filter((item) => ["monthly", "cumulative"].includes(item)).slice(0, 2) : []
+      };
+      return json(200, { intent, model: result.model || MODEL });
+    }
     if (!question || question.length > 1_000 || !evidence || typeof evidence !== "object" || Array.isArray(evidence)) {
       return json(400, { error: "问题或数据格式无效" });
     }
