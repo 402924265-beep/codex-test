@@ -1,5 +1,6 @@
 const { readFileSync } = require("node:fs");
 const { join } = require("node:path");
+const { getStore } = require("@netlify/blobs");
 
 const MODEL = process.env.DEEPSEEK_MODEL || "deepseek-flash";
 const BASE_URL = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").replace(/\/$/, "");
@@ -60,6 +61,21 @@ function validateAnswer(answer, evidence) {
   if (evidence?.narrativeOnly && NUMERIC_CLAIM.test(answer)) throw new Error("DeepSeek重复或改写了本地数值，已禁止输出该结论");
 }
 
+function overlap(question, example) {
+  const pairs = (value) => new Set([...String(value || "").replace(/\s/g, "")].slice(0, 120).map((char, index, chars) => char + (chars[index + 1] || "")).filter((pair) => pair.length > 1));
+  const a = pairs(question), b = pairs(example);
+  return [...a].filter((pair) => b.has(pair)).length;
+}
+
+async function learningExamples(question) {
+  try {
+    const examples = await getStore({ name: "mfg-assistant-learning", consistency: "strong" }).get("approved-examples", { type: "json" });
+    return (Array.isArray(examples) ? examples : []).map((item) => ({ ...item, score: overlap(question, item.question) })).filter((item) => item.score >= 2).sort((a, b) => b.score - a.score).slice(0, 3).map(({ question: original, correctedQuestion }) => ({ original, correctedQuestion }));
+  } catch {
+    return [];
+  }
+}
+
 exports.handler = async function handler(event) {
   if (event.httpMethod === "GET" && (event.queryStringParameters?.status === "1" || event.path?.endsWith("/status"))) {
     return json(200, { configured: Boolean(API_KEY), model: MODEL, knowledgeLoaded: Boolean(knowledge) });
@@ -75,6 +91,7 @@ exports.handler = async function handler(event) {
     const language = ["zh", "en", "tr"].includes(incoming.language) ? incoming.language : "zh";
     if (incoming.mode === "intent") {
       if (!question || question.length > 1_000) return json(400, { error: "问题格式无效" });
+      const examples = await learningExamples(question);
       const previous = incoming.context && typeof incoming.context === "object" ? {
         subject: String(incoming.context.subject || "").slice(0, 100),
         factory: ["dw", "ck", "combined"].includes(incoming.context.factory) ? incoming.context.factory : null,
@@ -84,7 +101,7 @@ exports.handler = async function handler(event) {
       } : null;
       const response = await fetch(`${BASE_URL}/chat/completions`, {
         method: "POST", headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: INTENT_PROMPT }, { role: "user", content: `上一轮已确认条件：${JSON.stringify(previous)}\n本轮问题：${question}\n请严格输出JSON。` }], response_format: { type: "json_object" }, temperature: 0, max_tokens: 300, stream: false })
+        body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: INTENT_PROMPT + (examples.length ? `\n以下是人工审核通过的口语纠错示例，只学习表达方式，不照搬示例里的月份、工厂或指标：${JSON.stringify(examples)}` : "") }, { role: "user", content: `上一轮已确认条件：${JSON.stringify(previous)}\n本轮问题：${question}\n请严格输出JSON。` }], response_format: { type: "json_object" }, temperature: 0, max_tokens: 300, stream: false })
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) return json(502, { error: `DeepSeek语义识别失败（${response.status}）` });
