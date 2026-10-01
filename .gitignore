@@ -7,3 +7,5 @@ web_static/dev-server.err.log
 web_static/preview-*.png
 web_static/data/
 data/
+
+.netlify/
