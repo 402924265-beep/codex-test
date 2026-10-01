@@ -23,6 +23,25 @@ test("Netlify DeepSeek proxy refuses calls without a configured key", async () =
   assert.match(JSON.parse(response.body).error, /API Key/);
 });
 
+test("a masked Netlify secret is not a usable model credential", async () => {
+  const previous = process.env.DEEPSEEK_API_KEY;
+  const modulePath = require.resolve("../../netlify/functions/deepseek.cjs");
+  const cached = require.cache[modulePath];
+  try {
+    process.env.DEEPSEEK_API_KEY = "****************demo";
+    delete require.cache[modulePath];
+    const masked = require(modulePath).handler;
+    const status = await masked({ httpMethod: "GET", queryStringParameters: { status: "1" } });
+    assert.equal(JSON.parse(status.body).configured, false);
+    const response = await masked({ httpMethod: "POST", body: JSON.stringify({ question: "连接核验", evidence: {} }) });
+    assert.equal(response.statusCode, 503);
+  } finally {
+    if (previous === undefined) delete process.env.DEEPSEEK_API_KEY;
+    else process.env.DEEPSEEK_API_KEY = previous;
+    require.cache[modulePath] = cached;
+  }
+});
+
 test("comparison questions use verified YoY and MoM business rules", () => {
   const functionSource = readFileSync(new URL("../../netlify/functions/deepseek.cjs", import.meta.url), "utf8");
   const knowledge = readFileSync(new URL("../../netlify/functions/deepseek-cost-knowledge.md", import.meta.url), "utf8");

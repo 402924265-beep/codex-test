@@ -4,7 +4,8 @@ const { getStore } = require("@netlify/blobs");
 
 const MODEL = process.env.DEEPSEEK_MODEL || "deepseek-flash";
 const BASE_URL = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com").replace(/\/$/, "");
-const API_KEY = (process.env.DEEPSEEK_API_KEY || "").trim();
+const configuredKey = (process.env.DEEPSEEK_API_KEY || "").trim();
+const API_KEY = /\*{8,}/.test(configuredKey) ? "" : configuredKey;
 const MAX_BODY = 900_000;
 const NUMERIC_CLAIM = /[+-]?\d[\d,.]*\s*(?:K€|k€|€\/台|€\/人|€|%|万欧元?|人月|台|人)/i;
 const SYSTEM_PROMPT = `你是制造费用工作台内的指标分析助手。用户问题会附带由本地确定性引擎生成的数据证据。

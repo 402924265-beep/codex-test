@@ -1,41 +1,53 @@
-# 智能指标问答共享改造 — 2026-10-01验收状态
+# 智能指标问答共享改造 — 2026-10-01当前验收状态
 
-新版在原智能指标问答界面内支持共享对话、连续追问、多指标表格、已确认口径检索及Excel数据版本发布。DeepSeek规划查询和解释；金额、单台、费率、累计和两厂合并由确定性引擎计算。未修改原三张表业务数值、公式、cooking-data.js或原Excel解析器。
+## 当前可用入口
 
-## 当前可审阅结果
+- 正式原站：https://mfg-cost-workbench-lixiang.netlify.app/mfg-cost-workbench/
+- 问答直达（无需先操作登录页）：https://mfg-cost-workbench-lixiang.netlify.app/mfg-cost-workbench/?embed=assistant&lang=zh
+- 已恢复完整旧生产部署 `6ab3f88e9869687e51bb6689`。浏览器实际提问“洗碗机2026年7月折旧费用是多少”已返回本地结果和DeepSeek解释；另一个无财务金额公式问题也完成真实模型调用。页面可打开，不等于新版共享问答已正式交付。
+- 新版完整预览 `6abe970690d15e842d8025e6`：https://6abe970690d15e842d8025e6--mfg-cost-workbench-lixiang.netlify.app/mfg-cost-workbench/?embed=assistant&lang=zh 。共享后台可用，DeepSeek部署变量是脱敏占位值，实际调用401；不要把其绿色“已连接”标识当作真实连接验证。
 
-- 最终预览：https://6abe0349ae47b573becf2b69--mfg-cost-workbench-lixiang.netlify.app/mfg-cost-workbench/?embed=assistant&lang=zh
-- 原站：https://mfg-cost-workbench-lixiang.netlify.app/mfg-cost-workbench/
-- 原站现已恢复已验证的完整生产部署`6ab3f88e9869687e51bb6689`，DeepSeek状态`configured=true`。新版暂不作为正式交付。
-- 最终预览共享接口可读：revision=1、18条基线知识、无验收聊天或候选写入、数据版本`excel-bcec9c5e093d4078`。预览没有生产密钥，不能声称真实AI问答验收通过。
-- 18条知识包含17条已确认规则和1条待行政核定参数；迁入科目复合键、G&A隔离、Q4、三类人工、累计/合并加权、UPPH、缺失值、Service Fee、收益证据、Halino售价情景等边界。账面收入沿用收入来源表，不以制造费生产数量覆盖收入数量。
-- 会话纠错经口令确认发布后共享；会话发布的动态口径可撤回/恢复，撤回后不进入后续模型资料。源表计算边界不能通过聊天撤回。回答记录数据版本及口径摘要；历史聊天不因规则撤回而改写。
-- 初始成本基线仍是9月23日的原站数据。三张表当前记忆已有9月29日新版文件；本次没有自动覆盖财务基线。Excel导入核对后才发布新版本。
+## 已确定的部署阻塞
 
-## 已完成验证
+用户已明确同意此前三项授权：发布口令默认范围、原站密钥用于新版后端并切换、真实CK/DW问答验收；无需重复问这些权限。
 
-- 源工程208项，Excel导入222项，共享引擎/后台50项，原仓库84项，共564项通过；git diff --check通过。
-- 导入测试读取真实三张表格式，核对全年摘要值和另一工厂不被覆盖。摘要与旧明细不一致时，只有当前摘要等于已发布摘要才保留已核对明细，否则把明细标缺失；不自动调平或分摊差额。
-- 本机隔离模拟服务不接外部API：电脑1440×900、手机390×844均无整页横向溢出；多指标表同时展示售价、产量、收入、人工金额、单台和收入费率；连续追问保留两厂及1—7月范围，显示预算对比与逐月表；图表已绘制；第二标签读取同一会话。
-- 本机模拟纠错进入待确认并发布成功。真实Netlify提交→发布→另一浏览器复问尚未做。
-- 图像证据保存在项目`outputs/shared-assistant-qa-20261001/`。截图内财务数字为模拟数据，不是业务分析结论。
-- Excel下载按钮已触发，但当前浏览器工具的下载事件超时且未取得文件，浏览器下载与回读尚未验收，不列为通过。
-- Impeccable检测因缺HTML解析模块降级：491项建议及1项原有视觉警告，没有阻断错误；不作为完整视觉验收结论。随后进行上述真实界面检查。
+直接读取生产部署API错误正文确认：403，`Account credit usage exceeded - new deploys are blocked until credits are added`。此前SDK只返回Forbidden，以及另一个额度界面新周期的读数不足以排除额度阻塞；以本次实际部署拒绝为准。免费Netlify可以等下个账期重置，不必购买。没有购买套餐或启用自动充值。
 
-## 正式发布剩余确认
+Netlify Secrets Controller不向API返回真实生产密钥，原值未修改。把脱敏返回值用于部署变量会得到401，即使configured=true。完整生产部署应直接继承原环境变量，不再复制读取到的占位文本。新版曾短暂切到原地址，真实调用失败后已恢复原完整生产版本；共享Blobs数据没有回滚或删除。没有通过预览切换继续规避已确认的额度限制。
 
-自动审批已拒绝下列操作，均已向用户提问，尚未取得明确回答；不得绕过：
+## 共同学习与共享数据
 
-1. 新增`COST_LEARNING_ADMIN_TOKEN`。免费账号拒绝仅Functions的范围，需用户同意只在原站以默认环境范围保存，或由用户自行配置。现有环境变量不覆盖。凭据不写入HTML、Git、聊天或记忆。
-2. 将原站已有DeepSeek密钥用于新版同站部署的后端函数并切换完整正式版本。标准生产部署API现返回403，原因未确认；完整预览可部署。CLI的部署变量尝试未恢复连接，完整创建时设置部署变量的方案仍待授权与验证。
-3. 把已发布CK/DW费用、人工、产量、收入、同期与预算计算结果交给现有DeepSeek解释，并将几条验收问答保存到原Netlify共享会话。可另选只用模拟数据验收。
+共享会话、业务口径和Excel版本通过站点级 `mfg-shared-assistant` 保存，强一致读取、ETag并发保护。模型理解问题，确定性引擎计算金额、单台、费率、累计和两厂合并，再交模型解释。共同学习是把经确认的知识用于后续回答，不修改模型权重；缺数据仍需说明缺口。
 
-完成以上后，还须原地址核验模型连接、提交/确认口径、另一浏览器继续会话及重问、数据预览/发布并发保护和导出文件回读。不要把测试、Git推送或预览发布当作正式业务验收。
+18条基线规则已迁入（17确认、1行政待核定）。本轮又按用户已确认要求发布1条人工输出格式：售价→产量→收入→三类人工金额/单台/费率；两厂分别及合计；分子分母期间一致，自定售价标情景。真实Netlify提交→待确认→发布→新请求读取通过，当前共19条，revision=5，候选清空。发布口令已在原站以免费账号默认范围创建，本机仅保存在Git忽略的 `.netlify/shared-publish-token.txt`，权限600；不进入HTML、Git、聊天和记忆正文。
 
-## 维护与恢复
+真实共享会话保存了一问一答：1—7月CK/DW多指标问题，回答因401失败。不能声称新模型多轮规划、同义问法学习或两设备续聊已通过。数据版本保持 `excel-bcec9c5e093d4078`，来源9月23日，没有发布新成本数据；9月29日三张表不自动覆盖基线。
 
-- 可编辑源工程：`/Users/lixiang/Documents/ChatGPT/制造费三张表网站/outputs/mfg-cost-workbench-20260914/`。重点为shared-engine.js、shared-client.js、shared-import.js、shared-knowledge.json、shared.test.cjs、shared-import.test.mjs、app.js、style.css和build.mjs。
-- 发布仓库：`/Users/lixiang/Documents/ChatGPT/制造费三张表网站/codex-test/`。新入口为netlify/functions/shared.mjs；共享后台为lib/shared-handler.cjs；生成计算包为lib/shared-engine.cjs。
-- 用bundled Node运行build.mjs后，将生成HTML复制到web_static/mfg-cost-workbench/index.html。新函数使用原生Netlify Request/Response和静态ESM getStore，保留强一致及ETag条件写入；不改回旧CJS connectLambda入口。
-- 用户原有design-qa.md、attendance-implementation-tr.png、两处.DS_Store不加入本次提交。当前只推送工作分支，未经正式切换确认不推main触发发布。
-- 共享会话保存在站点级mfg-shared-assistant存储。当前无账号，不能核验操作者真实身份；发布口令校验不是公司单点登录。会话目前整份读取，长期大量聊天的分页是规模限制，尚未实现。
+未修改原业务数值、公式、cooking-data.js或原Excel解析链。保留G&A与主段人工隔离、SAP复合科目键、累计/合并加权、Q4=10—12、UPPH、缺失值、Service Fee、Halino售价情景及收益证据边界。
+
+## 本地修复与验证
+
+本轮补上脱敏密钥防护：旧代理状态不把占位值认作配置成功，共享后端在请求模型前拒绝占位值；新界面把未经真实调用验证的“已连接”改为“配置已载入”。这些修复目前只在本地/工作分支，生产额度恢复前未上线。
+
+本轮源工程208项、共享引擎/后台52项、仓库85项通过。Excel导入逻辑未改，先前222项实际工作簿导入验证仍是已完成证据。原有桌面/手机、模拟多轮、候选发布、图表已验证。浏览器Excel下载与回读仍未验收，不列为完成。
+
+截图与API证据：项目 `outputs/shared-assistant-qa-20261001/`，新增 `restored-live-answer.png`、`live-query-1.json`、`live-rule-publish.json`。旧模型能实际回答，不代表其每句话或业务因果已重新验收。
+
+## 免费方案待用户选择
+
+用户询问Netlify用途和免费替代，尚未授权更换服务商或向新平台迁移数据。建议先评估Cloudflare Pages/Workers + D1免费方案，继续使用现有DeepSeek API。官方截至2026-10-01：Workers每天10万请求、每次10毫秒CPU；D1总存储5GB、每天500万行读/10万行写。免费额度不代表不限量，迁移前必须测试当前计算包、初始化时间和数据库读写。可复用界面与业务引擎，需适配Netlify Blobs到D1、部署路由/密钥和共享事务，不能直接换网址宣称完成。
+
+官方来源：
+- https://developers.cloudflare.com/workers/platform/pricing/
+- https://developers.cloudflare.com/workers/platform/limits/
+- https://developers.cloudflare.com/d1/platform/pricing/
+- https://docs.netlify.com/manage/accounts-and-billing/billing/resume-paused-projects/
+- https://docs.netlify.com/build/environment-variables/secrets-controller/
+
+## 恢复与下一步
+
+可编辑源：`outputs/mfg-cost-workbench-20260914/`；发布仓库：`codex-test/`。保留原生Netlify Request/Response静态ESM getStore入口，不退回旧connectLambda。临时部署脚本中 `mfg-production-full.mjs` 会误读取脱敏值，已判无效，不得复用；生产方案应完整上传文件/函数并直接继承生产环境。
+
+若继续Netlify：恢复额度后完整生产部署，验证真实多指标/连续追问、纠错发布后复问、两端共享、数据预览和导出回读。若用户选择Cloudflare：先完成本地后端适配和免费限额测试，再取得该平台登录/数据迁移所需授权并迁移；原Netlify保留恢复入口。
+
+用户原有design-qa.md、attendance-implementation-tr.png和两处.DS_Store保持未提交。主分支不改；工作分支保存本轮修复。
